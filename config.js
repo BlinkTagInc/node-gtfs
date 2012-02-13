@@ -27,7 +27,7 @@ module.exports = function(app){
          '\x1b[32m:url\x1b[0m :status \x1b[90m:response-time ms\x1b[0m'))
       .use(express.errorHandler({dumpExceptions: true, showStack: true}))
       .enable('dev')
-      .set('domain', 'test.anystopapp.com');
+      .set('domain', 'app.local');
   });
   
   // Prod
@@ -36,7 +36,7 @@ module.exports = function(app){
       .use(express.logger({buffer: 10000}))
       .use(express.errorHandler())
       .enable('prod')
-      .set('domain', 'api.anystopapp.com');
+      .set('domain', 'api.productiondomain.com');
   });  
   
 }
