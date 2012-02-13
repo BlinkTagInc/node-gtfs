@@ -9,6 +9,9 @@ module.exports = function routes(app){
   //Routelist
   app.get('/api/routes/:agency', api.getRoutesByAgency);
   
+  //Stoplist
+  app.get('/api/stops/:agency/:route_id/:direction_id', api.getStopsByRoute);
+  app.get('/api/stops/:agency/:route_id', api.getStopsByRoute);
   
   app.get('/api/download/:agency', api.downloadGTFS);
   
