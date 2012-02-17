@@ -2,11 +2,6 @@
 var express = require('express')
   , MemoryStore = express.session.MemoryStore
   , mongoose = require('mongoose');
-  
-require('fs').readFile(__dirname + '/lib/util/util.js', function(err, content) {
-    if (err) throw err;
-    eval(content.toString());
-});
 
 module.exports = function(app){
   

@@ -14,6 +14,10 @@ module.exports = function routes(app){
   app.get('/api/stops/:agency/:route_id/:direction_id', api.getStopsByRoute);
   app.get('/api/stops/:agency/:route_id', api.getStopsByRoute);
   
+  //Times
+  app.get('/api/times/:agency/:route_id/:stop_id/:direction_id', api.getTimesByStop);
+  app.get('/api/times/:agency/:route_id/:stop_id', api.getTimesByStop);
+  
   //Download
   app.get('/api/download/:agency', api.downloadGTFS);
   
