@@ -11,7 +11,7 @@ To load data, run
     ./lib/download.js agency1 agency2 agency3
     
     //Example
-    ./lib/download.js capital-area-transit
+    ./lib/download.js san-francisco-municipal-transportation-agency ac-transit
 
 ##Endpoints
 
@@ -24,14 +24,14 @@ To load data, run
     /api/routes/:agency
     
     //Example
-    /api/routes/capital-area-transit
+    /api/routes/san-francisco-municipal-transportation-agency
 
 ###List stops for a route
 
     /api/stops/:agency/:route_id/:direction_id
     
     //Example
-    /api/stops/capital-area-transit/34/1
+    /api/stops/san-francisco-municipal-transportation-agency/34/1
 `:direction_id` is optional
 
 ###List stop times for a stop    
@@ -39,7 +39,7 @@ To load data, run
     /api/times/:agency/:route_id/:stop_id/:direction_id
     
     //Example
-    /api/times/capital-area-transit/34/1256/0
+    /api/times/san-francisco-municipal-transportation-agency/34/1256/0
 `:direction_id` is optional
 
 ###List stops near a point
@@ -47,5 +47,5 @@ To load data, run
     /api/stopsNearby/:lat/:lon/:radius
     
     //Example
-    /api/StopsNearby/37.736531/-122.256964/0.1
-`:radius` is optional
+    /api/StopsNearby/37.73/-122.25/0.25
+`:radius` is optional and in miles
