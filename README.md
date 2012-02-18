@@ -6,12 +6,14 @@ node-GTFS loads grabs transit data in GTFS format from [GTFS Data Exchange](http
 
 You need the agency_key from [GTFS Data Exchange](http://www.gtfs-data-exchange.com/) - it is in the URL of each individual transit agency's page.  For example, Austin Capital Metro is `capital-area-transit`, Washington DC is `wmata`.  See the [full list of agencies with data](http://www.gtfs-data-exchange.com/agencies).
 
-To load data, run
+###To load data:
 
-    ./lib/download.js agency1 agency2 agency3
+    node ./lib/download.js agency1 agency2 agency3
     
     //Example
-    ./lib/download.js san-francisco-municipal-transportation-agency ac-transit
+    node ./lib/download.js san-francisco-municipal-transportation-agency ac-transit
+
+To keep schedules up to date, you might want to schedule this to be daily.
 
 ##Endpoints
 
