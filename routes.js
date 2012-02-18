@@ -14,6 +14,9 @@ module.exports = function routes(app){
   app.get('/api/stops/:agency/:route_id/:direction_id', api.getStopsByRoute);
   app.get('/api/stops/:agency/:route_id', api.getStopsByRoute);
   
+  app.get('/api/stopsNearby/:lat/:lon/:radiusInMiles', api.getStopsByDistance);
+  app.get('/api/stopsNearby/:lat/:lon', api.getStopsByDistance);
+  
   //Times
   app.get('/api/times/:agency/:route_id/:stop_id/:direction_id', api.getTimesByStop);
   app.get('/api/times/:agency/:route_id/:stop_id', api.getTimesByStop);
