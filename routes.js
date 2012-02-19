@@ -10,6 +10,10 @@ module.exports = function routes(app){
   app.get('/api/routes/:agency', api.getRoutesByAgency);
   app.get('/api/routes', api.getRoutesByAgency);
   
+  app.get('/api/routesNearby/:lat/:lon/:radiusInMiles', api.getRoutesByDistance);
+  app.get('/api/routesNearby/:lat/:lon', api.getRoutesByDistance);
+  
+  
   //Stoplist
   app.get('/api/stops/:agency/:route_id/:direction_id', api.getStopsByRoute);
   app.get('/api/stops/:agency/:route_id', api.getStopsByRoute);
