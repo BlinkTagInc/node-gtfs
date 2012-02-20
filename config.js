@@ -11,6 +11,7 @@ module.exports = function(app){
         .set('views', __dirname + '/views')
         .set('view engine', 'jade')
         .set('public', __dirname + '/public')
+        .enable('jsonp callback')
         .enable('error templates')
         .use(express.static(__dirname + '/public'))
   });

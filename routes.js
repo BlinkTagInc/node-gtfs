@@ -1,10 +1,13 @@
 var errors = require('./lib/util/errors')
-  , api = require('./lib/util/api');
+  , api = require('./lib/api');
 
 module.exports = function routes(app){
 
   //AgencyList
-   app.get('/api/agencies', api.getAllAgencies);
+  app.get('/api/agencies', api.getAllAgencies);
+   
+  app.get('/api/agenciesNearby/:lat/:lon/:radiusInMiles', api.getAgenciesByDistance);
+  app.get('/api/agenciesNearby/:lat/:lon', api.getAgenciesByDistance);
 
   //Routelist
   app.get('/api/routes/:agency', api.getRoutesByAgency);
