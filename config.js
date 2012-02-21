@@ -2,10 +2,24 @@
 var express = require('express')
   , MemoryStore = express.session.MemoryStore
   , mongoose = require('mongoose');
+  
+require('./models/Agency');
+require('./models/Calendar');
+require('./models/CalendarDate');
+require('./models/FareAttribute');
+require('./models/FareRule');
+require('./models/FeedInfo');
+require('./models/Frequencies');
+require('./models/Route');
+require('./models/Stop');
+require('./models/StopTime');
+require('./models/Transfer');
+require('./models/Trip');
 
 module.exports = function(app){
   
   app.configure(function(){
+    var db = mongoose.connect('mongodb://localhost/db');
     this.use(express.cookieParser())
         .use(express.bodyParser())
         .set('views', __dirname + '/views')
@@ -14,6 +28,7 @@ module.exports = function(app){
         .enable('jsonp callback')
         .enable('error templates')
         .use(express.static(__dirname + '/public'))
+        .set('db', db)
   });
 
   // Dev

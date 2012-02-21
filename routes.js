@@ -1,8 +1,8 @@
-var errors = require('./lib/util/errors')
-  , api = require('./lib/api');
+var errors = require('./lib/util/errors');
 
 module.exports = function routes(app){
-
+  var api = require('./lib/api')(app);
+  
   //AgencyList
   app.get('/api/agencies', api.getAllAgencies);
    
