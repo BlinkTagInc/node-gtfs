@@ -5,6 +5,7 @@
   "dependencies": {
       "express": ">= 2.5.8"
     , "mongoose": ">= 2.5.7"
+    , "mongodb": ">=0.9.9-4"
     , "csv": ">= 0.0.11"
     , "async": ">= 0.1.16"
     , "less": "> 1.2.2"
