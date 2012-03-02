@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>node-gtfs</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" media="screen" title="no title" charset="utf-8">
+  
+  <script type="text/javascript" src="js/d3.js"></script>
+  <script type="text/javascript" src="js/d3.layout.js"></script>
+  <link type="text/css" rel="stylesheet" href="css/bubble.css"/>
+  
+  <style>
+    #data table tbody tr{
+      cursor:pointer;
+    }
+  </style>
+  
+</head>
+<body>
+  <div class="navbar">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </a>
+        <a class="brand" href="#">node-GTFS</a>
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li class="active"><a href="#agencies">Agencies</a></li>
+            <li><a href="#routes">Routes</a></li>
+            <li><a href="#stops">Stops</a></li>
+            <li><a href="#times">Times</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <h1>Agencies</h1>
+    
+    <div id="data"></div>
+
+  </div> <!-- /container -->
+
+
+  <script src="js/jquery-1.7.1.min.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>

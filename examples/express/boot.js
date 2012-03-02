@@ -1,13 +1,9 @@
-
 var config = require('./config')
-  , routes = require('./routes')
-  , errorHandlers = require('./lib/error-handlers');
+  , routes = require('./routes');
 
 module.exports = function boot(app){
 
   config(app);
-
-  errorHandlers(app);
   
   routes(app);
 
