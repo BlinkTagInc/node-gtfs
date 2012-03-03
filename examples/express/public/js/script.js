@@ -6,7 +6,8 @@ window.log = function f(){ log.history = log.history || []; log.history.push(arg
 (function(a){function b(){}for(var c="assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,time,timeEnd,trace,warn".split(","),d;!!(d=c.pop());){a[d]=a[d]||b;}})
 (function(){try{console.log();return window.console;}catch(a){return (window.console={});}}());
 
-var agencies = {};
+var agencies = {}
+  , map;
 
 $(document).ready(function(){
   //load all agencies on pageload
@@ -18,6 +19,8 @@ $(document).ready(function(){
     .on('click', '#stops tbody tr', getStop);
 
   $('#nav-button').on('click', function(){
+    $('#map').hide();
+
     switch($(this).attr('data-previous')){
       case 'agencies':
         getAgencies();
@@ -30,11 +33,21 @@ $(document).ready(function(){
         break;
     }
   });
+  
+
+  //setup map
+  map = new L.Map('map');
+  var cloudmade = new L.TileLayer('http://{s}.tile.cloudmade.com/7a80f6e2fb44480bb068f596f4736073/997/256/{z}/{x}/{y}.png', {
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+    maxZoom: 18
+  });
+  map.addLayer(cloudmade);
 
 });
 
 
 function getAgencies(){
+
   if(!Object.keys(agencies).length){
     $.getJSON('api/agencies', function(data){
       data.forEach(function(agency){
@@ -91,17 +104,13 @@ function getStop(){
   $('#nav-button').attr('data-route-id', route_id);
 
 
-   //render map
-  var map = new L.Map('map');
-  var cloudmade = new L.TileLayer('http://{s}.tile.cloudmade.com/7a80f6e2fb44480bb068f596f4736073/997/256/{z}/{x}/{y}.png', {
-    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
-    maxZoom: 18
-  });
+  //render map
+  $('#map').show();
 
   var lat = parseFloat(stop.stop_lat);
   var lon = parseFloat(stop.stop_lon);
   var stop_loc = new L.LatLng(lat, lon);
-  map.setView(stop_loc, 13).addLayer(cloudmade);
+  map.setView(stop_loc, 13);
 
   var marker = new L.Marker(stop_loc);
   map.addLayer(marker);
