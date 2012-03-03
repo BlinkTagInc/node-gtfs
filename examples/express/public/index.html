@@ -4,14 +4,14 @@
   <title>node-gtfs</title>
   <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" media="screen" title="no title" charset="utf-8">
   
-  <script type="text/javascript" src="js/d3.js"></script>
-  <script type="text/javascript" src="js/d3.layout.js"></script>
-  <link type="text/css" rel="stylesheet" href="css/bubble.css"/>
-  
   <style>
     #data table tbody tr{
       cursor:pointer;
     }
+    .navigation{
+      height:30px;
+    }
+
   </style>
   
 </head>
@@ -38,6 +38,9 @@
   </div>
 
   <div class="container">
+    <div class="navigation">
+      <button class="btn" id="nav-button" style="display:none"><i class="icon-arrow-left"></i> Back</button>
+    </div>
 
     <h1>Agencies</h1>
     
