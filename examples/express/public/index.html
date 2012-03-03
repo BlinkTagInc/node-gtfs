@@ -3,13 +3,30 @@
 <head>
   <title>node-gtfs</title>
   <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" media="screen" title="no title" charset="utf-8">
-  
+
+  <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
+  <!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" />
+  <![endif]-->
+
   <style>
     #data table tbody tr{
       cursor:pointer;
     }
+
     .navigation{
       height:30px;
+    }
+  
+    #map{
+      width:800px;
+      height:400px;
+    }
+
+    footer{
+      margin-top:50px;
+      border-top:1px #CCC solid;
+      text-align:right;
     }
 
   </style>
@@ -27,10 +44,12 @@
         <a class="brand" href="#">node-GTFS</a>
         <div class="nav-collapse">
           <ul class="nav">
+            <!--
             <li class="active"><a href="#agencies">Agencies</a></li>
             <li><a href="#routes">Routes</a></li>
             <li><a href="#stops">Stops</a></li>
             <li><a href="#times">Times</a></li>
+            -->
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -46,10 +65,17 @@
     
     <div id="data"></div>
 
+    <div id="map"></div>
+
+    <footer>
+      <a href="https://github.com/brendannee/node-gtfs">View on Github</a>
+    </footer>
+
   </div> <!-- /container -->
 
 
   <script src="js/jquery-1.7.1.min.js"></script>
+  <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
   <script src="js/script.js"></script>
 </body>
 </html>
