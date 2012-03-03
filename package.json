@@ -1,7 +1,8 @@
 {
-  "name": "AnyStop",
-  "description": "AnyStop API",
+  "name": "gtfs",
+  "description": "GTFS ",
   "version": "0.0.1",
+  "author": "Brendan Nee <me@bn.ee>",
   "dependencies": {
       "express": ">= 2.5.8"
     , "mongoose": ">= 2.5.7"
@@ -11,5 +12,8 @@
     , "less": "> 1.2.2"
     , "request": ">= 2.9.152"
     , "underscore": ">= 1.3.1"
-  }
+  },
+  "keywords": ["transit","gtfs","transportation"],
+  "repository": "git://github.com/brendannee/node-gtfs",
+  "main": "index"
 }
