@@ -1,10 +1,14 @@
 #Node-GTFS
 
-node-GTFS loads transit data in [GTFS format](https://developers.google.com/transit/) from [GTFS Data Exchange](http://www.gtfs-data-exchange.com/), unzips it and stores it to a MongoDB database and provides some simple APIs to query for agencies, routes, stops and times.  It also has spatial queries to find nearby stops, routes and agencies.
+node-GTFS loads transit data in [GTFS format](https://developers.google.com/transit/) from [GTFS Data Exchange](http://www.gtfs-data-exchange.com/), unzips it and stores it to a MongoDB database and provides some methods to query for agencies, routes, stops and times.  It also has spatial queries to find nearby stops, routes and agencies.
 
 ##Loading data
 
-You need the agency_key from [GTFS Data Exchange](http://www.gtfs-data-exchange.com/) - it is in the URL of each individual transit agency's page.  For example, Austin Capital Metro is `capital-area-transit`, Washington DC is `wmata`.  See the [full list of agencies with data](http://www.gtfs-data-exchange.com/agencies). There is a [json file](https://github.com/brendannee/node-gtfs/blob/master/agencies.json) with all tranit agency names and keys in the repo.
+Before you can use node-GTFS you must specify agencies to download from GTFS Data Exchange. You need the dataexchange_id for each agency you want to include from [GTFS Data Exchange](http://www.gtfs-data-exchange.com/) - it is in the URL of each individual transit agency's page.
+
+A full list of agencies is available via the [GTFS Data Exchange API](http://www.gtfs-data-exchange.com/api/agencies).
+
+For example, Austin Capital Metro is `capital-area-transit`, Washington DC is `wmata`.
 
 ###To load data
 
@@ -13,9 +17,15 @@ You need the agency_key from [GTFS Data Exchange](http://www.gtfs-data-exchange.
     //Example
     node ./lib/download.js san-francisco-municipal-transportation-agency ac-transit
 
-To keep schedules up to date, you might want to schedule this to be daily.
+To keep schedules up to date, you might want to schedule this to occur once per day.
 
-###To use the APIs
+##Example
+
+There is an example web app that creates some endpoints and has a simple frontend for viewing transit data.  It is in examples/express.  You could load the example site with:
+
+    node ./examples/express/index.js
+
+###Example APIs
 
     node index.js
 
@@ -67,7 +77,7 @@ Returns all routes that stop at the 100 nearest stops within the specified radiu
 `:radius` is optional and in miles.  Default: 0.25 miles
 Returns the 100 nearest stops within the specified radius
 
-###List stop times for a stop    
+###List stop times for a stop
 
     /api/times/:agency/:route_id/:stop_id/:direction_id
     
