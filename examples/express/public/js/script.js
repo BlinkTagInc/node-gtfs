@@ -8,6 +8,7 @@ window.log = function f(){ log.history = log.history || []; log.history.push(arg
 
 var agencies = {}
   , map
+  , markerGroup = new L.LayerGroup()
   , cloudmadeAPI = '7a80f6e2fb44480bb068f596f4736073';
 
 $(document).ready(function(){
@@ -85,39 +86,38 @@ $(document).ready(function(){
       //disable button
       $('#locationForm input[type=submit]').attr('disabled', 'disabled');
 
-      switch($(this).attr('data-form-type')){
-        case 'agencies':
-          //geocode
-          $.getJSON('http://geocoding.cloudmade.com/' + cloudmadeAPI + '/geocoding/v2/find.js?query=' + $('#location').val().replace(/\s/g,'+') + '&return_location=true&callback=?', function(data){
-            $('#locationForm input[type=submit]').removeAttr('disabled');
+      //geocode
+      var geocodeQuery = $('#location').val().replace(/\s/g,'+');
+      $.getJSON('http://geocoding.cloudmade.com/' + cloudmadeAPI + '/geocoding/v2/find.js?query=' + geocodeQuery + '&return_location=true&callback=?', function(data){
+        $('#locationForm input[type=submit]').removeAttr('disabled');
+        
+        if(data.features){
 
-            //get first result from geocoding
-            var lat = data.features[0].centroid.coordinates[0]
-              , lon = data.features[0].centroid.coordinates[1]
-              , radius = $('#radius').val();
+          //get first result from geocoding
+          var lat = data.features[0].centroid.coordinates[0]
+            , lon = data.features[0].centroid.coordinates[1]
+            , radius = $('#radius').val();
 
-            getAgenciesNearby(lat, lon, radius);
-          });
-          break;
+          switch($('#locationForm').attr('data-form-type')){
+            case 'agencies':
+              getAgenciesNearby(lat, lon, radius);
+              break;
+            case 'routes':
+              getRoutesNearby(lat, lon, radius);
+              break;
+            case 'stops':
+              getStopsNearby(lat, lon, radius);
+              break;
+          }
 
-        case 'routes':
-          //geocode
-          $.getJSON('http://geocoding.cloudmade.com/' + cloudmadeAPI + '/geocoding/v2/find.js?query=' + $('#location').val().replace(/\s/g,'+') + '&return_location=true&callback=?', function(data){
-            $('#locationForm input[type=submit]').removeAttr('disabled');
+        } else {
+          $('#locationForm fieldset').addClass('error');
+        }
+      });
 
-            //get first result from geocoding
-            var lat = data.features[0].centroid.coordinates[0]
-              , lon = data.features[0].centroid.coordinates[1]
-              , radius = $('#radius').val();
-
-            getRoutesNearby(lat, lon, radius);
-          });
-          break;
-      }
     } else {
       $('#locationForm fieldset').addClass('error');
     }
-
     return false;
   });
   
@@ -219,33 +219,38 @@ function getAgenciesNearby(lat, lon, radius){
   var agenciesNearby = {};
 
   $.getJSON('/api/agenciesNearby/' + lat + '/' + lon + '/' + radius || '', function(data){
-    //render map
-    $('#map').show();
+    if(data.length){
+      //render map
+      $('#map').show();
 
-    var mapCenter = new L.LatLng(lat, lon);
-    var mapBounds = new L.LatLngBounds([]);
-    map.setView(mapCenter, 13);
+       markerGroup.clearLayers();
 
-    data.forEach(function(agency){
-      agenciesNearby[agency.agency_key] = agency;
+      var mapCenter = new L.LatLng(lat, lon);
+      var mapBounds = new L.LatLngBounds([]);
+      map.setView(mapCenter, 13);
 
-      var agency_center = new L.LatLng(agency.agency_center[1], agency.agency_center[0]);
-      mapBounds.extend(agency_center);
+      data.forEach(function(agency){
+        agenciesNearby[agency.agency_key] = agency;
 
-      var popupContent = '<strong>' + agency.agency_name + '</strong><br>' + 
-                     'Site: ' + agency.agency_url + '<br>' + 
-                     'Phone: ' + agency.agency_phone + '<br>' + 
-                     'agency_key: ' + agency.agency_key;
+        var agency_center = new L.LatLng(agency.agency_center[1], agency.agency_center[0]);
+        mapBounds.extend(agency_center);
 
-      var marker = new L.Marker(agency_center);
-      marker.bindPopup(popupContent).openPopup(); 
+        var popupContent = '<strong>' + agency.agency_name + '</strong><br>' + 
+                       'Site: ' + agency.agency_url + '<br>' + 
+                       'Phone: ' + agency.agency_phone + '<br>' + 
+                       'agency_key: ' + agency.agency_key;
 
-      map.addLayer(marker);
-    });
+        var marker = new L.Marker(agency_center);
+        marker.bindPopup(popupContent).openPopup(); 
+        markerGroup.addLayer(marker);
+      });
 
-    map.fitBounds(mapBounds);
-    renderTable(agenciesNearby, 'agenciesNearby');
-
+      map.addLayer(markerGroup);
+      map.fitBounds(mapBounds);
+      renderTable(agenciesNearby, 'agenciesNearby');
+    } else {
+      $('#data').html('No agencies within ' + radius + ' miles');
+    }
   });
 }
 
@@ -270,10 +275,33 @@ function getStopsNearby(lat, lon, radius){
 
   $.getJSON('/api/stopsNearby/' + lat + '/' + lon + '/' + radius || '', function(data){
     if(data.length){
+      //render map
+      $('#map').show();
+
+      markerGroup.clearLayers();
+      
+      var mapCenter = new L.LatLng(lat, lon);
+      var mapBounds = new L.LatLngBounds([]);
+      map.setView(mapCenter, 13);
+
       data.forEach(function(stop){
         stopsNearby[stop.stop_id] = stop;
+
+        var stop_loc = new L.LatLng(stop.loc[1], stop.loc[0]);
+        mapBounds.extend(stop_loc);
+
+        var popupContent = '<strong>' + stop.stop_name + '</strong><br>' + 
+                       'Stop ID: ' + stop.stop_id + '<br>' + 
+                       'Coordinates: ' + stop.loc[1] + ', ' + stop.loc[0] + '<br>' + 
+                       'agency_key: ' + stop.agency_key;
+
+        var marker = new L.Marker(stop_loc);
+        marker.bindPopup(popupContent).openPopup();
+        markerGroup.addLayer(marker);
       });
 
+      map.addLayer(markerGroup);
+      map.fitBounds(mapBounds);
       renderTable(stopsNearby, 'stopsNearby');
     } else {
       $('#data').html('No stops within ' + radius + ' miles');
