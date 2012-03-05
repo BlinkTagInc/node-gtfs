@@ -21,10 +21,25 @@ $(document).ready(function(){
   });
   map.addLayer(cloudmade);
 
-  $('#data')
-    .on('click', '#agencies tbody tr', getRoutes)
-    .on('click', '#routes tbody tr', getStops)
-    .on('click', '#stops tbody tr', getStop);
+  $('#data').on('click', 'tbody tr', function(){
+      switch($('#data').attr('data-view-type')){
+        case 'agencies':
+          getRoutes.call(this);
+          break;
+        case 'routes':
+          getStops.call(this);
+          break;
+        case 'stops':
+          getStop.call(this);
+          break;
+        case 'agenciesNearby':
+          getRoutes.call(this);
+          break;
+        case 'routesNearby':
+          getStops.call(this);
+          break;
+      }
+    });
 
   $('#nav-button').on('click', function(){
     $('#map').hide();
@@ -125,6 +140,7 @@ $(document).ready(function(){
 
 
 function getAgencies(){
+  $('#data').attr('data-view-type', 'agencies');
   $('#locationForm').hide();
   $('#data').show();
   $('#pageTitle').html('Agencies');
@@ -144,9 +160,15 @@ function getAgencies(){
 function getRoutes(){
   var agency_key = $(this).attr('data-agency-key');
 
+  $('#data').attr('data-view-type', 'routes');
+
+
   $('#pageTitle').html('Routes for ' + agencies[agency_key].agency_name);
 
   $('#map').hide();
+
+  $('#nav-button').attr('data-agency-key', agency_key);
+  $('#nav-button').attr('data-previous', 'agencies');
 
   if(!agencies[agency_key].routes){
     agencies[agency_key].routes = {};
@@ -165,9 +187,15 @@ function getStops(){
   var agency_key = $(this).attr('data-agency-key')
     , route_id = $(this).attr('data-route-id');
 
+  $('#data').attr('data-view-type', 'stops');
+
   $('#data').attr('data-route-id', route_id);
 
   $('#pageTitle').html('Stops on Route ' + agencies[agency_key].routes[route_id].route_short_name + ': ' + agencies[agency_key].routes[route_id].route_long_name);
+
+  $('#nav-button').attr('data-agency-key', agency_key);
+  $('#nav-button').attr('data-route-id', route_id);
+  $('#nav-button').attr('data-previous', 'routes');
 
   if(!agencies[agency_key].routes[route_id].stops){
     agencies[agency_key].routes[route_id].stops = {};
@@ -187,6 +215,8 @@ function getStop(){
     , route_id = $(this).attr('data-route-id')
     , stop_id = $(this).attr('data-stop-id')
     , stop = agencies[agency_key].routes[route_id].stops[stop_id];
+
+  $('#data').attr('data-view-type', 'stop');
 
   $('#pageTitle').html('Stop: ' + stop.stop_name);
   $('#data').html('<div>Coordinates: ' + stop.stop_lat + ', ' + stop.stop_lon + '</div>');
@@ -217,6 +247,8 @@ function getStop(){
 
 function getAgenciesNearby(lat, lon, radius){
   var agenciesNearby = {};
+
+  $('#data').attr('data-view-type', 'agenciesNearby');
 
   $.getJSON('/api/agenciesNearby/' + lat + '/' + lon + '/' + radius || '', function(data){
     if(data.length){
@@ -256,10 +288,17 @@ function getAgenciesNearby(lat, lon, radius){
 
 function getRoutesNearby(lat, lon, radius){
   var routesNearby = {};
+
+  $('#data').attr('data-view-type', 'routesNearby');
+
   $.getJSON('/api/routesNearby/' + lat + '/' + lon + '/' + radius || '', function(data){
     if(data.length){
       data.forEach(function(route){
         routesNearby[route.route_id] = route;
+        if(!agencies[route.agency_key].hasOwnProperty('routes')){
+          agencies[route.agency_key].routes = {};
+        }
+        agencies[route.agency_key].routes[route.route_id] = route;
       });
 
       renderTable(routesNearby, 'routesNearby');
@@ -272,6 +311,8 @@ function getRoutesNearby(lat, lon, radius){
 
 function getStopsNearby(lat, lon, radius){
   var stopsNearby = {};
+
+  $('#data').attr('data-view-type', 'stopsNearby');
 
   $.getJSON('/api/stopsNearby/' + lat + '/' + lon + '/' + radius || '', function(data){
     if(data.length){
@@ -310,12 +351,12 @@ function getStopsNearby(lat, lon, radius){
   });
 }
 
-function renderTable(data, tableType){
+function renderTable(data, viewType){
   var columns = []
     , sortVariable;
 
   $('#data').html('<table class="table table-bordered table-striped"><thead><tr></tr></thead><tbody></tbody></table>');
-  $('#data table').attr('id', tableType);
+  $('#data table').attr('id', viewType);
   for(var key in data){
     var item = data[key]
       , row = $('<tr>');
@@ -337,31 +378,33 @@ function renderTable(data, tableType){
       $(row).append('<td>' + value + '</td>');
     });
 
-    switch(tableType){
+    switch(viewType){
       case 'agencies':
+        $(row).attr('data-agency-key', item.agency_key);
+        break;
+      case 'agenciesNearby':
         $(row).attr('data-agency-key', item.agency_key);
         break;
       case 'routes':
         $(row).attr('data-agency-key', item.agency_key);
         $(row).attr('data-route-id', item.route_id);
-        $('#nav-button').attr('data-agency-key', item.agency_key);
-        $('#nav-button').attr('data-previous', 'agencies');
+        break;
+      case 'routesNearby':
+        $(row).attr('data-agency-key', item.agency_key);
+        $(row).attr('data-route-id', item.route_id);
         break;
       case 'stops':
         var route_id = $('#data').attr('data-route-id');
         $(row).attr('data-agency-key', item.agency_key);
         $(row).attr('data-route-id', route_id);
         $(row).attr('data-stop-id', item.stop_id);
-        $('#nav-button').attr('data-agency-key', item.agency_key);
-        $('#nav-button').attr('data-route-id', route_id);
-        $('#nav-button').attr('data-previous', 'routes');
         break;
   
     }
     $('#data table tbody').append(row);
   };
 
-  if(tableType != 'agencies'){
+  if(viewType != 'agencies'){
     $('#nav-button').show();
   } else {
     $('#nav-button').hide();
