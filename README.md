@@ -20,7 +20,7 @@ The mongodb URI is also configured in config.js
 
 To keep schedules up to date, you might want to schedule this to occur once per day.
 
-##Example
+##Example Application
 
 There is an example web app that creates some restful API endpoints and has a simple frontend for viewing transit data.  It is in examples/express.  You could load the example site with:
 
@@ -38,7 +38,7 @@ There is an example web app that creates some restful API endpoints and has a si
     
     //Example
     /api/agencies/37.73/-122.25/0.25
-`:radius` is optional and in miles.  Default: 0.25 miles
+`:radius` is optional and in miles.  Default: 25 miles
 Returns all agencies that serve the 100 nearest stops within the specified radius
 
 ###List routes for an agency
@@ -54,7 +54,7 @@ Returns all agencies that serve the 100 nearest stops within the specified radiu
     
     //Example
     /api/routesNearby/37.73/-122.25/0.25
-`:radius` is optional and in miles.  Default: 0.25 miles
+`:radius` is optional and in miles.  Default: 1 mile
 Returns all routes that stop at the 100 nearest stops within the specified radius
 
 ###List stops for a route
@@ -71,7 +71,7 @@ Returns all routes that stop at the 100 nearest stops within the specified radiu
     
     //Example
     /api/StopsNearby/37.73/-122.25/0.25
-`:radius` is optional and in miles.  Default: 0.25 miles
+`:radius` is optional and in miles.  Default: 1 mile
 Returns the 100 nearest stops within the specified radius
 
 ###List stop times for a stop
