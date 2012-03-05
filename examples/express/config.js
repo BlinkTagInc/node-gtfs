@@ -2,7 +2,6 @@ var express = require('express')
   , mongoose = require('mongoose');
   
 module.exports = function(app){
-  
   app.configure(function(){
     var db = mongoose.connect('mongodb://localhost/db');
     this.use(express.cookieParser())
@@ -30,7 +29,6 @@ module.exports = function(app){
       .use(express.logger({buffer: 10000}))
       .use(express.errorHandler())
       .enable('prod')
-      .set('domain', 'api.productiondomain.com');
-  });  
-  
+      .set('domain', 'productiondomain.com');
+  });
 }

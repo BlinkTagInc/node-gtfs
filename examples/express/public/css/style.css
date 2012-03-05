@@ -1,0 +1,36 @@
+#data table tbody tr{
+  cursor:pointer;
+}
+
+.navigation{
+  height:30px;
+}
+
+#pageTitle{
+  margin-bottom:10px;
+}
+
+#map{
+  height:400px;
+  margin-bottom:20px;
+  display:none;
+}
+
+#locationForm{
+  display:none;
+}
+
+#locationForm label{
+  margin:0 5px 0 10px;
+}
+
+#locationForm fieldset{
+  display:inline;
+}
+
+
+footer{
+  margin-top:50px;
+  border-top:1px #CCC solid;
+  text-align:right;
+}
