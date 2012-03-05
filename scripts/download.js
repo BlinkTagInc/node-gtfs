@@ -1,3 +1,10 @@
+//load config.js
+try {
+  var config = require('../config.js');
+} catch (e) {
+  console.log(e)
+}
+
 var url = require('url')
   , request = require('request')
   , exec = require('child_process').exec
@@ -9,9 +16,9 @@ var url = require('url')
   , Connection = require('mongodb').Connection
   , Server = require('mongodb').Server
   , BSON = require('mongodb').BSONNative
-  , dbName = process.env['MONGO_NODE_DRIVER_DATABASE'] || 'db'
-  , host = process.env['MONGO_NODE_DRIVER_HOST'] || 'localhost'
-  , port = process.env['MONGO_NODE_DRIVER_PORT'] || Connection.DEFAULT_PORT
+  , dbName = process.env['MONGO_NODE_DATABASE'] || config.mongo_node_database
+  , host = process.env['MONGO_NODE_HOST'] || config.mongo_node_host
+  , port = process.env['MONGO_NODE_PORT'] || config.mongo_node_port || Connection.DEFAULT_PORT
   , db = new Db(dbName, new Server(host, port, {}))
   , q;
 
@@ -66,20 +73,16 @@ var GTFSFiles = [
   }
 ];
 
-
-//loop through all agencies specified (remove first two arguments)
-process.argv.splice(0, 2);
-
-if(process.argv.length < 1){
-  console.log('Error: No agency_key specified\nTry running `node download.js capital-metro` to load transit data');
+if(!config.agencies){
+  console.log('Error: No agency_key specified in config.js\nTry adding `capital-metro` to the agencies in config.js to load transit data');
   process.exit();
 }
 
 //open database and create queue for agency list
 db.open(function(err, db) { 
   q = async.queue(downloadGTFS, 1);
-
-  process.argv.forEach(function(agency_key){
+  //loop through all agencies specified
+  config.agencies.forEach(function(agency_key){
     q.push({agency_key: agency_key}, function(e){
       if(e){
         console.log(e);
