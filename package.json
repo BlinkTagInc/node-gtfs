@@ -1,7 +1,7 @@
 {
   "name": "gtfs",
-  "description": "GTFS ",
-  "version": "0.0.1",
+  "description": "Download GTFS transit data into mongodb and expose routes, stops, times and more",
+  "version": "0.0.2",
   "author": "Brendan Nee <me@bn.ee>",
   "dependencies": {
       "express": ">= 2.5.8"
