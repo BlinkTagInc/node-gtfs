@@ -227,13 +227,16 @@ function getStop(){
   //render map
   $('#map').show();
 
+  markerGroup.clearLayers();
+
   var lat = parseFloat(stop.stop_lat);
   var lon = parseFloat(stop.stop_lon);
   var stop_loc = new L.LatLng(lat, lon);
   map.setView(stop_loc, 13);
 
   var marker = new L.Marker(stop_loc);
-  map.addLayer(marker);
+  markerGroup.addLayer(marker);
+  map.addLayer(markerGroup);
 
   var popupContent = '<strong>' + stop.stop_name + '</strong><br>' + 
                      'Stop ID: ' + stop_id + '<br>' + 
