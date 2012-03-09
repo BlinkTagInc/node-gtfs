@@ -1,16 +1,13 @@
-var express = require('express')
-  , mongoose = require('mongoose');
+var express = require('express');
   
 module.exports = function(app){
   app.configure(function(){
-    var db = mongoose.connect('mongodb://localhost/db');
     this.use(express.cookieParser())
         .use(express.bodyParser())
         .set('public', __dirname + '/public')
         .enable('jsonp callback')
         .enable('error templates')
         .use(express.static(__dirname + '/public'))
-        .set('db', db)
   });
 
   // Dev
