@@ -1,6 +1,12 @@
 // usage: log('inside coolFunc', this, arguments);
 // paulirish.com/2009/log-a-lightweight-wrapper-for-consolelog/
+
+/* This file (script.js) implements most of the JQuery/JavaScript rendering code for the node-gtfs human interface, i.e. the 
+   interface that is displayed when the server is accessed directly and not through any of the API endpoints. 
+*/ 
 window.log = function f(){ log.history = log.history || []; log.history.push(arguments); if(this.console) { var args = arguments, newarr; args.callee = args.callee.caller; newarr = [].slice.call(args); if (typeof console.log === 'object') log.apply.call(console.log, console, newarr); else console.log.apply(console, newarr);}};
+
+
 
 // make it safe to use console.log always
 (function(a){function b(){}for(var c="assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,time,timeEnd,trace,warn".split(","),d;!!(d=c.pop());){a[d]=a[d]||b;}})
@@ -75,14 +81,38 @@ $(document).ready(function(){
       $('#locationForm')
         .attr('data-form-type', 'agencies')
         .show();
+      $('#agencySelectForm').hide();
     })
+    
+    //NOT YET IMPLEMENTED
+    /*.on('click', '#routes-by-agency', function(){
+      $('#data').empty();
+      $('#pageTitle').html('Find Routes by Location');
+      $('#agencySelectForm input[type=submit]').val('Find Routes');
+      $('#agencySelectForm')
+        .attr('data-form-type', 'routes')
+        .show();
+      $('#locationForm').hide();
+    })*/
+    
     .on('click', '#routes-by-location', function(){
       $('#data').empty();
       $('#pageTitle').html('Find Routes by Location');
+      $('#locationForm input[type=submit]').val('Find Agencies');
+      $('#locationForm')
+        .attr('data-form-type', 'agencies')
+        .show();
+      $('#agencySelectForm').hide();
+    })
+    
+    .on('click', '#routes-by-agency', function(){
+      $('#data').empty();
+      $('#pageTitle').html('Find Routes by Agency');
       $('#locationForm input[type=submit]').val('Find Routes');
       $('#locationForm')
         .attr('data-form-type', 'routes')
         .show();
+      $('#agencySelectForm').hide();
     })
     .on('click', '#stops-by-location', function(){
       $('#data').empty();
@@ -91,6 +121,7 @@ $(document).ready(function(){
       $('#locationForm')
         .attr('data-form-type', 'stops')
         .show();
+      $('#agencySelectForm').hide();
     });;
 
   //form handler
@@ -138,10 +169,14 @@ $(document).ready(function(){
   
 });
 
+//IVAN TODO: Add form handler for routesByAgency here
+//Should use getRoutes() to 
+
 
 function getAgencies(){
   $('#data').attr('data-view-type', 'agencies');
   $('#locationForm').hide();
+  $('#agencySelectForm').hide();
   $('#data').show();
   $('#pageTitle').html('Agencies');
 
@@ -191,7 +226,13 @@ function getStops(){
 
   $('#data').attr('data-route-id', route_id);
 
-  $('#pageTitle').html('Stops on Route ' + agencies[agency_key].routes[route_id].route_short_name + ': ' + agencies[agency_key].routes[route_id].route_long_name);
+  if(agencies[agency_key].routes[route_id].route_short_name != undefined) {
+     $('#pageTitle').html('Stops on Route ' + agencies[agency_key].routes[route_id].route_short_name + ': ' + agencies[agency_key].routes[route_id].route_long_name);
+  } else if(agencies[agency_key].routes[route_id].route_long_name != undefined) {
+     $('#pageTitle').html('Stops on Route ' + agencies[agency_key].routes[route_id].route_long_name);
+  } else {
+     $('#pageTitle').html('Stops on Selected Route');
+  }
 
   $('#nav-button').attr('data-agency-key', agency_key);
   $('#nav-button').attr('data-route-id', route_id);
@@ -374,11 +415,36 @@ function renderTable(data, viewType){
         }
       }
     }
+    
+    //This function just converts route_type identifiers to the actual types they enumerate
+    //as defined (enumerated) by the GTFS spec
+    var routeTypeFunction = function(route_type_str) {
+        route_type_i = parseInt(route_type_str);
+        
+        if(route_type_i < 0 || route_type_i > 7) { return(route_type_str); }
+        
+        var routeTypes = new Array();
+        //"Tram", "Metro", "Rail", "Bus", "Ferry", "CableCar", "Gondola", "Furnicular"
+        routeTypes[0] = "Tram";
+        routeTypes[1] = "Metro";
+        routeTypes[2] = "Rail";
+        routeTypes[3] = "Bus";
+        routeTypes[4] = "Ferry";
+        routeTypes[5] = "CableCar";
+        routeTypes[6] = "Gondola";
+        routeTypes[7] = "Furnicular";
+        
+        return(routeTypes[route_type_i]);
+    };
 
     columns.forEach(function(column, index){
       var value = (typeof item[column] != 'object') ? item[column] : JSON.stringify(item[column]);
       value = (value !== undefined) ? value : '';
-      $(row).append('<td>' + value + '</td>');
+      //magic number "2" refers to the column that contains colors in the route view
+      if(index==2 && viewType=='routes') {$(row).append('<td><b><font color="#' + value + '">' + value + '</font></b></td>');}
+      //magic number "2" refers to the column that contains route_types in the route view
+      else if(index==1 && viewType=='routes') {$(row).append('<td>' + routeTypeFunction(value) + '</td>');}
+      else {$(row).append('<td>' + value + '</td>');}
     });
 
     switch(viewType){

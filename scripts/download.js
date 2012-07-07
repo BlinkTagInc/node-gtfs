@@ -130,9 +130,20 @@ function downloadGTFS(task, cb){
     });
   }
   
+  /** This function downloads the GTFS feed for the agency specified by agency_key. It is used as part of the
+  node-gtfs update process.
+  */
   function downloadFiles(cb){
-    var downloadUrl = 'http://www.gtfs-data-exchange.com/agency/' + agency_key + '/latest.zip'
+    //Figure out the download URL. Usually the GTFS files are downloaded from gtfs-data-exchange.com but
+    //sometimes a different URL is used; if a URL is specified in config.agencyUrls then use that one.
+    var downloadUrl = ''
+  	
+  	if(config.agencyUrls[agency_key] != undefined) {
+  		downloadUrl = config.agencyUrls[agency_key], fileName = downloadDir + '/latest.zip';
+  	} else {
+  		downloadUrl = 'http://www.gtfs-data-exchange.com/agency/' + agency_key + '/latest.zip'
       , fileName = downloadDir + '/latest.zip';
+  	}
 
     //do download
     request(downloadUrl, processFile).pipe(fs.createWriteStream(fileName));
