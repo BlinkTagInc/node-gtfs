@@ -440,10 +440,8 @@ function renderTable(data, viewType){
     columns.forEach(function(column, index){
       var value = (typeof item[column] != 'object') ? item[column] : JSON.stringify(item[column]);
       value = (value !== undefined) ? value : '';
-      //magic number "2" refers to the column that contains colors in the route view
-      if(index==2 && viewType=='routes') {$(row).append('<td><b><font color="#' + value + '">' + value + '</font></b></td>');}
-      //magic number "2" refers to the column that contains route_types in the route view
-      else if(index==1 && viewType=='routes') {$(row).append('<td>' + routeTypeFunction(value) + '</td>');}
+      if(columns[index]=='route_color' && viewType=='routes') {$(row).append('<td><b><font color="#' + value + '">' + value + '</font></b></td>');}
+      else if(columns[index]=='route_type' && viewType=='routes') {$(row).append('<td>' + routeTypeFunction(value) + '</td>');}
       else {$(row).append('<td>' + value + '</td>');}
     });
 
