@@ -185,28 +185,36 @@ function getRoutes(){
 
 function getStops(){
   var agency_key = $(this).attr('data-agency-key')
-    , route_id = $(this).attr('data-route-id');
+    , route_id = $(this).attr('data-route-id')
+    , route = agencies[agency_key].routes[route_id]
+    , routeTitle;
+
+  if(route.route_short_name){
+    routeTitle = route.route_short_name + ': ' + route.route_long_name;
+  } else {
+    routeTitle = route.route_long_name;
+  }
 
   $('#data').attr('data-view-type', 'stops');
 
   $('#data').attr('data-route-id', route_id);
 
-  $('#pageTitle').html('Stops on Route ' + agencies[agency_key].routes[route_id].route_short_name + ': ' + agencies[agency_key].routes[route_id].route_long_name);
+  $('#pageTitle').html('Stops on Route ' + routeTitle);
 
   $('#nav-button').attr('data-agency-key', agency_key);
   $('#nav-button').attr('data-route-id', route_id);
   $('#nav-button').attr('data-previous', 'routes');
 
-  if(!agencies[agency_key].routes[route_id].stops){
-    agencies[agency_key].routes[route_id].stops = {};
+  if(!route.stops){
+    route.stops = {};
     $.getJSON('api/stops/' + agency_key + '/' + route_id, function(data){
       data.forEach(function(stop){
-        agencies[agency_key].routes[route_id].stops[stop.stop_id] = stop;
+        route.stops[stop.stop_id] = stop;
       });
-      renderTable(agencies[agency_key].routes[route_id].stops, 'stops');
+      renderTable(route.stops, 'stops');
     });
   } else {
-    renderTable(agencies[agency_key].routes[route_id].stops, 'stops');
+    renderTable(route.stops, 'stops');
   }
 }
 
