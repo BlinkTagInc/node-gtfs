@@ -91,7 +91,7 @@ db.open(function(err, db) {
   });
 
   q.drain = function(e) {
-    console.log('All agencies completed (' + process.argv.length + ' total)');
+    console.log('All agencies completed (' + config.agencies.length + ' total)');
     setTimeout(function(){ 
       db.close();
       process.exit();
