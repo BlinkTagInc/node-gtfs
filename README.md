@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/brendannee/node-gtfs.png)](http://travis-ci.org/brendannee/node-gtfs)
 #Node-GTFS
 
 node-GTFS loads transit data in [GTFS format](https://developers.google.com/transit/) from [GTFS Data Exchange](http://www.gtfs-data-exchange.com/), unzips it and stores it to a MongoDB database and provides some methods to query for agencies, routes, stops and times.  It also has spatial queries to find nearby stops, routes and agencies.
