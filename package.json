@@ -4,8 +4,8 @@
   "version": "0.0.2",
   "author": "Brendan Nee <me@bn.ee>",
   "dependencies": {
-      "express": ">= 2.5.8"
-    , "mongoose": ">= 2.5.7"
+      "express": ">= 3.x"
+    , "mongoose": ">= 3.x"
     , "mongodb": ">=0.9.9-4"
     , "csv": ">= 0.0.11"
     , "async": ">= 0.1.16"
