@@ -35,10 +35,10 @@ There is an example web app that creates some restful API endpoints and has a si
 
 ###List agencies near a point
 
-    /api/agencies/:lat/:lon/:radius
+    /api/agenciesNearby/:lat/:lon/:radius
     
     //Example
-    /api/agencies/37.73/-122.25/0.25
+    /api/agenciesNearby/37.73/-122.25/10
 `:radius` is optional and in miles.  Default: 25 miles
 Returns all agencies that serve the 100 nearest stops within the specified radius
 
