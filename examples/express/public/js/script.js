@@ -70,14 +70,38 @@ $(document).ready(function(){
       $('#locationForm')
         .attr('data-form-type', 'agencies')
         .show();
+      $('#agencySelectForm').hide();
     })
+    
+    //NOT YET IMPLEMENTED
+    /*.on('click', '#routes-by-agency', function(){
+      $('#data').empty();
+      $('#pageTitle').html('Find Routes by Location');
+      $('#agencySelectForm input[type=submit]').val('Find Routes');
+      $('#agencySelectForm')
+        .attr('data-form-type', 'routes')
+        .show();
+      $('#locationForm').hide();
+    })*/
+    
     .on('click', '#routes-by-location', function(){
       $('#data').empty();
       $('#pageTitle').html('Find Routes by Location');
+      $('#locationForm input[type=submit]').val('Find Agencies');
+      $('#locationForm')
+        .attr('data-form-type', 'agencies')
+        .show();
+      $('#agencySelectForm').hide();
+    })
+    
+    .on('click', '#routes-by-agency', function(){
+      $('#data').empty();
+      $('#pageTitle').html('Find Routes by Agency');
       $('#locationForm input[type=submit]').val('Find Routes');
       $('#locationForm')
         .attr('data-form-type', 'routes')
         .show();
+      $('#agencySelectForm').hide();
     })
     .on('click', '#stops-by-location', function(){
       $('#data').empty();
@@ -86,6 +110,7 @@ $(document).ready(function(){
       $('#locationForm')
         .attr('data-form-type', 'stops')
         .show();
+      $('#agencySelectForm').hide();
     });;
 
   //form handler
@@ -132,10 +157,14 @@ $(document).ready(function(){
   });
 });
 
+//IVAN TODO: Add form handler for routesByAgency here
+//Should use getRoutes() to 
+
 
 function getAgencies(){
   $('#data').attr('data-view-type', 'agencies');
   $('#locationForm').hide();
+  $('#agencySelectForm').hide();
   $('#data').show();
   $('#pageTitle').html('Agencies');
 
@@ -186,17 +215,18 @@ function getStops(){
     , route = agencies[agency_key].routes[route_id]
     , routeTitle;
 
-  if(route.route_short_name){
+  if(route.route_short_name && route.route_long_name){
     routeTitle = route.route_short_name + ': ' + route.route_long_name;
-  } else {
+  } else if (route.route_long_name) {
     routeTitle = route.route_long_name;
+  } else {
+    routeTitle = 'Stops on Selected Route';
   }
+  $('#pageTitle').html('Stops on Route ' + routeTitle);
 
   $('#data').attr('data-view-type', 'stops');
 
   $('#data').attr('data-route-id', route_id);
-
-  $('#pageTitle').html('Stops on Route ' + routeTitle);
 
   $('#nav-button').attr('data-agency-key', agency_key);
   $('#nav-button').attr('data-route-id', route_id);
@@ -377,11 +407,34 @@ function renderTable(data, viewType){
         }
       }
     }
+    
+    //This function just converts route_type identifiers to the actual types they enumerate
+    //as defined (enumerated) by the GTFS spec
+    var routeTypeFunction = function(route_type_str) {
+        route_type_i = parseInt(route_type_str);
+        
+        if(route_type_i < 0 || route_type_i > 7) { return(route_type_str); }
+        
+        var routeTypes = new Array();
+        //"Tram", "Metro", "Rail", "Bus", "Ferry", "CableCar", "Gondola", "Furnicular"
+        routeTypes[0] = "Tram";
+        routeTypes[1] = "Metro";
+        routeTypes[2] = "Rail";
+        routeTypes[3] = "Bus";
+        routeTypes[4] = "Ferry";
+        routeTypes[5] = "CableCar";
+        routeTypes[6] = "Gondola";
+        routeTypes[7] = "Furnicular";
+        
+        return(routeTypes[route_type_i]);
+    };
 
     columns.forEach(function(column, index){
       var value = (typeof item[column] != 'object') ? item[column] : JSON.stringify(item[column]);
       value = (value !== undefined) ? value : '';
-      $(row).append('<td>' + value + '</td>');
+      if(columns[index]=='route_color' && viewType=='routes') {$(row).append('<td><b><font color="#' + value + '">' + value + '</font></b></td>');}
+      else if(columns[index]=='route_type' && viewType=='routes') {$(row).append('<td>' + routeTypeFunction(value) + '</td>');}
+      else {$(row).append('<td>' + value + '</td>');}
     });
 
     switch(viewType){
