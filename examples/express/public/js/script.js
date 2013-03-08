@@ -1,17 +1,12 @@
-// usage: log('inside coolFunc', this, arguments);
-// paulirish.com/2009/log-a-lightweight-wrapper-for-consolelog/
-window.log = function f(){ log.history = log.history || []; log.history.push(arguments); if(this.console) { var args = arguments, newarr; args.callee = args.callee.caller; newarr = [].slice.call(args); if (typeof console.log === 'object') log.apply.call(console.log, console, newarr); else console.log.apply(console, newarr);}};
-
-// make it safe to use console.log always
-(function(a){function b(){}for(var c="assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,time,timeEnd,trace,warn".split(","),d;!!(d=c.pop());){a[d]=a[d]||b;}})
-(function(){try{console.log();return window.console;}catch(a){return (window.console={});}}());
-
 var agencies = {}
   , map
   , markerGroup = new L.LayerGroup()
   , cloudmadeAPI = '7a80f6e2fb44480bb068f596f4736073';
 
 $(document).ready(function(){
+
+  //get Agencies on pageload
+  getAgencies();
 
   //setup map
   map = new L.Map('map');
@@ -135,7 +130,6 @@ $(document).ready(function(){
     }
     return false;
   });
-  
 });
 
 
@@ -147,6 +141,10 @@ function getAgencies(){
 
   if(!Object.keys(agencies).length){
     $.getJSON('api/agencies', function(data){
+      if(!data.length) {
+        $('#data').html('No agencies.  Why not <a href="https://github.com/brendannee/node-gtfs">load some</a>?');
+        return;
+      }
       data.forEach(function(agency){
         agencies[agency.agency_key] = agency;
       });
@@ -161,7 +159,6 @@ function getRoutes(){
   var agency_key = $(this).attr('data-agency-key');
 
   $('#data').attr('data-view-type', 'routes');
-
 
   $('#pageTitle').html('Routes for ' + agencies[agency_key].agency_name);
 
@@ -251,9 +248,7 @@ function getStop(){
                      'Route: ' + route_id + '<br>' + 
                      'Agency: ' + agencies[agency_key].agency_name;
 
-
   marker.bindPopup(popupContent).openPopup();
-
 }
 
 function getAgenciesNearby(lat, lon, radius){
@@ -262,38 +257,38 @@ function getAgenciesNearby(lat, lon, radius){
   $('#data').attr('data-view-type', 'agenciesNearby');
 
   $.getJSON('/api/agenciesNearby/' + lat + '/' + lon + '/' + radius || '', function(data){
-    if(data.length){
-      //render map
-      $('#map').show();
-
-       markerGroup.clearLayers();
-
-      var mapCenter = new L.LatLng(lat, lon);
-      var mapBounds = new L.LatLngBounds([]);
-      map.setView(mapCenter, 13);
-
-      data.forEach(function(agency){
-        agenciesNearby[agency.agency_key] = agency;
-
-        var agency_center = new L.LatLng(agency.agency_center[1], agency.agency_center[0]);
-        mapBounds.extend(agency_center);
-
-        var popupContent = '<strong>' + agency.agency_name + '</strong><br>' + 
-                       'Site: ' + agency.agency_url + '<br>' + 
-                       'Phone: ' + agency.agency_phone + '<br>' + 
-                       'agency_key: ' + agency.agency_key;
-
-        var marker = new L.Marker(agency_center);
-        marker.bindPopup(popupContent).openPopup(); 
-        markerGroup.addLayer(marker);
-      });
-
-      map.addLayer(markerGroup);
-      map.fitBounds(mapBounds);
-      renderTable(agenciesNearby, 'agenciesNearby');
-    } else {
+    if(!data.length){
       $('#data').html('No agencies within ' + radius + ' miles');
     }
+
+    //render map
+    $('#map').show();
+
+    markerGroup.clearLayers();
+
+    var mapCenter = new L.LatLng(lat, lon);
+    var mapBounds = new L.LatLngBounds([]);
+    map.setView(mapCenter, 13);
+
+    data.forEach(function(agency){
+      agenciesNearby[agency.agency_key] = agency;
+
+      var agency_center = new L.LatLng(agency.agency_center[1], agency.agency_center[0]);
+      mapBounds.extend(agency_center);
+
+      var popupContent = '<strong>' + agency.agency_name + '</strong><br>' + 
+                     'Site: ' + agency.agency_url + '<br>' + 
+                     'Phone: ' + agency.agency_phone + '<br>' + 
+                     'agency_key: ' + agency.agency_key;
+
+      var marker = new L.Marker(agency_center);
+      marker.bindPopup(popupContent).openPopup(); 
+      markerGroup.addLayer(marker);
+    });
+
+    map.addLayer(markerGroup);
+    map.fitBounds(mapBounds);
+    renderTable(agenciesNearby, 'agenciesNearby');
   });
 }
 
@@ -303,20 +298,20 @@ function getRoutesNearby(lat, lon, radius){
   $('#data').attr('data-view-type', 'routesNearby');
 
   $.getJSON('/api/routesNearby/' + lat + '/' + lon + '/' + radius || '', function(data){
-    if(data.length){
-      data.forEach(function(route){
-        routesNearby[route.route_id] = route;
-        if(!agencies[route.agency_key].hasOwnProperty('routes')){
-          agencies[route.agency_key].routes = {};
-        }
-        agencies[route.agency_key].routes[route.route_id] = route;
-      });
-
-      renderTable(routesNearby, 'routesNearby');
-    } else {
+    if(!data.length){
       $('#data').html('No routes within ' + radius + ' miles');
+      return;
     }
 
+    data.forEach(function(route){
+      routesNearby[route.route_id] = route;
+      if(!agencies[route.agency_key].hasOwnProperty('routes')){
+        agencies[route.agency_key].routes = {};
+      }
+      agencies[route.agency_key].routes[route.route_id] = route;
+    });
+
+    renderTable(routesNearby, 'routesNearby');
   });
 }
 
@@ -326,39 +321,39 @@ function getStopsNearby(lat, lon, radius){
   $('#data').attr('data-view-type', 'stopsNearby');
 
   $.getJSON('/api/stopsNearby/' + lat + '/' + lon + '/' + radius || '', function(data){
-    if(data.length){
-      //render map
-      $('#map').show();
-
-      markerGroup.clearLayers();
-      
-      var mapCenter = new L.LatLng(lat, lon);
-      var mapBounds = new L.LatLngBounds([]);
-      map.setView(mapCenter, 13);
-
-      data.forEach(function(stop){
-        stopsNearby[stop.stop_id] = stop;
-
-        var stop_loc = new L.LatLng(stop.loc[1], stop.loc[0]);
-        mapBounds.extend(stop_loc);
-
-        var popupContent = '<strong>' + stop.stop_name + '</strong><br>' + 
-                       'Stop ID: ' + stop.stop_id + '<br>' + 
-                       'Coordinates: ' + stop.loc[1] + ', ' + stop.loc[0] + '<br>' + 
-                       'agency_key: ' + stop.agency_key;
-
-        var marker = new L.Marker(stop_loc);
-        marker.bindPopup(popupContent).openPopup();
-        markerGroup.addLayer(marker);
-      });
-
-      map.addLayer(markerGroup);
-      map.fitBounds(mapBounds);
-      renderTable(stopsNearby, 'stopsNearby');
-    } else {
+    if(!data.length){
       $('#data').html('No stops within ' + radius + ' miles');
+      return;
     }
 
+    //render map
+    $('#map').show();
+
+    markerGroup.clearLayers();
+    
+    var mapCenter = new L.LatLng(lat, lon);
+    var mapBounds = new L.LatLngBounds([]);
+    map.setView(mapCenter, 13);
+
+    data.forEach(function(stop){
+      stopsNearby[stop.stop_id] = stop;
+
+      var stop_loc = new L.LatLng(stop.loc[1], stop.loc[0]);
+      mapBounds.extend(stop_loc);
+
+      var popupContent = '<strong>' + stop.stop_name + '</strong><br>' + 
+                     'Stop ID: ' + stop.stop_id + '<br>' + 
+                     'Coordinates: ' + stop.loc[1] + ', ' + stop.loc[0] + '<br>' + 
+                     'agency_key: ' + stop.agency_key;
+
+      var marker = new L.Marker(stop_loc);
+      marker.bindPopup(popupContent).openPopup();
+      markerGroup.addLayer(marker);
+    });
+
+    map.addLayer(markerGroup);
+    map.fitBounds(mapBounds);
+    renderTable(stopsNearby, 'stopsNearby');
   });
 }
 
