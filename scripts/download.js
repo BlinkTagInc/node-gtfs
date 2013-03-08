@@ -9,6 +9,7 @@ var url = require('url')
   , request = require('request')
   , exec = require('child_process').exec
   , fs = require('fs')
+  , path = require('path')
   , csv = require('csv')
   , async = require('async')
   , downloadDir = 'downloads'
@@ -175,11 +176,13 @@ function downloadGTFS(task, cb){
     //Loop through each file and add agency_key
     async.forEachSeries(GTFSFiles, function(GTFSFile, cb){
       if(GTFSFile){
+        var filepath = path.join(downloadDir, GTFSFile.fileNameBase + '.txt');
+        if (!fs.existsSync(filepath)) return cb();
         console.log(agency_key + ': ' + GTFSFile.fileNameBase + ' Importing data');
         db.collection(GTFSFile.collection, function(e, collection){
           csv()
-            .fromPath(downloadDir + '/' + GTFSFile.fileNameBase + '.txt', {columns: true})
-            .on('data', function(line, index){
+            .from.path(filepath, {columns: true})
+            .on('record', function(line, index){
                //remove null values
               for(var key in line){
                 if(line[key] === null){
