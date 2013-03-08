@@ -20,7 +20,7 @@ var url = require('url')
   , dbName = process.env['MONGO_NODE_DATABASE'] || config.mongo_node_database
   , host = process.env['MONGO_NODE_HOST'] || config.mongo_node_host
   , port = process.env['MONGO_NODE_PORT'] || config.mongo_node_port || Connection.DEFAULT_PORT
-  , db = new Db(dbName, new Server(host, port, {}))
+  , db = new Db(dbName, new Server(host, port, {safe: false}))
   , q;
 
 var GTFSFiles = [
@@ -75,7 +75,7 @@ var GTFSFiles = [
 ];
 
 if(!config.agencies){
-  console.log('Error: No agency_key specified in config.js\nTry adding `capital-metro` to the agencies in config.js to load transit data');
+  console.log('Error: No agency_key specified in config.js\nTry adding \'capital-metro\' to the agencies in config.js to load transit data');
   process.exit();
 }
 
@@ -239,26 +239,36 @@ function downloadGTFS(task, cb){
   function postProcess(cb){
     console.log(agency_key + ':  Post Processing data');
 
-    var agency_center = [
-        (agency_bounds.ne[0] - agency_bounds.sw[0])/2 + agency_bounds.sw[0]
-      , (agency_bounds.ne[1] - agency_bounds.sw[1])/2 + agency_bounds.sw[1]
-      ];
-
-    db.collection('agencies', function(e, collection){
-      collection.find({agency_key: agency_key}).toArray(function(e, agencies){
-        async.forEach(agencies, function(agency, cb){
-          agency.agency_bounds = agency_bounds;
-          agency.agency_center = agency_center;
-          collection.update(
-              {_id: agency._id}
-            , agency
-            , {safe:true}
-            , cb);
-
-        }, cb);
-      });
+    async.series([
+        agencyCenter
+      , longestTrip
+    ], function(e, results){
+      cb();
     });
   }
 
+  function agencyCenter(cb){
+    var agency_center = [
+        (agency_bounds.ne[0] - agency_bounds.sw[0])/2 + agency_bounds.sw[0]
+      , (agency_bounds.ne[1] - agency_bounds.sw[1])/2 + agency_bounds.sw[1]
+    ];
+
+    db.collection('agencies')
+      .update({agency_key: agency_key}, {$set: {agency_bounds: agency_bounds, agency_center: agency_center}}, {safe: true}, cb);
+  }
+
+  function longestTrip(cb){
+    /*db.trips.find({agency_key: agency_key}).for.toArray(function(e, trips){
+        async.forEach(trips, function(trip, cb){
+          db.collection('stoptimes', function(e, collection){
+
+          });
+          console.log(trip);
+          cb();
+        }, cb);
+      });
+    });*/
+    cb();
+  }
 
 }
