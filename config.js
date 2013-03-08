@@ -1,9 +1,8 @@
 module.exports = {
     mongo_node_host: 'localhost'
-  , mongo_node_database: 'db'
+  , mongo_node_database: 'gtfs'
   , agencies: [
         'caltrain'
-      , 'airbart'
       , 'alamedaoakland-ferry'
       , 'ac-transit'
       , 'county-connection'
