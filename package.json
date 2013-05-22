@@ -3,6 +3,16 @@
   "description": "Download GTFS transit data into mongodb and expose routes, stops, times and more",
   "version": "0.0.4",
   "author": "Brendan Nee <me@bn.ee>",
+  "contributors": [
+    {
+      "name": "Jason Schapiro",
+      "email": "yono38@gmail.com"
+    },
+    {
+      "name": "Jacob Childress",
+      "email": "jacobc@gmail.com"
+    }
+  ],
   "dependencies": {
       "express": "= 3.2.x"
     , "mongoose": "= 3.6.x"
