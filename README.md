@@ -16,7 +16,7 @@ The mongodb URI is also configured in config.js
 
 ###To load data
 
-    npm run-script download
+    node ./scripts/download
 
 To keep schedules up to date, you might want to schedule this to occur once per day.
 

@@ -1,11 +1,9 @@
 {
   "name": "gtfs",
   "description": "Download GTFS transit data into mongodb and expose routes, stops, times and more",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "author": "Brendan Nee <me@bn.ee>",
   "dependencies": {
-  "scripts": {
-    "download": "node scripts/download.js"
       "express": "= 3.2.x"
     , "mongoose": "= 3.6.x"
     , "mongodb": "= 1.3.x"
