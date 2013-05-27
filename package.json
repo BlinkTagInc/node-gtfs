@@ -11,6 +11,7 @@
     , "async": ">= 0.2.x"
     , "request": ">= 2.14.x"
     , "underscore": ">= 1.4.4"
+	, "unzip": ">= "0.1.7"
   },
   "scripts": {
     "download": "node scripts/download.js"

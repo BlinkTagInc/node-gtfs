@@ -121,14 +121,29 @@ function downloadGTFS(task, cb){
   });
 
   function cleanupFiles(cb){
-    //remove old downloaded files
-    exec('rm -rf ' + downloadDir, function(e, stdout, stderr){
-      try{
-        //create downloads directory
-        fs.mkdirSync(downloadDir);
-        cb();
-      } catch(e){ console.log(e) }
-    });
+    
+    if (process.platform.match(/^win/)){
+        //remove old downloaded file
+		exec( 'rmdir /Q /S ' + downloadDir, function(e, stdout, stderr){
+		  try{
+			//create downloads directory
+
+			fs.mkdirSync(downloadDir);
+			cb();
+		  } catch(e){ console.log(e) }
+		});
+
+	}else{
+		//remove old downloaded files
+		exec('rm -rf ' + downloadDir, function(e, stdout, stderr){
+		  try{
+			//create downloads directory
+
+			fs.mkdirSync(downloadDir);
+			cb();
+		  } catch(e){ console.log(e) }
+		});
+	}
   }
   
   /** This function downloads the GTFS feed for the agency specified by agency_key. It is used as part of the
@@ -150,20 +165,28 @@ function downloadGTFS(task, cb){
     request(downloadUrl, processFile).pipe(fs.createWriteStream(fileName));
 
     function processFile(e, response, body){
+	
+	  var fs = require('fs');
+	  var unzip = require('unzip');
+	  
       if(response.statusCode == 200){
         console.log(agency_key + ': Download successful');
-      
+		
+     
+       fs.createReadStream(downloadDir + '/latest.zip').pipe(unzip.Extract({ path: downloadDir }));
+	   cb(null, 'download');
+	 
         //remove old text files and unzip file
-        var unzip = 'unzip ' + downloadDir + '/latest.zip -d ' + downloadDir;
+       /* var unzip = 'unzip ' + downloadDir + '/latest.zip -d ' + downloadDir;
         exec(unzip, function(e, stdout, stderr) {
           if(!e && !stderr){
             console.log(agency_key + ': Unzip successful');
             cb(null, 'download');
           } else { 
-            cb(new Error(agency_key + ': Unzip failed'), 'download');
+            cb(new Error(agency_key + ': Unzip failed ' + stderr), 'download');
           }
         });
-
+*/
       } else {
         cb(new Error('Couldn\'t download files'));
       }
