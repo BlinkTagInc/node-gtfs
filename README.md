@@ -85,39 +85,32 @@ Returns the 100 nearest stops within the specified radius
 
 ##Hosting the Example App with Heroku and MongoHQ
 
-Log in, install dependencies locally and create app
+A `Procfile` is already in the repo pointing to the example app in `examples/express`.
 
-    $ heroku login
-    $ npm install
-    $ heroku create
+Create app on Heroku
+
+    $ heroku apps:create YOURAPPNAME
 
 Add MongoHQ to your app
 
     $ heroku addons:add mongohq:sandbox
 
-Using your MongoHQ control panel, create a DB user and figure out your MongoDB URL. Export that URL as a MONGOHQ_URL environment variable.
+MONGOHQ creates a user, database and exports it as a MONGOHQ_URL environment variable.
 
-Execute the download script
-
-    $ npm script download
-
-Make any changes you need to and test your app
-
-    $ foreman start
-
-Commit your changes
-
-    $ git commit -m "Added auto-kitten detection"
-
-Push changes to Heroku
+Push your app to Heroku
 
     $ git push heroku master
 
-##Updating the database
+Execute the download script to populate the database with the agency data specified in config.js
+
+    $ run node ./scripts/download
+
+
+##Pulling in updated transit data
 
 Re-run the download script whenever you need to refresh the database.
 
-    $ npm script download
+    $ npm run node ./scripts/download
 
 ## License
 
