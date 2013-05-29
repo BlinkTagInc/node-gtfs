@@ -17,7 +17,7 @@ module.exports = function(app){
          '\x1b[32m:url\x1b[0m :status \x1b[90m:response-time ms\x1b[0m'))
       .use(express.errorHandler({dumpExceptions: true, showStack: true}))
       .enable('dev')
-      .set('domain', 'app.local');
+      .set('domain', 'localhost');
   });
   
   // Prod
