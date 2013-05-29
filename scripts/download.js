@@ -41,7 +41,7 @@ var GTFSFiles = [
     , collection: 'fareattributes'
   },
   {
-      fileNameBase: 'fare_files'
+      fileNameBase: 'fare_rules'
     , collection: 'farerules'
   },
   {
