@@ -13,4 +13,5 @@ var mongoose = require('mongoose')
         , ne : {type: Array, index: '2d'}
       }
       , agency_center     :  { type: Array, index: '2d' }
+      , date_last_updated :  { type: Number }
     }));

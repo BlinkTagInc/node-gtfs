@@ -79,7 +79,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
   //loop through all agencies specified
   //If the agency_key is a URL, download that GTFS file, otherwise treat 
   //it as an agency_key and get file from gtfs-data-exchange.com
-  config.agencies.forEach(function(item){
+  config.agencies.forEach(function(item) {
     if(typeof(item) == 'string') {
       var agency = {
               agency_key: item
@@ -106,7 +106,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
   }
 
 
-  function downloadGTFS(task, cb){
+  function downloadGTFS(task, cb) {
     var agency_key = task.agency_key
       , agency_bounds = {sw: [], ne: []}
       , agency_url = task.agency_url;
@@ -126,7 +126,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
     });
 
 
-    function cleanupFiles(cb){
+    function cleanupFiles(cb) {
       //remove old downloaded file
   		exec( (process.platform.match(/^win/) ? 'rmdir /Q /S ' : 'rm -rf ') + downloadDir, function(e, stdout, stderr) {
   		  try {
@@ -144,7 +144,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
     }
     
 
-    function downloadFiles(cb){
+    function downloadFiles(cb) {
       //do download
       request(agency_url, processFile).pipe(fs.createWriteStream(downloadDir + '/latest.zip'));
 
@@ -159,11 +159,11 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
     }
 
 
-    function removeDatabase(cb){
+    function removeDatabase(cb) {
       //remove old db records based on agency_key
       async.forEach(GTFSFiles, function(GTFSFile, cb){
         db.collection(GTFSFile.collection, function(e, collection){
-          collection.remove({ agency_key: agency_key }, {safe: true}, cb);
+          collection.remove({ agency_key: agency_key }, cb);
         });
       }, function(e){
           cb(e, 'remove');
@@ -171,7 +171,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
     }
 
 
-    function importFiles(cb){
+    function importFiles(cb) {
       //Loop through each file and add agency_key
       async.forEachSeries(GTFSFiles, function(GTFSFile, cb){
         if(GTFSFile){
@@ -236,30 +236,31 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
     }
 
 
-    function postProcess(cb){
+    function postProcess(cb) {
       console.log(agency_key + ':  Post Processing data');
 
       async.series([
           agencyCenter
         , longestTrip
+        , updatedDate
       ], function(e, results){
         cb();
       });
     }
 
 
-    function agencyCenter(cb){
+    function agencyCenter(cb) {
       var agency_center = [
           (agency_bounds.ne[0] - agency_bounds.sw[0])/2 + agency_bounds.sw[0]
         , (agency_bounds.ne[1] - agency_bounds.sw[1])/2 + agency_bounds.sw[1]
       ];
 
       db.collection('agencies')
-        .update({agency_key: agency_key}, {$set: {agency_bounds: agency_bounds, agency_center: agency_center}}, {safe: true}, cb);
+        .update({agency_key: agency_key}, {$set: {agency_bounds: agency_bounds, agency_center: agency_center}}, cb);
     }
 
 
-    function longestTrip(cb){
+    function longestTrip(cb) {
       /*db.trips.find({agency_key: agency_key}).for.toArray(function(e, trips){
           async.forEach(trips, function(trip, cb){
             db.collection('stoptimes', function(e, collection){
@@ -271,6 +272,11 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
         });
       });*/
       cb();
+    }
+
+    function updatedDate(cb) {
+      db.collection('agencies')
+        .update({agency_key: agency_key}, {$set: {date_last_updated: Date.now()}}, cb);
     }
   }
 });
