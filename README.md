@@ -83,6 +83,42 @@ Returns the 100 nearest stops within the specified radius
 `:direction_id` is optional
 
 
+##Hosting the Example App with Heroku and MongoHQ
+
+Log in, install dependencies locally and create app
+
+    $ heroku login
+    $ npm install
+    $ heroku create
+
+Add MongoHQ to your app
+
+    $ heroku addons:add mongohq:sandbox
+
+Using your MongoHQ control panel, create a DB user and figure out your MongoDB URL. Export that URL as a MONGOHQ_URL environment variable.
+
+Execute the download script
+
+    $ npm script download
+
+Make any changes you need to and test your app
+
+    $ foreman start
+
+Commit your changes
+
+    $ git commit -m "Added auto-kitten detection"
+
+Push changes to Heroku
+
+    $ git push heroku master
+
+##Updating the database
+
+Re-run the download script whenever you need to refresh the database.
+
+    $ npm script download
+
 ## License
 
 (The MIT License)
