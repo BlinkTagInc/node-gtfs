@@ -34,12 +34,14 @@
     </div>
   </div>
 
-  <div class="container">
+  <div id="content" class="container">
     <div class="navigation">
       <button class="btn" id="nav-button" style="display:none"><i class="icon-arrow-left"></i> Back</button>
     </div>
 
     <h1 id="pageTitle">Agencies</h1>
+
+    <div id="loading">Loading...</div>
 
     <form id="locationForm" class="form-inline form-search">
       <fieldset class="control-group">
@@ -69,11 +71,13 @@
 
     <div id="data"></div>
 
+  </div> <!-- /container -->
+
+  <div class="container">
     <footer>
       <a href="https://github.com/brendannee/node-gtfs">View on Github</a>
     </footer>
-
-  </div> <!-- /container -->
+  </div>
 
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script src="http://cdn.leafletjs.com/leaflet-0.4.4/leaflet.js"></script>

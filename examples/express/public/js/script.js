@@ -17,38 +17,32 @@ $(document).ready(function(){
   map.addLayer(cloudmade);
 
   $('#data').on('click', 'tbody tr', function(){
-      switch($('#data').attr('data-view-type')){
-        case 'agencies':
-          getRoutes.call(this);
-          break;
-        case 'routes':
-          getStops.call(this);
-          break;
-        case 'stops':
-          getStop.call(this);
-          break;
-        case 'agenciesNearby':
-          getRoutes.call(this);
-          break;
-        case 'routesNearby':
-          getStops.call(this);
-          break;
-      }
-    });
+    showLoading();
+    $('#data').empty()
+    
+    var viewType = $('#data').data('view-type');
+    if(viewType == 'agencies') {
+      getRoutes.call(this);
+    } else if(viewType == 'routes') {
+      getStops.call(this);
+    } else if(viewType == 'stops') {
+      getStop.call(this);
+    } else if(viewType == 'agenciesNearby') {
+      getRoutes.call(this);
+    } else if(viewType == 'routesNearby') {
+      getStops.call(this);
+    }
+  });
 
   $('#nav-button').on('click', function(){
     $('#map').hide();
-
-    switch($(this).attr('data-previous')){
-      case 'agencies':
-        getAgencies();
-        break;
-      case 'routes':
-        getRoutes.call(this);
-        break;
-      case 'stops':
-        getStops.call(this);
-        break;
+    var previous = $(this).data('previous');
+    if(previous == 'agencies') {
+      getAgencies();
+    } else if(previous == 'routes') {
+      getRoutes.call(this);
+    } else if(previous == 'stops') {
+      getStops.call(this);
     }
   });
 
@@ -68,7 +62,7 @@ $(document).ready(function(){
       $('#pageTitle').html('Find Agencies by Location');
       $('#locationForm input[type=submit]').val('Find Agencies');
       $('#locationForm')
-        .attr('data-form-type', 'agencies')
+        .data('form-type', 'agencies')
         .show();
       $('#agencySelectForm').hide();
     })
@@ -79,7 +73,7 @@ $(document).ready(function(){
       $('#pageTitle').html('Find Routes by Location');
       $('#agencySelectForm input[type=submit]').val('Find Routes');
       $('#agencySelectForm')
-        .attr('data-form-type', 'routes')
+        .data('form-type', 'routes')
         .show();
       $('#locationForm').hide();
     })*/
@@ -89,7 +83,7 @@ $(document).ready(function(){
       $('#pageTitle').html('Find Routes by Location');
       $('#locationForm input[type=submit]').val('Find Agencies');
       $('#locationForm')
-        .attr('data-form-type', 'agencies')
+        .data('form-type', 'agencies')
         .show();
       $('#agencySelectForm').hide();
     })
@@ -99,7 +93,7 @@ $(document).ready(function(){
       $('#pageTitle').html('Find Routes by Agency');
       $('#locationForm input[type=submit]').val('Find Routes');
       $('#locationForm')
-        .attr('data-form-type', 'routes')
+        .data('form-type', 'routes')
         .show();
       $('#agencySelectForm').hide();
     })
@@ -108,7 +102,7 @@ $(document).ready(function(){
       $('#pageTitle').html('Find Stops by Location');
       $('#locationForm input[type=submit]').val('Find Stops');
       $('#locationForm')
-        .attr('data-form-type', 'stops')
+        .data('form-type', 'stops')
         .show();
       $('#agencySelectForm').hide();
     });;
@@ -131,18 +125,15 @@ $(document).ready(function(){
           //get first result from geocoding
           var lat = data.features[0].centroid.coordinates[0]
             , lon = data.features[0].centroid.coordinates[1]
-            , radius = $('#radius').val();
+            , radius = $('#radius').val()
+            , formType = $('#locationForm').data('form-type');
 
-          switch($('#locationForm').attr('data-form-type')){
-            case 'agencies':
-              getAgenciesNearby(lat, lon, radius);
-              break;
-            case 'routes':
-              getRoutesNearby(lat, lon, radius);
-              break;
-            case 'stops':
-              getStopsNearby(lat, lon, radius);
-              break;
+          if(formType == 'agencies') {
+            getAgenciesNearby(lat, lon, radius);
+          } else if(formType == 'routes') {
+            getRoutesNearby(lat, lon, radius);
+          } else if(formType == 'stops') {
+            getStopsNearby(lat, lon, radius);
           }
 
         } else {
@@ -185,16 +176,16 @@ function getAgencies(){
 }
 
 function getRoutes(){
-  var agency_key = $(this).attr('data-agency-key');
+  var agency_key = $(this).data('agency-key');
 
-  $('#data').attr('data-view-type', 'routes');
+  $('#data').data('view-type', 'routes');
 
   $('#pageTitle').html('Routes for ' + agencies[agency_key].agency_name);
 
   $('#map').hide();
 
-  $('#nav-button').attr('data-agency-key', agency_key);
-  $('#nav-button').attr('data-previous', 'agencies');
+  $('#nav-button').data('agency-key', agency_key);
+  $('#nav-button').data('previous', 'agencies');
 
   if(!agencies[agency_key].routes){
     agencies[agency_key].routes = {};
@@ -210,8 +201,8 @@ function getRoutes(){
 }
 
 function getStops(){
-  var agency_key = $(this).attr('data-agency-key')
-    , route_id = $(this).attr('data-route-id')
+  var agency_key = $(this).data('agency-key')
+    , route_id = $(this).data('route-id')
     , route = agencies[agency_key].routes[route_id]
     , routeTitle;
 
@@ -224,13 +215,14 @@ function getStops(){
   }
   $('#pageTitle').html('Stops on Route ' + routeTitle);
 
-  $('#data').attr('data-view-type', 'stops');
+  $('#data')
+    .data('view-type', 'stops')
+    .data('route-id', route_id);
 
-  $('#data').attr('data-route-id', route_id);
-
-  $('#nav-button').attr('data-agency-key', agency_key);
-  $('#nav-button').attr('data-route-id', route_id);
-  $('#nav-button').attr('data-previous', 'routes');
+  $('#nav-button')
+    .data('agency-key', agency_key)
+    .data('route-id', route_id)
+    .data('previous', 'routes');
 
   if(!route.stops){
     route.stops = {};
@@ -246,17 +238,17 @@ function getStops(){
 }
 
 function getStop(){
-  var agency_key = $(this).attr('data-agency-key')
-    , route_id = $(this).attr('data-route-id')
-    , stop_id = $(this).attr('data-stop-id')
+  var agency_key = $(this).data('agency-key')
+    , route_id = $(this).data('route-id')
+    , stop_id = $(this).data('stop-id')
     , stop = agencies[agency_key].routes[route_id].stops[stop_id];
 
-  $('#data').attr('data-view-type', 'stop');
+  $('#data').data('view-type', 'stop');
 
   $('#pageTitle').html('Stop: ' + stop.stop_name);
   $('#data').html('<div>Coordinates: ' + stop.stop_lat + ', ' + stop.stop_lon + '</div>');
-  $('#nav-button').attr('data-previous', 'stops');
-  $('#nav-button').attr('data-route-id', route_id);
+  $('#nav-button').data('previous', 'stops');
+  $('#nav-button').data('route-id', route_id);
 
 
   //render map
@@ -284,7 +276,7 @@ function getStop(){
 function getAgenciesNearby(lat, lon, radius){
   var agenciesNearby = {};
 
-  $('#data').attr('data-view-type', 'agenciesNearby');
+  $('#data').data('view-type', 'agenciesNearby');
 
   $.getJSON('/api/agenciesNearby/' + lat + '/' + lon + '/' + radius || '', function(data){
     if(!data.length){
@@ -325,7 +317,7 @@ function getAgenciesNearby(lat, lon, radius){
 function getRoutesNearby(lat, lon, radius){
   var routesNearby = {};
 
-  $('#data').attr('data-view-type', 'routesNearby');
+  $('#data').data('view-type', 'routesNearby');
 
   $.getJSON('/api/routesNearby/' + lat + '/' + lon + '/' + radius || '', function(data){
     if(!data.length){
@@ -348,7 +340,7 @@ function getRoutesNearby(lat, lon, radius){
 function getStopsNearby(lat, lon, radius){
   var stopsNearby = {};
 
-  $('#data').attr('data-view-type', 'stopsNearby');
+  $('#data').data('view-type', 'stopsNearby');
 
   $.getJSON('/api/stopsNearby/' + lat + '/' + lon + '/' + radius || '', function(data){
     if(!data.length){
@@ -410,23 +402,24 @@ function renderTable(data, viewType){
     
     //This function just converts route_type identifiers to the actual types they enumerate
     //as defined (enumerated) by the GTFS spec
-    var routeTypeFunction = function(route_type_str) {
-        route_type_i = parseInt(route_type_str);
-        
-        if(route_type_i < 0 || route_type_i > 7) { return(route_type_str); }
-        
-        var routeTypes = new Array();
-        //"Tram", "Metro", "Rail", "Bus", "Ferry", "CableCar", "Gondola", "Furnicular"
-        routeTypes[0] = "Tram";
-        routeTypes[1] = "Metro";
-        routeTypes[2] = "Rail";
-        routeTypes[3] = "Bus";
-        routeTypes[4] = "Ferry";
-        routeTypes[5] = "CableCar";
-        routeTypes[6] = "Gondola";
-        routeTypes[7] = "Furnicular";
-        
-        return(routeTypes[route_type_i]);
+    function routeTypeFunction(route_type_str) {
+      var routeTypes = [
+              "Tram"
+            , "Metro"
+            , "Rail"
+            , "Bus"
+            , "Ferry"
+            , "CableCar"
+            , "Gondola"
+            , "Funicular"
+          ]
+        , route_type_i = parseInt(route_type_str);
+      
+      if(route_type_i < 0 || route_type_i > 7) { 
+        return route_type_str; 
+      } else {
+        return routeTypes[route_type_i];
+      }
     };
 
     columns.forEach(function(column, index){
@@ -439,24 +432,24 @@ function renderTable(data, viewType){
 
     switch(viewType){
       case 'agencies':
-        $(row).attr('data-agency-key', item.agency_key);
+        $(row).data('agency-key', item.agency_key);
         break;
       case 'agenciesNearby':
-        $(row).attr('data-agency-key', item.agency_key);
+        $(row).data('agency-key', item.agency_key);
         break;
       case 'routes':
-        $(row).attr('data-agency-key', item.agency_key);
-        $(row).attr('data-route-id', item.route_id);
+        $(row).data('agency-key', item.agency_key);
+        $(row).data('route-id', item.route_id);
         break;
       case 'routesNearby':
-        $(row).attr('data-agency-key', item.agency_key);
-        $(row).attr('data-route-id', item.route_id);
+        $(row).data('agency-key', item.agency_key);
+        $(row).data('route-id', item.route_id);
         break;
       case 'stops':
-        var route_id = $('#data').attr('data-route-id');
-        $(row).attr('data-agency-key', item.agency_key);
-        $(row).attr('data-route-id', route_id);
-        $(row).attr('data-stop-id', item.stop_id);
+        var route_id = $('#data').data('route-id');
+        $(row).data('agency-key', item.agency_key);
+        $(row).data('route-id', route_id);
+        $(row).data('stop-id', item.stop_id);
         break;
   
     }
@@ -468,4 +461,15 @@ function renderTable(data, viewType){
   } else {
     $('#nav-button').hide();
   }
+
+  hideLoading();
+}
+
+
+function showLoading() {
+  $('#loading').show();
+}
+
+function hideLoading() {
+  $('#loading').fadeOut();
 }
