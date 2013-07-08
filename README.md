@@ -4,7 +4,7 @@ node-GTFS loads transit data in [GTFS format](https://developers.google.com/tran
 
 ##Configuration for loading data
 
-Before you can use node-GTFS you must specify agencies to download from GTFS Data Exchange. You need the dataexchange_id for each agency you want to include from [GTFS Data Exchange](http://www.gtfs-data-exchange.com/) - it is in the URL of each individual transit agency's page.
+Before you can use node-GTFS you must specify agencies to download from GTFS Data Exchange. You need the `dataexchange_id` for each agency you want to include from [GTFS Data Exchange](http://www.gtfs-data-exchange.com/) - it is in the URL of each individual transit agency's page.
 
 A full list of agencies is available via the [GTFS Data Exchange API](http://www.gtfs-data-exchange.com/api/agencies).
 
@@ -103,14 +103,12 @@ Push your app to Heroku
 
 Execute the download script to populate the database with the agency data specified in config.js
 
-    $ run node ./scripts/download
+    $ heroku run node ./scripts/download
 
 
 ##Pulling in updated transit data
 
-Re-run the download script whenever you need to refresh the database.
-
-    $ npm run node ./scripts/download
+Re-run the download script whenever you need to refresh the database. You may want to schedule this with a cronjob.  Heroku lets you do this with [scheduler](https://devcenter.heroku.com/articles/scheduler).
 
 ## License
 
