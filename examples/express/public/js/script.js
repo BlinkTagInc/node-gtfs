@@ -19,7 +19,7 @@ $(document).ready(function(){
   $('#data').on('click', 'tbody tr', function(){
     showLoading();
     $('#data').empty()
-    
+
     var viewType = $('#data').data('view-type');
     if(viewType == 'agencies') {
       getRoutes.call(this);
@@ -66,7 +66,7 @@ $(document).ready(function(){
         .show();
       $('#agencySelectForm').hide();
     })
-    
+
     //NOT YET IMPLEMENTED
     /*.on('click', '#routes-by-agency', function(){
       $('#data').empty();
@@ -77,17 +77,17 @@ $(document).ready(function(){
         .show();
       $('#locationForm').hide();
     })*/
-    
+
     .on('click', '#routes-by-location', function(){
       $('#data').empty();
       $('#pageTitle').html('Find Routes by Location');
-      $('#locationForm input[type=submit]').val('Find Agencies');
+      $('#locationForm input[type=submit]').val('Find Routes');
       $('#locationForm')
-        .data('form-type', 'agencies')
+        .data('form-type', 'routes')
         .show();
       $('#agencySelectForm').hide();
     })
-    
+
     .on('click', '#routes-by-agency', function(){
       $('#data').empty();
       $('#pageTitle').html('Find Routes by Agency');
@@ -119,7 +119,7 @@ $(document).ready(function(){
       var geocodeQuery = $('#location').val().replace(/\s/g,'+');
       $.getJSON('http://geocoding.cloudmade.com/' + cloudmadeAPI + '/geocoding/v2/find.js?query=' + geocodeQuery + '&return_location=true&callback=?', function(data){
         $('#locationForm input[type=submit]').removeAttr('disabled');
-        
+
         if(data.features){
 
           //get first result from geocoding
@@ -149,7 +149,7 @@ $(document).ready(function(){
 });
 
 //IVAN TODO: Add form handler for routesByAgency here
-//Should use getRoutes() to 
+//Should use getRoutes() to
 
 
 function getAgencies(){
@@ -265,9 +265,9 @@ function getStop(){
   markerGroup.addLayer(marker);
   map.addLayer(markerGroup);
 
-  var popupContent = '<strong>' + stop.stop_name + '</strong><br>' + 
-                     'Stop ID: ' + stop_id + '<br>' + 
-                     'Route: ' + route_id + '<br>' + 
+  var popupContent = '<strong>' + stop.stop_name + '</strong><br>' +
+                     'Stop ID: ' + stop_id + '<br>' +
+                     'Route: ' + route_id + '<br>' +
                      'Agency: ' + agencies[agency_key].agency_name;
 
   marker.bindPopup(popupContent).openPopup();
@@ -298,13 +298,13 @@ function getAgenciesNearby(lat, lon, radius){
       var agency_center = new L.LatLng(agency.agency_center[1], agency.agency_center[0]);
       mapBounds.extend(agency_center);
 
-      var popupContent = '<strong>' + agency.agency_name + '</strong><br>' + 
-                     'Site: ' + agency.agency_url + '<br>' + 
-                     'Phone: ' + agency.agency_phone + '<br>' + 
+      var popupContent = '<strong>' + agency.agency_name + '</strong><br>' +
+                     'Site: ' + agency.agency_url + '<br>' +
+                     'Phone: ' + agency.agency_phone + '<br>' +
                      'agency_key: ' + agency.agency_key;
 
       var marker = new L.Marker(agency_center);
-      marker.bindPopup(popupContent).openPopup(); 
+      marker.bindPopup(popupContent).openPopup();
       markerGroup.addLayer(marker);
     });
 
@@ -352,7 +352,7 @@ function getStopsNearby(lat, lon, radius){
     $('#map').show();
 
     markerGroup.clearLayers();
-    
+
     var mapCenter = new L.LatLng(lat, lon);
     var mapBounds = new L.LatLngBounds([]);
     map.setView(mapCenter, 13);
@@ -363,9 +363,9 @@ function getStopsNearby(lat, lon, radius){
       var stop_loc = new L.LatLng(stop.loc[1], stop.loc[0]);
       mapBounds.extend(stop_loc);
 
-      var popupContent = '<strong>' + stop.stop_name + '</strong><br>' + 
-                     'Stop ID: ' + stop.stop_id + '<br>' + 
-                     'Coordinates: ' + stop.loc[1] + ', ' + stop.loc[0] + '<br>' + 
+      var popupContent = '<strong>' + stop.stop_name + '</strong><br>' +
+                     'Stop ID: ' + stop.stop_id + '<br>' +
+                     'Coordinates: ' + stop.loc[1] + ', ' + stop.loc[0] + '<br>' +
                      'agency_key: ' + stop.agency_key;
 
       var marker = new L.Marker(stop_loc);
@@ -399,7 +399,7 @@ function renderTable(data, viewType){
         }
       }
     }
-    
+
     //This function just converts route_type identifiers to the actual types they enumerate
     //as defined (enumerated) by the GTFS spec
     function routeTypeFunction(route_type_str) {
@@ -414,9 +414,9 @@ function renderTable(data, viewType){
             , "Funicular"
           ]
         , route_type_i = parseInt(route_type_str);
-      
-      if(route_type_i < 0 || route_type_i > 7) { 
-        return route_type_str; 
+
+      if(route_type_i < 0 || route_type_i > 7) {
+        return route_type_str;
       } else {
         return routeTypes[route_type_i];
       }
@@ -451,7 +451,7 @@ function renderTable(data, viewType){
         $(row).data('route-id', route_id);
         $(row).data('stop-id', item.stop_id);
         break;
-  
+
     }
     $('#data table tbody').append(row);
   };
