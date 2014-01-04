@@ -97,6 +97,10 @@ Add MongoHQ to your app
 
 MONGOHQ creates a user, database and exports it as a MONGOHQ_URL environment variable.
 
+Add Heroku as a remote repo:
+
+    $ git remote add heroku git@heroku.com:YOUR_APP_NAME.git
+
 Push your app to Heroku
 
     $ git push heroku master
