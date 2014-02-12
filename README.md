@@ -2,6 +2,14 @@
 
 node-GTFS loads transit data in [GTFS format](https://developers.google.com/transit/) from [GTFS Data Exchange](http://www.gtfs-data-exchange.com/), unzips it and stores it to a MongoDB database and provides some methods to query for agencies, routes, stops and times.  It also has spatial queries to find nearby stops, routes and agencies.
 
+##Setup
+
+`git clone git@github.com:brendannee/node-gtfs.git`
+
+`cd node-gtfs`
+
+`npm install`
+
 ##Configuration for loading data
 
 Before you can use node-GTFS you must specify agencies to download from GTFS Data Exchange. You need the `dataexchange_id` for each agency you want to include from [GTFS Data Exchange](http://www.gtfs-data-exchange.com/) - it is in the URL of each individual transit agency's page.
@@ -12,7 +20,8 @@ For example, Austin Capital Metro is `capital-area-transit`, Washington DC is `w
 
 Add the list of agency keys you'd like to support to config.js as an array called `agencies`
 
-The mongodb URI is also configured in config.js
+The mongodb URI is also configured in `config.js`. Default database URI is:
+`mongodb://localhost:27017/gtfs`
 
 ###To load data
 
