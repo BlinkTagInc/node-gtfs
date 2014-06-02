@@ -51,6 +51,10 @@ var GTFSFiles = [
     , collection: 'routes'
   },
   {
+      fileNameBase: 'shapes'
+    , collection: 'shapes'
+  },
+  {
       fileNameBase: 'stop_times'
     , collection: 'stoptimes'
   },
@@ -199,8 +203,11 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
                 if(line.direction_id){
                   line.direction_id = parseInt(line.direction_id, 10);
                 }
+                if(line.shape_pt_sequence){
+                  line.shape_pt_sequence = parseInt(line.shape_pt_sequence, 10);
+                }
 
-                //make lat/lon array
+                //make lat/lon array for stops
                 if(line.stop_lat && line.stop_lon){
                   line.loc = [parseFloat(line.stop_lon), parseFloat(line.stop_lat)];
                   
@@ -217,6 +224,13 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
                   if(agency_bounds.ne[1] < line.loc[1] || !agency_bounds.ne[1]){
                     agency_bounds.ne[1] = line.loc[1];
                   }
+                }
+
+                //make lat/long for shapes
+                if(line.shape_pt_lat && line.shape_pt_lon){
+                  line.shape_pt_lon = parseFloat(line.shape_pt_lon)
+                  line.shape_pt_lat = parseFloat(line.shape_pt_lat)
+                  line.loc = [line.shape_pt_lon, line.shape_pt_lat];
                 }
 
                 //insert into db
