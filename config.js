@@ -11,4 +11,4 @@ module.exports = {
     , 'bay-area-rapid-transit'
     , 'golden-gate-ferry'
   ]
-}
+};

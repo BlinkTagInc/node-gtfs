@@ -35,5 +35,10 @@
   },
   "keywords": ["transit","gtfs","transportation"],
   "repository": "git://github.com/brendannee/node-gtfs",
-  "main": "index"
+  "main": "index",
+  "devDependencies": {
+    "csv-parse": "0.0.5",
+    "should": "^4.0.4",
+    "supertest": "^0.13.0"
+  }
 }
