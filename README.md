@@ -3,6 +3,7 @@
 node-GTFS loads transit data in [GTFS format](https://developers.google.com/transit/) from [GTFS Data Exchange](http://www.gtfs-data-exchange.com/), unzips it and stores it to a MongoDB database and provides some methods to query for agencies, routes, stops and times.  It also has spatial queries to find nearby stops, routes and agencies.
 
 ## Forking motivations
+* .immediate: Write tests for download script and lib/gtfs API
 * .immediate: Support importing GTFS feed into ArangoDB and still support that same API as the original branch
 * .next: Move to database agnotic codebase. Possibly using JugglingDB
 
