@@ -84,13 +84,14 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
   //If the agency_key is a URL, download that GTFS file, otherwise treat 
   //it as an agency_key and get file from gtfs-data-exchange.com
   config.agencies.forEach(function(item) {
+    var agency;
     if(typeof(item) == 'string') {
-      var agency = {
+      agency = {
               agency_key: item
             , agency_url: 'http://www.gtfs-data-exchange.com/agency/' + item + '/latest.zip'
           }
     } else {
-      var agency = {
+      agency = {
               agency_key: item.agency_key
             , agency_url: item.url
           }
@@ -107,7 +108,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
     console.log('All agencies completed (' + config.agencies.length + ' total)');
     db.close();
     process.exit();
-  }
+  };
 
 
   function downloadGTFS(task, cb) {
@@ -125,7 +126,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
       postProcess,
       cleanupFiles
     ], function(e, results){
-      console.log( e || agency_key + ': Completed')
+      console.log( e || agency_key + ': Completed');
       cb();
     });
 
@@ -228,8 +229,8 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
 
                 //make lat/long for shapes
                 if(line.shape_pt_lat && line.shape_pt_lon){
-                  line.shape_pt_lon = parseFloat(line.shape_pt_lon)
-                  line.shape_pt_lat = parseFloat(line.shape_pt_lat)
+                  line.shape_pt_lon = parseFloat(line.shape_pt_lon);
+                  line.shape_pt_lat = parseFloat(line.shape_pt_lat);
                   line.loc = [line.shape_pt_lon, line.shape_pt_lat];
                 }
 
@@ -298,5 +299,5 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
 
 function handleError(e) {
   console.error(e || 'Unknown Error');
-  process.exit(1)
-};
+  process.exit(1);
+}
