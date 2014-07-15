@@ -21,7 +21,10 @@ DatabaseTestSupport.prototype.teardown = function(cb){
     if (!collections) cb(new Error('Missing collections'));
 
     async.eachSeries(collections, function(collection, next){
-        collection.drop(function(){ next();});
+      if (collection.collectionName.substring(0, 6) === 'system') return next();
+      collection.remove({}, function(err){
+        next();
+      });
     }, cb);
   });
 };
