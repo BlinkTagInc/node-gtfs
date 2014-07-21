@@ -1,93 +1,34 @@
 var fs = require('fs');
-var request = require('supertest');
 var async = require('async');
-var should = require('should');
 var unzip = require('unzip');
 var parse = require('csv-parse');
 
 var config = require('./../../config');
 var downloadScript = require('../../../scripts/download');
-
 var agenciesFixtures = {
   http: [{ agency_key: 'caltrain', url:  'http://www.gtfs-data-exchange.com/agency/caltrain/latest.zip'}],
   local: [{ agency_key: 'caltrain', url: __dirname + '/../../fixture/caltrain_20120824_0333.zip'}]
 };
 
-// taken from script/download.js
-// TODO: make it available as an export?
-var GTFSFiles = [
-  {
-    fileNameBase: 'agency'
-    , collection: 'agencies'
-  },
-  {
-    fileNameBase: 'calendar_dates'
-    , collection: 'calendardates'
-  },
-  {
-    fileNameBase: 'calendar'
-    , collection: 'calendars'
-  },
-  {
-    fileNameBase: 'fare_attributes'
-    , collection: 'fareattributes'
-  },
-  {
-    fileNameBase: 'fare_rules'
-    , collection: 'farerules'
-  },
-  {
-    fileNameBase: 'feed_info'
-    , collection: 'feedinfos'
-  },
-  {
-    fileNameBase: 'frequencies'
-    , collection: 'frequencies'
-  },
-  {
-    fileNameBase: 'routes'
-    , collection: 'routes'
-  },
-  {
-    fileNameBase: 'shapes'
-    , collection: 'shapes'
-  },
-  {
-    fileNameBase: 'stop_times'
-    , collection: 'stoptimes'
-  },
-  {
-    fileNameBase: 'stops'
-    , collection: 'stops'
-  },
-  {
-    fileNameBase: 'transfers'
-    , collection: 'transfers'
-  },
-  {
-    fileNameBase: 'trips'
-    , collection: 'trips'
-  }
-];
+var databaseTestSupport = require('./../../support/database')(config);
 
-describe('GTFS Feed Download', function(){
+var GTFSFiles = require('../../support/GTFSFiles');
 
-  this.timeout(5000);
+describe('script/download.js', function(){
 
-  describe('Download from different GTFS sources', function(){
+  this.timeout(10000);
 
-    it('should be able to download from HTTP', function(done){
+  describe('Download and import from different GTFS sources', function(){
+
+    it('should be able to download and import from HTTP', function(done){
       config.agencies = agenciesFixtures.http;
-      downloadScript(config, function(){
-        done();
-      });
+      downloadScript(config, done);
     });
 
-    it('should be able to download from local filesystem', function(done){
+    it('should be able to download and import from local filesystem', function(done){
       config.agencies = agenciesFixtures.local;
-      downloadScript(config, function(){
-        done();
-      });
+      downloadScript(config, done);
+
     });
 
   });
@@ -100,8 +41,6 @@ describe('GTFS Feed Download', function(){
       throw new Error('Test failed', err);
     };
 
-    // TODO: update when we move to agnostic db implementation
-    var mongodb = require('mongodb');
     var db;
     var countData = {};
     var tmpDir = __dirname + '/../../fixture/tmp/';
@@ -142,15 +81,16 @@ describe('GTFS Feed Download', function(){
           });
         },
         connectToDb: function(next){
-          mongodb.Db.connect(config.mongo_url, {w: 1}, function(err, _db) {
+          databaseTestSupport.connect(function(err, _db){
             db = _db;
             next();
           });
         },
+        teardownDatabase: function(next){
+          databaseTestSupport.teardown(next);
+        },
         executeDownloadScript: function(next){
-          downloadScript(config, function(){
-            next();
-          });
+          downloadScript(config, next);
         }
       },function(){
         done();
@@ -159,9 +99,11 @@ describe('GTFS Feed Download', function(){
 
     after(function(done) {
       async.series({
+        teardownDatabase: function(next){
+          databaseTestSupport.teardown(next);
+        },
         closeDb: function(next){
-          db.close();
-          next();
+          databaseTestSupport.close(next);
         }
       },function(err, results){
         done();
