@@ -1,7 +1,5 @@
 var fs = require('fs');
-var request = require('supertest');
 var async = require('async');
-var should = require('should');
 var unzip = require('unzip');
 var parse = require('csv-parse');
 
@@ -20,15 +18,14 @@ describe('script/download.js', function(){
 
   this.timeout(10000);
 
-  describe('Download from different GTFS sources', function(){
+  describe('Download and import from different GTFS sources', function(){
 
-    it('should be able to download from HTTP', function(done){
-
+    it('should be able to download and import from HTTP', function(done){
       config.agencies = agenciesFixtures.http;
       downloadScript(config, done);
     });
 
-    it('should be able to download from local filesystem', function(done){
+    it('should be able to download and import from local filesystem', function(done){
       config.agencies = agenciesFixtures.local;
       downloadScript(config, done);
 

@@ -73,10 +73,10 @@ describe('gtfs.agencies(): ', function(){
         databaseTestSupport.teardown(next);
       }
     }, function(){
-      gtfs.agencies(function(err, res){
-        should.not.exist(err);
-        should.exist(res);
-        res.should.have.length(0);
+      gtfs.agencies(function(err, agencies) {
+        should.not.exists(err);
+        should.exists(agencies);
+        agencies.should.have.length(0);
         done();
       });
     });
