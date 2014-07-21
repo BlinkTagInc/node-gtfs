@@ -5,6 +5,7 @@ node-GTFS loads transit data in [GTFS format](https://developers.google.com/tran
 ## Forking motivations
 * .immediate: Write tests for download script and lib/gtfs API
 * .immediate: Support importing GTFS feed into ArangoDB and still support that same API as the original branch
+* .optimization: Some queries need only to be calculated once and results can be re-used. (For eg: gtfs.getStopsByRoute(), a particular route & direction are expected to always have the same stops)
 * .next: Move to database agnotic codebase. Possibly using JugglingDB
 
 ##Setup
