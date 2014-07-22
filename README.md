@@ -94,8 +94,6 @@ Returns the 100 nearest stops within the specified radius
 
 ##Hosting the Example App with Heroku and MongoHQ
 
-A `Procfile` is already in the repo pointing to the example app in `examples/express`.
-
 Create app on Heroku
 
     $ heroku apps:create YOURAPPNAME

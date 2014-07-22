@@ -47,6 +47,7 @@
     "timekeeper": "0.0.4"
   },
   "scripts": {
-    "test": "NODE_ENV=test mocha ./test/mocha/**/*.js --reporter spec"
+    "test": "NODE_ENV=test mocha ./test/mocha/**/*.js --reporter spec",
+    "start": "node examples/express/index.js"
   }
 }
