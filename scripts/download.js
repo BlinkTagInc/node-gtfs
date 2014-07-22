@@ -9,13 +9,22 @@ var request = require('request')
   , Db = require('mongodb').Db
   , q;
 
-//load config.js
-try {
-  var config = require('../config.js');
-} catch (e) {
-  handleError(new Error('Cannot find config.js'));
-}
 
+// check if this file was invoked directthrough commandline or required as an export
+var invocation = (require.main === module) ? 'direct' : 'required';
+
+var config = {};
+if (invocation === 'direct') {
+  try {
+    config = require('../config.js');
+  } catch (e) {
+    handleError(new Error('Cannot find config.js'));
+  }
+  if(!config.agencies){
+    handleError(new Error('No agency_key specified in config.js\nTry adding \'capital-metro\' to the agencies in config.js to load transit data'));
+    process.exit();
+  }
+}
 
 var GTFSFiles = [
   {
@@ -72,10 +81,11 @@ var GTFSFiles = [
   }
 ];
 
-if(!config.agencies){
-  handleError(new Error('No agency_key specified in config.js\nTry adding \'capital-metro\' to the agencies in config.js to load transit data'));
-  process.exit();
-}
+// wrap original procedure in a function and preserve original indentation for easy diffs
+// reformat indentation if-and-after pull-request is accepted
+function main(config, callback){
+
+var log = (config.verbose === false) ? function(){} : console.log;
 
 //open database and create queue for agency list
 Db.connect(config.mongo_url, {w: 1}, function(err, db) { 
@@ -84,13 +94,14 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
   //If the agency_key is a URL, download that GTFS file, otherwise treat 
   //it as an agency_key and get file from gtfs-data-exchange.com
   config.agencies.forEach(function(item) {
+    var agency;
     if(typeof(item) == 'string') {
-      var agency = {
+      agency = {
               agency_key: item
             , agency_url: 'http://www.gtfs-data-exchange.com/agency/' + item + '/latest.zip'
           }
     } else {
-      var agency = {
+      agency = {
               agency_key: item.agency_key
             , agency_url: item.url
           }
@@ -104,10 +115,9 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
   });
 
   q.drain = function(e) {
-    console.log('All agencies completed (' + config.agencies.length + ' total)');
-    db.close();
-    process.exit();
-  }
+    log('All agencies completed (' + config.agencies.length + ' total)');
+    callback();
+  };
 
 
   function downloadGTFS(task, cb) {
@@ -115,7 +125,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
       , agency_bounds = {sw: [], ne: []}
       , agency_url = task.agency_url;
 
-    console.log('Starting ' + agency_key);
+    log('Starting ' + agency_key);
 
     async.series([
       cleanupFiles,
@@ -125,7 +135,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
       postProcess,
       cleanupFiles
     ], function(e, results){
-      console.log( e || agency_key + ': Completed')
+      log( e || agency_key + ': Completed');
       cb();
     });
 
@@ -150,14 +160,28 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
 
     function downloadFiles(cb) {
       //do download
-      request(agency_url, processFile).pipe(fs.createWriteStream(downloadDir + '/latest.zip'));
+      // update implementation to allow download from local filesystem, to allow testable code
+      var file_protocol = require('url').parse(agency_url)['protocol'];
+      if (file_protocol === 'http:' || file_protocol === 'https:') {
+        request(agency_url, processFile).pipe(fs.createWriteStream(downloadDir + '/latest.zip'));
 
-      function processFile(e, response, body){
-        if(response && response.statusCode != 200){ cb(new Error('Couldn\'t download files')); }
-        console.log(agency_key + ': Download successful');
-  	
-        fs.createReadStream(downloadDir + '/latest.zip')
-          .pipe(unzip.Extract({ path: downloadDir }).on('close', cb))
+        function processFile(e, response, body){
+          if(response && response.statusCode != 200){ cb(new Error('Couldn\'t download files')); }
+          log(agency_key + ': Download successful');
+
+          fs.createReadStream(downloadDir + '/latest.zip')
+            .pipe(unzip.Extract({ path: downloadDir }).on('close', cb))
+            .on('error', handleError);
+        }
+      } else {
+        if (!fs.existsSync(agency_url)) return cb(new Error('File does not exists'));
+        fs.createReadStream(agency_url)
+          .pipe(fs.createWriteStream(downloadDir + '/latest.zip'))
+          .on('close', function(){
+            fs.createReadStream(downloadDir + '/latest.zip')
+              .pipe(unzip.Extract({ path: downloadDir }).on('close', cb))
+              .on('error', handleError);
+          })
           .on('error', handleError);
       }
     }
@@ -181,7 +205,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
         if(GTFSFile){
           var filepath = path.join(downloadDir, GTFSFile.fileNameBase + '.txt');
           if (!fs.existsSync(filepath)) return cb();
-          console.log(agency_key + ': ' + GTFSFile.fileNameBase + ' Importing data');
+          log(agency_key + ': ' + GTFSFile.fileNameBase + ' Importing data');
           db.collection(GTFSFile.collection, function(e, collection){
             csv()
               .from.path(filepath, {columns: true})
@@ -228,8 +252,8 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
 
                 //make lat/long for shapes
                 if(line.shape_pt_lat && line.shape_pt_lon){
-                  line.shape_pt_lon = parseFloat(line.shape_pt_lon)
-                  line.shape_pt_lat = parseFloat(line.shape_pt_lat)
+                  line.shape_pt_lon = parseFloat(line.shape_pt_lon);
+                  line.shape_pt_lat = parseFloat(line.shape_pt_lat);
                   line.loc = [line.shape_pt_lon, line.shape_pt_lat];
                 }
 
@@ -251,7 +275,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
 
 
     function postProcess(cb) {
-      console.log(agency_key + ':  Post Processing data');
+      log(agency_key + ':  Post Processing data');
 
       async.series([
           agencyCenter
@@ -294,9 +318,18 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
     }
   }
 });
-
+}
 
 function handleError(e) {
   console.error(e || 'Unknown Error');
-  process.exit(1)
-};
+  process.exit(1);
+}
+
+// allow script to be called directly from commandline or required (for testable code)
+if (invocation === 'direct') {
+  main(config, function(){
+    process.exit();
+  });
+} else {
+  module.exports = main;
+}
