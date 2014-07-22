@@ -2,12 +2,6 @@
 
 node-GTFS loads transit data in [GTFS format](https://developers.google.com/transit/) from [GTFS Data Exchange](http://www.gtfs-data-exchange.com/), unzips it and stores it to a MongoDB database and provides some methods to query for agencies, routes, stops and times.  It also has spatial queries to find nearby stops, routes and agencies.
 
-## Forking motivations
-* .immediate: Write tests for download script and lib/gtfs API
-* .immediate: Support importing GTFS feed into ArangoDB and still support that same API as the original branch
-* .optimization: Some queries need only to be calculated once and results can be re-used. (For eg: gtfs.getStopsByRoute(), a particular route & direction are expected to always have the same stops)
-* .next: Move to database agnotic codebase. Possibly using JugglingDB
-
 ##Setup
 
 `git clone git@github.com:brendannee/node-gtfs.git`
@@ -50,7 +44,7 @@ There is an example web app that creates some restful API endpoints and has a si
 ###List agencies near a point
 
     /api/agenciesNearby/:lat/:lon/:radius
-    
+
     //Example
     /api/agenciesNearby/37.73/-122.25/10
 `:radius` is optional and in miles.  Default: 25 miles
@@ -59,14 +53,14 @@ Returns all agencies that serve the 100 nearest stops within the specified radiu
 ###List routes for an agency
 
     /api/routes/:agency
-    
+
     //Example
     /api/routes/san-francisco-municipal-transportation-agency
 
 ###List routes near a point
 
     /api/routesNearby/:lat/:lon/:radius
-    
+
     //Example
     /api/routesNearby/37.73/-122.25/0.25
 `:radius` is optional and in miles.  Default: 1 mile
@@ -75,7 +69,7 @@ Returns all routes that stop at the 100 nearest stops within the specified radiu
 ###List stops for a route
 
     /api/stops/:agency/:route_id/:direction_id
-    
+
     //Example
     /api/stops/san-francisco-municipal-transportation-agency/34/1
 `:direction_id` is optional
@@ -83,7 +77,7 @@ Returns all routes that stop at the 100 nearest stops within the specified radiu
 ###List stops near a point
 
     /api/stopsNearby/:lat/:lon/:radius
-    
+
     //Example
     /api/StopsNearby/37.73/-122.25/0.25
 `:radius` is optional and in miles.  Default: 1 mile
@@ -92,7 +86,7 @@ Returns the 100 nearest stops within the specified radius
 ###List stop times for a stop
 
     /api/times/:agency/:route_id/:stop_id/:direction_id
-    
+
     //Example
     /api/times/san-francisco-municipal-transportation-agency/34/1256/0
 `:direction_id` is optional
