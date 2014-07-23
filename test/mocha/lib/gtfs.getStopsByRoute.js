@@ -173,24 +173,93 @@ describe('gtfs.getStopsByRoute(): ', function(){
     });
   });
 
-  it('should return array of stops if it exists for given agency, route (without specifying direction)', function(done){
+  it('should return array of all stops for all directions if it exists for given agency and route (without specifying direction)', function(done){
     var agency_key = 'caltrain';
     var route_id = 'ct_local_20120701';
 
-    gtfs.getStopsByRoute(agency_key, route_id, function(err, stops){
+    var expectedResults = {
+      0: {
+        direction_id: 0,
+        stops_count: 24,
+        stops: [
+          'San Jose Caltrain',
+          'Santa Clara Caltrain',
+          'Lawrence Caltrain',
+          'Sunnyvale Caltrain',
+          'Mountain View Caltrain',
+          'San Antonio Caltrain',
+          'California Ave Caltrain',
+          'Palo Alto Caltrain',
+          'Menlo Park Caltrain',
+          'Atherton Caltrain',
+          'Redwood City Caltrain',
+          'San Carlos Caltrain',
+          'Belmont Caltrain',
+          'Hillsdale Caltrain',
+          'Hayward Park Caltrain',
+          'San Mateo Caltrain',
+          'Burlingame Caltrain',
+          'Broadway Caltrain',
+          'Millbrae Caltrain',
+          'San Bruno Caltrain',
+          'So. San Francisco Caltrain',
+          'Bayshore Caltrain',
+          '22nd Street Caltrain',
+          'San Francisco Caltrain'
+        ]
+      },
+      1: {
+        direction_id: 1,
+        stops_count: 29,
+        stops: [
+          'San Francisco Caltrain',
+          '22nd Street Caltrain',
+          'Bayshore Caltrain',
+          'So. San Francisco Caltrain',
+          'San Bruno Caltrain',
+          'Millbrae Caltrain',
+          'Burlingame Caltrain',
+          'San Mateo Caltrain',
+          'Hayward Park Caltrain',
+          'Hillsdale Caltrain',
+          'Belmont Caltrain',
+          'San Carlos Caltrain',
+          'Redwood City Caltrain',
+          'Menlo Park Caltrain',
+          'Palo Alto Caltrain',
+          'California Ave Caltrain',
+          'San Antonio Caltrain',
+          'Mountain View Caltrain',
+          'Sunnyvale Caltrain',
+          'Lawrence Caltrain',
+          'Santa Clara Caltrain',
+          'College Park Caltrain',
+          'San Jose Caltrain',
+          'Tamien Caltrain',
+          'Capitol Caltrain',
+          'Blossom Hill Caltrain',
+          'Morgan Hill Caltrain',
+          'San Martin Caltrain',
+          'Gilroy Caltrain'
+        ]
+      }
+    };
+
+    gtfs.getStopsByRoute(agency_key, route_id, function(err, results){
       should.not.exist(err);
-      should.exist(stops);
+      should.exist(results);
 
-      // defer writing a test until we figure this out
-      // this api is supposed to map to endpoint: /api/stops/:agency/:route_id
-      // naturally, it should return stops for all directions like so
-      // [
-      //    {direction_id: 0, stops: [stop1, stop2, ...]},
-      //    {direction_id: 1, stops: [stopX, stopW, ...]}
-      // ]
-      // Submitted an issue @ github: https://github.com/brendannee/node-gtfs/issues/19
-
-      should.equal(0,1,'Not specifying direction_id does not return ALL stops (it should be the same as specifying ALL direction ids)');
+      results.should.have.length(2, 'Should have 2 directions');
+      for (var i in results){
+        var row = results[i];
+        row.should.have.property('direction_id');
+        row.should.have.property('stops');
+        row.stops.should.have.length(expectedResults[row.direction_id].stops_count);
+        for (var k in row.stops){
+          var stop = row.stops[k];
+          expectedResults[row.direction_id].stops[k].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
+        }
+      }
       done();
 
     });
