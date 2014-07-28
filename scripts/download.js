@@ -207,10 +207,11 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
           if (!fs.existsSync(filepath)) return cb();
           log(agency_key + ': ' + GTFSFile.fileNameBase + ' Importing data');
           db.collection(GTFSFile.collection, function(e, collection){
-            csv()
-              .from.path(filepath, {columns: true})
-              .on('record', function(line, index){
-                 //remove null values
+            var input = fs.createReadStream(filepath);
+            var parser = csv.parse({columns: true});
+            parser.on('readable', function(){
+              while(line = parser.read()){
+                //remove null values
                 for(var key in line){
                   if(line[key] === null){
                     delete line[key];
@@ -261,11 +262,13 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
                 collection.insert(line, function(e, inserted) {
                   if(e) { handleError(e); }
                 });
-              })
-              .on('end', function(count){
+              }
+            });
+            parser.on('end', function(count){
                 cb();
-              })
-              .on('error', handleError);
+            });
+            parser.on('error', handleError);
+            input.pipe(parser);
           });
         }
       }, function(e){
