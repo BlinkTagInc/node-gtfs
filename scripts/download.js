@@ -88,10 +88,10 @@ function main(config, callback){
 var log = (config.verbose === false) ? function(){} : console.log;
 
 //open database and create queue for agency list
-Db.connect(config.mongo_url, {w: 1}, function(err, db) { 
+Db.connect(config.mongo_url, {w: 1}, function(err, db) {
   q = async.queue(downloadGTFS, 1);
   //loop through all agencies specified
-  //If the agency_key is a URL, download that GTFS file, otherwise treat 
+  //If the agency_key is a URL, download that GTFS file, otherwise treat
   //it as an agency_key and get file from gtfs-data-exchange.com
   config.agencies.forEach(function(item) {
     var agency;
@@ -156,7 +156,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
         }
   		});
     }
-    
+
 
     function downloadFiles(cb) {
       //do download
@@ -217,7 +217,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
                     delete line[key];
                   }
                 }
-                
+
                 //add agency_key
                 line.agency_key = agency_key;
 
@@ -235,7 +235,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
                 //make lat/lon array for stops
                 if(line.stop_lat && line.stop_lon){
                   line.loc = [parseFloat(line.stop_lon), parseFloat(line.stop_lat)];
-                  
+
                   //Calulate agency bounds
                   if(agency_bounds.sw[0] > line.loc[0] || !agency_bounds.sw[0]){
                     agency_bounds.sw[0] = line.loc[0];

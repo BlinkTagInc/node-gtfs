@@ -1,0 +1,53 @@
+body {
+  padding: 50px;
+}
+a {
+  color: #00B7FF;
+}
+#content {
+  min-height: 400px;
+}
+#data table tbody tr {
+  cursor: pointer;
+}
+.navigation {
+  height: 30px;
+}
+#pageTitle {
+  margin-bottom: 10px;
+}
+#map {
+  height: 400px;
+  margin: 20px 0;
+  display: none;
+}
+#locationForm {
+  display: none;
+}
+#locationForm label {
+  margin: 0 5px 0 10px;
+}
+#locationForm .form-group {
+  margin: 0 10px;
+  ;
+}
+#loading {
+  display: none;
+  width: 150px;
+  height: 150px;
+  position: absolute;
+  top: 200px;
+  left: 50%;
+  margin-left: -75px;
+  text-align: center;
+  padding-top: 100px;
+  box-sizing: border-box;
+  font-weight: bold;
+  background: rgba(200, 200, 200, 0.6) url('../images/loading.gif') center 50px no-repeat;
+  border-radius: 20px;
+}
+footer {
+  margin-top: 50px;
+  border-top: 1px #CCC solid;
+  text-align: right;
+}

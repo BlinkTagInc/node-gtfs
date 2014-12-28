@@ -29,11 +29,23 @@ The mongodb URI is also configured in `config.js`. Default database URI is:
 
 To keep schedules up to date, you might want to schedule this to occur once per day.
 
-##Example Application
+#Example Application
 
-There is an example web app that creates some restful API endpoints and has a simple frontend for viewing transit data.  It is in examples/express.  You could load the example site with:
+An example app is provided that creates some restful API endpoints and has a simple frontend for viewing and exploring transit data.  It is in `examples/express`.
 
-    node ./examples/express/index.js
+
+##Running the example app locally
+
+Run the example site:
+
+    cd examples/express
+
+    npm install
+
+    debug=node-gtfs-exampleapp npm start
+
+Visit `localhost:3000` in your browser
+
 
 ##Endpoints
 
