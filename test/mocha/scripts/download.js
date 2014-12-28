@@ -1,6 +1,6 @@
 var fs = require('fs');
 var async = require('async');
-var unzip = require('unzip');
+var unzip = require('unzip2');
 var parse = require('csv-parse');
 
 var config = require('./../../config');

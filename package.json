@@ -31,7 +31,7 @@
     "async": "~0.9.0",
     "request": "~2.38.0",
     "underscore": "~1.6.0",
-    "unzip": "~0.1.9"
+    "unzip2": "~0.2.5"
   },
   "keywords": [
     "transit",

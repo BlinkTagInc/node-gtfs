@@ -4,7 +4,7 @@ var request = require('request')
   , path = require('path')
   , csv = require('csv')
   , async = require('async')
-  , unzip = require('unzip')
+  , unzip = require('unzip2')
   , downloadDir = 'downloads'
   , Db = require('mongodb').Db
   , q;
