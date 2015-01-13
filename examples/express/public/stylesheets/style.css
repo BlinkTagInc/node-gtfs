@@ -4,34 +4,33 @@ body {
 a {
   color: #00B7FF;
 }
-#content {
+h1 {
+  margin-bottom: 10px;
+}
+.content {
   min-height: 400px;
 }
-#data table tbody tr {
+table.table-data tbody tr {
   cursor: pointer;
 }
 .navigation {
   height: 30px;
 }
-#pageTitle {
-  margin-bottom: 10px;
-}
-#map {
+.map {
   height: 400px;
   margin: 20px 0;
   display: none;
 }
-#locationForm {
+.form-location {
   display: none;
 }
-#locationForm label {
+.form-location label {
   margin: 0 5px 0 10px;
 }
-#locationForm .form-group {
+.form-location .form-group {
   margin: 0 10px;
-  ;
 }
-#loading {
+.loading {
   display: none;
   width: 150px;
   height: 150px;

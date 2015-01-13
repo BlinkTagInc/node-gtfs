@@ -415,7 +415,7 @@ function renderTable(data, viewType){
   var columns,
       sortVariable;
 
-  $('#data').html('<table class="table table-bordered table-striped"><thead><tr></tr></thead><tbody></tbody></table>');
+  $('#data').html('<table class="table table-bordered table-striped table-data"><thead><tr></tr></thead><tbody></tbody></table>');
   $('#data table').attr('id', viewType);
 
   _.each(data, function(item) {

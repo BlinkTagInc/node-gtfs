@@ -1,15 +1,15 @@
 extends layout
 
 block content
-  #content.container
+  .content.container
     .navigation
       button#nav-button.btn(style="display:none") <i class="glyphicon glyphicon-chevron-left"></i> Back
   
     h1#pageTitle Agencies
     
-    #loading Loading...
+    #loading.loading Loading...
     
-    form#locationForm.form-inline.form-search
+    form#locationForm.form-inline.form-search.form-location
       .form-group
         label.control-label(for="location") Location:
         input#location.form-control(type="text" name="location")
@@ -30,6 +30,6 @@ block content
         input#location(type="text" name="location")
       button.btn.btn-primary.btn-sm(type="submit") Find Agencies
     
-    #map
+    #map.map
     
     #data
