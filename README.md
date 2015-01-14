@@ -25,6 +25,12 @@ The mongodb URI is also configured in `config.js`. Default database URI is:
 
 ###To load data
 
+Make sure mongo is running:
+
+    mongod
+
+Run the download script:
+
     node ./scripts/download
 
 To keep schedules up to date, you might want to schedule this to occur once per day.
@@ -41,6 +47,12 @@ Run the example site:
     cd examples/express
 
     npm install
+
+Make sure mongo is running:
+
+    mongod
+
+Run the example app:
 
     debug=node-gtfs-exampleapp npm start
 
