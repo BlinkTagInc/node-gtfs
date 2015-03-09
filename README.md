@@ -54,6 +54,8 @@ Install dependencies
 
     npm install
 
+    bower install
+
 Make sure mongo is running:
 
     mongod
