@@ -1,35 +1,41 @@
-body {
-  padding: 50px;
-}
 a {
   color: #00B7FF;
 }
+
 h1 {
   margin-bottom: 10px;
 }
+
 .content {
   min-height: 400px;
 }
+
 table.table-data tbody tr {
   cursor: pointer;
 }
+
 .navigation {
   height: 30px;
 }
+
 .map {
   height: 400px;
   margin: 20px 0;
   display: none;
 }
+
 .form-location {
   display: none;
 }
+
 .form-location label {
   margin: 0 5px 0 10px;
 }
+
 .form-location .form-group {
   margin: 0 10px;
 }
+
 .loading {
   display: none;
   width: 150px;
@@ -45,6 +51,7 @@ table.table-data tbody tr {
   background: rgba(200, 200, 200, 0.6) url('../images/loading.gif') center 50px no-repeat;
   border-radius: 20px;
 }
+
 footer {
   margin-top: 50px;
   border-top: 1px #CCC solid;

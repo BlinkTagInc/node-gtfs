@@ -18,24 +18,27 @@ $('#data').on('click', 'tbody tr', function(){
   showLoading();
 
   var viewType = $('#data').data('view-type');
+  var agency_key;
+  var route_id;
+
   if(viewType === 'agencies') {
-    var agency_key = $(this).data('agency-key');
+    agency_key = $(this).data('agency-key');
     getRoutes(agency_key);
   } else if(viewType === 'routes') {
-    var route_id = $(this).data('route-id');
-    var agency_key = $(this).data('agency-key');
+    route_id = $(this).data('route-id');
+    agency_key = $(this).data('agency-key');
     getStops(route_id, agency_key);
   } else if(viewType === 'stops') {
     var stop_id = $(this).data('stop-id');
-    var route_id = $(this).data('route-id');
-    var agency_key = $(this).data('agency-key');
+    route_id = $(this).data('route-id');
+    agency_key = $(this).data('agency-key');
     getStop(stop_id, route_id, agency_key);
   } else if(viewType === 'agenciesNearby') {
-    var agency_key = $(this).data('agency-key');
+    agency_key = $(this).data('agency-key');
     getRoutes(agency_key);
   } else if(viewType === 'routesNearby') {
-    var route_id = $(this).data('route-id');
-    var agency_key = $(this).data('agency-key');
+    route_id = $(this).data('route-id');
+    agency_key = $(this).data('agency-key');
     getStops(route_id, agency_key);
   }
 });
@@ -43,14 +46,15 @@ $('#data').on('click', 'tbody tr', function(){
 $('#nav-button').on('click', function(){
   $('#map').hide();
   var previous = $(this).data('previous');
+  var agency_key;
   if(previous === 'agencies') {
     getAgencies();
   } else if(previous === 'routes') {
-    var agency_key = $(this).data('agency-key');
+    agency_key = $(this).data('agency-key');
     getRoutes(agency_key);
   } else if(previous === 'stops') {
     var route_id = $(this).data('route-id');
-    var agency_key = $(this).data('agency-key');
+    agency_key = $(this).data('agency-key');
     getStops(route_id, agency_key);
   }
 });
@@ -109,7 +113,7 @@ $('#top-nav')
 //form handler
 $('#locationForm').submit(function(){
 
-  if($('#location').val() != ''){
+  if($('#location').val() !== ''){
     $('#locationForm .form-group').removeClass('has-error');
 
     //disable button
@@ -148,9 +152,6 @@ $('#locationForm').submit(function(){
   }
   return false;
 });
-
-//IVAN TODO: Add form handler for routesByAgency here
-//Should use getRoutes() to
 
 
 function getAgencies(){
@@ -202,6 +203,7 @@ function getRoutes(agency_key){
   }
 }
 
+
 function getStops(route_id, agency_key){
   var route = agencies[agency_key].routes[route_id],
       routeTitle;
@@ -240,6 +242,7 @@ function getStops(route_id, agency_key){
     renderTable(route.stops, 'stops');
   }
 }
+
 
 function getStop(stop_id, route_id, agency_key){
   var stop = agencies[agency_key].routes[route_id].stops[stop_id];
@@ -408,7 +411,7 @@ function getRouteType(route_type_str) {
   } else {
     return routeTypes[route_type_i];
   }
-};
+}
 
 
 function renderTable(data, viewType){
@@ -481,6 +484,7 @@ function renderTable(data, viewType){
 function showLoading() {
   $('#loading').show();
 }
+
 
 function hideLoading() {
   $('#loading').fadeOut();

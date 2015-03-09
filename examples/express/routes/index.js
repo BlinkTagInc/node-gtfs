@@ -1,9 +1,9 @@
-var express = require('express');
-var router = express.Router();
-var gtfs = require('gtfs');
+var router = require('express').Router();
+
 
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Node GTFS Demo' });
+  res.render('index', { title: 'Node GTFS Example App' });
 });
+
 
 module.exports = router;
