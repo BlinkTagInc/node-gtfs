@@ -31,9 +31,13 @@ Make sure mongo is running:
 
 Run the download script:
 
+    npm run download
+
+or
+
     node ./scripts/download
 
-To keep schedules up to date, you might want to schedule this to occur once per day.
+To keep schedules up to date, you could schedule this to occur once per day.
 
 #Example Application
 
@@ -45,6 +49,8 @@ An example app is provided that creates some restful API endpoints and has a sim
 Run the example site:
 
     cd examples/express
+
+Install dependencies
 
     npm install
 
