@@ -1,14 +1,26 @@
 #Node-GTFS
 
-node-GTFS loads transit data in [GTFS format](https://developers.google.com/transit/) from [GTFS Data Exchange](http://www.gtfs-data-exchange.com/), unzips it and stores it to a MongoDB database and provides some methods to query for agencies, routes, stops and times.  It also has spatial queries to find nearby stops, routes and agencies.
+[![NPM version](https://img.shields.io/npm/v/gtfs.svg?style=flat)](https://www.npmjs.com/package/gtfs)
+[![David](https://img.shields.io/david/brendannee/node-gtfs.svg)]()
+[![npm](https://img.shields.io/npm/dm/gtfs.svg?style=flat)]()
+
+`node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/) from [GTFS Data Exchange](http://www.gtfs-data-exchange.com/), unzips it and stores it to a MongoDB database and provides some methods to query for agencies, routes, stops and times.  It also has spatial queries to find nearby stops, routes and agencies.
 
 ##Setup
 
-`git clone git@github.com:brendannee/node-gtfs.git`
+You can clone from github:
 
-`cd node-gtfs`
+    git clone git@github.com:brendannee/node-gtfs.git
 
-`npm install`
+    cd node-gtfs
+
+    npm install
+
+or install directly from npm:
+
+    npm install gtfs
+
+    cd node_modules/gtfs
 
 ##Configuration for loading data
 
@@ -23,13 +35,13 @@ Add the list of agency keys you'd like to support to config.js as an array calle
 The mongodb URI is also configured in `config.js`. Default database URI is:
 `mongodb://localhost:27017/gtfs`
 
-###To load data
+##Loading Data
 
-Make sure mongo is running:
+### Make sure mongo is running
 
     mongod
 
-Run the download script:
+### Run the download script
 
     npm run download
 
@@ -37,32 +49,36 @@ or
 
     node ./scripts/download
 
+### Scheduling
+
 To keep schedules up to date, you could schedule this to occur once per day.
 
-#Example Application
+# Example Application
 
 An example app is provided that creates some restful API endpoints and has a simple frontend for viewing and exploring transit data.  It is in `examples/express`.
 
 
-##Running the example app locally
+## Running the example app locally
 
-Run the example site:
+### Run the example site
 
     cd examples/express
 
-Install dependencies
+### Install dependencies
 
     npm install
 
     bower install
 
-Make sure mongo is running:
+### Make sure mongo is running
 
     mongod
 
-Run the example app:
+### Run the example app
 
     debug=node-gtfs-exampleapp npm start
+
+### View in your browser
 
 Visit `localhost:3000` in your browser
 
