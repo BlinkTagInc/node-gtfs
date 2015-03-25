@@ -1,26 +1,53 @@
 {
   "name": "gtfs",
   "description": "Download GTFS transit data into mongodb and expose routes, stops, times and more",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Brendan Nee <me@bn.ee>",
   "contributors": [
     {
-      "name": "Jason Schapiro",
-      "email": "yono38@gmail.com"
+      "name": "Alessio Bogon"
     },
     {
       "name": "Jacob Childress",
       "email": "jacobc@gmail.com"
     },
     {
-      "name": "wdalrymple"
+      "name": "Robin Chou",
+      "email": "hello@robinchou.com"
+    },
+    {
+      "name": "cobralibre",
+      "email": "jacobc@gmail.com"
     },
     {
       "name": "Matt Gruskin"
     },
     {
+      "name": "Sam Hashemi",
+      "email": "sam@samhashemi.com"
+    },
+    {
+      "name": "Hafiz Ismail"
+    },
+    {
       "name": "Ethan Lo",
       "email": "ethan@ethanlo.com"
+    },
+    {
+      "name": "Natalie Perna"
+    },
+    {
+      "name": "Landon Reed"
+    },
+    {
+      "name": "Jason Schapiro",
+      "email": "yono38@gmail.com"
+    },
+    {
+      "name": "wdalrymple"
+    },
+    {
+      "name": "Ivan Yulaev"
     }
   ],
   "dependencies": {
