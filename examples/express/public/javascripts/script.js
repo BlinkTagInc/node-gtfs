@@ -233,8 +233,10 @@ function getStops(route_id, agency_key){
   if(!route.stops){
     route.stops = {};
     $.getJSON('api/stops/' + agency_key + '/' + route_id, function(data){
-      data.forEach(function(stop){
-        route.stops[stop.stop_id] = stop;
+      data.forEach(function (direction) {
+        direction.stops.forEach(function (stop) {
+          route.stops[stop.stop_id] = stop;
+        });
       });
       renderTable(route.stops, 'stops');
     });
