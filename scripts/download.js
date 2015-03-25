@@ -211,7 +211,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
         log(agency_key + ': Importing data - ' + GTFSFile.fileNameBase);
         db.collection(GTFSFile.collection, function(e, collection){
           var input = fs.createReadStream(filepath);
-          var parser = csv.parse({columns: true});
+          var parser = csv.parse({columns: true, relax: true});
           parser.on('readable', function(){
             while(line = parser.read()){
               //remove null values
