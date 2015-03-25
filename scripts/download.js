@@ -6,11 +6,11 @@ var request = require('request'),
     async = require('async'),
     unzip = require('unzip2'),
     downloadDir = 'downloads',
-    Db = require('mongodb').Db,
+    MongoClient = require('mongodb').MongoClient,
     q;
 
 
-// check if this file was invoked directthrough commandline or required as an export
+// check if this file was invoked direct through command line or required as an export
 var invocation = (require.main === module) ? 'direct' : 'required';
 
 var config = {};
@@ -89,7 +89,9 @@ function main(config, callback){
 var log = (config.verbose === false) ? function(){} : console.log;
 
 //open database and create queue for agency list
-Db.connect(config.mongo_url, {w: 1}, function(err, db) {
+MongoClient.connect(config.mongo_url, {w: 1}, function(e, db) {
+  if(e) handleError(e);
+
   q = async.queue(downloadGTFS, 1);
   //loop through all agencies specified
   //If the agency_key is a URL, download that GTFS file, otherwise treat
@@ -113,6 +115,8 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
   });
 
   q.drain = function(e) {
+    if(e) handleError(e);
+
     log('All agencies completed (' + config.agencies.length + ' total)');
     callback();
   };
@@ -163,17 +167,11 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
       if (file_protocol === 'http:' || file_protocol === 'https:') {
         log(agency_key + ': Downloading');
         request(agency_url, processFile).pipe(fs.createWriteStream(downloadDir + '/latest.zip'));
-
-        function processFile(e, response, body){
-          if(response && response.statusCode != 200){ cb(new Error('Couldn\'t download files')); }
-          log(agency_key + ': Download successful');
-
-          fs.createReadStream(downloadDir + '/latest.zip')
-            .pipe(unzip.Extract({ path: downloadDir }).on('close', cb))
-            .on('error', handleError);
-        }
       } else {
-        if (!fs.existsSync(agency_url)) return cb(new Error('File does not exists'));
+        if (!fs.existsSync(agency_url)) {
+          return cb(new Error('File does not exists'));
+        }
+
         fs.createReadStream(agency_url)
           .pipe(fs.createWriteStream(downloadDir + '/latest.zip'))
           .on('close', function(){
@@ -186,6 +184,16 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
     }
 
 
+    function processFile(e, response, body){
+      if(response && response.statusCode != 200){ cb(new Error('Couldn\'t download files')); }
+      log(agency_key + ': Download successful');
+
+      fs.createReadStream(downloadDir + '/latest.zip')
+        .pipe(unzip.Extract({ path: downloadDir }).on('close', cb))
+        .on('error', handleError);
+    }
+
+
     function removeDatabase(cb) {
       //remove old db records based on agency_key
       async.forEach(GTFSFiles, function(GTFSFile, cb){
@@ -193,7 +201,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
           collection.remove({ agency_key: agency_key }, cb);
         });
       }, function(e){
-          cb(e, 'remove');
+        cb(e, 'remove');
       });
     }
 
@@ -263,7 +271,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
 
               //insert into db
               collection.insert(line, function(e, inserted) {
-                if(e) { handleError(e); }
+                if(e) handleError(e);
               });
             }
           });
