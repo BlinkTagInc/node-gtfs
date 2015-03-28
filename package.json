@@ -1,34 +1,61 @@
 {
   "name": "gtfs",
   "description": "Download GTFS transit data into mongodb and expose routes, stops, times and more",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Brendan Nee <me@bn.ee>",
   "contributors": [
     {
-      "name": "Jason Schapiro",
-      "email": "yono38@gmail.com"
+      "name": "Alessio Bogon"
     },
     {
       "name": "Jacob Childress",
       "email": "jacobc@gmail.com"
     },
     {
-      "name": "wdalrymple"
+      "name": "Robin Chou",
+      "email": "hello@robinchou.com"
+    },
+    {
+      "name": "cobralibre",
+      "email": "jacobc@gmail.com"
     },
     {
       "name": "Matt Gruskin"
     },
     {
+      "name": "Sam Hashemi",
+      "email": "sam@samhashemi.com"
+    },
+    {
+      "name": "Hafiz Ismail"
+    },
+    {
       "name": "Ethan Lo",
       "email": "ethan@ethanlo.com"
+    },
+    {
+      "name": "Natalie Perna"
+    },
+    {
+      "name": "Landon Reed"
+    },
+    {
+      "name": "Jason Schapiro",
+      "email": "yono38@gmail.com"
+    },
+    {
+      "name": "wdalrymple"
+    },
+    {
+      "name": "Ivan Yulaev"
     }
   ],
   "dependencies": {
     "async": "~0.9.0",
     "csv": "~0.4.1",
-    "mongoose": "~3.8.24",
-    "mongodb": "~1.4.34",
-    "request": "~2.53.0",
+    "mongoose": "~3.8.25",
+    "mongodb": "~2.0.24",
+    "request": "~2.54.0",
     "underscore": "~1.8.2",
     "unzip2": "~0.2.5"
   },
@@ -40,10 +67,10 @@
   "repository": "git://github.com/brendannee/node-gtfs",
   "main": "index",
   "devDependencies": {
-    "csv-parse": "0.0.9",
-    "should": "^5.1.0",
-    "supertest": "^0.15.0",
-    "timekeeper": "0.0.5"
+    "csv-parse": "~0.1.0",
+    "should": "~5.2.0",
+    "supertest": "~0.15.0",
+    "timekeeper": "~0.0.5"
   },
   "scripts": {
     "download": "node scripts/download.js",
