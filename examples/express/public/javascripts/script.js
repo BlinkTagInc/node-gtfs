@@ -9,7 +9,7 @@ getAgencies();
 //setup map
 map = new L.Map('map');
 
-L.tileLayer('http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png', {
+L.tileLayer('https://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png', {
   attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'
 }).addTo(map);
 
@@ -121,7 +121,7 @@ $('#locationForm').submit(function(){
 
     //geocode
     var location = $('#location').val();
-    var geocodeURL = 'http://nominatim.openstreetmap.org/search/' + encodeURIComponent(location) + '?format=json&limit=1&json_callback=?';
+    var geocodeURL = 'https://nominatim.openstreetmap.org/search/' + encodeURIComponent(location) + '?format=json&limit=1&json_callback=?';
 
     $.getJSON(geocodeURL)
       .done(function(data){
