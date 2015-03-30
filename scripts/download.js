@@ -167,6 +167,15 @@ MongoClient.connect(config.mongo_url, {w: 1}, function(e, db) {
       if (file_protocol === 'http:' || file_protocol === 'https:') {
         log(agency_key + ': Downloading');
         request(agency_url, processFile).pipe(fs.createWriteStream(downloadDir + '/latest.zip'));
+
+        function processFile(e, response, body){
+          if(response && response.statusCode != 200){ cb(new Error('Couldn\'t download files')); }
+          log(agency_key + ': Download successful');
+
+          fs.createReadStream(downloadDir + '/latest.zip')
+            .pipe(unzip.Extract({ path: downloadDir }).on('close', cb))
+            .on('error', handleError);
+        }
       } else {
         if (!fs.existsSync(agency_url)) {
           return cb(new Error('File does not exists'));
@@ -181,16 +190,6 @@ MongoClient.connect(config.mongo_url, {w: 1}, function(e, db) {
           })
           .on('error', handleError);
       }
-    }
-
-
-    function processFile(e, response, body){
-      if(response && response.statusCode != 200){ cb(new Error('Couldn\'t download files')); }
-      log(agency_key + ': Download successful');
-
-      fs.createReadStream(downloadDir + '/latest.zip')
-        .pipe(unzip.Extract({ path: downloadDir }).on('close', cb))
-        .on('error', handleError);
     }
 
 
