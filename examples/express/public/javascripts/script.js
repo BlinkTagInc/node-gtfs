@@ -73,7 +73,7 @@ $('#top-nav')
   .on('click', '#agencies-by-location', function(){
     $('#data').empty();
     $('#pageTitle').html('Find Agencies by Location');
-    $('#locationForm input[type=submit]').val('Find Agencies');
+    $('#locationForm button[type="submit"]').text('Find Agencies');
     $('#locationForm')
       .data('form-type', 'agencies')
       .show();
@@ -83,7 +83,7 @@ $('#top-nav')
   .on('click', '#routes-by-location', function(){
     $('#data').empty();
     $('#pageTitle').html('Find Routes by Location');
-    $('#locationForm input[type=submit]').val('Find Routes');
+    $('#locationForm button[type="submit"]').text('Find Routes');
     $('#locationForm')
       .data('form-type', 'routes')
       .show();
@@ -93,7 +93,7 @@ $('#top-nav')
   .on('click', '#routes-by-agency', function(){
     $('#data').empty();
     $('#pageTitle').html('Find Routes by Agency');
-    $('#locationForm input[type=submit]').val('Find Routes');
+    $('#locationForm button[type="submit"]').text('Find Routes');
     $('#locationForm')
       .data('form-type', 'routes')
       .show();
@@ -102,7 +102,7 @@ $('#top-nav')
   .on('click', '#stops-by-location', function(){
     $('#data').empty();
     $('#pageTitle').html('Find Stops by Location');
-    $('#locationForm input[type=submit]').val('Find Stops');
+    $('#locationForm button[type="submit"]').text('Find Stops');
     $('#locationForm')
       .data('form-type', 'stops')
       .show();
@@ -117,7 +117,7 @@ $('#locationForm').submit(function(){
     $('#locationForm .form-group').removeClass('has-error');
 
     //disable button
-    $('#locationForm input[type=submit]').prop('disabled', true);
+    $('#locationForm button[type="submit"]').prop('disabled', true);
 
     //geocode
     var location = $('#location').val();
@@ -125,7 +125,7 @@ $('#locationForm').submit(function(){
 
     $.getJSON(geocodeURL)
       .done(function(data){
-        $('#locationForm input[type=submit]').prop('disabled', false);
+        $('#locationForm button[type="submit"]').prop('disabled', false);
 
         if(data && data.length){
           //get first result from geocoding
