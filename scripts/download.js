@@ -174,7 +174,10 @@ MongoClient.connect(config.mongo_url, {w: 1}, function(e, db) {
 
           fs.createReadStream(downloadDir + '/latest.zip')
             .pipe(unzip.Extract({ path: downloadDir }).on('close', cb))
-            .on('error', handleError);
+            .on('error', function(e) {
+              log(agency_key + ': Error Unzipping File');
+              handleError(e);
+            });
         }
       } else {
         if (!fs.existsSync(agency_url)) {
