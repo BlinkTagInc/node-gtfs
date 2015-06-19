@@ -1,8 +1,11 @@
 {
   "name": "gtfs",
   "description": "Download GTFS transit data into mongodb and expose routes, stops, times and more",
-  "version": "0.1.4",
-  "author": "Brendan Nee <me@bn.ee>",
+  "version": "0.1.5",
+  "author": {
+    "name": "Brendan Nee",
+    "email": "me@bn.ee"
+  },
   "contributors": [
     {
       "name": "Alessio Bogon"
@@ -64,7 +67,10 @@
     "gtfs",
     "transportation"
   ],
-  "repository": "git://github.com/brendannee/node-gtfs",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/brendannee/node-gtfs.git"
+  },
   "main": "index",
   "devDependencies": {
     "csv-parse": "~0.1.0",

@@ -1,7 +1,7 @@
 {
   "name": "node-gtfs-exampleapp",
   "description": "An example Express app for node-gtfs. Explore transit data.",
-  "version": "0.1.1",
+  "version": "0.1.5",
   "private": false,
   "repository": "git://github.com/brendannee/node-gtfs",
   "scripts": {
