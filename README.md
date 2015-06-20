@@ -30,9 +30,13 @@ A full list of agencies is available via the [GTFS Data Exchange API](http://www
 
 For example, Austin Capital Metro is `capital-area-transit`, Washington DC is `wmata`.
 
-Add the list of agency keys you'd like to support to config.js as an array called `agencies`
+Copy `config-sample.js` to `config.js`.
 
-The mongodb URI is also configured in `config.js`. Default database URI is:
+    co config-sample.js config.js
+
+Add the list of agency keys you'd like to support to `config.js` as an array called `agencies`.
+
+The mongodb URI should also be configured in `config.js`. Default database URI is:
 `mongodb://localhost:27017/gtfs`
 
 ##Loading Data
@@ -150,7 +154,9 @@ Add MongoHQ to your app
 
     $ heroku addons:add mongohq:sandbox
 
-MONGOHQ creates a user, database and exports it as a MONGOHQ_URL environment variable.
+MONGOHQ creates a user, database and exports it as a `MONGOHQ_URL` environment variable.
+
+Add a `MONGO_URL` config variable to heroku with the same URL as the `MONGOHQ_URL`.
 
 Push your app to Heroku
 

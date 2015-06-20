@@ -16,10 +16,15 @@ var invocation = (require.main === module) ? 'direct' : 'required';
 var config = {};
 if (invocation === 'direct') {
   try {
-    config = require('../config.js');
-  } catch (e) {
-    handleError(new Error('Cannot find config.js'));
+    var config = require('../config.js');
+  } catch(e) {
+    try {
+      var config = require('../config-sample.js');
+    } catch(e) {
+      handleError(new Error('Cannot find config.js'));
+    }
   }
+
 
   if(!config.agencies){
     handleError(new Error('No agency_key specified in config.js\nTry adding \'capital-metro\' to the agencies in config.js to load transit data'));
