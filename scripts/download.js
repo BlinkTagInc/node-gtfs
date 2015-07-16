@@ -85,20 +85,15 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
               agency_key: item
             , agency_url: 'http://www.gtfs-data-exchange.com/agency/' + item + '/latest.zip'
           }
-    } else if (item.url) {
+    } else {
       var agency = {
               agency_key: item.agency_key
             , agency_url: item.url
           }
-    } else {
-      var agency = {
-              agency_key: item.agency_key
-            , agency_path: item.path
-          }
     }
 
-    if(!agency.agency_key || (!agency.agency_url && !agency.agency_path)) {
-      handleError(new Error('No URL or file path or Agency Key provided.'));
+    if(!agency.agency_key || !agency.agency_url) {
+      handleError(new Error('No URL or Agency Key provided.'));
     }
 
     q.push(agency);
@@ -114,8 +109,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
   function downloadGTFS(task, cb){
     var agency_key = task.agency_key
       , agency_bounds = {sw: [], ne: []}
-      , agency_url = task.agency_url
-      , agency_path = task.agency_path;
+      , agency_url = task.agency_url;
 
     console.log('Starting ' + agency_key);
 
@@ -152,22 +146,15 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
 
     function downloadFiles(cb){
       //do download
-      if (agency_url) {
-        request(agency_url, processDownloadedFile).pipe(fs.createWriteStream(downloadDir + '/latest.zip'));
-      } else {
-        processFile(agency_path);
-      }
+      request(agency_url, processFile).pipe(fs.createWriteStream(downloadDir + '/latest.zip'));
 
-      function processDownloadedFile(e, response, body){
+      function processFile(e, response, body){
         if(response && response.statusCode != 200){ cb(new Error('Couldn\'t download files')); }
         console.log(agency_key + ': Download successful');
-        processFile(downloadDir + '/latest.zip');
-      }
-
-      function processFile(path) {
-        fs.createReadStream(path)
+  	
+        fs.createReadStream(downloadDir + '/latest.zip')
           .pipe(unzip.Extract({ path: downloadDir }).on('close', cb))
-          .on('error', handleError);       
+          .on('error', handleError);
       }
     }
 
