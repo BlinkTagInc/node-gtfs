@@ -21,19 +21,28 @@
     {
       "name": "Ethan Lo",
       "email": "ethan@ethanlo.com"
+    },
+    {
+      "name": "Jean-François Vial",
+      "email": "jeff@modulaweb.fr"
     }
   ],
   "dependencies": {
-      "express": "= 3.2.x"
-    , "mongoose": "= 3.6.x"
-    , "mongodb": "= 1.3.x"
-    , "csv": "= 0.3.x"
-    , "async": "= 0.2.x"
-    , "request": "= 2.x.x"
-    , "underscore": "= 1.4.x"
-    , "unzip": "= 0.1.x"
+    "async": "= 0.2.x",
+    "csv": "= 0.3.x",
+    "express": "= 3.2.x",
+    "mongodb": "= 1.3.x",
+    "mongoose": "= 3.6.x",
+    "request": "= 2.x.x",
+    "underscore": "= 1.4.x",
+    "unzip": "= 0.1.x"
   },
-  "keywords": ["transit","gtfs","transportation"],
+  "keywords": [
+    "transit",
+    "gtfs",
+    "transportation"
+  ],
   "repository": "git://github.com/brendannee/node-gtfs",
-  "main": "index"
+  "main": "index",
+  "license": "MIT"
 }
