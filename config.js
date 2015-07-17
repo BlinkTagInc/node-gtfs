@@ -5,8 +5,6 @@ module.exports = {
       Optionally, specify a download URL to use a dataset not from gtfs-data-exchange.com */
       'alamedaoakland-ferry'
     , { agency_key: 'caltrain', url: 'http://www.gtfs-data-exchange.com/agency/caltrain/latest.zip'}
-      /* You can specify a path to the GTFS file */
-    /*, { agency_key: 'localAgency', path: '/path/to/the/gtfs.zip'} */
     , 'ac-transit'
     , 'county-connection'
     , 'san-francisco-municipal-transportation-agency'
