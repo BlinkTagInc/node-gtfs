@@ -5,6 +5,7 @@ var request = require('request')
   , csv = require('csv')
   , async = require('async')
   , unzip = require('unzip')
+  , proj4 = require('proj4')
   , downloadDir = 'downloads'
   , Db = require('mongodb').Db
   , q;
@@ -97,6 +98,10 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
           }
     }
 
+    if (item.proj) {
+        agency.agency_proj = item.proj;
+    }
+
     if(!agency.agency_key || (!agency.agency_url && !agency.agency_path)) {
       handleError(new Error('No URL or file path or Agency Key provided.'));
     }
@@ -115,7 +120,9 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
     var agency_key = task.agency_key
       , agency_bounds = {sw: [], ne: []}
       , agency_url = task.agency_url
-      , agency_path = task.agency_path;
+      , agency_path = task.agency_path
+      , agency_proj = task.agency_proj
+    ;
 
     console.log('Starting ' + agency_key);
 
@@ -215,7 +222,19 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
 
                 //make lat/lon array
                 if(line.stop_lat && line.stop_lon){
+
                   line.loc = [parseFloat(line.stop_lon), parseFloat(line.stop_lat)];
+
+                  // correct empty coords
+                  if (isNaN(line.loc[0])) line.loc[0] = 0;
+                  if (isNaN(line.loc[1])) line.loc[1] = 0;
+
+                  // convert to epsg4326 if needed
+                  if (agency_proj) {
+                    line.loc = proj4(agency_proj, 'WGS84', line.loc);
+                    line.stop_lon = line.loc[0];
+                    line.stop_lat = line.loc[1];                    
+                  }
                   
                   //Calulate agency bounds
                   if(agency_bounds.sw[0] > line.loc[0] || !agency_bounds.sw[0]){
@@ -255,6 +274,7 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
       async.series([
           agencyCenter
         , longestTrip
+        , fixCoordinates
       ], function(e, results){
         cb();
       });
@@ -284,6 +304,29 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
         });
       });*/
       cb();
+    }
+
+    function fixCoordinates(cb) {
+      console.log(agency_key + ':  Post Processing data - fix coordinates');
+      db.collection('stops').find({agency_key: agency_key, location_type: 1}, function(e, stations){
+        if (e) handleError(e);
+        async.forEach(stations, function(station, cb){
+          if (station.loc[0]==0 || (station.loc[1]==0)) {
+            // its a station, and coordinates are wrong... lest find a stop in this station and copy its coordinates
+            console.log(agency_key + ':  Post Processing data - fix coordinates - found "'+station.stop_id+'" have bad location');
+            db.collection('stops').findOne({agency_key: agency_key, parent_station: station.stop_id}, function(e, stop){
+              if (e) handleError(e);
+              sation.loc = stop.loc;
+              db.collection('stops').update({_id: station._id}, {$set: {loc: station.loc}}, {safe: true}, function(e) {
+                if (e) handleError(e);
+                console.log(agency_key + ':  Post Processing data - fix coordinates - found "'+station.stop_id+'" have bad location : location fixed');
+              });
+            });
+          }
+          //cb();
+        }, cb);
+      });
+      //cb();
     }
   }
 });
