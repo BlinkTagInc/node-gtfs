@@ -6,6 +6,7 @@ var request = require('request')
   , async = require('async')
   , unzip = require('unzip')
   , proj4 = require('proj4')
+  , glob = require('glob')
   , downloadDir = 'downloads'
   , Db = require('mongodb').Db
   , q;
@@ -80,33 +81,63 @@ Db.connect(config.mongo_url, {w: 1}, function(err, db) {
   //loop through all agencies specified
   //If the agency_key is a URL, download that GTFS file, otherwise treat 
   //it as an agency_key and get file from gtfs-data-exchange.com
+  for(var i in config.agencies) {
+    var item = config.agencies[i];
+    if (item.dir) {
+      var format = item.format || '*.zip';
+      var files = glob.sync(item.dir + format);
+
+      files.forEach(function(item){
+        var p = path.parse(item);
+
+        config.agencies.push({
+              agency_key: p.name 
+            , path: item
+        });
+
+      });
+
+      delete config.agencies[i];
+    }
+  }
+  
+  var seenPath = [];
+
   config.agencies.forEach(function(item){
+    var ok = false;
     if(typeof(item) == 'string') {
       var agency = {
               agency_key: item
             , agency_url: 'http://www.gtfs-data-exchange.com/agency/' + item + '/latest.zip'
           }
+          ok = true;
     } else if (item.url) {
       var agency = {
               agency_key: item.agency_key
             , agency_url: item.url
           }
-    } else {
-      var agency = {
+          ok = true;
+    } else if (item.path) {
+      if (seenPath.indexOf(item.path) < 0) {
+        var agency = {
               agency_key: item.agency_key
             , agency_path: item.path
           }
+        seenPath.push(item.path);
+        ok = true;
+      }
     }
 
-    if (item.proj) {
-        agency.agency_proj = item.proj;
-    }
+    if (ok) {
+      if (item.proj) {
+          agency.agency_proj = item.proj;
+      }
 
-    if(!agency.agency_key || (!agency.agency_url && !agency.agency_path)) {
-      handleError(new Error('No URL or file path or Agency Key provided.'));
+      if(!agency.agency_key || (!agency.agency_url && !agency.agency_path)) {
+        handleError(new Error('No URL or file path or Agency Key provided.'));
+      }
+      q.push(agency);
     }
-
-    q.push(agency);
   });
 
   q.drain = function(e) {
