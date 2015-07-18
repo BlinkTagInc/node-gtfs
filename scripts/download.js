@@ -7,7 +7,6 @@ var path = require('path');
 var proj4 = require('proj4');
 var request = require('request');
 var unzip = require('unzip2');
-
 var q;
 
 
@@ -26,72 +25,74 @@ if(invocation === 'direct') {
     }
   }
 
-
   if(!config.agencies) {
     handleError(new Error('No agency_key specified in config.js\nTry adding \'capital-metro\' to the agencies in config.js to load transit data'));
     process.exit();
   }
 }
 
-var GTFSFiles = [{
-  fileNameBase: 'agency',
-  collection: 'agencies'
-}, {
-  fileNameBase: 'calendar_dates',
-  collection: 'calendardates'
-}, {
-  fileNameBase: 'calendar',
-  collection: 'calendars'
-}, {
-  fileNameBase: 'fare_attributes',
-  collection: 'fareattributes'
-}, {
-  fileNameBase: 'fare_rules',
-  collection: 'farerules'
-}, {
-  fileNameBase: 'feed_info',
-  collection: 'feedinfos'
-}, {
-  fileNameBase: 'frequencies',
-  collection: 'frequencies'
-}, {
-  fileNameBase: 'routes',
-  collection: 'routes'
-}, {
-  fileNameBase: 'shapes',
-  collection: 'shapes'
-}, {
-  fileNameBase: 'stop_times',
-  collection: 'stoptimes'
-}, {
-  fileNameBase: 'stops',
-  collection: 'stops'
-}, {
-  fileNameBase: 'transfers',
-  collection: 'transfers'
-}, {
-  fileNameBase: 'trips',
-  collection: 'trips'
-}];
+
+var GTFSFiles = [
+  {
+    fileNameBase: 'agency',
+    collection: 'agencies'
+  }, {
+    fileNameBase: 'calendar_dates',
+    collection: 'calendardates'
+  }, {
+    fileNameBase: 'calendar',
+    collection: 'calendars'
+  }, {
+    fileNameBase: 'fare_attributes',
+    collection: 'fareattributes'
+  }, {
+    fileNameBase: 'fare_rules',
+    collection: 'farerules'
+  }, {
+    fileNameBase: 'feed_info',
+    collection: 'feedinfos'
+  }, {
+    fileNameBase: 'frequencies',
+    collection: 'frequencies'
+  }, {
+    fileNameBase: 'routes',
+    collection: 'routes'
+  }, {
+    fileNameBase: 'shapes',
+    collection: 'shapes'
+  }, {
+    fileNameBase: 'stop_times',
+    collection: 'stoptimes'
+  }, {
+    fileNameBase: 'stops',
+    collection: 'stops'
+  }, {
+    fileNameBase: 'transfers',
+    collection: 'transfers'
+  }, {
+    fileNameBase: 'trips',
+    collection: 'trips'
+  }
+];
 
 
 function main(config, callback) {
   var log = (config.verbose === false) ? function () {} : console.log;
 
-  //open database and create queue for agency list
+  // open database and create queue for agency list
   MongoClient.connect(config.mongo_url, {
     w: 1
   }, function (e, db) {
     if(e) handleError(e);
 
     q = async.queue(downloadGTFS, 1);
-    //loop through all agencies specified
-    //If the agency_key is a URL, download that GTFS file, otherwise treat
-    //it as an agency_key and get file from gtfs-data-exchange.com
+    // loop through all agencies specified
+    // If the agency_key is a URL, download that GTFS file, otherwise treat
+    // it as an agency_key and get file from gtfs-data-exchange.com
     config.agencies.forEach(function (item) {
       var agency = {};
 
-      if(typeof(item) == 'string') {
+      if(typeof (item) == 'string') {
         agency.agency_key = item;
         agency.agency_url = 'http://www.gtfs-data-exchange.com/agency/' + item + '/latest.zip';
       } else if(item.url) {
@@ -102,7 +103,7 @@ function main(config, callback) {
         agency.path = item.path;
       }
 
-      if(!agency.agency_key ) {
+      if(!agency.agency_key) {
         handleError(new Error('No URL or Agency Key or path provided.'));
       }
 
@@ -287,15 +288,15 @@ function main(config, callback) {
                   ];
 
                   // if coordinates are not specified, use [0,0]
-                  if (isNaN(line.loc[0])) {
+                  if(isNaN(line.loc[0])) {
                     line.loc[0] = 0;
                   }
-                  if (isNaN(line.loc[1])) {
+                  if(isNaN(line.loc[1])) {
                     line.loc[1] = 0;
                   }
 
                   // Convert to epsg4326 if needed
-                  if (task.agency_proj) {
+                  if(task.agency_proj) {
                     line.loc = proj4(task.agency_proj, 'WGS84', line.loc);
                     line.stop_lon = line.loc[0];
                     line.stop_lat = line.loc[1];
@@ -354,10 +355,9 @@ function main(config, callback) {
 
 
       function agencyCenter(cb) {
-        var agency_center = [
-          (agency_bounds.ne[0] - agency_bounds.sw[0]) / 2 + agency_bounds.sw[0],
-          (agency_bounds.ne[1] - agency_bounds.sw[1]) / 2 + agency_bounds.sw[1]
-        ];
+        var lat = (agency_bounds.ne[0] - agency_bounds.sw[0]) / 2 + agency_bounds.sw[0];
+        var lon = (agency_bounds.ne[1] - agency_bounds.sw[1]) / 2 + agency_bounds.sw[1];
+        var agency_center = [lat, lon];
 
         db.collection('agencies')
           .update({
@@ -390,7 +390,7 @@ function handleError(e) {
   process.exit(1);
 }
 
-// allow script to be called directly from commandline or required (for testable code)
+// Allow script to be called directly from commandline or required (for testable code)
 if(invocation === 'direct') {
   main(config, function () {
     process.exit();
