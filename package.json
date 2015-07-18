@@ -1,7 +1,7 @@
 {
   "name": "gtfs",
   "description": "Download GTFS transit data into mongodb and expose routes, stops, times and more",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "author": {
     "name": "Brendan Nee",
     "email": "me@bn.ee"
@@ -62,7 +62,7 @@
     "csv": "~0.4.5",
     "mongoose": "~4.0.5",
     "mongodb": "~2.0.34",
-    "proj4": "= 2.3.6",
+    "proj4": "~2.3.6",
     "request": "~2.58.0",
     "underscore": "~1.8.3",
     "unzip2": "~0.2.5"
