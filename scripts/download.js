@@ -4,10 +4,10 @@ var csv = require('csv');
 var fs = require('fs');
 var MongoClient = require('mongodb').MongoClient;
 var path = require('path');
+var proj4 = require('proj4');
 var request = require('request');
 var unzip = require('unzip2');
 
-var downloadDir = 'downloads';
 var q;
 
 
@@ -91,16 +91,19 @@ function main(config, callback) {
     config.agencies.forEach(function (item) {
       var agency = {};
 
-      if(typeof (item) == 'string') {
+      if(typeof(item) == 'string') {
         agency.agency_key = item;
         agency.agency_url = 'http://www.gtfs-data-exchange.com/agency/' + item + '/latest.zip';
-      } else {
+      } else if(item.url) {
         agency.agency_key = item.agency_key;
         agency.agency_url = item.url;
+      } else if(item.path) {
+        agency.agency_key = item.agency_key;
+        agency.path = item.path;
       }
 
-      if(!agency.agency_key || !agency.agency_url) {
-        handleError(new Error('No URL or Agency Key provided.'));
+      if(!agency.agency_key ) {
+        handleError(new Error('No URL or Agency Key or path provided.'));
       }
 
       q.push(agency);
@@ -115,18 +118,19 @@ function main(config, callback) {
 
 
     function downloadGTFS(task, cb) {
-      var agency_key = task.agency_key,
-        agency_bounds = {
-          sw: [],
-          ne: []
-        },
-        agency_url = task.agency_url;
+      var downloadDir = 'downloads';
+      var gtfsDir = 'downloads';
+      var agency_key = task.agency_key;
+      var agency_bounds = {
+        sw: [],
+        ne: []
+      };
 
       log(agency_key + ': Starting');
 
       async.series([
         cleanupFiles,
-        downloadFiles,
+        getFiles,
         removeDatabase,
         importFiles,
         postProcess,
@@ -155,13 +159,21 @@ function main(config, callback) {
       }
 
 
+      function getFiles(cb) {
+        if(task.agency_url) {
+          downloadFiles(cb);
+        } else if(task.path) {
+          readFiles(cb);
+        }
+      }
+
+
       function downloadFiles(cb) {
         // do download
-        // update implementation to allow download from local filesystem, to allow testable code
-        var file_protocol = require('url').parse(agency_url).protocol;
+        var file_protocol = require('url').parse(task.agency_url).protocol;
         if(file_protocol === 'http:' || file_protocol === 'https:') {
           log(agency_key + ': Downloading');
-          request(agency_url, processFile).pipe(fs.createWriteStream(downloadDir + '/latest.zip'));
+          request(task.agency_url, processFile).pipe(fs.createWriteStream(downloadDir + '/latest.zip'));
 
           function processFile(e, response, body) {
             if(response && response.statusCode != 200) {
@@ -179,11 +191,11 @@ function main(config, callback) {
               });
           }
         } else {
-          if(!fs.existsSync(agency_url)) {
+          if(!fs.existsSync(task.agency_url)) {
             return cb(new Error('File does not exists'));
           }
 
-          fs.createReadStream(agency_url)
+          fs.createReadStream(task.agency_url)
             .pipe(fs.createWriteStream(downloadDir + '/latest.zip'))
             .on('close', function () {
               fs.createReadStream(downloadDir + '/latest.zip')
@@ -193,6 +205,22 @@ function main(config, callback) {
                 .on('error', handleError);
             })
             .on('error', handleError);
+        }
+      }
+
+
+      function readFiles(cb) {
+        if(path.extname(task.path) === '.zip') {
+          // local file is zipped
+          fs.createReadStream(task.path)
+            .pipe(unzip.Extract({
+              path: downloadDir
+            }).on('close', cb))
+            .on('error', handleError);
+        } else {
+          // local file is unzipped, just read it from there.
+          gtfsDir = task.path;
+          cb();
         }
       }
 
@@ -214,7 +242,7 @@ function main(config, callback) {
       function importFiles(cb) {
         //Loop through each file and add agency_key
         async.forEachSeries(GTFSFiles, function (GTFSFile, cb) {
-          var filepath = path.join(downloadDir, GTFSFile.fileNameBase + '.txt');
+          var filepath = path.join(gtfsDir, GTFSFile.fileNameBase + '.txt');
 
           if(!fs.existsSync(filepath)) {
             log(agency_key + ': Importing data - No ' + GTFSFile.fileNameBase + ' file found');
@@ -251,14 +279,29 @@ function main(config, callback) {
                   line.shape_pt_sequence = parseInt(line.shape_pt_sequence, 10);
                 }
 
-                //make lat/lon array for stops
+                // make lat/lon array for stops
                 if(line.stop_lat && line.stop_lon) {
                   line.loc = [
                     parseFloat(line.stop_lon),
                     parseFloat(line.stop_lat)
                   ];
 
-                  //Calulate agency bounds
+                  // if coordinates are not specified, use [0,0]
+                  if (isNaN(line.loc[0])) {
+                    line.loc[0] = 0;
+                  }
+                  if (isNaN(line.loc[1])) {
+                    line.loc[1] = 0;
+                  }
+
+                  // Convert to epsg4326 if needed
+                  if (task.agency_proj) {
+                    line.loc = proj4(task.agency_proj, 'WGS84', line.loc);
+                    line.stop_lon = line.loc[0];
+                    line.stop_lat = line.loc[1];
+                  }
+
+                  // Calulate agency bounds
                   if(agency_bounds.sw[0] > line.loc[0] || !agency_bounds.sw[0]) {
                     agency_bounds.sw[0] = line.loc[0];
                   }

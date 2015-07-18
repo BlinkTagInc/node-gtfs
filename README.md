@@ -24,15 +24,19 @@ or install directly from npm:
 
 ##Configuration for loading data
 
-Before you can use node-GTFS you must specify agencies to download from GTFS Data Exchange. You need the `dataexchange_id` for each agency you want to include from [GTFS Data Exchange](http://www.gtfs-data-exchange.com/) - it is in the URL of each individual transit agency's page.
+Copy `config-sample.js` to `config.js`.
+
+    cp config-sample.js config.js
+
+Before you can use node-GTFS you must specify the transit agencies you'd like to use.
+
+You can specify agencies using their [GTFS Data Exchange](http://www.gtfs-data-exchange.com/) `dataexchange_id`, a `url` to the GTFS file or a local `path`.
+
+To download from GTFS Data Exchange, you'll need the `dataexchange_id` for each agency you want to include from [GTFS Data Exchange](http://www.gtfs-data-exchange.com/) - it is in the URL of each individual transit agency's page.
 
 A full list of agencies is available via the [GTFS Data Exchange API](http://www.gtfs-data-exchange.com/api/agencies).
 
 For example, Austin Capital Metro is `capital-area-transit`, Washington DC is `wmata`.
-
-Copy `config-sample.js` to `config.js`.
-
-    co config-sample.js config.js
 
 Add the list of agency keys you'd like to support to `config.js` as an array called `agencies`.
 
