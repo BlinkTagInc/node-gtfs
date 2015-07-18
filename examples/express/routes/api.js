@@ -1,6 +1,13 @@
 var router = require('express').Router();
 var gtfs = require('gtfs');
 
+/* Enable CORS */
+router.all('*', function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  next();
+});
+
 
 /* AgencyList */
 router.get('/agencies', function(req, res, next) {
