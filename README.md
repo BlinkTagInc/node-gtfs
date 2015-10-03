@@ -61,115 +61,214 @@ or
 
 To keep schedules up to date, you could schedule this to occur once per day.
 
-# Example Application
+# Querying data
 
-An example app is provided that creates some restful API endpoints and has a simple frontend for viewing and exploring transit data.  It is in `examples/express`.
+You can include this library in your project to expose some functions for querying GTFS data.
 
+## Including
 
-## Running the example app locally
+You can include this library.
 
-### Run the example site
-
-    cd examples/express
-
-### Install dependencies
-
-    npm install
-
-    bower install
-
-### Make sure mongo is running
-
-    mongod
-
-### Run the example app
-
-    debug=node-gtfs-exampleapp npm start
-
-### View in your browser
-
-Visit `localhost:3000` in your browser
+    var gtfs = require('gtfs');
 
 
 ##Endpoints
 
-###List agencies
+###Agencies
 
-    /api/agencies
+Returns an array of all agencies
 
-###List agencies near a point
+    gtfs.agencies(function(err, agencies) {
 
-    /api/agenciesNearby/:lat/:lon/:radius
+    });
 
-    //Example
-    /api/agenciesNearby/37.73/-122.25/10
-`:radius` is optional and in miles.  Default: 25 miles
-Returns all agencies that serve the 100 nearest stops within the specified radius
+###Agencies near a point
 
-###List routes for an agency
+Returns an array of agencies within a `radius` of the `lat`, `lon` specified
 
-    /api/routes/:agency
+    gtfs.getAgenciesByDistance(lat, lon, radius, function(err, agencies) {
 
-    //Example
-    /api/routes/san-francisco-municipal-transportation-agency
+    });
 
-###List routes near a point
+###Get a specific agency
 
-    /api/routesNearby/:lat/:lon/:radius
+Returns an agency
 
-    //Example
-    /api/routesNearby/37.73/-122.25/0.25
-`:radius` is optional and in miles.  Default: 1 mile
-Returns all routes that stop at the 100 nearest stops within the specified radius
+    gtfs.getAgency(agency_key, function(err, agency) {
 
-###List stops for a route
+    });
 
-    /api/stops/:agency/:route_id/:direction_id
+###Routes for an agency
 
-    //Example
-    /api/stops/san-francisco-municipal-transportation-agency/34/1
-`:direction_id` is optional
+Returns an array of routes for the `agency_key` specified
 
-###List stops near a point
+    gtfs.getRoutesByAgency(agency_key, function(err, routes) {
 
-    /api/stopsNearby/:lat/:lon/:radius
+    });
 
-    //Example
-    /api/StopsNearby/37.73/-122.25/0.25
-`:radius` is optional and in miles.  Default: 1 mile
-Returns the 100 nearest stops within the specified radius
+###Get a specific route
 
-###List stop times for a stop
+Returns a route for the `route_id` specified
 
-    /api/times/:agency/:route_id/:stop_id/:direction_id
+    gtfs.getRoutesById(agency_key, route_id, function(err, routes) {
 
-    //Example
-    /api/times/san-francisco-municipal-transportation-agency/34/1256/0
-`:direction_id` is optional
+    });
 
+###Routes near a point
 
-##Hosting the Example App with Heroku and MongoHQ
+Returns an array of routes within a `radius` of the `lat`, `lon` specified
 
-Create app on Heroku
+    gtfs.getRoutesByDistance(lat, lon, radius, function(err, routes) {
 
-    $ heroku apps:create YOURAPPNAME
+    });
 
-Add MongoHQ to your app
+`radius` is optional and in miles.  Default: 1 mile
 
-    $ heroku addons:add mongohq:sandbox
+###Routes that serve a specific stop
 
-MONGOHQ creates a user, database and exports it as a `MONGOHQ_URL` environment variable.
+Returns an array of routes serving the `agency_key` and `stop_id` specified
 
-Add a `MONGO_URL` config variable to heroku with the same URL as the `MONGOHQ_URL`.
+    gtfs.getRoutesByStop(agency_key, stop_id, function(err, routes) {
 
-Push your app to Heroku
+    });
 
-    $ git push heroku master
+###Stops by id
 
-Execute the download script to populate the database with the agency data specified in config.js
+Returns an array of stops matching the `stop_ids` specified
 
-    $ heroku run node ./scripts/download
+    gtfs.getStops(agency_key, stop_ids, function(err, stops) {
 
+    });
+
+`stop_ids` can be a single `stop_id` or an array of `stop_ids`.
+
+###Stops by route
+
+Returns an array of stops along the `route_id` for the `agency_key` and `direction_id` specified
+
+    gtfs.getStopsByRoute(agency_key, route_id, direction_id, function(err, stops) {
+
+    });
+
+###Stops near a point
+
+Returns an array of stops within a `radius` of the `lat`, `lon` specified
+
+    gtfs.getStopsByDistance(lat, lon, radius, function(err, stops) {
+
+    });
+
+`radius` is optional and in miles.  Default: 1 mile
+
+###Stop times for a trip
+
+Returns an array of stoptimes for the `trip_id` specified
+
+    gtfs.getStoptimesByTrip(agency_key, trip_id, function(err, stoptimes) {
+
+    });
+
+###Stop times by stop
+
+Returns an array of stoptimes for the `agency_key`, `route_id`, `stop_id` and `direction_id` specified
+
+    gtfs.getStoptimesByStop(gency_key, route_id, stop_id, direction_id, function(err, stoptimes) {
+
+    });
+
+###Trips by route and direction
+
+Returns an array of trips for the `agency_key`, `route_id` and `direction_id` specified
+
+    gtfs.getTripsByRouteAndDirection(gency_key, route_id, direction_id, service_ids, function(err, trips) {
+
+    });
+
+`service_ids` is optional
+
+###Direction name by route
+
+Returns an object of `{northData: "Headsign north", southData: "Headsign south"}` for the `agency_key` and `route_id` specified
+
+    gtfs.findBothDirectionNames(agency_key, route_id, function(err, directionNames) {
+
+    });
+
+###Shapes by route
+
+Returns an array of shapes for the `agency_key`, `route_id` and `direction_id` specified
+
+    gtfs.getShapesByRoute(agency_key, route_id, direction_id, function(err, shapes) {
+
+    });
+
+###Coordinates by route
+
+Returns an array of coordinates for the `agency_key`, and `route_id` specified
+
+    gtfs.getCoordinatesByRoute(agency_key, route_id, function(err, coordinates) {
+
+    });
+
+###Calendars
+
+Returns an array of calendars, optionally bounded by start_date and end_date
+
+    gtfs.getCalendars(agency_key, start_date, end_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday, function(err, calendars) {
+
+    });
+
+###Calendars by serivce
+
+Returns an array of calendars for the `service_ids` specified
+
+    gtfs.getCalendarsByService(service_ids, function(err, calendars) {
+
+    });
+
+`service_ids` can be a single `service_id` or an array of `service_ids`.
+
+###Calendar Dates by service
+
+Returns an array of calendarDates for the `service_ids` specified
+
+    gtfs.getCalendarDatesByService(service_ids, function(err, calendars) {
+
+    });
+
+`service_ids` can be a single `service_id` or an array of `service_ids`.
+
+###Feed Info
+
+Returns feed_info for the agency_key specified
+
+    gtfs.getFeedInfo(agency_key, function(err, feedinfo) {
+
+    });
+
+###Timetables
+
+Returns an array of timetables for the `agency_key` specified
+
+    gtfs.getTimetablesByAgency(agency_key, function(err, timetables) {
+
+    });
+
+###Timetable by id
+
+Returns a timetable object matching the `timetable_id` specified
+
+    gtfs.getTimetable(agency_key, timetable_id, function(err, timetable) {
+
+    });
+
+###Route Directions by Route
+
+Returns a route directions object matching the `route_id` and `direction_id` specified
+
+    gtfs.getRouteDirection(agency_key, route_id, direction_id, function(err, routeDirection) {
+
+    });
 
 ##Pulling in updated transit data
 
