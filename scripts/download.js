@@ -25,55 +25,59 @@ if(invocation === 'direct') {
     }
   }
 
+
   if(!config.agencies) {
     handleError(new Error('No agency_key specified in config.js\nTry adding \'capital-metro\' to the agencies in config.js to load transit data'));
     process.exit();
   }
 }
 
-
-var GTFSFiles = [
-  {
-    fileNameBase: 'agency',
-    collection: 'agencies'
-  }, {
-    fileNameBase: 'calendar_dates',
-    collection: 'calendardates'
-  }, {
-    fileNameBase: 'calendar',
-    collection: 'calendars'
-  }, {
-    fileNameBase: 'fare_attributes',
-    collection: 'fareattributes'
-  }, {
-    fileNameBase: 'fare_rules',
-    collection: 'farerules'
-  }, {
-    fileNameBase: 'feed_info',
-    collection: 'feedinfos'
-  }, {
-    fileNameBase: 'frequencies',
-    collection: 'frequencies'
-  }, {
-    fileNameBase: 'routes',
-    collection: 'routes'
-  }, {
-    fileNameBase: 'shapes',
-    collection: 'shapes'
-  }, {
-    fileNameBase: 'stop_times',
-    collection: 'stoptimes'
-  }, {
-    fileNameBase: 'stops',
-    collection: 'stops'
-  }, {
-    fileNameBase: 'transfers',
-    collection: 'transfers'
-  }, {
-    fileNameBase: 'trips',
-    collection: 'trips'
-  }
-];
+var GTFSFiles = [{
+  fileNameBase: 'agency',
+  collection: 'agencies'
+}, {
+  fileNameBase: 'calendar_dates',
+  collection: 'calendardates'
+}, {
+  fileNameBase: 'calendar',
+  collection: 'calendars'
+}, {
+  fileNameBase: 'fare_attributes',
+  collection: 'fareattributes'
+}, {
+  fileNameBase: 'fare_rules',
+  collection: 'farerules'
+}, {
+  fileNameBase: 'feed_info',
+  collection: 'feedinfos'
+}, {
+  fileNameBase: 'frequencies',
+  collection: 'frequencies'
+}, {
+  fileNameBase: 'routes',
+  collection: 'routes'
+}, {
+  fileNameBase: 'shapes',
+  collection: 'shapes'
+}, {
+  fileNameBase: 'stop_times',
+  collection: 'stoptimes'
+}, {
+  fileNameBase: 'stops',
+  collection: 'stops'
+}, {
+  fileNameBase: 'transfers',
+  collection: 'transfers'
+}, {
+  fileNameBase: 'trips',
+  collection: 'trips'
+}, {
+  fileNameBase: 'timetables',
+  collection: 'timetables'
+}, {
+  fileNameBase: 'route_directions',
+  collection: 'routedirections'
+}];
 
 
 function main(config, callback) {
