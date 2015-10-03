@@ -6,6 +6,10 @@
 
 `node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/), unzips it and stores it to a MongoDB database. In addition, it provides some methods to query for agencies, routes, stops and times.  It also has spatial queries to find nearby stops, routes and agencies.
 
+## Example Application
+
+The [GTFS-to-HTML](https://github.com/brendannee/gtfs-to-html) app uses node-gtfs for downloading and querying GTFS data. It provides a good example of how to use this library.
+
 ## Setup
 
 You can clone from github:
