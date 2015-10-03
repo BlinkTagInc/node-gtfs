@@ -33,7 +33,7 @@ var StopTime = mongoose.model('StopTime', new mongoose.Schema({
     type: String
   },
   pickup_type: {
-    type: String
+    type: Number
   },
   drop_off_type: {
     type: String

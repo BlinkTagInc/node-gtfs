@@ -9,9 +9,11 @@ var CalendarDate = mongoose.model('CalendarDate', new mongoose.Schema({
     type: String
   },
   date: {
-    type: String
+    type: Number
   },
   exception_type: {
-    type: String
+    type: Number,
+    min: 1,
+    max: 2
   }
 }));

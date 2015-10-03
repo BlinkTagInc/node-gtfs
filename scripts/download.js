@@ -270,6 +270,39 @@ function main(config, callback) {
                 line.agency_key = agency_key;
 
                 //convert fields that should be int
+                if(line.monday) {
+                  line.monday = parseInt(line.monday, 10);
+                }
+                if(line.tuesday) {
+                  line.tuesday = parseInt(line.tuesday, 10);
+                }
+                if(line.wednesday) {
+                  line.wednesday = parseInt(line.wednesday, 10);
+                }
+                if(line.thursday) {
+                  line.thursday = parseInt(line.thursday, 10);
+                }
+                if(line.friday) {
+                  line.friday = parseInt(line.friday, 10);
+                }
+                if(line.saturday) {
+                  line.satuday = parseInt(line.saturday, 10);
+                }
+                if(line.sunday) {
+                  line.sunday = parseInt(line.sunday, 10);
+                }
+                if(line.start_date) {
+                  line.start_date = parseInt(line.start_date, 10);
+                }
+                if(line.end_date) {
+                  line.end_date = parseInt(line.end_date, 10);
+                }
+                if(line.date) {
+                  line.date = parseInt(line.date, 10);
+                }
+                if(line.exception_type) {
+                  line.exception_type = parseInt(line.exception_type, 10);
+                }
                 if(line.stop_sequence) {
                   line.stop_sequence = parseInt(line.stop_sequence, 10);
                 }

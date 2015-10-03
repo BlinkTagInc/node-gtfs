@@ -9,30 +9,44 @@ var Calendar = mongoose.model('Calendar', new mongoose.Schema({
     type: String
   },
   monday: {
-    type: String
+    type: Number,
+    min: 0,
+    max: 1
   },
   tuesday: {
-    type: String
+    type: Number,
+    min: 0,
+    max: 1
   },
   wednesday: {
-    type: String
+    type: Number,
+    min: 0,
+    max: 1
   },
   thursday: {
-    type: String
+    type: Number,
+    min: 0,
+    max: 1
   },
   friday: {
-    type: String
+    type: Number,
+    min: 0,
+    max: 1
   },
   saturday: {
-    type: String
+    type: Number,
+    min: 0,
+    max: 1
   },
   sunday: {
-    type: String
+    type: Number,
+    min: 0,
+    max: 1
   },
   start_date: {
-    type: String
+    type: Number
   },
   end_date: {
-    type: String
+    type: Number
   }
 }));
