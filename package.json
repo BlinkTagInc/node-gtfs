@@ -1,7 +1,7 @@
 {
   "name": "gtfs",
   "description": "Download GTFS transit data into mongodb and expose routes, stops, times and more",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": {
     "name": "Brendan Nee",
     "email": "me@bn.ee"
@@ -58,12 +58,12 @@
     }
   ],
   "dependencies": {
-    "async": "~1.2.1",
+    "async": "~1.4.2",
     "csv": "~0.4.5",
-    "mongoose": "~4.0.5",
+    "mongoose": "~4.1.9",
     "mongodb": "~2.0.34",
     "proj4": "~2.3.6",
-    "request": "~2.58.0",
+    "request": "~2.64.0",
     "underscore": "~1.8.3",
     "unzip2": "~0.2.5"
   },
@@ -78,14 +78,13 @@
   },
   "main": "index",
   "devDependencies": {
-    "csv-parse": "~0.1.3",
-    "should": "~7.0.1",
-    "supertest": "~1.0.1",
+    "csv-parse": "~1.0.0",
+    "should": "~7.1.0",
+    "supertest": "~1.1.0",
     "timekeeper": "~0.0.5"
   },
   "scripts": {
     "download": "node scripts/download.js",
-    "start": "node ./examples/express/bin/www",
     "test": "NODE_ENV=test mocha ./test/mocha/**/*.js --reporter spec"
   },
   "license": "MIT"
