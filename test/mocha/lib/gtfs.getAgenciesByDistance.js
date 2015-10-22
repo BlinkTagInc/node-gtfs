@@ -29,7 +29,7 @@ describe('gtfs.getAgenciesByDistance(): ', function(){
       }
     }, function(){
       done();
-    })
+    });
   });
 
   after(function(done) {

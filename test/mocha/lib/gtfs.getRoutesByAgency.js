@@ -84,7 +84,7 @@ describe('gtfs.getRoutesByAgency(): ', function(){
           route_short_name: '',
           route_long_name: 'Bullet',
           route_desc: '',
-          route_type: '2',
+          route_type: 2,
           route_url: '',
           route_color: 'E31837',
           route_text_color: '',
@@ -95,7 +95,7 @@ describe('gtfs.getRoutesByAgency(): ', function(){
           route_short_name: '',
           route_long_name: 'Limited',
           route_desc: '',
-          route_type: '2',
+          route_type: 2,
           route_url: '',
           route_color: 'FEF0B5',
           route_text_color: '',
@@ -106,7 +106,7 @@ describe('gtfs.getRoutesByAgency(): ', function(){
           route_short_name: '',
           route_long_name: 'Local',
           route_desc: '',
-          route_type: '2',
+          route_type: 2,
           route_url: '',
           route_color: '',
           route_text_color: '',
@@ -117,7 +117,7 @@ describe('gtfs.getRoutesByAgency(): ', function(){
           route_short_name: '',
           route_long_name: 'Bullet',
           route_desc: '',
-          route_type: '2',
+          route_type: 2,
           route_url: '',
           route_color: 'E31837',
           route_text_color: '',
@@ -128,7 +128,7 @@ describe('gtfs.getRoutesByAgency(): ', function(){
           route_short_name: '',
           route_long_name: 'Limited',
           route_desc: '',
-          route_type: '2',
+          route_type: 2,
           route_url: '',
           route_color: 'FEF0B5',
           route_text_color: '',
@@ -139,7 +139,7 @@ describe('gtfs.getRoutesByAgency(): ', function(){
           route_short_name: '',
           route_long_name: 'Local',
           route_desc: '',
-          route_type: '2',
+          route_type: 2,
           route_url: '',
           route_color: '',
           route_text_color: '',
@@ -164,7 +164,6 @@ describe('gtfs.getRoutesByAgency(): ', function(){
         route.route_color.should.equal(expectedRoute.route_color);
         route.route_text_color.should.equal(expectedRoute.route_text_color);
         route.agency_key.should.equal(expectedRoute.agency_key);
-
       }
 
       done();

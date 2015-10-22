@@ -34,7 +34,7 @@ describe('gtfs.agencies(): ', function(){
       }
     }, function(){
       done();
-    })
+    });
   });
 
   after(function(done) {
@@ -113,7 +113,7 @@ describe('gtfs.agencies(): ', function(){
       agency.agency_center[0].should.eql(-121.9867495);
       agency.agency_center[1].should.eql(37.38976166855);
 
-      new Date(agency.date_last_updated).should.eql(timeReference);
+      agency.date_last_updated.should.eql(timeReference.getTime());
 
       done();
     });

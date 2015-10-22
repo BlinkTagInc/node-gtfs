@@ -1,5 +1,5 @@
 var async = require('async');
-var mongodb = require('mongodb');
+var MongoClient = require('mongodb').MongoClient;
 var should = require('should');
 
 function DatabaseTestSupport(config){
@@ -10,7 +10,7 @@ function DatabaseTestSupport(config){
 }
 
 DatabaseTestSupport.prototype.connect = function(cb){
-  mongodb.Db.connect(this.config.mongo_url, {w: 1}, function(err, db) {
+  MongoClient.connect(this.config.mongo_url, {w: 1}, function(err, db) {
     should.not.exists(err);
     should.exists(db);
     this.db = db;
