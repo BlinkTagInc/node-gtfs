@@ -5,22 +5,18 @@ var FareAttribute = mongoose.model('FareAttribute', new mongoose.Schema({
     type: String,
     index: true
   },
-  fare_id: {
-    type: String
-  },
-  price: {
-    type: String
-  },
-  currency_type: {
-    type: String
-  },
+  fare_id: String,
+  price: Number,
+  currency_type: String,
   payment_method: {
-    type: String
+    type: Number,
+    min: 0,
+    max: 1
   },
   transfers: {
-    type: String
+    type: Number,
+    min: 0,
+    max: 2
   },
-  transfer_duration: {
-    type: String
-  }
+  transfer_duration: Number
 }));

@@ -4,22 +4,10 @@ var FeedInfo = mongoose.model('FeedInfo', new mongoose.Schema({
     type: String,
     index: true
   },
-  feed_publisher_name: {
-    type: String
-  },
-  feed_publisher_url: {
-    type: String
-  },
-  feed_lang: {
-    type: String
-  },
-  feed_start_date: {
-    type: String
-  },
-  feed_end_date: {
-    type: String
-  },
-  feed_version: {
-    type: String
-  }
+  feed_publisher_name: String,
+  feed_publisher_url: String,
+  feed_lang: String,
+  feed_start_date: Number,
+  feed_end_date: Number,
+  feed_version: String
 }));

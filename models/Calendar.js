@@ -5,9 +5,7 @@ var Calendar = mongoose.model('Calendar', new mongoose.Schema({
     type: String,
     index: true
   },
-  service_id: {
-    type: String
-  },
+  service_id: String,
   monday: {
     type: Number,
     min: 0,
@@ -43,10 +41,6 @@ var Calendar = mongoose.model('Calendar', new mongoose.Schema({
     min: 0,
     max: 1
   },
-  start_date: {
-    type: Number
-  },
-  end_date: {
-    type: Number
-  }
+  start_date: Number,
+  end_date: Number
 }));

@@ -5,19 +5,9 @@ var FareRule = mongoose.model('FareRule', new mongoose.Schema({
     type: String,
     index: true
   },
-  fare_id: {
-    type: String
-  },
-  route_id: {
-    type: String
-  },
-  origin_id: {
-    type: String
-  },
-  destination_id: {
-    type: String
-  },
-  contains_id: {
-    type: String
-  }
+  fare_id: String,
+  route_id: String,
+  origin_id: String,
+  destination_id: String,
+  contains_id: String
 }));

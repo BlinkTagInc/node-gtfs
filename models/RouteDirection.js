@@ -5,19 +5,13 @@ var RouteDirection = mongoose.model('RouteDirection', new mongoose.Schema({
     type: String,
     index: true
   },
-  route_id: {
-    type: String
-  },
-  route_name: {
-    type: String
-  },
+  route_id: String,
+  route_name: String,
   direction_id: {
     type: Number,
     index: true,
     min: 0,
     max: 1
   },
-  direction_name: {
-    type: String
-  }
+  direction_name: String
 }));

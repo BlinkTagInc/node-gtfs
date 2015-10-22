@@ -5,12 +5,8 @@ var CalendarDate = mongoose.model('CalendarDate', new mongoose.Schema({
     type: String,
     index: true
   },
-  service_id: {
-    type: String
-  },
-  date: {
-    type: Number
-  },
+  service_id: String,
+  date: Number,
   exception_type: {
     type: Number,
     min: 1,

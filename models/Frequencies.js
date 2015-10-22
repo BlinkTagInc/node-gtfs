@@ -5,19 +5,13 @@ var Frequencies = mongoose.model('Frequencies', new mongoose.Schema({
     type: String,
     index: true
   },
-  trip_id: {
-    type: String
-  },
-  start_time: {
-    type: String
-  },
-  end_time: {
-    type: String
-  },
-  headway_secs: {
-    type: String
-  },
+  trip_id: String,
+  start_time: String,
+  end_time: String,
+  headway_secs: Number,
   exact_times: {
-    type: String
+    type: Number,
+    min: 0,
+    max: 1
   }
 }));

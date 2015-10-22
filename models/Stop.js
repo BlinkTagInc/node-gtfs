@@ -9,38 +9,27 @@ var Stop = mongoose.model('Stop', new mongoose.Schema({
     type: String,
     index: true
   },
-  stop_code: {
-    type: String
-  },
-  stop_name: {
-    type: String
-  },
-  stop_desc: {
-    type: String
-  },
-  stop_lat: {
-    type: Number
-  },
-  stop_lon: {
-    type: Number
-  },
+  stop_code: String,
+  stop_name: String,
+  stop_desc: String,
+  stop_lat: Number,
+  stop_lon: Number,
   loc: {
     type: Array,
     index: '2d'
   },
-  zone_id: {
-    type: String
-  },
-  stop_url: {
-    type: String
-  },
+  zone_id: String,
+  stop_url: String,
   location_type: {
-    type: String
+    type: Number,
+    min: 0,
+    max: 1
   },
-  parent_station: {
-    type: String
-  },
-  stop_timezone: {
-    type: String
+  parent_station: String,
+  stop_timezone: String,
+  wheelchair_boarding: {
+    type: Number,
+    min: 0,
+    max: 2
   }
 }));

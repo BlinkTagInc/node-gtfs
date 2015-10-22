@@ -5,16 +5,13 @@ var Transfer = mongoose.model('Transfer', new mongoose.Schema({
     type: String,
     index: true
   },
-  from_stop_id: {
-    type: String
-  },
-  to_stop_id: {
-    type: String
-  },
+  from_stop_id: String,
+  to_stop_id: String,
   transfer_type: {
-    type: String
+    type: Number,
+    index: true,
+    min: 0,
+    max: 3
   },
-  min_transfer_time: {
-    type: String
-  }
+  min_transfer_time: Number
 }));

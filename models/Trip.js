@@ -13,25 +13,15 @@ var Trip = mongoose.model('Trip', new mongoose.Schema({
     type: String,
     index: true
   },
-  trip_id: {
-    type: String
-  },
-  trip_headsign: {
-    type: String
-  },
-  trip_short_name: {
-    type: String
-  },
+  trip_id: String,
+  trip_headsign: String,
+  trip_short_name: String,
   direction_id: {
     type: Number,
     index: true,
     min: 0,
     max: 1
   },
-  block_id: {
-    type: String
-  },
-  shape_id: {
-    type: String
-  }
+  block_id: String,
+  shape_id: String
 }));

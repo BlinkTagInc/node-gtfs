@@ -21,24 +21,23 @@ var StopTime = mongoose.model('StopTime', new mongoose.Schema({
     get: utils.secondsToTime,
     set: utils.timeToSeconds
   },
-  stop_id: {
-    type: String,
-    index: true
-  },
+  stop_id: String,
   stop_sequence: {
     type: Number,
     index: true
   },
-  stop_headsign: {
-    type: String
-  },
+  stop_headsign: String,
   pickup_type: {
-    type: Number
+    type: Number,
+    index: true,
+    min: 0,
+    max: 3
   },
   drop_off_type: {
-    type: String
+    type: Number,
+    index: true,
+    min: 0,
+    max: 3
   },
-  shape_dist_traveled: {
-    type: String
-  }
+  shape_dist_traveled: Number
 }));

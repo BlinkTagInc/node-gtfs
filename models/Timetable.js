@@ -23,12 +23,8 @@ var Timetable = mongoose.model('Timetable', new mongoose.Schema({
     type: String,
     index: true
   },
-  start_date: {
-    type:  Number
-  },
-  end_date: {
-    type:  Number
-  },
+  start_date: Number,
+  end_date: Number,
   monday: {
     type: Number,
     min: 0,
@@ -64,15 +60,9 @@ var Timetable = mongoose.model('Timetable', new mongoose.Schema({
     min: 0,
     max: 1
   },
-  route_label: {
-    type: String
-  },
-  service_notes: {
-    type: String
-  },
-  timetable_file_name: {
-    type: String
-  },
+  route_label: String,
+  service_notes: String,
+  timetable_file_name: String,
   use_stop_sequence: {
     type: Number,
     min: 0,

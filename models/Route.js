@@ -5,31 +5,17 @@ var Route = mongoose.model('Route', new mongoose.Schema({
     type: String,
     index: true
   },
-  route_id: {
-    type: String
-  },
-  agency_id: {
-    type: String
-  },
-  route_short_name: {
-    type: String
-  },
-  route_long_name: {
-    type: String
-  },
-  route_desc: {
-    type: String
-  },
+  route_id: String,
+  agency_id: String,
+  route_short_name: String,
+  route_long_name: String,
+  route_desc: String,
   route_type: {
-    type: String
+    type: Number,
+    min: 0,
+    max: 7
   },
-  route_url: {
-    type: String
-  },
-  route_color: {
-    type: String
-  },
-  route_text_color: {
-    type: String
-  }
+  route_url: String,
+  route_color: String,
+  route_text_color: String
 }));
