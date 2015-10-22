@@ -73,10 +73,12 @@ var GTFSFiles = [{
   collection: 'trips'
 }, {
   fileNameBase: 'timetables',
-  collection: 'timetables'
+  collection: 'timetables',
+  nonstandard: true
 }, {
   fileNameBase: 'route_directions',
-  collection: 'routedirections'
+  collection: 'routedirections',
+  nonstandard: true
 }];
 
 
@@ -250,11 +252,14 @@ function main(config, callback) {
           var filepath = path.join(gtfsDir, GTFSFile.fileNameBase + '.txt');
 
           if(!fs.existsSync(filepath)) {
-            log(agency_key + ': Importing data - No ' + GTFSFile.fileNameBase + ' file found');
+            if(!GTFSFile.nonstandard) {
+              log(agency_key + ': Importing data - No ' + GTFSFile.fileNameBase + '.txt file found');
+            }
+            
             return cb();
           }
 
-          log(agency_key + ': Importing data - ' + GTFSFile.fileNameBase);
+          log(agency_key + ': Importing data - ' + GTFSFile.fileNameBase + '.txt');
           db.collection(GTFSFile.collection, function (e, collection) {
             var input = fs.createReadStream(filepath);
             var parser = csv.parse({
