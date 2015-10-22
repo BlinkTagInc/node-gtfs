@@ -58,14 +58,14 @@
     }
   ],
   "dependencies": {
-    "async": "~1.4.2",
-    "csv": "~0.4.5",
-    "mongoose": "~4.1.9",
-    "mongodb": "~2.0.34",
-    "proj4": "~2.3.6",
-    "request": "~2.64.0",
-    "underscore": "~1.8.3",
-    "unzip2": "~0.2.5"
+    "async": "1.4.2",
+    "csv": "0.4.6",
+    "mongoose": "4.1.12",
+    "mongodb": "2.0.46",
+    "proj4": "2.3.12",
+    "request": "2.65.0",
+    "underscore": "1.8.3",
+    "unzip2": "0.2.5"
   },
   "keywords": [
     "transit",
@@ -78,10 +78,10 @@
   },
   "main": "index",
   "devDependencies": {
-    "csv-parse": "~1.0.0",
-    "should": "~7.1.0",
-    "supertest": "~1.1.0",
-    "timekeeper": "~0.0.5"
+    "csv-parse": "1.0.0",
+    "should": "7.1.1",
+    "supertest": "1.1.0",
+    "timekeeper": "0.0.5"
   },
   "scripts": {
     "download": "node scripts/download.js",
