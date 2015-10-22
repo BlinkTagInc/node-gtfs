@@ -293,3 +293,9 @@ Returns a route directions object matching the `route_id` and `direction_id` spe
     gtfs.getRouteDirection(agency_key, route_id, direction_id, function(err, routeDirection) {
 
     });
+
+## Tests
+
+To run tests:
+
+    npm test
