@@ -34,18 +34,15 @@ Copy `config-sample.js` to `config.js`.
 
 Before you can use gtfs-to-html you must specify the transit agencies you'd like to use.
 
-You can specify agencies using their [GTFS Data Exchange](http://www.gtfs-data-exchange.com/) `dataexchange_id`, a `url` to the GTFS file or a local `path`.
+You can specify agencies using a `url` to the GTFS file or a local `path`.
 
-* Put agency_key names from [gtfs-data-exchange.com](http://gtfs-data-exchange.com). See the [full list of agencies availale on GTFS data exchange](http://www.gtfs-data-exchange.com/api/agencies).:
-```
-    'bay-area-rapid-transit'
-```
+To find an agency's GTFS URL, visit transitfeeds.com. You can use the direct URL from the agency or you can use a URL generated from the transitfeeds.com API along with your API token.
 
 * Specify a download URL:
 ```
 {
-    agency_key: 'caltrain',
-    url: 'http://www.gtfs-data-exchange.com/agency/caltrain/latest.zip'
+    agency_key: 'county-connection',
+    url: 'http://cccta.org/GTFS/google_transit.zip'
 }
 ```
 

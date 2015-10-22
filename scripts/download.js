@@ -93,15 +93,10 @@ function main(config, callback) {
 
     q = async.queue(downloadGTFS, 1);
     // loop through all agencies specified
-    // If the agency_key is a URL, download that GTFS file, otherwise treat
-    // it as an agency_key and get file from gtfs-data-exchange.com
     config.agencies.forEach(function (item) {
       var agency = {};
 
-      if(typeof (item) == 'string') {
-        agency.agency_key = item;
-        agency.agency_url = 'http://www.gtfs-data-exchange.com/agency/' + item + '/latest.zip';
-      } else if(item.url) {
+      if(item.url) {
         agency.agency_key = item.agency_key;
         agency.agency_url = item.url;
       } else if(item.path) {
