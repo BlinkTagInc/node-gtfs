@@ -3,3 +3,4 @@ bower_components
 downloads
 config.js
 .idea
+test/fixture/tmp/*.txt
