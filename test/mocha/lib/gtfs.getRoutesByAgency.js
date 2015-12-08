@@ -65,7 +65,6 @@ describe('gtfs.getRoutesByAgency(): ', function(){
         databaseTestSupport.teardown(next);
       }
     }, function(){
-		console.log('1) agency_key: ' + agency_key);
       gtfs.getRoutesByAgency(agency_key, function(err, res){
         should.not.exist(err);
         should.exist(res);
@@ -76,7 +75,6 @@ describe('gtfs.getRoutesByAgency(): ', function(){
   });
 
   it('should return expected routes for given agency (agency_id not provided)', function(done){
-	console.log('2) agency_key: ' + agency_key);
     gtfs.getRoutesByAgency(agency_key, function(err, routes){
       should.not.exist(err);
       should.exist(routes);
@@ -179,7 +177,6 @@ describe('gtfs.getRoutesByAgency(): ', function(){
         databaseTestSupport.teardown(next);
       }
     }, function(){
-		console.log('3) agency_key: ' + agency_key + '\tagency_id: ' + agency_id);
       gtfs.getRoutesByAgency(agency_key, agency_id, function(err, res){
         should.not.exist(err);
         should.exist(res);
@@ -190,7 +187,6 @@ describe('gtfs.getRoutesByAgency(): ', function(){
   });
 
   it('should return expected routes for given agency and agency_id', function(done){
-	console.log('4) agency_key: ' + agency_key + '\tagency_id: ' + agency_id);
     gtfs.getRoutesByAgency(agency_key, agency_id, function(err, routes){
       should.not.exist(err);
       should.exist(routes);
