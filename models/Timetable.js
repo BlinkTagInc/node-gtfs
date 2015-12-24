@@ -62,6 +62,7 @@ var Timetable = mongoose.model('Timetable', new mongoose.Schema({
   },
   route_label: String,
   service_notes: String,
+  orientation: String,
   timetable_file_name: String,
   use_stop_sequence: {
     type: Number,
