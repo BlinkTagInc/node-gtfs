@@ -23,5 +23,15 @@ var Trip = mongoose.model('Trip', new mongoose.Schema({
     max: 1
   },
   block_id: String,
-  shape_id: String
+  shape_id: String,
+  wheelchair_accessible: {
+    type: Number,
+    min: 0,
+    max: 2
+  },
+  bikes_allowed: {
+    type: Number,
+    min: 0,
+    max: 2
+  }
 }));

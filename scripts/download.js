@@ -306,7 +306,10 @@ function main(config, callback) {
                   'drop_off_type',
                   'use_stop_sequence',
                   'transfer_type',
-                  'min_transfer_time'
+                  'min_transfer_time',
+                  'wheelchair_accessible',
+                  'bikes_allowed',
+                  'timepoint'
                 ];
 
                 integerFields.forEach(function(fieldName) {

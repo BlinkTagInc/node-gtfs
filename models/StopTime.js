@@ -39,5 +39,10 @@ var StopTime = mongoose.model('StopTime', new mongoose.Schema({
     min: 0,
     max: 3
   },
-  shape_dist_traveled: Number
+  shape_dist_traveled: Number,
+  timepoint: {
+    type: Number,
+    min: 0,
+    max: 1
+  }
 }));
