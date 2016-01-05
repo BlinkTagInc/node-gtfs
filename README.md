@@ -4,11 +4,16 @@
 [![David](https://img.shields.io/david/brendannee/node-gtfs.svg)]()
 [![npm](https://img.shields.io/npm/dm/gtfs.svg?style=flat)]()
 
-`node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/), unzips it and stores it to a MongoDB database. In addition, it provides some methods to query for agencies, routes, stops and times.  It also has spatial queries to find nearby stops, routes and agencies.
+`node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/),
+unzips it and stores it to a MongoDB database. In addition, it provides some
+methods to query for agencies, routes, stops and times.  It also has spatial
+queries to find nearby stops, routes and agencies.
 
 ## Example Application
 
-The [GTFS-to-HTML](https://github.com/brendannee/gtfs-to-html) app uses node-gtfs for downloading and querying GTFS data. It provides a good example of how to use this library.
+The [GTFS-to-HTML](https://github.com/brendannee/gtfs-to-html) app uses
+node-gtfs for downloading and querying GTFS data. It provides a good example of
+how to use this library.
 
 ## Setup
 
@@ -32,11 +37,14 @@ Copy `config-sample.js` to `config.js`.
 
     cp config-sample.js config.js
 
-Before you can use gtfs-to-html you must specify the transit agencies you'd like to use.
+Before you can use gtfs-to-html you must specify the transit agencies you'd
+like to use.
 
 You can specify agencies using a `url` to the GTFS file or a local `path`.
 
-To find an agency's GTFS URL, visit transitfeeds.com. You can use the direct URL from the agency or you can use a URL generated from the transitfeeds.com API along with your API token.
+To find an agency's GTFS URL, visit transitfeeds.com. You can use the direct
+URL from the agency or you can use a URL generated from the transitfeeds.com
+API along with your API token.
 
 * Specify a download URL:
 ```
@@ -61,7 +69,8 @@ To find an agency's GTFS URL, visit transitfeeds.com. You can use the direct URL
 }
 ```
 
-The mongodb URI should also be configured in `config.js`. The default database URI is:
+The mongodb URI should also be configured in `config.js`. The default database
+URI is:
 `mongodb://localhost:27017/gtfs`
 
 ## Loading Data
@@ -84,7 +93,8 @@ To keep schedules up to date, you could schedule this to occur once per day.
 
 # Querying data
 
-You can include this library in your project to expose some functions for querying GTFS data.
+You can include this library in your project to expose some functions for
+querying GTFS data.
 
 ## Including
 
@@ -97,7 +107,7 @@ Include this library.
 
 ### Agencies
 
-Returns an array of all agencies
+Returns an array of all agencies.
 
     gtfs.agencies(function(err, agencies) {
 
@@ -105,7 +115,7 @@ Returns an array of all agencies
 
 ###Agencies near a point
 
-Returns an array of agencies within a `radius` of the `lat`, `lon` specified
+Returns an array of agencies within a `radius` of the `lat`, `lon` specified.
 
     gtfs.getAgenciesByDistance(lat, lon, radius, function(err, agencies) {
 
@@ -113,7 +123,7 @@ Returns an array of agencies within a `radius` of the `lat`, `lon` specified
 
 ### Get a specific agency
 
-Returns an agency
+Returns an agency.
 
     gtfs.getAgency(agency_key, function(err, agency) {
 
@@ -121,7 +131,7 @@ Returns an agency
 
 ### Routes for an agency
 
-Returns an array of routes for the `agency_key` specified
+Returns an array of routes for the `agency_key` specified.
 
     gtfs.getRoutesByAgency(agency_key, function(err, routes) {
 
@@ -129,7 +139,7 @@ Returns an array of routes for the `agency_key` specified
 
 ### Get a specific route
 
-Returns a route for the `route_id` specified
+Returns a route for the `route_id` specified.
 
     gtfs.getRoutesById(agency_key, route_id, function(err, routes) {
 
@@ -137,17 +147,17 @@ Returns a route for the `route_id` specified
 
 ### Routes near a point
 
-Returns an array of routes within a `radius` of the `lat`, `lon` specified
+Returns an array of routes within a `radius` of the `lat`, `lon` specified.
 
     gtfs.getRoutesByDistance(lat, lon, radius, function(err, routes) {
 
     });
 
-`radius` is optional and in miles.  Default: 1 mile
+`radius` is optional and in miles.  Default: 1 mile.
 
 ### Routes that serve a specific stop
 
-Returns an array of routes serving the `agency_key` and `stop_id` specified
+Returns an array of routes serving the `agency_key` and `stop_id` specified.
 
     gtfs.getRoutesByStop(agency_key, stop_id, function(err, routes) {
 
@@ -155,7 +165,7 @@ Returns an array of routes serving the `agency_key` and `stop_id` specified
 
 ### Stops by id
 
-Returns an array of stops matching the `stop_ids` specified
+Returns an array of stops matching the `stop_ids` specified.
 
     gtfs.getStops(agency_key, stop_ids, function(err, stops) {
 
@@ -191,7 +201,8 @@ Returns an array of stoptimes for the `trip_id` specified
 
 ### Stop times by stop
 
-Returns an array of stoptimes for the `agency_key`, `route_id`, `stop_id` and `direction_id` specified
+Returns an array of stoptimes for the `agency_key`, `route_id`, `stop_id` and
+`direction_id` specified.
 
     gtfs.getStoptimesByStop(gency_key, route_id, stop_id, direction_id, function(err, stoptimes) {
 
@@ -199,7 +210,8 @@ Returns an array of stoptimes for the `agency_key`, `route_id`, `stop_id` and `d
 
 ### Trips by route and direction
 
-Returns an array of trips for the `agency_key`, `route_id` and `direction_id` specified
+Returns an array of trips for the `agency_key`, `route_id` and `direction_id`
+specified.
 
     gtfs.getTripsByRouteAndDirection(gency_key, route_id, direction_id, service_ids, function(err, trips) {
 
@@ -209,7 +221,8 @@ Returns an array of trips for the `agency_key`, `route_id` and `direction_id` sp
 
 ### Direction name by route
 
-Returns an object of `{northData: "Headsign north", southData: "Headsign south"}` for the `agency_key` and `route_id` specified
+Returns an object of `{northData: "Headsign north", southData: "Headsign south"}`
+for the `agency_key` and `route_id` specified.
 
     gtfs.findBothDirectionNames(agency_key, route_id, function(err, directionNames) {
 
@@ -217,7 +230,8 @@ Returns an object of `{northData: "Headsign north", southData: "Headsign south"}
 
 ### Shapes by route
 
-Returns an array of shapes for the `agency_key`, `route_id` and `direction_id` specified
+Returns an array of shapes for the `agency_key`, `route_id` and `direction_id`
+specified.
 
     gtfs.getShapesByRoute(agency_key, route_id, direction_id, function(err, shapes) {
 
@@ -275,9 +289,11 @@ Returns an array of timetables for the `agency_key` specified
 
     });
 
-### Timetable by id
+### Timetables by id
 
-Returns a timetable object matching the `timetable_id` specified
+Returns an array timetable objects matching the `timetable_id` specified. A
+timetable may consist of multiple overlapping routes, so more than one timetable
+object can be returned.
 
     gtfs.getTimetable(agency_key, timetable_id, function(err, timetable) {
 
@@ -285,7 +301,8 @@ Returns a timetable object matching the `timetable_id` specified
 
 ### TimetableStopOrders by id
 
-Returns an array of TimetableStopOrder objects matching the `timetable_id` specified
+Returns an array of TimetableStopOrder objects matching the `timetable_id`
+specified.
 
     gtfs.getTimetableStopOrders(agency_key, timetable_id, function(err, timetableStopOrders) {
 
