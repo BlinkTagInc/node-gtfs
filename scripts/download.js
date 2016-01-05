@@ -76,8 +76,8 @@ var GTFSFiles = [{
   collection: 'timetables',
   nonstandard: true
 }, {
-  fileNameBase: 'route_directions',
-  collection: 'routedirections',
+  fileNameBase: 'timetable_stop_order',
+  collection: 'timetablestoporder',
   nonstandard: true
 }];
 

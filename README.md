@@ -283,14 +283,6 @@ Returns a timetable object matching the `timetable_id` specified
 
     });
 
-### Route Directions by Route
-
-Returns a route directions object matching the `route_id` and `direction_id` specified
-
-    gtfs.getRouteDirection(agency_key, route_id, direction_id, function(err, routeDirection) {
-
-    });
-
 ## Tests
 
 To run tests:
