@@ -77,7 +77,7 @@ var GTFSFiles = [{
   nonstandard: true
 }, {
   fileNameBase: 'timetable_stop_order',
-  collection: 'timetablestoporder',
+  collection: 'timetablestoporders',
   nonstandard: true
 }];
 

@@ -283,6 +283,14 @@ Returns a timetable object matching the `timetable_id` specified
 
     });
 
+### TimetableStopOrders by id
+
+Returns an array of TimetableStopOrder objects matching the `timetable_id` specified
+
+    gtfs.getTimetableStopOrders(agency_key, timetable_id, function(err, timetableStopOrders) {
+
+    });
+
 ## Tests
 
 To run tests:
