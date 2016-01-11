@@ -6,7 +6,7 @@ var parse = require('csv-parse');
 var config = require('./../../config');
 var downloadScript = require('../../../scripts/download');
 var agenciesFixtures = {
-  http: [{ agency_key: 'caltrain', url:  'http://www.gtfs-data-exchange.com/agency/caltrain/latest.zip'}],
+  http: [{ agency_key: 'caltrain', url:  'http://transitfeeds.com/p/caltrain/122/latest/download'}],
   local: [{ agency_key: 'caltrain', url: __dirname + '/../../fixture/caltrain_20120824_0333.zip'}]
 };
 
