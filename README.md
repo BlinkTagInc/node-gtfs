@@ -123,17 +123,26 @@ Returns an array of agencies within a `radius` of the `lat`, `lon` specified.
 
 ### Get a specific agency
 
-Returns an agency.
+Returns an agency.  An `agency_key` is required, optionally you can specify an `agency_id` for GTFS files that have more than one agency listed in `agencies.txt`.
+
 
     gtfs.getAgency(agency_key, function(err, agency) {
 
     });
 
+    gtfs.getAgency(agency_key, agency_id, function(err, agency) {
+
+    });
+
 ### Routes for an agency
 
-Returns an array of routes for the `agency_key` specified.
+Returns an array of routes for the `agency_key` specified. An `agency_key` is required, optionally you can specify an `agency_id` for GTFS files that have more than one agency listed in `agencies.txt`.
 
     gtfs.getRoutesByAgency(agency_key, function(err, routes) {
+
+    });
+
+    gtfs.getRoutesByAgency(agency_key, agency_id, function(err, routes) {
 
     });
 
