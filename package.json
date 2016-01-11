@@ -1,7 +1,7 @@
 {
   "name": "gtfs",
   "description": "Download GTFS transit data into mongodb and expose routes, stops, times and more",
-  "version": "0.3.6",
+  "version": "0.4.0",
   "author": {
     "name": "Brendan Nee",
     "email": "me@bn.ee"
@@ -33,11 +33,17 @@
       "name": "Hafiz Ismail"
     },
     {
+      "name": "LeAnne Lis"
+    },
+    {
       "name": "Ethan Lo",
       "email": "ethan@ethanlo.com"
     },
     {
       "name": "Natalie Perna"
+    },
+    {
+      "name": "Léo Pradel"
     },
     {
       "name": "Landon Reed"
