@@ -14,6 +14,7 @@ var db;
 // setup fixtures
 var agenciesFixtures = [{ agency_key: 'caltrain', url: __dirname + '/../../fixture/caltrain_20120824_0333.zip'}];
 var agency_key = agenciesFixtures[0].agency_key;
+var agency_id = agenciesFixtures[0].agency_id;
 
 config.agencies = agenciesFixtures;
 
@@ -58,7 +59,7 @@ describe('gtfs.getRoutesByAgency(): ', function(){
     });
   });
 
-  it('should return empty array if no routes for given agency exists', function(done){
+  it('should return empty array if no routes for given agency exists (agency_id not provided)', function(done){
     async.series({
       teardownDatabase: function(next){
         databaseTestSupport.teardown(next);
@@ -73,8 +74,120 @@ describe('gtfs.getRoutesByAgency(): ', function(){
     });
   });
 
-  it('should return expected routes for given agency', function(done){
-    gtfs.getRoutesByAgency(agency_key,function(err, routes){
+  it('should return expected routes for given agency (agency_id not provided)', function(done){
+    gtfs.getRoutesByAgency(agency_key, function(err, routes){
+      should.not.exist(err);
+      should.exist(routes);
+
+      var expectedRoutes = {
+        ct_bullet_20120701: {
+          route_id: 'ct_bullet_20120701',
+          route_short_name: '',
+          route_long_name: 'Bullet',
+          route_desc: '',
+          route_type: 2,
+          route_url: '',
+          route_color: 'E31837',
+          route_text_color: '',
+          agency_key: 'caltrain'
+        },
+        ct_limited_20120701: {
+          route_id: 'ct_limited_20120701',
+          route_short_name: '',
+          route_long_name: 'Limited',
+          route_desc: '',
+          route_type: 2,
+          route_url: '',
+          route_color: 'FEF0B5',
+          route_text_color: '',
+          agency_key: 'caltrain'
+        },
+        ct_local_20120701: {
+          route_id: 'ct_local_20120701',
+          route_short_name: '',
+          route_long_name: 'Local',
+          route_desc: '',
+          route_type: 2,
+          route_url: '',
+          route_color: '',
+          route_text_color: '',
+          agency_key: 'caltrain'
+        },
+        ct_bullet_20121001: {
+          route_id: 'ct_bullet_20121001',
+          route_short_name: '',
+          route_long_name: 'Bullet',
+          route_desc: '',
+          route_type: 2,
+          route_url: '',
+          route_color: 'E31837',
+          route_text_color: '',
+          agency_key: 'caltrain'
+        },
+        ct_limited_20121001: {
+          route_id: 'ct_limited_20121001',
+          route_short_name: '',
+          route_long_name: 'Limited',
+          route_desc: '',
+          route_type: 2,
+          route_url: '',
+          route_color: 'FEF0B5',
+          route_text_color: '',
+          agency_key: 'caltrain'
+        },
+        ct_local_20121001: {
+          route_id: 'ct_local_20121001',
+          route_short_name: '',
+          route_long_name: 'Local',
+          route_desc: '',
+          route_type: 2,
+          route_url: '',
+          route_color: '',
+          route_text_color: '',
+          agency_key: 'caltrain'
+        }
+      };
+
+      routes.should.have.length(6);
+
+      for (var i in routes){
+        var route = routes[i];
+        var expectedRoute = expectedRoutes[route.route_id];
+
+        should.exist(expectedRoute);
+        route.route_id.should.equal(expectedRoute.route_id);
+        route.route_short_name.should.equal(expectedRoute.route_short_name);
+        route.route_long_name.should.equal(expectedRoute.route_long_name);
+        route.route_desc.should.equal(expectedRoute.route_desc);
+        route.route_type.should.equal(expectedRoute.route_type);
+        route.route_long_name.should.equal(expectedRoute.route_long_name);
+        route.route_url.should.equal(expectedRoute.route_url);
+        route.route_color.should.equal(expectedRoute.route_color);
+        route.route_text_color.should.equal(expectedRoute.route_text_color);
+        route.agency_key.should.equal(expectedRoute.agency_key);
+      }
+
+      done();
+    });
+  });
+  
+  it('should return empty array if no routes for given agency exists (agency_id provided)', function(done){
+    async.series({
+      teardownDatabase: function(next){
+        databaseTestSupport.teardown(next);
+      }
+    }, function(){
+      gtfs.getRoutesByAgency(agency_key, agency_id, function(err, res){
+        should.not.exist(err);
+        should.exist(res);
+        res.should.have.length(0);
+        done();
+      });
+    });
+  });
+
+  it('should return expected routes for given agency and agency_id', function(done){
+    gtfs.getRoutesByAgency(agency_key, agency_id, function(err, routes){
       should.not.exist(err);
       should.exist(routes);
 
