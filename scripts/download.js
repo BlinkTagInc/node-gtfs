@@ -2,10 +2,12 @@ var async = require('async');
 var exec = require('child_process').exec;
 var csv = require('csv');
 var fs = require('fs');
+var mkdirp = require('mkdirp');
 var MongoClient = require('mongodb').MongoClient;
 var path = require('path');
 var proj4 = require('proj4');
 var request = require('request');
+var rimraf = require('rimraf');
 var unzip = require('unzip2');
 var q;
 
@@ -16,10 +18,10 @@ var invocation = (require.main === module) ? 'direct' : 'required';
 var config = {};
 if(invocation === 'direct') {
   try {
-    var config = require('../config.js');
+    config = require('../config.js');
   } catch(e) {
     try {
-      var config = require('../config-sample.js');
+      config = require('../config-sample.js');
     } catch(e) {
       handleError(new Error('Cannot find config.js'));
     }
@@ -144,19 +146,13 @@ function main(config, callback) {
 
 
       function cleanupFiles(cb) {
-        //remove old downloaded file
-        exec((process.platform.match(/^win/) ? 'rmdir /Q /S ' : 'rm -rf ') + downloadDir, function (e) {
-          try {
-            //create downloads directory
-            fs.mkdirSync(downloadDir);
-            cb();
-          } catch(e) {
-            if(e.code == 'EEXIST') {
-              cb();
-            } else {
-              handleError(e);
-            }
+        // remove old downloaded file
+        rimraf(downloadDir, function(e) {
+          if(e) {
+            return handleError(e);
           }
+
+          mkdirp(downloadDir, cb);
         });
       }
 
