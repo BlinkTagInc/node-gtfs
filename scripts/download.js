@@ -8,6 +8,7 @@ var proj4 = require('proj4');
 var request = require('request');
 var rimraf = require('rimraf');
 var unzip = require('unzip2');
+var argv = require('yargs').argv;
 
 var filenames = require('../lib/filenames');
 
@@ -123,7 +124,7 @@ function main(config, callback) {
           log(agency_key + ': Downloading');
           request(task.agency_url, processFile).pipe(fs.createWriteStream(downloadDir + '/latest.zip'));
 
-          function processFile(e, response, body) {
+          function processFile(e, response) {
             if (response && response.statusCode != 200) {
               cb(new Error('Couldn\'t download files'));
             }
@@ -175,6 +176,12 @@ function main(config, callback) {
 
       function removeDatabase(cb) {
         // remove old db records based on agency_key
+        // can be overridden using the --skip-delete command line argument
+        if (argv['skip-delete']) {
+          log(agency_key + ': Skipping deletion of existing data');
+          return cb();
+        }
+
         async.forEach(filenames, function(filename, cb) {
           db.collection(filename.collection, function(e, collection) {
             collection.remove({

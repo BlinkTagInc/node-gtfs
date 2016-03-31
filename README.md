@@ -87,6 +87,14 @@ or
 
     node ./scripts/download
 
+By default, the download script will delete any existing data with the same `agency_key` from your database. If you don't want this to happen, pass the `--skip-delete` flag
+
+    npm run download -- --skip-delete
+
+or
+
+    node ./scripts/download --skip-delete
+
 ### Scheduling
 
 To keep schedules up to date, you could schedule this to occur once per day.
