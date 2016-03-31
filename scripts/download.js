@@ -9,13 +9,14 @@ var proj4 = require('proj4');
 var request = require('request');
 var rimraf = require('rimraf');
 var unzip = require('unzip2');
+
+var filenames = require('../lib/filenames');
+
 var q;
-
-
+var config = {};
 // check if this file was invoked direct through command line or required as an export
 var invocation = (require.main === module) ? 'direct' : 'required';
 
-var config = {};
 if(invocation === 'direct') {
   try {
     config = require('../config.js');
@@ -27,61 +28,11 @@ if(invocation === 'direct') {
     }
   }
 
-
   if(!config.agencies) {
     handleError(new Error('No agency_key specified in config.js\nTry adding \'capital-metro\' to the agencies in config.js to load transit data'));
     process.exit();
   }
 }
-
-var GTFSFiles = [{
-  fileNameBase: 'agency',
-  collection: 'agencies'
-}, {
-  fileNameBase: 'calendar_dates',
-  collection: 'calendardates'
-}, {
-  fileNameBase: 'calendar',
-  collection: 'calendars'
-}, {
-  fileNameBase: 'fare_attributes',
-  collection: 'fareattributes'
-}, {
-  fileNameBase: 'fare_rules',
-  collection: 'farerules'
-}, {
-  fileNameBase: 'feed_info',
-  collection: 'feedinfos'
-}, {
-  fileNameBase: 'frequencies',
-  collection: 'frequencies'
-}, {
-  fileNameBase: 'routes',
-  collection: 'routes'
-}, {
-  fileNameBase: 'shapes',
-  collection: 'shapes'
-}, {
-  fileNameBase: 'stop_times',
-  collection: 'stoptimes'
-}, {
-  fileNameBase: 'stops',
-  collection: 'stops'
-}, {
-  fileNameBase: 'transfers',
-  collection: 'transfers'
-}, {
-  fileNameBase: 'trips',
-  collection: 'trips'
-}, {
-  fileNameBase: 'timetables',
-  collection: 'timetables',
-  nonstandard: true
-}, {
-  fileNameBase: 'timetable_stop_order',
-  collection: 'timetablestoporders',
-  nonstandard: true
-}];
 
 
 function main(config, callback) {
@@ -224,9 +175,9 @@ function main(config, callback) {
 
 
       function removeDatabase(cb) {
-        //remove old db records based on agency_key
-        async.forEach(GTFSFiles, function (GTFSFile, cb) {
-          db.collection(GTFSFile.collection, function (e, collection) {
+        // remove old db records based on agency_key
+        async.forEach(filenames, function (filename, cb) {
+          db.collection(filename.collection, function (e, collection) {
             collection.remove({
               agency_key: agency_key
             }, cb);
@@ -238,20 +189,20 @@ function main(config, callback) {
 
 
       function importFiles(cb) {
-        //Loop through each file and add agency_key
-        async.forEachSeries(GTFSFiles, function (GTFSFile, cb) {
-          var filepath = path.join(gtfsDir, GTFSFile.fileNameBase + '.txt');
+        // Loop through each file and add agency_key
+        async.forEachSeries(filenames, function (filename, cb) {
+          var filepath = path.join(gtfsDir, filename.fileNameBase + '.txt');
 
           if(!fs.existsSync(filepath)) {
-            if(!GTFSFile.nonstandard) {
-              log(agency_key + ': Importing data - No ' + GTFSFile.fileNameBase + '.txt file found');
+            if(!filename.nonstandard) {
+              log(agency_key + ': Importing data - No ' + filename.fileNameBase + '.txt file found');
             }
 
             return cb();
           }
 
-          log(agency_key + ': Importing data - ' + GTFSFile.fileNameBase + '.txt');
-          db.collection(GTFSFile.collection, function(e, collection) {
+          log(agency_key + ': Importing data - ' + filename.fileNameBase + '.txt');
+          db.collection(filename.collection, function(e, collection) {
             if(e) return handleError(e);
             var input = fs.createReadStream(filepath);
 
