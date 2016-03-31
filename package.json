@@ -72,10 +72,10 @@
   "dependencies": {
     "async": "1.5.2",
     "csv": "0.4.6",
-    "mkdirp": "^0.5.1",
-    "mongodb": "2.1.7",
-    "mongoose": "4.4.4",
-    "proj4": "2.3.12",
+    "mkdirp": "0.5.1",
+    "mongodb": "2.1.14",
+    "mongoose": "4.4.10",
+    "proj4": "2.3.14",
     "request": "2.69.0",
     "rimraf": "2.5.2",
     "underscore": "1.8.3",
@@ -92,10 +92,10 @@
   },
   "main": "index",
   "devDependencies": {
-    "csv-parse": "1.0.1",
+    "csv-parse": "1.0.2",
     "eslint": "2.5.3",
     "mocha": "2.4.5",
-    "should": "8.2.2",
+    "should": "8.3.0",
     "supertest": "1.2.0",
     "timekeeper": "0.0.5"
   },
