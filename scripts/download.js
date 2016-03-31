@@ -17,7 +17,7 @@ var config = {};
 // check if this file was invoked direct through command line or required as an export
 var invocation = (require.main === module) ? 'direct' : 'required';
 
-if(invocation === 'direct') {
+if (invocation === 'direct') {
   try {
     config = require('../config.js');
   } catch(e) {
@@ -28,7 +28,7 @@ if(invocation === 'direct') {
     }
   }
 
-  if(!config.agencies) {
+  if (!config.agencies) {
     handleError(new Error('No agency_key specified in config.js\nTry adding \'capital-metro\' to the agencies in config.js to load transit data'));
     process.exit();
   }
@@ -36,36 +36,36 @@ if(invocation === 'direct') {
 
 
 function main(config, callback) {
-  var log = (config.verbose === false) ? function () {} : console.log;
+  var log = (config.verbose === false) ? function() {} : console.log;
 
   // open database and create queue for agency list
   MongoClient.connect(config.mongo_url, {
     w: 1
-  }, function (e, db) {
-    if(e) handleError(e);
+  }, function(e, db) {
+    if (e) handleError(e);
 
     q = async.queue(downloadGTFS, 1);
     // loop through all agencies specified
-    config.agencies.forEach(function (item) {
+    config.agencies.forEach(function(item) {
       var agency = {};
 
-      if(item.url) {
+      if (item.url) {
         agency.agency_key = item.agency_key;
         agency.agency_url = item.url;
-      } else if(item.path) {
+      } else if (item.path) {
         agency.agency_key = item.agency_key;
         agency.path = item.path;
       }
 
-      if(!agency.agency_key) {
+      if (!agency.agency_key) {
         handleError(new Error('No URL or Agency Key or path provided.'));
       }
 
       q.push(agency);
     });
 
-    q.drain = function (e) {
-      if(e) handleError(e);
+    q.drain = function(e) {
+      if (e) handleError(e);
 
       log('All agencies completed (' + config.agencies.length + ' total)');
       callback();
@@ -90,7 +90,7 @@ function main(config, callback) {
         importFiles,
         postProcess,
         cleanupFiles
-      ], function (e, results) {
+      ], function(e, results) {
         log(e || agency_key + ': Completed');
         cb();
       });
@@ -99,7 +99,7 @@ function main(config, callback) {
       function cleanupFiles(cb) {
         // remove old downloaded file
         rimraf(downloadDir, function(e) {
-          if(e) {
+          if (e) {
             return handleError(e);
           }
 
@@ -109,9 +109,9 @@ function main(config, callback) {
 
 
       function getFiles(cb) {
-        if(task.agency_url) {
+        if (task.agency_url) {
           downloadFiles(cb);
-        } else if(task.path) {
+        } else if (task.path) {
           readFiles(cb);
         }
       }
@@ -120,12 +120,12 @@ function main(config, callback) {
       function downloadFiles(cb) {
         // do download
         var file_protocol = require('url').parse(task.agency_url).protocol;
-        if(file_protocol === 'http:' || file_protocol === 'https:') {
+        if (file_protocol === 'http:' || file_protocol === 'https:') {
           log(agency_key + ': Downloading');
           request(task.agency_url, processFile).pipe(fs.createWriteStream(downloadDir + '/latest.zip'));
 
           function processFile(e, response, body) {
-            if(response && response.statusCode != 200) {
+            if (response && response.statusCode != 200) {
               cb(new Error('Couldn\'t download files'));
             }
             log(agency_key + ': Download successful');
@@ -134,19 +134,19 @@ function main(config, callback) {
               .pipe(unzip.Extract({
                 path: downloadDir
               }).on('close', cb))
-              .on('error', function (e) {
+              .on('error', function(e) {
                 log(agency_key + ': Error Unzipping File');
                 handleError(e);
               });
           }
         } else {
-          if(!fs.existsSync(task.agency_url)) {
+          if (!fs.existsSync(task.agency_url)) {
             return cb(new Error('File does not exists'));
           }
 
           fs.createReadStream(task.agency_url)
             .pipe(fs.createWriteStream(downloadDir + '/latest.zip'))
-            .on('close', function () {
+            .on('close', function() {
               fs.createReadStream(downloadDir + '/latest.zip')
                 .pipe(unzip.Extract({
                   path: downloadDir
@@ -159,7 +159,7 @@ function main(config, callback) {
 
 
       function readFiles(cb) {
-        if(path.extname(task.path) === '.zip') {
+        if (path.extname(task.path) === '.zip') {
           // local file is zipped
           fs.createReadStream(task.path)
             .pipe(unzip.Extract({
@@ -176,13 +176,13 @@ function main(config, callback) {
 
       function removeDatabase(cb) {
         // remove old db records based on agency_key
-        async.forEach(filenames, function (filename, cb) {
-          db.collection(filename.collection, function (e, collection) {
+        async.forEach(filenames, function(filename, cb) {
+          db.collection(filename.collection, function(e, collection) {
             collection.remove({
               agency_key: agency_key
             }, cb);
           });
-        }, function (e) {
+        }, function(e) {
           cb(e, 'remove');
         });
       }
@@ -190,11 +190,11 @@ function main(config, callback) {
 
       function importFiles(cb) {
         // Loop through each file and add agency_key
-        async.forEachSeries(filenames, function (filename, cb) {
+        async.forEachSeries(filenames, function(filename, cb) {
           var filepath = path.join(gtfsDir, filename.fileNameBase + '.txt');
 
-          if(!fs.existsSync(filepath)) {
-            if(!filename.nonstandard) {
+          if (!fs.existsSync(filepath)) {
+            if (!filename.nonstandard) {
               log(agency_key + ': Importing data - No ' + filename.fileNameBase + '.txt file found');
             }
 
@@ -203,7 +203,7 @@ function main(config, callback) {
 
           log(agency_key + ': Importing data - ' + filename.fileNameBase + '.txt');
           db.collection(filename.collection, function(e, collection) {
-            if(e) return handleError(e);
+            if (e) return handleError(e);
             var input = fs.createReadStream(filepath);
 
             var parser = csv.parse({
@@ -215,7 +215,7 @@ function main(config, callback) {
               while(line = parser.read()) {
                 //remove null values
                 for(var key in line) {
-                  if(line[key] === null) {
+                  if (line[key] === null) {
                     delete line[key];
                   }
                 }
@@ -260,7 +260,7 @@ function main(config, callback) {
                 ];
 
                 integerFields.forEach(function(fieldName) {
-                  if(line[fieldName]) {
+                  if (line[fieldName]) {
                     line[fieldName] = parseInt(line[fieldName], 10);
                   }
                 });
@@ -276,56 +276,56 @@ function main(config, callback) {
                 ];
 
                 floatFields.forEach(function(fieldName) {
-                  if(line[fieldName]) {
+                  if (line[fieldName]) {
                     line[fieldName] = parseFloat(line[fieldName]);
                   }
                 });
 
                 // make lat/lon array for stops
-                if(line.stop_lat && line.stop_lon) {
+                if (line.stop_lat && line.stop_lon) {
                   line.loc = [
                     line.stop_lon,
                     line.stop_lat
                   ];
 
                   // if coordinates are not specified, use [0,0]
-                  if(isNaN(line.loc[0])) {
+                  if (isNaN(line.loc[0])) {
                     line.loc[0] = 0;
                   }
-                  if(isNaN(line.loc[1])) {
+                  if (isNaN(line.loc[1])) {
                     line.loc[1] = 0;
                   }
 
                   // Convert to epsg4326 if needed
-                  if(task.agency_proj) {
+                  if (task.agency_proj) {
                     line.loc = proj4(task.agency_proj, 'WGS84', line.loc);
                     line.stop_lon = line.loc[0];
                     line.stop_lat = line.loc[1];
                   }
 
                   // Calulate agency bounds
-                  if(agency_bounds.sw[0] > line.loc[0] || !agency_bounds.sw[0]) {
+                  if (agency_bounds.sw[0] > line.loc[0] || !agency_bounds.sw[0]) {
                     agency_bounds.sw[0] = line.loc[0];
                   }
-                  if(agency_bounds.ne[0] < line.loc[0] || !agency_bounds.ne[0]) {
+                  if (agency_bounds.ne[0] < line.loc[0] || !agency_bounds.ne[0]) {
                     agency_bounds.ne[0] = line.loc[0];
                   }
-                  if(agency_bounds.sw[1] > line.loc[1] || !agency_bounds.sw[1]) {
+                  if (agency_bounds.sw[1] > line.loc[1] || !agency_bounds.sw[1]) {
                     agency_bounds.sw[1] = line.loc[1];
                   }
-                  if(agency_bounds.ne[1] < line.loc[1] || !agency_bounds.ne[1]) {
+                  if (agency_bounds.ne[1] < line.loc[1] || !agency_bounds.ne[1]) {
                     agency_bounds.ne[1] = line.loc[1];
                   }
                 }
 
                 //make lat/long for shapes
-                if(line.shape_pt_lat && line.shape_pt_lon) {
+                if (line.shape_pt_lat && line.shape_pt_lon) {
                   line.loc = [line.shape_pt_lon, line.shape_pt_lat];
                 }
 
                 //insert into db
                 collection.insert(line, function(e, inserted) {
-                  if(e) {
+                  if (e) {
                     handleError(e);
                   }
                 });
@@ -337,7 +337,7 @@ function main(config, callback) {
             parser.on('error', handleError);
             input.pipe(parser);
           });
-        }, function (e) {
+        }, function(e) {
           cb(e, 'import');
         });
       }
@@ -349,7 +349,7 @@ function main(config, callback) {
         async.series([
           agencyCenter,
           updatedDate
-        ], function (e, results) {
+        ], function(e, results) {
           cb();
         });
       }
@@ -392,8 +392,8 @@ function handleError(e) {
 }
 
 // Allow script to be called directly from commandline or required (for testable code)
-if(invocation === 'direct') {
-  main(config, function () {
+if (invocation === 'direct') {
+  main(config, function() {
     process.exit();
   });
 } else {
