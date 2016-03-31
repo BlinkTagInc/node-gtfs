@@ -1,5 +1,4 @@
 var async = require('async');
-var exec = require('child_process').exec;
 var csv = require('csv');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
@@ -90,7 +89,7 @@ function main(config, callback) {
         importFiles,
         postProcess,
         cleanupFiles
-      ], function(e, results) {
+      ], function(e) {
         log(e || agency_key + ': Completed');
         cb();
       });
@@ -324,14 +323,14 @@ function main(config, callback) {
                 }
 
                 //insert into db
-                collection.insert(line, function(e, inserted) {
+                collection.insert(line, function(e) {
                   if (e) {
                     handleError(e);
                   }
                 });
               }
             });
-            parser.on('end', function(count) {
+            parser.on('end', function() {
               cb();
             });
             parser.on('error', handleError);
@@ -349,7 +348,7 @@ function main(config, callback) {
         async.series([
           agencyCenter,
           updatedDate
-        ], function(e, results) {
+        ], function() {
           cb();
         });
       }

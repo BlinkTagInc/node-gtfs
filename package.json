@@ -93,6 +93,7 @@
   "main": "index",
   "devDependencies": {
     "csv-parse": "1.0.1",
+    "eslint": "2.5.3",
     "mocha": "2.4.5",
     "should": "8.2.2",
     "supertest": "1.2.0",
