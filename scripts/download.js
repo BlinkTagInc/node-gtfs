@@ -44,26 +44,10 @@ function main(config, callback) {
   }, function(e, db) {
     if (e) handleError(e);
 
+    // Create queue
     q = async.queue(downloadGTFS, 1);
-    // loop through all agencies specified
-    config.agencies.forEach(function(item) {
-      var agency = {};
 
-      if (item.url) {
-        agency.agency_key = item.agency_key;
-        agency.agency_url = item.url;
-      } else if (item.path) {
-        agency.agency_key = item.agency_key;
-        agency.path = item.path;
-      }
-
-      if (!agency.agency_key) {
-        handleError(new Error('No URL or Agency Key or path provided.'));
-      }
-
-      q.push(agency);
-    });
-
+    // assign drain callback
     q.drain = function(e) {
       if (e) handleError(e);
 
@@ -71,6 +55,23 @@ function main(config, callback) {
       callback();
     };
 
+    // loop through all agencies specified, push to queue.
+    config.agencies.forEach(function(item) {
+      var agency = {};
+
+      agency.agency_key = item.agency_key;
+      if (!agency.agency_key) {
+        handleError(new Error('No URL or Agency Key or path provided.'));
+      }
+
+      if (item.url) {
+        agency.agency_url = item.url;
+      } else if (item.path) {
+        agency.path = item.path;
+      }
+
+      q.push(agency);
+    });
 
     function downloadGTFS(task, cb) {
       var downloadDir = 'downloads';
@@ -105,7 +106,7 @@ function main(config, callback) {
 
           mkdirp(downloadDir, cb);
         });
-      }
+      };
 
 
       function getFiles(cb) {
@@ -114,7 +115,7 @@ function main(config, callback) {
         } else if (task.path) {
           readFiles(cb);
         }
-      }
+      };
 
 
       function downloadFiles(cb) {
@@ -155,7 +156,7 @@ function main(config, callback) {
             })
             .on('error', handleError);
         }
-      }
+      };
 
 
       function readFiles(cb) {
