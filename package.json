@@ -2,101 +2,55 @@
   "name": "gtfs",
   "description": "Download GTFS transit data into mongodb and expose routes, stops, times and more",
   "version": "0.4.4",
-  "author": {
-    "name": "Brendan Nee",
-    "email": "me@bn.ee"
-  },
-  "contributors": [
-    {
-      "name": "Alessio Bogon"
-    },
-    {
-      "name": "Jacob Childress",
-      "email": "jacobc@gmail.com"
-    },
-    {
-      "name": "Robin Chou",
-      "email": "hello@robinchou.com"
-    },
-    {
-      "name": "cobralibre",
-      "email": "jacobc@gmail.com"
-    },
-    {
-      "name": "Matt Gruskin"
-    },
-    {
-      "name": "Sam Hashemi",
-      "email": "sam@samhashemi.com"
-    },
-    {
-      "name": "Hafiz Ismail"
-    },
-    {
-      "name": "LeAnne Lis"
-    },
-    {
-      "name": "Ethan Lo",
-      "email": "ethan@ethanlo.com"
-    },
-    {
-      "name": "Natalie Perna"
-    },
-    {
-      "name": "Léo Pradel"
-    },
-    {
-      "name": "Landon Reed"
-    },
-    {
-      "name": "Jason Schapiro",
-      "email": "yono38@gmail.com"
-    },
-    {
-      "name": "Jean-François Vial",
-      "email": "jeff@modulaweb.fr"
-    },
-    {
-      "name": "wdalrymple"
-    },
-    {
-      "name": "Ivan Yulaev"
-    },
-    {
-      "name": "Adam Pitchie"
-    },
-    {
-      "name": "Daniel Demidov"
-    }
-  ],
-  "dependencies": {
-    "async": "1.5.2",
-    "csv": "0.4.6",
-    "mkdirp": "0.5.1",
-    "mongodb": "2.1.14",
-    "mongoose": "4.4.10",
-    "proj4": "2.3.14",
-    "request": "2.69.0",
-    "rimraf": "2.5.2",
-    "underscore": "1.8.3",
-    "unzip2": "0.2.5",
-    "yargs": "4.3.2"
-  },
   "keywords": [
     "transit",
     "gtfs",
     "transportation"
   ],
+  "author": "Brendan Nee <me@bn.ee>",
+  "contributors": [
+    "Alessio Bogon",
+    "Jacob Childress <jacobc@gmail.com>",
+    "Robin Chou <hello@robinchou.com>",
+    "cobralibre <jacobc@gmail.com>",
+    "Matt Gruskin",
+    "Sam Hashemi <sam@samhashemi.com>",
+    "Hafiz Ismail",
+    "LeAnne Lis",
+    "Ethan Lo <ethan@ethanlo.com>",
+    "Natalie Perna",
+    "Léo Pradel",
+    "Landon Reed",
+    "Jason Schapiro <yono38@gmail.com>",
+    "Jean-François Vial <jeff@modulaweb.fr>",
+    "wdalrymple",
+    "Ivan Yulaev",
+    "Adam Pitchie",
+    "Daniel Demidov"
+  ],
+  "dependencies": {
+    "async": "1.5.2",
+    "csv": "0.4.6",
+    "mkdirp": "0.5.1",
+    "mongodb": "2.1.19",
+    "mongoose": "4.4.17",
+    "proj4": "2.3.14",
+    "request": "2.72.0",
+    "rimraf": "2.5.2",
+    "underscore": "1.8.3",
+    "unzip2": "0.2.5",
+    "yargs": "4.7.1"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/brendannee/node-gtfs.git"
   },
   "main": "index",
   "devDependencies": {
-    "csv-parse": "1.0.2",
-    "eslint": "2.5.3",
+    "csv-parse": "1.1.0",
+    "eslint": "2.10.2",
     "mocha": "2.4.5",
-    "should": "8.3.0",
+    "should": "8.3.1",
     "supertest": "1.2.0",
     "timekeeper": "0.0.5"
   },
