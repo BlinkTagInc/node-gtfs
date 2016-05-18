@@ -1,4 +1,5 @@
 var async = require('async');
+var _ = require('lodash');
 var csv = require('csv');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
@@ -34,6 +35,20 @@ if (invocation === 'direct') {
   }
 }
 
+/*
+ * Divides the given arr into chunks with the given max
+ * length. Returns a new array containing the chunks.
+ */
+function getChunks(arr, max) {
+  var chunksCount = parseInt(arr.length / max) + 1;
+
+  var chunks = [];
+  _.times(chunksCount, count => {
+    chunks.push(_.slice(arr, count * max, (count + 1) * max));
+  });
+
+  return chunks;
+}
 
 function main(config, callback) {
   var log = (config.verbose === false) ? function() {} : console.log;
@@ -217,6 +232,8 @@ function main(config, callback) {
               relax: true
             });
 
+            var lines = [];
+
             parser.on('readable', function() {
               while(line = parser.read()) {
                 //remove null values
@@ -328,17 +345,39 @@ function main(config, callback) {
                 if (line.shape_pt_lat && line.shape_pt_lon) {
                   line.loc = [line.shape_pt_lon, line.shape_pt_lat];
                 }
-
-                //insert into db
-                collection.insert(line, function(e) {
-                  if (e) {
-                    handleError(e);
-                  }
-                });
+                lines.push(line);
               }
             });
+
             parser.on('end', function() {
-              cb();
+              log('length of csv-array %d ' + filename.fileNameBase, lines.length);
+              var chunks = getChunks(lines, 10000);
+              log('length of csv-chunks %d ' + filename.fileNameBase, chunks.length);
+
+              // only insert 1 chunk at once in order to avoid an out-of-memory error
+              var queue = async.queue(function (chunk, callback) {
+                collection.insertMany(chunk, function(e) {
+                  if (e) {
+                    log('ERROR during mongo insertMany chunk ' + filename.fileNameBase);
+                    handleError(e);
+                    callback(e);
+                  }
+                  callback();
+                });
+              }, 1);
+
+              queue.drain = function () {
+                log('DRAIN all items have been processed from ' + filename.fileNameBase);
+                cb();
+              };
+
+              queue.push(chunks, function (err) {
+                if (err) {
+                  log('ERROR SINGLE CALLBACK item processing ' + filename.fileNameBase);
+                } else {
+                  // ignore we don't want to fill the screen with unnecessary information
+                }
+              });
             });
             parser.on('error', handleError);
             input.pipe(parser);

@@ -1,7 +1,6 @@
 // dependencies
 var async = require('async');
 var should = require('should');
-var _ = require('underscore');
 
 // libraries
 var config = require('./../../config');
