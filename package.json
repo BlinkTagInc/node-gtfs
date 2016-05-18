@@ -26,7 +26,8 @@
     "wdalrymple",
     "Ivan Yulaev",
     "Adam Pitchie",
-    "Daniel Demidov"
+    "Daniel Demidov",
+    "gerlacdt"
   ],
   "dependencies": {
     "async": "1.5.2",

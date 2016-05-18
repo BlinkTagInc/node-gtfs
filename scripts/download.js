@@ -35,20 +35,6 @@ if (invocation === 'direct') {
   }
 }
 
-/*
- * Divides the given arr into chunks with the given max
- * length. Returns a new array containing the chunks.
- */
-function getChunks(arr, max) {
-  var chunksCount = parseInt(arr.length / max) + 1;
-
-  var chunks = [];
-  _.times(chunksCount, count => {
-    chunks.push(_.slice(arr, count * max, (count + 1) * max));
-  });
-
-  return chunks;
-}
 
 function main(config, callback) {
   var log = (config.verbose === false) ? function() {} : console.log;
@@ -350,24 +336,22 @@ function main(config, callback) {
             });
 
             parser.on('end', function() {
-              log('length of csv-array %d ' + filename.fileNameBase, lines.length);
-              var chunks = getChunks(lines, 10000);
-              log('length of csv-chunks %d ' + filename.fileNameBase, chunks.length);
+              var chunkSize = 10000;
+              var chunks = _.chunk(lines, chunkSize);
 
               // only insert 1 chunk at once in order to avoid an out-of-memory error
-              var queue = async.queue(function (chunk, callback) {
+              var queue = async.queue(function(chunk, cb) {
                 collection.insertMany(chunk, function(e) {
                   if (e) {
                     log('ERROR during mongo insertMany chunk ' + filename.fileNameBase);
                     handleError(e);
-                    callback(e);
+                    return cb(e);
                   }
-                  callback();
+                  cb();
                 });
               }, 1);
 
               queue.drain = function () {
-                log('DRAIN all items have been processed from ' + filename.fileNameBase);
                 cb();
               };
 
