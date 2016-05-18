@@ -1,4 +1,5 @@
 var async = require('async');
+var _ = require('lodash');
 var csv = require('csv');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
@@ -11,8 +12,6 @@ var unzip = require('unzip2');
 var argv = require('yargs').argv;
 
 var filenames = require('../lib/filenames');
-
-var _ = require('lodash');
 
 var q;
 var config = {};
