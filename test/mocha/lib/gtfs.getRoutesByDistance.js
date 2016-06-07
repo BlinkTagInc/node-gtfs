@@ -58,7 +58,7 @@ describe('gtfs.getRoutesByDistance(): ', function(){
     });
   });
 
-  it('should return error and empty array if no routes exists', function(done){
+  it('should return an empty array if no routes exist', function(done){
     async.series({
       teardownDatabase: function(next){
         databaseTestSupport.teardown(next);
@@ -68,7 +68,7 @@ describe('gtfs.getRoutesByDistance(): ', function(){
       var lat = 37.38976166855;
       var radius = 100;
       gtfs.getRoutesByDistance(lat, lon, radius, function(err, res){
-        should.exist(err);
+        should.not.exist(err);
         should.exist(res);
         res.should.have.length(0);
         done();
@@ -76,12 +76,12 @@ describe('gtfs.getRoutesByDistance(): ', function(){
     });
   });
 
-  it('should return error and empty array if no routes within given distance exists', function(done){
+  it('should return an empty array if no routes within given distance exist', function(done){
     var lon = -127.9867495;
     var lat = 40.38976166855;
     var radius = 100;
     gtfs.getRoutesByDistance(lat, lon, radius, function(err, res){
-      should.exist(err);
+      should.not.exist(err);
       should.exist(res);
       res.should.have.length(0);
       done();
@@ -90,7 +90,7 @@ describe('gtfs.getRoutesByDistance(): ', function(){
 
 
 
-  it('should return expected routes within given distance if exists', function(done){
+  it('should return expected routes within given distance if they exist', function(done){
     var lon = -121.9867495;
     var lat = 37.38976166855;
     var radius = 2;
