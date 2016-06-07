@@ -27,15 +27,16 @@
     "Ivan Yulaev",
     "Adam Pitchie",
     "Daniel Demidov",
-    "gerlacdt"
+    "gerlacdt",
+    "Heath Shurtleff"
   ],
   "dependencies": {
     "async": "1.5.2",
-    "csv": "0.4.6",
-    "lodash": "4.12.0",
+    "csv": "1.1.0",
+    "lodash": "4.13.1",
     "mkdirp": "0.5.1",
-    "mongodb": "2.1.19",
-    "mongoose": "4.4.17",
+    "mongodb": "2.1.21",
+    "mongoose": "4.4.20",
     "proj4": "2.3.14",
     "request": "2.72.0",
     "rimraf": "2.5.2",
@@ -48,12 +49,12 @@
   },
   "main": "index",
   "devDependencies": {
-    "csv-parse": "1.1.0",
-    "eslint": "2.10.2",
-    "mocha": "2.4.5",
-    "should": "8.3.1",
+    "csv-parse": "1.1.1",
+    "eslint": "2.11.1",
+    "mocha": "2.5.3",
+    "should": "9.0.0",
     "supertest": "1.2.0",
-    "timekeeper": "0.0.5"
+    "timekeeper": "0.1.1"
   },
   "scripts": {
     "download": "node scripts/download.js",
