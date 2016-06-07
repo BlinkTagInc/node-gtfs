@@ -182,13 +182,13 @@ Returns an array of routes serving the `agency_key` and `stop_id` specified.
 
 ### Stops by id
 
-Returns an array of stops matching the `stop_ids` specified.
+Returns an array of stops, optionally limited to those matching the `stop_ids` specified.
 
     gtfs.getStops(agency_key, stop_ids, function(err, stops) {
 
     });
 
-`stop_ids` can be a single `stop_id` or an array of `stop_ids`.
+`stop_ids` is optional and can be a single `stop_id` or an array of `stop_ids`.
 
 ### Stops by route
 
