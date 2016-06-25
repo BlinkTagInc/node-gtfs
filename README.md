@@ -69,6 +69,18 @@ API along with your API token.
 }
 ```
 
+* Specify specific GTFS files to exclude from import:
+```
+{
+    agency_key: 'localAgency',
+    path: '/path/to/the/unzipped/gtfs/',
+    exclude: [
+      'shapes',
+      'stops'
+    ]
+}
+```
+
 The mongodb URI should also be configured in `config.js`. The default database
 URI is:
 `mongodb://localhost:27017/gtfs`

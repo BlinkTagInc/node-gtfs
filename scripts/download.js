@@ -48,7 +48,9 @@ function main(config, callback) {
     q = async.queue(downloadGTFS, 1);
     // loop through all agencies specified
     config.agencies.forEach(function(item) {
-      var agency = {};
+      var agency = {
+        exclude: item.exclude
+      };
 
       if (item.url) {
         agency.agency_key = item.agency_key;
@@ -77,6 +79,7 @@ function main(config, callback) {
       var downloadDir = 'downloads';
       var gtfsDir = 'downloads';
       var agency_key = task.agency_key;
+      var exclude = task.exclude;
       var agency_bounds = {
         sw: [],
         ne: []
@@ -196,8 +199,15 @@ function main(config, callback) {
 
 
       function importFiles(cb) {
+
         // Loop through each file and add agency_key
         async.forEachSeries(filenames, function(filename, cb) {
+          // filter out excluded files from config
+          if (exclude && _.includes(exclude, filename.fileNameBase)) {
+            log(agency_key + ': Importing data - Skipping ' + filename.fileNameBase + '.txt');
+            return cb();
+          }
+
           var filepath = path.join(gtfsDir, filename.fileNameBase + '.txt');
 
           if (!fs.existsSync(filepath)) {
