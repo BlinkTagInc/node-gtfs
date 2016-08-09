@@ -233,7 +233,7 @@ Returns an array of stoptimes for the `trip_id` specified
 Returns an array of stoptimes for the `agency_key`, `route_id`, `stop_id` and
 `direction_id` specified.
 
-    gtfs.getStoptimesByStop(gency_key, route_id, stop_id, direction_id, function(err, stoptimes) {
+    gtfs.getStoptimesByStop(agency_key, route_id, stop_id, direction_id, function(err, stoptimes) {
 
     });
 
@@ -242,7 +242,7 @@ Returns an array of stoptimes for the `agency_key`, `route_id`, `stop_id` and
 Returns an array of trips for the `agency_key`, `route_id` and `direction_id`
 specified.
 
-    gtfs.getTripsByRouteAndDirection(gency_key, route_id, direction_id, service_ids, function(err, trips) {
+    gtfs.getTripsByRouteAndDirection(agency_key, route_id, direction_id, service_ids, function(err, trips) {
 
     });
 
