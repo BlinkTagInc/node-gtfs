@@ -1,22 +1,22 @@
-var async = require('async');
-var _ = require('lodash');
-var csv = require('csv');
-var fs = require('fs');
-var mkdirp = require('mkdirp');
-var MongoClient = require('mongodb').MongoClient;
-var path = require('path');
-var proj4 = require('proj4');
-var request = require('request');
-var rimraf = require('rimraf');
-var unzip = require('unzip2');
-var argv = require('yargs').argv;
+const async = require('async');
+const _ = require('lodash');
+const csv = require('csv');
+const fs = require('fs');
+const mkdirp = require('mkdirp');
+const MongoClient = require('mongodb').MongoClient;
+const path = require('path');
+const proj4 = require('proj4');
+const request = require('request');
+const rimraf = require('rimraf');
+const unzip = require('unzip2');
+const argv = require('yargs').argv;
 
-var filenames = require('../lib/filenames');
+const filenames = require('../lib/filenames');
 
-var q;
-var config = {};
+let q;
+let config = {};
 // check if this file was invoked direct through command line or required as an export
-var invocation = (require.main === module) ? 'direct' : 'required';
+const invocation = (require.main === module) ? 'direct' : 'required';
 
 if (invocation === 'direct') {
   try {
@@ -37,18 +37,18 @@ if (invocation === 'direct') {
 
 
 function main(config, callback) {
-  var log = (config.verbose === false) ? function() {} : console.log;
+  const log = (config.verbose === false) ? function() {} : console.log;
 
   // open database and create queue for agency list
   MongoClient.connect(config.mongo_url, {
     w: 1
-  }, function(e, db) {
-    if (e) handleError(e);
+  }, function(err, db) {
+    if (err) handleError(err);
 
     q = async.queue(downloadGTFS, 1);
     // loop through all agencies specified
     config.agencies.forEach(function(item) {
-      var agency = {
+      const agency = {
         exclude: item.exclude
       };
 
@@ -67,25 +67,25 @@ function main(config, callback) {
       q.push(agency);
     });
 
-    q.drain = function(e) {
-      if (e) handleError(e);
+    q.drain = (err) => {
+      if (err) handleError(err);
 
-      log('All agencies completed (' + config.agencies.length + ' total)');
+      log(`All agencies completed (${config.agencies.length} total)`);
       callback();
     };
 
 
     function downloadGTFS(task, cb) {
-      var downloadDir = 'downloads';
-      var gtfsDir = 'downloads';
-      var agency_key = task.agency_key;
-      var exclude = task.exclude;
-      var agency_bounds = {
+      const downloadDir = 'downloads';
+      let gtfsDir = 'downloads';
+      const agency_key = task.agency_key;
+      const exclude = task.exclude;
+      const agency_bounds = {
         sw: [],
         ne: []
       };
 
-      log(agency_key + ': Starting');
+      log(`${agency_key}: Starting`);
 
       async.series([
         cleanupFiles,
@@ -94,17 +94,17 @@ function main(config, callback) {
         importFiles,
         postProcess,
         cleanupFiles
-      ], function(e) {
-        log(e || agency_key + ': Completed');
+      ], (err) => {
+        log(err || `${agency_key}: Completed`);
         cb();
       });
 
 
       function cleanupFiles(cb) {
         // remove old downloaded file
-        rimraf(downloadDir, function(e) {
-          if (e) {
-            return handleError(e);
+        rimraf(downloadDir, (err) => {
+          if (err) {
+            return handleError(err);
           }
 
           mkdirp(downloadDir, cb);
@@ -123,24 +123,24 @@ function main(config, callback) {
 
       function downloadFiles(cb) {
         // do download
-        var file_protocol = require('url').parse(task.agency_url).protocol;
+        const file_protocol = require('url').parse(task.agency_url).protocol;
         if (file_protocol === 'http:' || file_protocol === 'https:') {
-          log(agency_key + ': Downloading');
-          request(task.agency_url, processFile).pipe(fs.createWriteStream(downloadDir + '/latest.zip'));
+          log(`${agency_key}: Downloading`);
+          request(task.agency_url, processFile).pipe(fs.createWriteStream(`${downloadDir}/latest.zip`));
 
-          function processFile(e, response) {
+          function processFile(err, response) {
             if (response && response.statusCode != 200) {
               cb(new Error('Couldn\'t download files'));
             }
-            log(agency_key + ': Download successful');
+            log(`${agency_key}: Download successful`);
 
-            fs.createReadStream(downloadDir + '/latest.zip')
+            fs.createReadStream(`${downloadDir}/latest.zip`)
               .pipe(unzip.Extract({
                 path: downloadDir
               }).on('close', cb))
-              .on('error', function(e) {
-                log(agency_key + ': Error Unzipping File');
-                handleError(e);
+              .on('error', function(err) {
+                log(`${agency_key}: Error Unzipping File`);
+                handleError(err);
               });
           }
         } else {
@@ -149,9 +149,9 @@ function main(config, callback) {
           }
 
           fs.createReadStream(task.agency_url)
-            .pipe(fs.createWriteStream(downloadDir + '/latest.zip'))
-            .on('close', function() {
-              fs.createReadStream(downloadDir + '/latest.zip')
+            .pipe(fs.createWriteStream(`${downloadDir}/latest.zip`))
+            .on('close', () => {
+              fs.createReadStream(`${downloadDir}/latest.zip`)
                 .pipe(unzip.Extract({
                   path: downloadDir
                 }).on('close', cb))
@@ -182,68 +182,65 @@ function main(config, callback) {
         // remove old db records based on agency_key
         // can be overridden using the --skip-delete command line argument
         if (argv['skip-delete']) {
-          log(agency_key + ': Skipping deletion of existing data');
+          log(`${agency_key}: Skipping deletion of existing data`);
           return cb();
         }
 
         async.forEach(filenames, function(filename, cb) {
           db.collection(filename.collection, function(e, collection) {
             collection.remove({
-              agency_key: agency_key
+              agency_key
             }, cb);
           });
-        }, function(e) {
-          cb(e, 'remove');
-        });
+        }, cb);
       }
 
 
       function importFiles(cb) {
-
         // Loop through each file and add agency_key
-        async.forEachSeries(filenames, function(filename, cb) {
+        async.forEachSeries(filenames, (filename, cb) => {
           // filter out excluded files from config
           if (exclude && _.includes(exclude, filename.fileNameBase)) {
-            log(agency_key + ': Importing data - Skipping ' + filename.fileNameBase + '.txt');
+            log(`${agency_key}: Importing data - Skipping ${filename.fileNameBase}.txt`);
             return cb();
           }
 
-          var filepath = path.join(gtfsDir, filename.fileNameBase + '.txt');
+          var filepath = path.join(gtfsDir, `${filename.fileNameBase}.txt`);
 
           if (!fs.existsSync(filepath)) {
             if (!filename.nonstandard) {
-              log(agency_key + ': Importing data - No ' + filename.fileNameBase + '.txt file found');
+              log(`${agency_key}: Importing data - No ${filename.fileNameBase}.txt file found`);
             }
 
             return cb();
           }
 
-          log(agency_key + ': Importing data - ' + filename.fileNameBase + '.txt');
-          db.collection(filename.collection, function(e, collection) {
-            if (e) return handleError(e);
-            var input = fs.createReadStream(filepath);
+          log(`${agency_key}: Importing data - ${filename.fileNameBase}.txt`);
+          db.collection(filename.collection, (err, collection) => {
+            if (err) return handleError(err);
+            const input = fs.createReadStream(filepath);
 
-            var parser = csv.parse({
+            const parser = csv.parse({
               columns: true,
               relax: true
             });
 
-            var lines = [];
+            const lines = [];
 
-            parser.on('readable', function() {
+            parser.on('readable', () => {
               while(line = parser.read()) {
-                //remove null values
-                for(var key in line) {
+                // Remove null values
+                for(const key in line) {
                   if (line[key] === null) {
                     delete line[key];
                   }
                 }
 
-                //add agency_key
+                // Add agency_key
                 line.agency_key = agency_key;
 
-                //convert fields that should be int
-                var integerFields = [
+                // Convert fields that should be int
+                const integerFields = [
                   'monday',
                   'tuesday',
                   'wednesday',
@@ -278,14 +275,14 @@ function main(config, callback) {
                   'timepoint'
                 ];
 
-                integerFields.forEach(function(fieldName) {
+                integerFields.forEach((fieldName) => {
                   if (line[fieldName]) {
                     line[fieldName] = parseInt(line[fieldName], 10);
                   }
                 });
 
-                //convert fields that should be float
-                var floatFields = [
+                // Convert fields that should be float
+                const floatFields = [
                   'price',
                   'shape_dist_traveled',
                   'shape_pt_lat',
@@ -294,7 +291,7 @@ function main(config, callback) {
                   'stop_lon'
                 ];
 
-                floatFields.forEach(function(fieldName) {
+                floatFields.forEach((fieldName) => {
                   if (line[fieldName]) {
                     line[fieldName] = parseFloat(line[fieldName]);
                   }
@@ -345,67 +342,65 @@ function main(config, callback) {
               }
             });
 
-            parser.on('end', function() {
-              var chunkSize = 10000;
-              var chunks = _.chunk(lines, chunkSize);
+            parser.on('end', () => {
+              const chunkSize = 10000;
+              const chunks = _.chunk(lines, chunkSize);
 
-              // only insert 1 chunk at once in order to avoid an out-of-memory error
-              var queue = async.queue(function(chunk, cb) {
-                collection.insertMany(chunk, function(e) {
-                  if (e) {
-                    log('ERROR during mongo insertMany chunk ' + filename.fileNameBase);
-                    handleError(e);
-                    return cb(e);
+              // Only insert 1 chunk at once in order to avoid an out-of-memory error
+              const queue = async.queue((chunk, cb) => {
+                collection.insertMany(chunk, function(err) {
+                  if (err) {
+                    log(`ERROR during mongo insertMany chunk ${filename.fileNameBase}`);
+                    handleError(err);
+                    return cb(err);
                   }
                   cb();
                 });
               }, 1);
 
-              queue.drain = function () {
+              queue.drain = () => {
                 cb();
               };
 
-              queue.push(chunks, function (err) {
+              queue.push(chunks, (err) => {
                 if (err) {
-                  log('ERROR SINGLE CALLBACK item processing ' + filename.fileNameBase);
+                  log(`ERROR SINGLE CALLBACK item processing ${filename.fileNameBase}`);
                 } else {
-                  // ignore we don't want to fill the screen with unnecessary information
+                  // Ignore we don't want to fill the screen with unnecessary information
                 }
               });
             });
             parser.on('error', handleError);
             input.pipe(parser);
           });
-        }, function(e) {
-          cb(e, 'import');
-        });
+        }, cb);
       }
 
 
       function postProcess(cb) {
-        log(agency_key + ': Post Processing data');
+        log(`${agency_key}: Post Processing data`);
 
         async.series([
           agencyCenter,
           updatedDate
-        ], function() {
+        ], () => {
           cb();
         });
       }
 
 
       function agencyCenter(cb) {
-        var lat = (agency_bounds.ne[0] - agency_bounds.sw[0]) / 2 + agency_bounds.sw[0];
-        var lon = (agency_bounds.ne[1] - agency_bounds.sw[1]) / 2 + agency_bounds.sw[1];
-        var agency_center = [lat, lon];
+        const lat = (agency_bounds.ne[0] - agency_bounds.sw[0]) / 2 + agency_bounds.sw[0];
+        const lon = (agency_bounds.ne[1] - agency_bounds.sw[1]) / 2 + agency_bounds.sw[1];
+        const agency_center = [lat, lon];
 
         db.collection('agencies')
           .update({
-            agency_key: agency_key
+            agency_key
           }, {
             $set: {
-              agency_bounds: agency_bounds,
-              agency_center: agency_center
+              agency_bounds,
+              agency_center
             }
           }, cb);
       }
@@ -414,7 +409,7 @@ function main(config, callback) {
       function updatedDate(cb) {
         db.collection('agencies')
           .update({
-            agency_key: agency_key
+            agency_key
           }, {
             $set: {
               date_last_updated: Date.now()
@@ -425,14 +420,14 @@ function main(config, callback) {
   });
 }
 
-function handleError(e) {
-  console.error(e || 'Unknown Error');
+function handleError(err) {
+  console.error(err || 'Unknown Error');
   process.exit(1);
 }
 
 // Allow script to be called directly from commandline or required (for testable code)
 if (invocation === 'direct') {
-  main(config, function() {
+  main(config, () => {
     process.exit();
   });
 } else {
