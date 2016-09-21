@@ -121,7 +121,7 @@ describe('gtfs.getAgenciesByDistance(): ', function(){
       // current fixture does not have fare url. update this if needed next time
       should.not.exist(agency.agency_fare_url);
 
-      agency.agency_bounds.should.have.keys(['sw', 'ne']);
+      agency.agency_bounds.should.have.keys('sw', 'ne');
       agency.agency_bounds.sw.should.have.length(2);
       agency.agency_bounds.sw[0].should.eql(-122.406408);
       agency.agency_bounds.sw[1].should.eql(37.003084);
