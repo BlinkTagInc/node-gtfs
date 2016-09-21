@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var Timetable = mongoose.model('Timetable', new mongoose.Schema({
+const Timetable = mongoose.model('Timetable', new mongoose.Schema({
   agency_key: {
     type: String,
     index: true
@@ -70,3 +70,5 @@ var Timetable = mongoose.model('Timetable', new mongoose.Schema({
     max: 1
   }
 }));
+
+module.exports = Timetable;

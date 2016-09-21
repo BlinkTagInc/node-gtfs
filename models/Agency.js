@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var Agency = mongoose.model('Agency', new mongoose.Schema({
+const Agency = mongoose.model('Agency', new mongoose.Schema({
   agency_key: {
     type: String,
     index: true
@@ -28,3 +28,5 @@ var Agency = mongoose.model('Agency', new mongoose.Schema({
   },
   date_last_updated: Number
 }));
+
+module.exports = Agency;

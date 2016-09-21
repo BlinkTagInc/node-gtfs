@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var Frequencies = mongoose.model('Frequencies', new mongoose.Schema({
+const Frequencies = mongoose.model('Frequencies', new mongoose.Schema({
   agency_key: {
     type: String,
     index: true
@@ -15,3 +15,5 @@ var Frequencies = mongoose.model('Frequencies', new mongoose.Schema({
     max: 1
   }
 }));
+
+module.exports = Frequencies;

@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var TimetableStopOrder = mongoose.model('TimetableStopOrder', new mongoose.Schema({
+const TimetableStopOrder = mongoose.model('TimetableStopOrder', new mongoose.Schema({
   agency_key: {
     type: String,
     index: true
@@ -12,3 +12,5 @@ var TimetableStopOrder = mongoose.model('TimetableStopOrder', new mongoose.Schem
   stop_id: String,
   stop_sequence: Number
 }));
+
+module.exports = TimetableStopOrder;

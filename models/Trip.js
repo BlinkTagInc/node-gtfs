@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var Trip = mongoose.model('Trip', new mongoose.Schema({
+const Trip = mongoose.model('Trip', new mongoose.Schema({
   agency_key: {
     type: String,
     index: true
@@ -35,3 +35,5 @@ var Trip = mongoose.model('Trip', new mongoose.Schema({
     max: 2
   }
 }));
+
+module.exports = Trip;

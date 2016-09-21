@@ -1,7 +1,7 @@
-var mongoose = require('mongoose');
-var utils = require('../lib/utils');
+const mongoose = require('mongoose');
+const utils = require('../lib/utils');
 
-var StopTime = mongoose.model('StopTime', new mongoose.Schema({
+const StopTime = mongoose.model('StopTime', new mongoose.Schema({
   agency_key: {
     type: String,
     index: true
@@ -46,3 +46,5 @@ var StopTime = mongoose.model('StopTime', new mongoose.Schema({
     max: 1
   }
 }));
+
+module.exports = StopTime;

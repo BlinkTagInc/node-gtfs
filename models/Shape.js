@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var Shape = mongoose.model('Shape', new mongoose.Schema({
+const Shape = mongoose.model('Shape', new mongoose.Schema({
   agency_key: {
     type: String,
     index: true
@@ -18,3 +18,5 @@ var Shape = mongoose.model('Shape', new mongoose.Schema({
   shape_pt_sequence: Number,
   shape_dist_traveled: Number
 }));
+
+module.exports = Shape;

@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var Calendar = mongoose.model('Calendar', new mongoose.Schema({
+const Calendar = mongoose.model('Calendar', new mongoose.Schema({
   agency_key: {
     type: String,
     index: true
@@ -44,3 +44,5 @@ var Calendar = mongoose.model('Calendar', new mongoose.Schema({
   start_date: Number,
   end_date: Number
 }));
+
+module.exports = Calendar;

@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var Stop = mongoose.model('Stop', new mongoose.Schema({
+const Stop = mongoose.model('Stop', new mongoose.Schema({
   agency_key: {
     type: String,
     index: true
@@ -33,3 +33,5 @@ var Stop = mongoose.model('Stop', new mongoose.Schema({
     max: 2
   }
 }));
+
+module.exports = Stop;

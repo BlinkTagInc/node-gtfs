@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var FareAttribute = mongoose.model('FareAttribute', new mongoose.Schema({
+const FareAttribute = mongoose.model('FareAttribute', new mongoose.Schema({
   agency_key: {
     type: String,
     index: true
@@ -20,3 +20,5 @@ var FareAttribute = mongoose.model('FareAttribute', new mongoose.Schema({
   },
   transfer_duration: Number
 }));
+
+module.exports = FareAttribute;

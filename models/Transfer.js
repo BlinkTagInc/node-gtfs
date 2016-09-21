@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var Transfer = mongoose.model('Transfer', new mongoose.Schema({
+const Transfer = mongoose.model('Transfer', new mongoose.Schema({
   agency_key: {
     type: String,
     index: true
@@ -15,3 +15,5 @@ var Transfer = mongoose.model('Transfer', new mongoose.Schema({
   },
   min_transfer_time: Number
 }));
+
+module.exports = Transfer;

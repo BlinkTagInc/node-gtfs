@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var FareRule = mongoose.model('FareRule', new mongoose.Schema({
+const FareRule = mongoose.model('FareRule', new mongoose.Schema({
   agency_key: {
     type: String,
     index: true
@@ -11,3 +11,5 @@ var FareRule = mongoose.model('FareRule', new mongoose.Schema({
   destination_id: String,
   contains_id: String
 }));
+
+module.exports = FareRule;

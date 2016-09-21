@@ -1,5 +1,6 @@
-var mongoose = require('mongoose');
-var FeedInfo = mongoose.model('FeedInfo', new mongoose.Schema({
+const mongoose = require('mongoose');
+
+const FeedInfo = mongoose.model('FeedInfo', new mongoose.Schema({
   agency_key: {
     type: String,
     index: true
@@ -11,3 +12,5 @@ var FeedInfo = mongoose.model('FeedInfo', new mongoose.Schema({
   feed_end_date: Number,
   feed_version: String
 }));
+
+module.exports = FeedInfo;
