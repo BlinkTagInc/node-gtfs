@@ -262,9 +262,11 @@ for the `agency_key` and `route_id` specified.
 Returns an array of shapes for the `agency_key`, `route_id` and `direction_id`
 specified sorted by `shape_pt_sequence`.
 
-    gtfs.getShapesByRoute(agency_key, route_id, direction_id, function(err, shapes) {
+    gtfs.getShapesByRoute(agency_key, route_id, direction_id, service_ids, function(err, shapes) {
 
     });
+
+`service_ids` is optional
 
 ### Coordinates by route
 

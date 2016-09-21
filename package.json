@@ -1,7 +1,7 @@
 {
   "name": "gtfs",
   "description": "Download GTFS transit data into mongodb and expose routes, stops, times and more",
-  "version": "0.4.9",
+  "version": "0.4.10",
   "keywords": [
     "transit",
     "gtfs",
