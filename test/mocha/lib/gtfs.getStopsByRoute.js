@@ -58,7 +58,7 @@ describe('gtfs.getStopsByRoute(): ', function(){
     });
   });
 
-  it('should return error and empty array if no stops exists for given agency, route and direction', function(done){
+  it('should return an empty array if no stops exists for given agency, route and direction', function(done){
     async.series({
       teardownDatabase: function(next){
         databaseTestSupport.teardown(next);
@@ -68,7 +68,7 @@ describe('gtfs.getStopsByRoute(): ', function(){
       var route_id = 'non_existing_route_id';
       var direction_id = '0';
       gtfs.getStopsByRoute(agency_key, route_id, direction_id, function(err, stops){
-        should.exist(err);
+        should.not.exist(err);
         should.exist(stops);
         stops.should.have.length(0);
         done();
