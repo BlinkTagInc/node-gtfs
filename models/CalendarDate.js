@@ -11,7 +11,8 @@ const CalendarDate = mongoose.model('CalendarDate', new mongoose.Schema({
     type: Number,
     min: 1,
     max: 2
-  }
+  },
+  holiday_name: String
 }));
 
 module.exports = CalendarDate;
