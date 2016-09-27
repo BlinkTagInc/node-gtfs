@@ -68,6 +68,14 @@ const Timetable = mongoose.model('Timetable', new mongoose.Schema({
     type: Number,
     min: 0,
     max: 1
+  },
+  timetable_page_id: {
+    type: String,
+    index: true
+  },
+  timetable_sequence: {
+    type: Number,
+    index: true
   }
 }));
 

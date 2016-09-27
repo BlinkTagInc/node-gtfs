@@ -339,6 +339,22 @@ specified.
 
     });
 
+### Timetable Pages
+
+Returns an array of timetable pages for the `agency_key` specified
+
+    gtfs.getTimetablePagesByAgency(agency_key, function(err, timetablePages) {
+
+    });
+
+### Timetable Pages by id
+
+Returns an array timetable pages matching the `timetable_page_id` specified.
+
+    gtfs.getTimetablePage(agency_key, timetable_page_id, function(err, timetable) {
+
+    });
+
 ## Tests
 
 To run tests:

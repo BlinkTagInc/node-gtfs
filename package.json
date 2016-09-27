@@ -33,7 +33,7 @@
   "dependencies": {
     "async": "2.0.1",
     "csv": "1.1.0",
-    "lodash": "4.16.1",
+    "lodash": "4.16.2",
     "mkdirp": "0.5.1",
     "moment": "2.15.1",
     "mongodb": "2.2.10",
@@ -51,7 +51,7 @@
   "main": "index",
   "devDependencies": {
     "csv-parse": "1.1.7",
-    "eslint": "3.5.0",
+    "eslint": "3.6.1",
     "mocha": "3.0.2",
     "should": "11.1.0",
     "supertest": "2.0.0",

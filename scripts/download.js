@@ -272,7 +272,8 @@ function main(config, callback) {
                   'min_transfer_time',
                   'wheelchair_accessible',
                   'bikes_allowed',
-                  'timepoint'
+                  'timepoint',
+                  'timetable_sequence'
                 ];
 
                 integerFields.forEach((fieldName) => {
