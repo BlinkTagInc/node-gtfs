@@ -151,7 +151,7 @@ If you don't want all GTFS files to be imported, you can specify an array of fil
 }
 ```
 
-## Loading Data
+## Importing Data
 
 ### Make sure mongo is running
 
@@ -161,17 +161,9 @@ If you don't want all GTFS files to be imported, you can specify an array of fil
 
     npm run import
 
-or
-
-    node ./scripts/import
-
 By default, the import script will delete any existing data with the same `agency_key` from your database. If you don't want this to happen, pass the `--skip-delete` flag
 
     npm run import -- --skip-delete
-
-or
-
-    node ./scripts/import --skip-delete
 
 ### Scheduling
 

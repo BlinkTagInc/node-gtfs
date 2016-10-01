@@ -4,7 +4,7 @@ var unzip = require('unzip2');
 var parse = require('csv-parse');
 
 var config = require('./../../config.json');
-var importScript = require('../../../scripts/import');
+var importScript = require('../../../lib/import');
 var agenciesFixturesUrl = [{
   agency_key: 'caltrain',
   url: 'http://transitfeeds.com/p/caltrain/122/latest/download'
@@ -18,7 +18,7 @@ var databaseTestSupport = require('./../../support/database')(config);
 
 var GTFSFiles = require('../../support/GTFSFiles');
 
-describe('script/import.js', function(){
+describe('lib/import.js', function(){
 
   this.timeout(10000);
 

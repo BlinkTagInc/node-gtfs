@@ -8,7 +8,7 @@ var timeReference = new Date();
 // libraries
 var config = require('./../../config.json');
 var gtfs = require('./../../../');
-var importScript = require('../../../scripts/import');
+var importScript = require('../../../lib/import');
 
 // test support
 var databaseTestSupport = require('./../../support/database')(config);

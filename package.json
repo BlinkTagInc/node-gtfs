@@ -58,7 +58,7 @@
     "timekeeper": "0.1.1"
   },
   "scripts": {
-    "import": "node scripts/import.js",
+    "import": "node lib/import.js",
     "test": "NODE_ENV=test mocha ./test/mocha/**/*.js --reporter spec --timeout 5000"
   },
   "license": "MIT"
