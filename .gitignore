@@ -1,6 +1,5 @@
 node_modules
-bower_components
 downloads
-config.js
+/config.json
 .idea
 test/fixture/tmp/*.txt

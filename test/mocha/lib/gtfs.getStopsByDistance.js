@@ -1,20 +1,21 @@
 // dependencies
 var async = require('async');
 var should = require('should');
-var _ = require('lodash');
 
 // libraries
-var config = require('./../../config');
+var config = require('./../../config.json');
 var gtfs = require('./../../../');
-var downloadScript = require('../../../scripts/download');
+var importScript = require('../../../scripts/import');
 
 // test support
 var databaseTestSupport = require('./../../support/database')(config);
 var db;
 
 // setup fixtures
-var agenciesFixtures = [{ agency_key: 'caltrain', url: __dirname + '/../../fixture/caltrain_20120824_0333.zip'}];
-var agency_key = agenciesFixtures[0].agency_key;
+var agenciesFixtures = [{
+  agency_key: 'caltrain',
+  path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
+}];
 
 config.agencies = agenciesFixtures;
 
@@ -53,7 +54,7 @@ describe('gtfs.getStopsByDistance(): ', function(){
         databaseTestSupport.teardown(next);
       },
       executeDownloadScript: function(next){
-        downloadScript(config, next);
+        importScript(config, next);
       }
     }, function(err, res){
       done();

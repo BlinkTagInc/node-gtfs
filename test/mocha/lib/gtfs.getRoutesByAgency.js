@@ -3,16 +3,20 @@ var async = require('async');
 var should = require('should');
 
 // libraries
-var config = require('./../../config');
+var config = require('./../../config.json');
 var gtfs = require('./../../../');
-var downloadScript = require('../../../scripts/download');
+var importScript = require('../../../scripts/import');
 
 // test support
 var databaseTestSupport = require('./../../support/database')(config);
 var db;
 
 // setup fixtures
-var agenciesFixtures = [{ agency_key: 'caltrain', url: __dirname + '/../../fixture/caltrain_20120824_0333.zip'}];
+var agenciesFixtures = [{
+  agency_key: 'caltrain',
+  path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
+}];
+
 var agency_key = agenciesFixtures[0].agency_key;
 var agency_id = agenciesFixtures[0].agency_id;
 
@@ -52,7 +56,7 @@ describe('gtfs.getRoutesByAgency(): ', function(){
         databaseTestSupport.teardown(next);
       },
       executeDownloadScript: function(next){
-        downloadScript(config, next);
+        importScript(config, next);
       }
     }, function(err, res){
       done();
@@ -170,7 +174,7 @@ describe('gtfs.getRoutesByAgency(): ', function(){
       done();
     });
   });
-  
+
   it('should return empty array if no routes for given agency exists (agency_id provided)', function(done){
     async.series({
       teardownDatabase: function(next){

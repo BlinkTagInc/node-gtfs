@@ -19,9 +19,11 @@ DatabaseTestSupport.prototype.connect = function(cb){
 };
 
 DatabaseTestSupport.prototype.teardown = function(cb){
+  if (!this.db || !this.db.collections) return cb(new Error('Missing collections'));
+
   this.db.collections(function(err, collections){
     if (err) return cb(err, null);
-    if (!collections) cb(new Error('Missing collections'));
+    if (!collections) return cb(new Error('Missing collections'));
 
     async.eachSeries(collections, function(collection, next){
       if (collection.collectionName.substring(0, 6) === 'system') return next();

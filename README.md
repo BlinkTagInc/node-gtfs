@@ -12,7 +12,7 @@ queries to find nearby stops, routes and agencies.
 ## Example Application
 
 The [GTFS-to-HTML](https://github.com/brendannee/gtfs-to-html) app uses
-node-gtfs for downloading and querying GTFS data. It provides a good example of
+node-gtfs for downloading, importing and querying GTFS data. It provides a good example of
 how to use this library.
 
 ## Setup
@@ -33,9 +33,11 @@ or install directly from npm:
 
 ## Configuration
 
-Copy `config-sample.js` to `config.js`.
+Copy `config-sample.json` to `config.json` and then add your projects configuration to `config.json`.
 
-    cp config-sample.js config.js
+    cp config-sample.json config.json
+
+### Agencies
 
 Before you can use gtfs-to-html you must specify the transit agencies you'd
 like to use.
@@ -49,41 +51,105 @@ API along with your API token.
 * Specify a download URL:
 ```
 {
-    agency_key: 'county-connection',
-    url: 'http://cccta.org/GTFS/google_transit.zip'
+  "agencies": [
+    {
+      "agency_key": "county-connection",
+      "url": "http://cccta.org/GTFS/google_transit.zip"
+    }
+  ]
 }
 ```
 
 * Specify a path to a zipped GTFS file:
 ```
 {
-    agency_key: 'localAgency',
-    path: '/path/to/the/gtfs.zip'
+  "agencies": [
+    {
+      "agency_key": "myAgency",
+      "path": "/path/to/the/gtfs.zip"
+    }
+  ]
 }
 ```
 * Specify a path to an unzipped GTFS file:
 ```
 {
-    agency_key: 'localAgency',
-    path: '/path/to/the/unzipped/gtfs/'
+  "agencies": [
+    {
+      "agency_key": "myAgency",
+      path: "/path/to/the/unzipped/gtfs/"
+    }
+  ]
 }
 ```
 
-* Specify specific GTFS files to exclude from import:
+### MongoDB URI
+
+Add the MongoDB URI to `config.json` with the key `mongo_url`. Running locally, you may want to use `mongodb://localhost:27017/gtfs`.
 ```
 {
-    agency_key: 'localAgency',
-    path: '/path/to/the/unzipped/gtfs/',
-    exclude: [
-      'shapes',
-      'stops'
-    ]
+  "mongo_url": "mongodb://localhost:27017/gtfs",
+  "agencies": [
+    {
+      "agency_key": "myAgency",
+      path: "/path/to/the/unzipped/gtfs/"
+    }
+  ]
 }
 ```
 
-The mongodb URI should also be configured in `config.js`. The default database
-URI is:
-`mongodb://localhost:27017/gtfs`
+### Proj4 Projection
+
+You can optionally specify a proj4 projection string to correct poorly formed coordinates:
+```
+{
+  "mongo_url": "mongodb://localhost:27017/gtfs",
+  "agencies": [
+    {
+      agency_key: 'localAgency',
+      path: '/path/to/the/unzipped/gtfs/',
+      proj: '+proj=lcc +lat_1=46.8 +lat_0=46.8 +lon_0=0 +k_0=0.99987742 +x_0=600000 +y_0=2200000 +a=6378249.2 +b=6356515 +towgs84=-168,-60,320,0,0,0,0 +pm=paris +units=m +no_defs'
+    }
+  ]
+}
+```
+
+### Logging
+
+If you don't want the import script to print any output to the console, you can set `verbose` to `false`.
+
+```
+{
+  "mongo_url": "mongodb://localhost:27017/gtfs",
+  "agencies": [
+    {
+      agency_key: 'localAgency',
+      path: '/path/to/the/unzipped/gtfs/',
+    }
+  ],
+  "verbose": false
+}
+```
+
+### Exclude files
+
+If you don't want all GTFS files to be imported, you can specify an array of files to exclude.
+
+```
+{
+  "mongo_url": "mongodb://localhost:27017/gtfs",
+  "agencies": [
+    {
+      agency_key: 'localAgency',
+      path: '/path/to/the/unzipped/gtfs/',
+      exclude: [
+        'shapes',
+        'stops'
+      ]
+    }
+  ]
+}
+```
 
 ## Loading Data
 
@@ -91,21 +157,21 @@ URI is:
 
     mongod
 
-### Run the download script
+### Run the import script
 
-    npm run download
-
-or
-
-    node ./scripts/download
-
-By default, the download script will delete any existing data with the same `agency_key` from your database. If you don't want this to happen, pass the `--skip-delete` flag
-
-    npm run download -- --skip-delete
+    npm run import
 
 or
 
-    node ./scripts/download --skip-delete
+    node ./scripts/import
+
+By default, the import script will delete any existing data with the same `agency_key` from your database. If you don't want this to happen, pass the `--skip-delete` flag
+
+    npm run import -- --skip-delete
+
+or
+
+    node ./scripts/import --skip-delete
 
 ### Scheduling
 
@@ -121,7 +187,6 @@ querying GTFS data.
 Include this library.
 
     var gtfs = require('gtfs');
-
 
 ## Endpoints
 

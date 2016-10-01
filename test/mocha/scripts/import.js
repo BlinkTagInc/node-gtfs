@@ -3,39 +3,41 @@ var async = require('async');
 var unzip = require('unzip2');
 var parse = require('csv-parse');
 
-var config = require('./../../config');
-var downloadScript = require('../../../scripts/download');
-var agenciesFixtures = {
-  http: [{ agency_key: 'caltrain', url:  'http://transitfeeds.com/p/caltrain/122/latest/download'}],
-  local: [{ agency_key: 'caltrain', url: __dirname + '/../../fixture/caltrain_20120824_0333.zip'}]
-};
+var config = require('./../../config.json');
+var importScript = require('../../../scripts/import');
+var agenciesFixturesUrl = [{
+  agency_key: 'caltrain',
+  url: 'http://transitfeeds.com/p/caltrain/122/latest/download'
+}];
+var agenciesFixturesLocal = [{
+  agency_key: 'caltrain',
+  path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
+}];
 
 var databaseTestSupport = require('./../../support/database')(config);
 
 var GTFSFiles = require('../../support/GTFSFiles');
 
-describe('script/download.js', function(){
+describe('script/import.js', function(){
 
   this.timeout(10000);
 
   describe('Download and import from different GTFS sources', function(){
 
     it('should be able to download and import from HTTP', function(done){
-      config.agencies = agenciesFixtures.http;
-      downloadScript(config, done);
+      config.agencies = agenciesFixturesUrl;
+      importScript(config, done);
     });
 
     it('should be able to download and import from local filesystem', function(done){
-      config.agencies = agenciesFixtures.local;
-      downloadScript(config, done);
-
+      config.agencies = agenciesFixturesLocal;
+      importScript(config, done);
     });
-
   });
 
   describe('Verify data imported into database', function(){
 
-    config.agencies = agenciesFixtures.local;
+    config.agencies = agenciesFixturesLocal;
 
     var onError = function(err){
       throw new Error('Test failed', err);
@@ -48,9 +50,9 @@ describe('script/download.js', function(){
     before(function(done) {
       async.series({
         extractFixture: function(next){
-          var agency_url_fixture =  agenciesFixtures.local[0].url;
-          fs.createReadStream(agency_url_fixture)
-            .pipe(unzip.Extract({ path:  tmpDir}).on('close', next).on('error', onError))
+          var agency_path_fixture =  agenciesFixturesLocal[0].path;
+          fs.createReadStream(agency_path_fixture)
+            .pipe(unzip.Extract({ path: tmpDir }).on('close', next).on('error', onError))
             .on('error', onError);
         },
         countRowsInGTFSFiles: function(next){
@@ -90,7 +92,7 @@ describe('script/download.js', function(){
           databaseTestSupport.teardown(next);
         },
         executeDownloadScript: function(next){
-          downloadScript(config, next);
+          importScript(config, next);
         }
       },function(){
         done();
@@ -193,7 +195,5 @@ describe('script/download.js', function(){
         done();
       });
     });
-
   });
-
 });
