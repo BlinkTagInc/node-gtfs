@@ -400,3 +400,8 @@ Returns an array timetable pages matching the `timetable_page_id` specified.
 To run tests:
 
     npm test
+
+
+## Linting
+
+    npm run lint

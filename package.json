@@ -59,7 +59,8 @@
   },
   "scripts": {
     "import": "node lib/import.js",
-    "test": "NODE_ENV=test mocha ./test/mocha/**/*.js --reporter spec --timeout 5000"
+    "test": "NODE_ENV=test mocha ./test/mocha/**/*.js --reporter spec --timeout 5000",
+    "lint": "eslint ."
   },
   "license": "MIT"
 }
