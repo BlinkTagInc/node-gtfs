@@ -313,15 +313,6 @@ specified.
 
 `service_ids` is optional
 
-### Direction name by route
-
-Returns an object of `{northData: "Headsign north", southData: "Headsign south"}`
-for the `agency_key` and `route_id` specified.
-
-    gtfs.findBothDirectionNames(agency_key, route_id, function(err, directionNames) {
-
-    });
-
 ### Shapes by route
 
 Returns an array of shapes for the `agency_key`, `route_id` and `direction_id`
@@ -332,14 +323,6 @@ specified sorted by `shape_pt_sequence`.
     });
 
 `service_ids` is optional
-
-### Coordinates by route
-
-Returns an array of coordinates for the `agency_key`, and `route_id` specified
-
-    gtfs.getCoordinatesByRoute(agency_key, route_id, function(err, coordinates) {
-
-    });
 
 ### Calendars
 
