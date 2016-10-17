@@ -1,15 +1,15 @@
-// dependencies
-var async = require('async');
-var should = require('should');
+
+const async = require('async');
+const should = require('should');
 
 // libraries
-var config = require('./../../config.json');
-var gtfs = require('./../../../');
-var importScript = require('../../../lib/import');
+const config = require('./../../config.json');
+const gtfs = require('./../../../');
+const importScript = require('../../../lib/import');
 
 // test support
-var databaseTestSupport = require('./../../support/database')(config);
-var db;
+const databaseTestSupport = require('./../../support/database')(config);
+let db;
 
 // setup fixtures
 var agenciesFixtures = [{
@@ -19,57 +19,51 @@ var agenciesFixtures = [{
 
 config.agencies = agenciesFixtures;
 
-describe('gtfs.getAgenciesByDistance(): ', function(){
+describe('gtfs.getAgenciesByDistance(): ', () => {
 
-  before(function(done){
+  before((done) => {
     async.series({
-      connectToDb: function(next){
-        databaseTestSupport.connect(function(err, _db){
+      connectToDb: (next) => {
+        databaseTestSupport.connect((err, _db) => {
           db = _db;
           next();
         });
       }
-    }, function(){
-      done();
-    });
+    }, done);
   });
 
-  after(function(done) {
+  after((done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       },
-      closeDb: function(next){
+      closeDb: (next) => {
         databaseTestSupport.close(next);
       }
-    }, function(){
-      done();
-    });
+    }, done);
   });
 
-  beforeEach(function(done){
+  beforeEach((done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       },
-      executeDownloadScript: function(next){
+      executeDownloadScript: (next) => {
         importScript(config, next);
       }
-    }, function(err, res){
-      done();
-    });
+    }, done);
   });
 
-  it('should return empty array if no agencies exists', function(done){
+  it('should return empty array if no agencies exists', (done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       }
     },function(){
-      var lon = -121.9867495;
-      var lat = 37.38976166855;
-      var radius = 100;
-      gtfs.getAgenciesByDistance(lat, lon, radius, function(err, res){
+      const lon = -121.9867495;
+      const lat = 37.38976166855;
+      const radius = 100;
+      gtfs.getAgenciesByDistance(lat, lon, radius, (err, res) => {
         should.not.exist(err);
         should.exist(res);
         res.should.have.length(0);
@@ -78,11 +72,11 @@ describe('gtfs.getAgenciesByDistance(): ', function(){
     });
   });
 
-  it('should return empty array if no agencies within given distance exists', function(done){
-    var lon = -127.9867495;
-    var lat = 40.38976166855;
-    var radius = 100;
-    gtfs.getAgenciesByDistance(lat, lon, radius, function(err, res){
+  it('should return empty array if no agencies within given distance exists', (done) => {
+    const lon = -127.9867495;
+    const lat = 40.38976166855;
+    const radius = 100;
+    gtfs.getAgenciesByDistance(lat, lon, radius, (err, res) => {
       should.not.exist(err);
       should.exist(res);
       res.should.have.length(0);
@@ -90,11 +84,11 @@ describe('gtfs.getAgenciesByDistance(): ', function(){
     });
   });
 
-  it('should return expected agencies within given distance if exists', function(done){
-    var lon = -121.9867495;
-    var lat = 37.38976166855;
-    var radius = 100;
-    gtfs.getAgenciesByDistance(lat, lon, radius, function(err, agencies){
+  it('should return expected agencies within given distance if exists', (done) => {
+    const lon = -121.9867495;
+    const lat = 37.38976166855;
+    const radius = 100;
+    gtfs.getAgenciesByDistance(lat, lon, radius, (err, agencies) => {
       should.not.exist(err);
       should.exist(agencies);
       agencies.should.have.length(1);
@@ -103,15 +97,15 @@ describe('gtfs.getAgenciesByDistance(): ', function(){
     });
   });
 
-  it('should return expected agencies within given distance (without specifying radius) if exists', function(done){
-    var lon = -121.9867495;
-    var lat = 37.38976166855;
-    gtfs.getAgenciesByDistance(lat, lon, function(err, agencies){
+  it('should return expected agencies within given distance (without specifying radius) if exists', (done) => {
+    const lon = -121.9867495;
+    const lat = 37.38976166855;
+    gtfs.getAgenciesByDistance(lat, lon, (err, agencies) => {
       should.not.exist(err);
       should.exist(agencies);
       agencies.should.have.length(1);
 
-      var agency = agencies[0].toObject(); // FIXME: should it just return plain vanilla objects by default?
+      const agency = agencies[0].toObject();
       agency.agency_key.should.equal('caltrain');
       agency.agency_id.should.equal('caltrain-ca-us');
       agency.agency_name.should.equal('Caltrain');

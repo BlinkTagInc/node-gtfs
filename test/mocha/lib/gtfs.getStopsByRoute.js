@@ -1,75 +1,69 @@
-// dependencies
-var async = require('async');
-var should = require('should');
+
+const async = require('async');
+const should = require('should');
 
 // libraries
-var config = require('./../../config.json');
-var gtfs = require('./../../../');
-var importScript = require('../../../lib/import');
+const config = require('./../../config.json');
+const gtfs = require('./../../../');
+const importScript = require('../../../lib/import');
 
 // test support
-var databaseTestSupport = require('./../../support/database')(config);
-var db;
+const databaseTestSupport = require('./../../support/database')(config);
+let db;
 
 // setup fixtures
-var agenciesFixtures = [{
+const agenciesFixtures = [{
   agency_key: 'caltrain',
   path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
 }];
 
 config.agencies = agenciesFixtures;
 
-describe('gtfs.getStopsByRoute(): ', function(){
+describe('gtfs.getStopsByRoute(): ', () => {
 
-  before(function(done){
+  before((done) => {
     async.series({
-      connectToDb: function(next){
-        databaseTestSupport.connect(function(err, _db){
+      connectToDb: (next) => {
+        databaseTestSupport.connect((err, _db) => {
           db = _db;
           next();
         });
       }
-    }, function(){
-      done();
-    })
+    }, done);
   });
 
   after(function(done) {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       },
-      closeDb: function(next){
+      closeDb: (next) => {
         databaseTestSupport.close(next);
       }
-    }, function(){
-      done();
-    });
+    }, done);
   });
 
-  beforeEach(function(done){
+  beforeEach((done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       },
-      executeDownloadScript: function(next){
+      executeDownloadScript: (next) => {
         importScript(config, next);
       }
-    }, function(err, res){
-      done();
-    });
+    }, done);
   });
 
-  it('should return an empty array if no stops exists for given agency, route and direction', function(done){
+  it('should return an empty array if no stops exists for given agency, route and direction', (done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       }
-    },function(){
-      var agency_key = 'non_existing_agency';
-      var route_id = 'non_existing_route_id';
-      var direction_id = '0';
-      gtfs.getStopsByRoute(agency_key, route_id, direction_id, function(err, stops){
+    }, () => {
+      const agency_key = 'non_existing_agency';
+      const route_id = 'non_existing_route_id';
+      const direction_id = '0';
+      gtfs.getStopsByRoute(agency_key, route_id, direction_id, (err, stops) => {
         should.not.exist(err);
         should.exist(stops);
         stops.should.have.length(0);
@@ -78,12 +72,12 @@ describe('gtfs.getStopsByRoute(): ', function(){
     });
   });
 
-  it('should return array of stops if it exists for given agency, route and direction', function(done){
-    var agency_key = 'caltrain';
-    var route_id = 'ct_local_20120701';
-    var direction_id = '0';
+  it('should return array of stops if it exists for given agency, route and direction', (done) => {
+    const agency_key = 'caltrain';
+    const route_id = 'ct_local_20120701';
+    const direction_id = '0';
 
-    var expectedStopIds = [
+    const expectedStopIds = [
       'San Jose Caltrain',
       'Santa Clara Caltrain',
       'Lawrence Caltrain',
@@ -110,26 +104,26 @@ describe('gtfs.getStopsByRoute(): ', function(){
       'San Francisco Caltrain'
     ];
 
-    gtfs.getStopsByRoute(agency_key, route_id, direction_id, function(err, stops){
+    gtfs.getStopsByRoute(agency_key, route_id, direction_id, (err, stops) => {
       should.not.exist(err);
       should.exist(stops);
 
       stops.should.have.length(24);
 
-      for (var i in stops){
-        var stop = stops[i];
-        expectedStopIds[i].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
-      }
+      stops.forEach((stop, idx) => {
+        expectedStopIds[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
+      });
+
       done();
     });
   });
 
-  it('should return array of stops if it exists for given agency, route and direction (opposite direction)', function(done){
-    var agency_key = 'caltrain';
-    var route_id = 'ct_local_20120701';
-    var direction_id = '1';
+  it('should return array of stops if it exists for given agency, route and direction (opposite direction)', (done) => {
+    const agency_key = 'caltrain';
+    const route_id = 'ct_local_20120701';
+    const direction_id = '1';
 
-    var expectedStopIds = [
+    const expectedStopIds = [
       'San Francisco Caltrain',
       '22nd Street Caltrain',
       'Bayshore Caltrain',
@@ -161,24 +155,24 @@ describe('gtfs.getStopsByRoute(): ', function(){
       'Gilroy Caltrain'
     ];
 
-    gtfs.getStopsByRoute(agency_key, route_id, direction_id, function(err, stops){
+    gtfs.getStopsByRoute(agency_key, route_id, direction_id, (err, stops) => {
       should.not.exist(err);
       should.exist(stops);
       stops.should.have.length(29);
 
-      for (var i in stops){
-        var stop = stops[i];
-        expectedStopIds[i].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
-      }
+      stops.forEach((stop, idx) => {
+        expectedStopIds[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
+      });
+
       done();
     });
   });
 
-  it('should return array of all stops for all directions if it exists for given agency and route (without specifying direction)', function(done){
-    var agency_key = 'caltrain';
-    var route_id = 'ct_local_20120701';
+  it('should return array of all stops for all directions if it exists for given agency and route (without specifying direction)', (done) => {
+    const agency_key = 'caltrain';
+    const route_id = 'ct_local_20120701';
 
-    var expectedResults = {
+    const expectedResults = {
       0: {
         direction_id: 0,
         stops_count: 24,
@@ -246,24 +240,21 @@ describe('gtfs.getStopsByRoute(): ', function(){
       }
     };
 
-    gtfs.getStopsByRoute(agency_key, route_id, function(err, results){
+    gtfs.getStopsByRoute(agency_key, route_id, (err, results) => {
       should.not.exist(err);
       should.exist(results);
 
       results.should.have.length(2, 'Should have 2 directions');
-      for (var i in results){
-        var row = results[i];
+      results.forEach((row) => {
         row.should.have.property('direction_id');
         row.should.have.property('stops');
         row.stops.should.have.length(expectedResults[row.direction_id].stops_count);
-        for (var k in row.stops){
-          var stop = row.stops[k];
-          expectedResults[row.direction_id].stops[k].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
-        }
-      }
-      done();
+        row.stops.forEach((stop, idx) => {
+          expectedResults[row.direction_id].stops[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
+        });
+      });
 
+      done();
     });
   });
-
 });

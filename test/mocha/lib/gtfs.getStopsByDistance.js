@@ -1,76 +1,69 @@
-// dependencies
-var async = require('async');
-var should = require('should');
+
+const async = require('async');
+const should = require('should');
 
 // libraries
-var config = require('./../../config.json');
-var gtfs = require('./../../../');
-var importScript = require('../../../lib/import');
+const config = require('./../../config.json');
+const gtfs = require('./../../../');
+const importScript = require('../../../lib/import');
 
 // test support
-var databaseTestSupport = require('./../../support/database')(config);
-var db;
+const databaseTestSupport = require('./../../support/database')(config);
+let db;
 
 // setup fixtures
-var agenciesFixtures = [{
+const agenciesFixtures = [{
   agency_key: 'caltrain',
   path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
 }];
 
 config.agencies = agenciesFixtures;
 
-describe('gtfs.getStopsByDistance(): ', function(){
+describe('gtfs.getStopsByDistance(): ', () => {
 
-  before(function(done){
+  before((done) => {
     async.series({
-      connectToDb: function(next){
-        databaseTestSupport.connect(function(err, _db){
+      connectToDb: (next) => {
+        databaseTestSupport.connect((err, _db) => {
           db = _db;
           next();
         });
       }
-    }, function(){
-      done();
-    })
+    }, done);
   });
 
-  after(function(done) {
+  after((done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
-//        next();
       },
-      closeDb: function(next){
+      closeDb: (next) => {
         databaseTestSupport.close(next);
       }
-    }, function(){
-      done();
-    });
+    }, done);
   });
 
-  beforeEach(function(done){
+  beforeEach((done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       },
-      executeDownloadScript: function(next){
+      executeDownloadScript: (next) => {
         importScript(config, next);
       }
-    }, function(err, res){
-      done();
-    });
+    }, done);
   });
 
-  it('should return an empty array if no stops exist', function(done){
+  it('should return an empty array if no stops exist', (done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       }
-    }, function() {
-      var lon = -121.9867495;
-      var lat = 37.38976166855;
-      var radius = 100;
-      gtfs.getStopsByDistance(lat, lon, radius, function(err, res){
+    }, () => {
+      const lon = -121.9867495;
+      const lat = 37.38976166855;
+      const radius = 100;
+      gtfs.getStopsByDistance(lat, lon, radius, (err, res) => {
         should.not.exist(err);
         should.exist(res);
         res.should.have.length(0);
@@ -80,11 +73,11 @@ describe('gtfs.getStopsByDistance(): ', function(){
   });
 
 
-  it('should return expected stops within given distance if they exist', function(done){
-    var lon = -121.9867495;
-    var lat = 37.38976166855;
-    var radius = 2;
-    var expectedStops = {
+  it('should return expected stops within given distance if they exist', (done) => {
+    const lon = -121.9867495;
+    const lat = 37.38976166855;
+    const radius = 2;
+    const expectedStops = {
       'Lawrence Caltrain': {
         loc: [ -121.996982, 37.371578 ],
         agency_key: 'caltrain',
@@ -98,14 +91,13 @@ describe('gtfs.getStopsByDistance(): ', function(){
       }
     };
 
-    gtfs.getStopsByDistance(lat, lon, radius, function(err, stops){
+    gtfs.getStopsByDistance(lat, lon, radius, (err, stops) => {
       should.not.exist(err);
       should.exist(stops);
       stops.should.have.length(1);
 
-      for (var i in stops){
-        var stop = stops[i];
-        var expectedStop = expectedStops[stop.stop_id];
+      stops.forEach((stop) => {
+        const expectedStop = expectedStops[stop.stop_id];
 
         should.exist(expectedStop);
         stop.stop_id.should.equal(expectedStop.stop_id);
@@ -115,16 +107,16 @@ describe('gtfs.getStopsByDistance(): ', function(){
         stop.stop_lon.should.equal(expectedStop.stop_lon);
         stop.stop_url.should.equal(expectedStop.stop_url);
         stop.agency_key.should.equal(expectedStop.agency_key);
+      });
 
-      }
       done();
     });
   });
 
-  it('should return expected stops within given distance (without specifying radius) if they exist', function(done){
-    var lon = -121.915671;
-    var lat = 37.340902;
-    var expectedStops = {
+  it('should return expected stops within given distance (without specifying radius) if they exist', (done) => {
+    const lon = -121.915671;
+    const lat = 37.340902;
+    const expectedStops = {
       'College Park Caltrain': {
         loc: [ -121.914998, 37.34217 ],
         agency_key: 'caltrain',
@@ -138,14 +130,13 @@ describe('gtfs.getStopsByDistance(): ', function(){
       }
     };
 
-    gtfs.getStopsByDistance(lat, lon, function(err, stops){
+    gtfs.getStopsByDistance(lat, lon, (err, stops) => {
       should.not.exist(err);
       should.exist(stops);
       stops.should.have.length(1);
 
-      for (var i in stops){
-        var stop = stops[i];
-        var expectedStop = expectedStops[stop.stop_id];
+      stops.forEach((stop) => {
+        const expectedStop = expectedStops[stop.stop_id];
 
         should.exist(expectedStop);
         stop.stop_id.should.equal(expectedStop.stop_id);
@@ -155,7 +146,8 @@ describe('gtfs.getStopsByDistance(): ', function(){
         stop.stop_lon.should.equal(expectedStop.stop_lon);
         stop.stop_url.should.equal(expectedStop.stop_url);
         stop.agency_key.should.equal(expectedStop.agency_key);
-      }
+      });
+
       done();
     });
   });

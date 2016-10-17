@@ -1,75 +1,70 @@
-// dependencies
-var async = require('async');
-var should = require('should');
+
+const async = require('async');
+const should = require('should');
 
 // libraries
-var config = require('./../../config.json');
-var gtfs = require('./../../../');
-var importScript = require('../../../lib/import');
+const config = require('./../../config.json');
+const gtfs = require('./../../../');
+const importScript = require('../../../lib/import');
 
 // test support
-var databaseTestSupport = require('./../../support/database')(config);
-var db;
+const databaseTestSupport = require('./../../support/database')(config);
+let db;
 
 // setup fixtures
-var agenciesFixtures = [{
+const agenciesFixtures = [{
   agency_key: 'caltrain',
   path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
 }];
 
 config.agencies = agenciesFixtures;
 
-describe('gtfs.getRoutesByDistance(): ', function(){
+describe('gtfs.getRoutesByDistance(): ', () => {
 
-  before(function(done){
+  before((done) => {
     async.series({
-      connectToDb: function(next){
-        databaseTestSupport.connect(function(err, _db){
+      connectToDb: (next) => {
+        databaseTestSupport.connect((err, _db) => {
           db = _db;
           next();
         });
       }
-    }, function(){
-      done();
-    })
+    }, done)
   });
 
-  after(function(done) {
+  after((done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       },
-      closeDb: function(next) {
+      closeDb: (next) => {
         databaseTestSupport.close(next);
       }
-    }, function(){
-      done();
-    });
+    }, done);
   });
 
-  beforeEach(function(done){
+  beforeEach((done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       },
-      executeDownloadScript: function(next){
+      executeDownloadScript: (next) => {
         importScript(config, next);
       }
-    }, function(err, res){
-      done();
-    });
+    }, done);
   });
 
-  it('should return an empty array if no routes exist', function(done){
+  it('should return an empty array if no routes exist', (done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       }
-    },function(){
-      var lon = -121.9867495;
-      var lat = 37.38976166855;
-      var radius = 100;
-      gtfs.getRoutesByDistance(lat, lon, radius, function(err, res){
+    }, () => {
+      const lon = -121.9867495;
+      const lat = 37.38976166855;
+      const radius = 100;
+
+      gtfs.getRoutesByDistance(lat, lon, radius, (err, res) => {
         should.not.exist(err);
         should.exist(res);
         res.should.have.length(0);
@@ -78,11 +73,12 @@ describe('gtfs.getRoutesByDistance(): ', function(){
     });
   });
 
-  it('should return an empty array if no routes within given distance exist', function(done){
-    var lon = -127.9867495;
-    var lat = 40.38976166855;
-    var radius = 100;
-    gtfs.getRoutesByDistance(lat, lon, radius, function(err, res){
+  it('should return an empty array if no routes within given distance exist', (done) => {
+    const lon = -127.9867495;
+    const lat = 40.38976166855;
+    const radius = 100;
+
+    gtfs.getRoutesByDistance(lat, lon, radius, (err, res) => {
       should.not.exist(err);
       should.exist(res);
       res.should.have.length(0);
@@ -92,11 +88,11 @@ describe('gtfs.getRoutesByDistance(): ', function(){
 
 
 
-  it('should return expected routes within given distance if they exist', function(done){
-    var lon = -121.9867495;
-    var lat = 37.38976166855;
-    var radius = 2;
-    var expectedRoutes = {
+  it('should return expected routes within given distance if they exist', (done) => {
+    const lon = -121.9867495;
+    const lat = 37.38976166855;
+    const radius = 2;
+    const expectedRoutes = {
       ct_limited_20120701: {
         route_id: 'ct_limited_20120701',
         route_short_name: '',
@@ -141,14 +137,13 @@ describe('gtfs.getRoutesByDistance(): ', function(){
       }
     };
 
-    gtfs.getRoutesByDistance(lat, lon, radius, function(err, routes){
+    gtfs.getRoutesByDistance(lat, lon, radius, (err, routes) => {
       should.not.exist(err);
       should.exist(routes);
       routes.should.have.length(4);
 
-      for (var i in routes){
-        var route = routes[i];
-        var expectedRoute = expectedRoutes[route.route_id];
+      routes.forEach((route) => {
+        const expectedRoute = expectedRoutes[route.route_id];
 
         should.exist(expectedRoute);
         route.route_id.should.equal(expectedRoute.route_id);
@@ -161,16 +156,15 @@ describe('gtfs.getRoutesByDistance(): ', function(){
         route.route_color.should.equal(expectedRoute.route_color);
         route.route_text_color.should.equal(expectedRoute.route_text_color);
         route.agency_key.should.equal(expectedRoute.agency_key);
-
-      }
+      });
       done();
     });
   });
 
-  it('should return expected routes within given distance (without specifying radius) if exists', function(done){
-    var lon = -122.39797353744507;
-    var lat = 37.7210684234136;
-    var expectedRoutes = {
+  it('should return expected routes within given distance (without specifying radius) if exists', (done) => {
+    const lon = -122.39797353744507;
+    const lat = 37.7210684234136;
+    const expectedRoutes = {
       ct_limited_20120701: {
         route_id: 'ct_limited_20120701',
         route_short_name: '',
@@ -214,14 +208,13 @@ describe('gtfs.getRoutesByDistance(): ', function(){
         agency_key: 'caltrain'
       }
     };
-    gtfs.getRoutesByDistance(lat, lon, function(err, routes){
+    gtfs.getRoutesByDistance(lat, lon, (err, routes) => {
       should.not.exist(err);
       should.exist(routes);
       routes.should.have.length(4);
 
-      for (var i in routes){
-        var route = routes[i];
-        var expectedRoute = expectedRoutes[route.route_id];
+      routes.forEach((route) => {
+        const expectedRoute = expectedRoutes[route.route_id];
 
         should.exist(expectedRoute);
         route.route_id.should.equal(expectedRoute.route_id);
@@ -234,9 +227,8 @@ describe('gtfs.getRoutesByDistance(): ', function(){
         route.route_color.should.equal(expectedRoute.route_color);
         route.route_text_color.should.equal(expectedRoute.route_text_color);
         route.agency_key.should.equal(expectedRoute.agency_key);
-      }
+      });
       done();
     });
   });
-
 });

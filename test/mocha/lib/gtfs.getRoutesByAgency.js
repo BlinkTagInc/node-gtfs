@@ -1,75 +1,69 @@
-// dependencies
-var async = require('async');
-var should = require('should');
+
+const async = require('async');
+const should = require('should');
 
 // libraries
-var config = require('./../../config.json');
-var gtfs = require('./../../../');
-var importScript = require('../../../lib/import');
+const config = require('./../../config.json');
+const gtfs = require('./../../../');
+const importScript = require('../../../lib/import');
 
 // test support
-var databaseTestSupport = require('./../../support/database')(config);
-var db;
+const databaseTestSupport = require('./../../support/database')(config);
+let db;
 
 // setup fixtures
-var agenciesFixtures = [{
+const agenciesFixtures = [{
   agency_key: 'caltrain',
   path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
 }];
 
-var agency_key = agenciesFixtures[0].agency_key;
-var agency_id = agenciesFixtures[0].agency_id;
+const agency_key = agenciesFixtures[0].agency_key;
+const agency_id = agenciesFixtures[0].agency_id;
 
 config.agencies = agenciesFixtures;
 
-describe('gtfs.getRoutesByAgency(): ', function(){
+describe('gtfs.getRoutesByAgency(): ', () => {
 
-  before(function(done){
+  before((done) => {
     async.series({
-      connectToDb: function(next){
-        databaseTestSupport.connect(function(err, _db){
+      connectToDb: (next) => {
+        databaseTestSupport.connect((err, _db) => {
           db = _db;
           next();
         });
       }
-    }, function(){
-      done();
-    })
+    }, done);
   });
 
-  after(function(done) {
+  after((done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       },
-      closeDb: function(next){
+      closeDb: (next) => {
         databaseTestSupport.close(next);
       }
-    }, function(){
-      done();
-    });
+    }, done);
   });
 
-  beforeEach(function(done){
+  beforeEach((done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       },
-      executeDownloadScript: function(next){
+      executeDownloadScript: (next) => {
         importScript(config, next);
       }
-    }, function(err, res){
-      done();
-    });
+    }, done);
   });
 
-  it('should return empty array if no routes for given agency exists (agency_id not provided)', function(done){
+  it('should return empty array if no routes for given agency exists (agency_id not provided)', (done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       }
-    }, function(){
-      gtfs.getRoutesByAgency(agency_key, function(err, res){
+    }, () => {
+      gtfs.getRoutesByAgency(agency_key, (err, res) => {
         should.not.exist(err);
         should.exist(res);
         res.should.have.length(0);
@@ -78,12 +72,12 @@ describe('gtfs.getRoutesByAgency(): ', function(){
     });
   });
 
-  it('should return expected routes for given agency (agency_id not provided)', function(done){
-    gtfs.getRoutesByAgency(agency_key, function(err, routes){
+  it('should return expected routes for given agency (agency_id not provided)', (done) => {
+    gtfs.getRoutesByAgency(agency_key, (err, routes) => {
       should.not.exist(err);
       should.exist(routes);
 
-      var expectedRoutes = {
+      const expectedRoutes = {
         ct_bullet_20120701: {
           route_id: 'ct_bullet_20120701',
           route_short_name: '',
@@ -154,9 +148,8 @@ describe('gtfs.getRoutesByAgency(): ', function(){
 
       routes.should.have.length(6);
 
-      for (var i in routes){
-        var route = routes[i];
-        var expectedRoute = expectedRoutes[route.route_id];
+      routes.forEach((route) => {
+        const expectedRoute = expectedRoutes[route.route_id];
 
         should.exist(expectedRoute);
         route.route_id.should.equal(expectedRoute.route_id);
@@ -169,19 +162,19 @@ describe('gtfs.getRoutesByAgency(): ', function(){
         route.route_color.should.equal(expectedRoute.route_color);
         route.route_text_color.should.equal(expectedRoute.route_text_color);
         route.agency_key.should.equal(expectedRoute.agency_key);
-      }
+      });
 
       done();
     });
   });
 
-  it('should return empty array if no routes for given agency exists (agency_id provided)', function(done){
+  it('should return empty array if no routes for given agency exists (agency_id provided)', (done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       }
-    }, function(){
-      gtfs.getRoutesByAgency(agency_key, agency_id, function(err, res){
+    }, () => {
+      gtfs.getRoutesByAgency(agency_key, agency_id, (err, res) => {
         should.not.exist(err);
         should.exist(res);
         res.should.have.length(0);
@@ -190,12 +183,12 @@ describe('gtfs.getRoutesByAgency(): ', function(){
     });
   });
 
-  it('should return expected routes for given agency and agency_id', function(done){
-    gtfs.getRoutesByAgency(agency_key, agency_id, function(err, routes){
+  it('should return expected routes for given agency and agency_id', (done) => {
+    gtfs.getRoutesByAgency(agency_key, agency_id, (err, routes) => {
       should.not.exist(err);
       should.exist(routes);
 
-      var expectedRoutes = {
+      const expectedRoutes = {
         ct_bullet_20120701: {
           route_id: 'ct_bullet_20120701',
           route_short_name: '',
@@ -266,9 +259,8 @@ describe('gtfs.getRoutesByAgency(): ', function(){
 
       routes.should.have.length(6);
 
-      for (var i in routes){
-        var route = routes[i];
-        var expectedRoute = expectedRoutes[route.route_id];
+      routes.forEach((route) => {
+        const expectedRoute = expectedRoutes[route.route_id];
 
         should.exist(expectedRoute);
         route.route_id.should.equal(expectedRoute.route_id);
@@ -281,7 +273,7 @@ describe('gtfs.getRoutesByAgency(): ', function(){
         route.route_color.should.equal(expectedRoute.route_color);
         route.route_text_color.should.equal(expectedRoute.route_text_color);
         route.agency_key.should.equal(expectedRoute.agency_key);
-      }
+      });
 
       done();
     });

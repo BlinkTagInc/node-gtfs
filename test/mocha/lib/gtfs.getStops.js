@@ -1,73 +1,67 @@
-// dependencies
-var async = require('async');
-var should = require('should');
+
+const async = require('async');
+const should = require('should');
 
 // libraries
-var config = require('./../../config.json');
-var gtfs = require('./../../../');
-var importScript = require('../../../lib/import');
+const config = require('./../../config.json');
+const gtfs = require('./../../../');
+const importScript = require('../../../lib/import');
 
 // test support
-var databaseTestSupport = require('./../../support/database')(config);
-var db;
+const databaseTestSupport = require('./../../support/database')(config);
+let db;
 
 // setup fixtures
-var agenciesFixtures = [{
+const agenciesFixtures = [{
   agency_key: 'caltrain',
   path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
 }];
 
 config.agencies = agenciesFixtures;
 
-describe('gtfs.getStops(): ', function(){
+describe('gtfs.getStops(): ', () => {
 
-  before(function(done){
+  before((done) => {
     async.series({
-      connectToDb: function(next){
-        databaseTestSupport.connect(function(err, _db){
+      connectToDb: (next) => {
+        databaseTestSupport.connect((err, _db) => {
           db = _db;
           next();
         });
       }
-    }, function(){
-      done();
-    })
+    }, done);
   });
 
-  after(function(done) {
+  after((done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       },
-      closeDb: function(next){
+      closeDb: (next) => {
         databaseTestSupport.close(next);
       }
-    }, function(){
-      done();
-    });
+    }, done);
   });
 
-  beforeEach(function(done){
+  beforeEach((done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       },
-      executeDownloadScript: function(next){
+      executeDownloadScript: (next) => {
         importScript(config, next);
       }
-    }, function(err, res){
-      done();
-    });
+    }, done);
   });
 
-  it('should return an empty array if no stops exists for given agency', function(done){
+  it('should return an empty array if no stops exists for given agency', (done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       }
-    },function(){
-      var agency_key = 'non_existing_agency';
-      gtfs.getStops(agency_key, function(err, stops){
+    },() => {
+      const agency_key = 'non_existing_agency';
+      gtfs.getStops(agency_key, (err, stops) => {
         should.exist(stops);
         stops.should.have.length(0);
         done();
@@ -75,10 +69,10 @@ describe('gtfs.getStops(): ', function(){
     });
   });
 
-  it('should return array of stops if it exists for given agency', function(done){
-    var agency_key = 'caltrain';
+  it('should return array of stops if it exists for given agency', (done) => {
+    const agency_key = 'caltrain';
 
-    var expectedStopIds = [
+    const expectedStopIds = [
       'Morgan Hill Caltrain',
       'Mountain View Caltrain',
       'Palo Alto Caltrain',
@@ -112,7 +106,7 @@ describe('gtfs.getStops(): ', function(){
       'Millbrae Caltrain'
     ];
 
-    gtfs.getStops(agency_key, function(err, stops){
+    gtfs.getStops(agency_key, (err, stops) => {
       should.not.exist(err);
       should.exist(stops);
 
@@ -121,14 +115,14 @@ describe('gtfs.getStops(): ', function(){
     });
   });
 
-  it('should return array of stops if it exists for given agency, and stop_ids', function(done){
-    var agency_key = 'caltrain';
-    var stop_ids = [
+  it('should return array of stops if it exists for given agency, and stop_ids', (done) => {
+    const agency_key = 'caltrain';
+    const stop_ids = [
       'Burlingame Caltrain',
       '22nd Street Caltrain'
     ];
 
-    gtfs.getStops(agency_key, stop_ids, function(err, stops){
+    gtfs.getStops(agency_key, stop_ids, (err, stops) => {
       should.not.exist(err);
       should.exist(stops);
       stops.should.have.length(2);

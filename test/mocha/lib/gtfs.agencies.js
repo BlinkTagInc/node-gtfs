@@ -1,82 +1,75 @@
-// dependencies
-var async = require('async');
-var should = require('should');
-var tk = require('timekeeper');
-var timeReference = new Date();
+
+const async = require('async');
+const should = require('should');
+const tk = require('timekeeper');
+const timeReference = new Date();
 
 // libraries
-var config = require('./../../config.json');
-var gtfs = require('./../../../');
-var importScript = require('../../../lib/import');
+const config = require('./../../config.json');
+const gtfs = require('./../../../');
+const importScript = require('../../../lib/import');
 
 // test support
-var databaseTestSupport = require('./../../support/database')(config);
-var db;
+const databaseTestSupport = require('./../../support/database')(config);
+let db;
 
 // setup fixtures
-var agenciesFixtures = [{
+const agenciesFixtures = [{
   agency_key: 'caltrain',
   path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
 }];
 
 config.agencies = agenciesFixtures;
 
-describe('gtfs.agencies(): ', function(){
-
-  before(function(done){
+describe('gtfs.agencies(): ', () => {
+  before((done) => {
     async.series({
-      connectToDb: function(next){
-        databaseTestSupport.connect(function(err, _db){
+      connectToDb: function(next) {
+        databaseTestSupport.connect((err, _db) => {
           db = _db;
           next();
         });
       },
-      setupMockDate: function(next){
+      setupMockDate: (next) => {
         tk.freeze(timeReference);
         next();
       }
-    }, function(){
-      done();
-    });
+    }, done);
   });
 
-  after(function(done) {
+  after((done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       },
-      closeDb: function(next){
+      closeDb: (next) => {
         databaseTestSupport.close(next);
       },
-      resetMockDate: function(next){
+      resetMockDate: (next) => {
         tk.reset();
         next();
       }
-    }, function(){
-      done();
-    });
+    }, done);
   });
 
-  beforeEach(function(done){
+  beforeEach((done)=> {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       },
-      executeDownloadScript: function(next){
+      executeDownloadScript: (next) => {
         importScript(config, next);
       }
-    }, function(err, res){
-      done();
-    });
+    }, done);
   });
 
-  it('should return empty array if no agencies exists', function(done){
+  it('should return empty array if no agencies exists', (done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       }
-    }, function(){
-      gtfs.agencies(function(err, agencies) {
+    }, () => {
+      gtfs.agencies((err, agencies) => {
         should.not.exists(err);
         should.exists(agencies);
         agencies.should.have.length(0);
@@ -85,13 +78,13 @@ describe('gtfs.agencies(): ', function(){
     });
   });
 
-  it('should return expected agency', function(done){
-    gtfs.agencies(function(err, agencies){
+  it('should return expected agency', (done) => {
+    gtfs.agencies((err, agencies) => {
       should.not.exist(err);
       should.exist(agencies);
       agencies.length.should.equal(1);
 
-      var agency = agencies[0].toObject();
+      const agency = agencies[0].toObject();
 
       agency.agency_key.should.equal('caltrain');
       agency.agency_id.should.equal('caltrain-ca-us');

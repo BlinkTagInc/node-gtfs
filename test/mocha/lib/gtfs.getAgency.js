@@ -1,21 +1,20 @@
-// dependencies
-var request = require('supertest');
-var async = require('async');
-var should = require('should');
-var tk = require('timekeeper');
-var timeReference = new Date();
+
+const async = require('async');
+const should = require('should');
+const tk = require('timekeeper');
+const timeReference = new Date();
 
 // libraries
-var config = require('./../../config.json');
-var gtfs = require('./../../../');
-var importScript = require('../../../lib/import');
+const config = require('./../../config.json');
+const gtfs = require('./../../../');
+const importScript = require('../../../lib/import');
 
 // test support
-var databaseTestSupport = require('./../../support/database')(config);
-var db;
+const databaseTestSupport = require('./../../support/database')(config);
+let db;
 
 // setup fixtures
-var agenciesFixtures = [{
+const agenciesFixtures = [{
   agency_key: 'caltrain',
   path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
 }];
@@ -24,61 +23,55 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getAgency(): ', function(){
 
-  before(function(done){
+  before((done) => {
     async.series({
-      connectToDb: function(next){
-        databaseTestSupport.connect(function(err, _db){
+      connectToDb: (next) => {
+        databaseTestSupport.connect((err, _db) => {
           db = _db;
           next();
         });
       },
-      setupMockDate: function(next){
+      setupMockDate: (next) => {
         tk.freeze(timeReference);
         next();
       }
-    }, function(){
-      done();
-    });
+    }, done);
   });
 
-  after(function(done) {
+  after((done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       },
-      closeDb: function(next){
+      closeDb: (next) => {
         databaseTestSupport.close(next);
       },
-      resetMockDate: function(next){
+      resetMockDate: (next) => {
         tk.reset();
         next();
       }
-    }, function(){
-      done();
-    });
+    }, done);
   });
 
-  beforeEach(function(done){
+  beforeEach((done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       },
-      executeDownloadScript: function(next){
+      executeDownloadScript: (next) => {
         importScript(config, next);
       }
-    }, function(err, res){
-      done();
-    });
+    }, done);
   });
 
-  it('should return null if agency_key does not exist (no agency_id provided)', function(done){
+  it('should return null if agency_key does not exist (no agency_id provided)', (done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       }
-    }, function(){
-	  var agency_key = 'caltrain-NOT';
-      gtfs.getAgency(agency_key, function(err, agencies) {
+    }, () => {
+      const agency_key = 'caltrain-NOT';
+      gtfs.getAgency(agency_key, (err, agencies) => {
         should.not.exists(err);
         should.not.exists(agencies);
 
@@ -87,13 +80,13 @@ describe('gtfs.getAgency(): ', function(){
     });
   });
 
-  it('should return expected agency for agency_key (no agency_id provided)', function(done){
-	var agency_key = 'caltrain';
-    gtfs.getAgency(agency_key, function(err, agencies){
+  it('should return expected agency for agency_key (no agency_id provided)', (done) => {
+    const agency_key = 'caltrain';
+    gtfs.getAgency(agency_key, (err, agencies) => {
       should.not.exist(err);
       should.exist(agencies);
 
-      var agency = agencies.toObject();
+      const agency = agencies.toObject();
 
       agency.agency_key.should.equal('caltrain');
       agency.agency_id.should.equal('caltrain-ca-us');
@@ -124,15 +117,15 @@ describe('gtfs.getAgency(): ', function(){
     });
   });
 
-  it('should return null if agency_key does not exist (agency_id provided)', function(done){
+  it('should return null if agency_key does not exist (agency_id provided)', (done) => {
     async.series({
-      teardownDatabase: function(next){
+      teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       }
-    }, function(){
-	  var agency_key = 'caltrain-NOT';
-	  var agency_id = 'caltrain-ca-us';
-      gtfs.getAgency(agency_key, agency_id, function(err, agencies) {
+    }, () => {
+      const agency_key = 'caltrain-NOT';
+      const agency_id = 'caltrain-ca-us';
+      gtfs.getAgency(agency_key, agency_id, (err, agencies) => {
         should.not.exists(err);
         should.not.exists(agencies);
 
@@ -141,14 +134,14 @@ describe('gtfs.getAgency(): ', function(){
     });
   });
 
-  it('should return expected agency for agency_key and agency_id', function(done){
-	var agency_key = 'caltrain';
-	var agency_id = 'caltrain-ca-us';
-    gtfs.getAgency(agency_key, agency_id, function(err, agencies){
+  it('should return expected agency for agency_key and agency_id', (done) => {
+    const agency_key = 'caltrain';
+    const agency_id = 'caltrain-ca-us';
+    gtfs.getAgency(agency_key, agency_id, (err, agencies) => {
       should.not.exist(err);
       should.exist(agencies);
 
-	  var agency = agencies.toObject();
+      const agency = agencies.toObject();
 
       agency.agency_key.should.equal('caltrain');
       agency.agency_id.should.equal('caltrain-ca-us');
@@ -178,5 +171,4 @@ describe('gtfs.getAgency(): ', function(){
       done();
     });
   });
-
 });

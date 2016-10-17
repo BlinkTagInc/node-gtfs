@@ -1,63 +1,65 @@
-var fs = require('fs');
-var async = require('async');
-var unzip = require('unzip2');
-var parse = require('csv-parse');
+const fs = require('fs');
+const async = require('async');
+const unzip = require('unzip2');
+const parse = require('csv-parse');
 
-var config = require('./../../config.json');
-var importScript = require('../../../lib/import');
-var agenciesFixturesUrl = [{
+const config = require('./../../config.json');
+const importScript = require('../../../lib/import');
+
+const agenciesFixturesUrl = [{
   agency_key: 'caltrain',
   url: 'http://transitfeeds.com/p/caltrain/122/latest/download'
 }];
-var agenciesFixturesLocal = [{
+
+const agenciesFixturesLocal = [{
   agency_key: 'caltrain',
   path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
 }];
 
-var databaseTestSupport = require('./../../support/database')(config);
+const databaseTestSupport = require('./../../support/database')(config);
 
-var GTFSFiles = require('../../support/GTFSFiles');
+const filenames = require('../../../lib/filenames');
 
-describe('lib/import.js', function(){
+describe('lib/import.js', function() {
 
   this.timeout(10000);
 
   describe('Download and import from different GTFS sources', function(){
 
-    it('should be able to download and import from HTTP', function(done){
+    it('should be able to download and import from HTTP', (done) => {
       config.agencies = agenciesFixturesUrl;
       importScript(config, done);
     });
 
-    it('should be able to download and import from local filesystem', function(done){
+    it('should be able to download and import from local filesystem', (done) => {
       config.agencies = agenciesFixturesLocal;
       importScript(config, done);
     });
   });
 
-  describe('Verify data imported into database', function(){
+  describe('Verify data imported into database', () => {
 
     config.agencies = agenciesFixturesLocal;
 
-    var onError = function(err){
+    const onError = (err) => {
       throw new Error('Test failed', err);
     };
 
-    var db;
-    var countData = {};
-    var tmpDir = __dirname + '/../../fixture/tmp/';
+    let db;
+    const countData = {};
+    const tmpDir = `${__dirname}/../../fixture/tmp/`;
 
-    before(function(done) {
+    before((done) => {
       async.series({
-        extractFixture: function(next){
-          var agency_path_fixture =  agenciesFixturesLocal[0].path;
+        extractFixture: (next) => {
+          const agency_path_fixture =  agenciesFixturesLocal[0].path;
           fs.createReadStream(agency_path_fixture)
             .pipe(unzip.Extract({ path: tmpDir }).on('close', next).on('error', onError))
             .on('error', onError);
         },
-        countRowsInGTFSFiles: function(next){
-          async.eachSeries(GTFSFiles, function(file, next){
-            var path = [tmpDir, file.fileNameBase, '.txt'].join('');
+        countRowsInGTFSFiles: (next) => {
+          async.eachSeries(filenames, (file, next) => {
+            const path = [tmpDir, file.fileNameBase, '.txt'].join('');
 
             // GTFS has optional files
             if (!fs.existsSync(path)) {
@@ -65,132 +67,126 @@ describe('lib/import.js', function(){
               return next();
             }
 
-            var parser = parse({columns: true}, function(err, data){
+            const parser = parse({columns: true}, (err, data) => {
               countData[file.collection] = data.length;
               next();
             });
 
             fs.createReadStream(path)
               .pipe(parser)
-              .on('error', function(err){
+              .on('error', (err) => {
                 onError(err);
                 countData[file.collection] = 0;
                 next();
               });
 
-          }, function(err){
-            next();
-          });
+          }, next);
         },
-        connectToDb: function(next){
-          databaseTestSupport.connect(function(err, _db){
+        connectToDb: (next) => {
+          databaseTestSupport.connect((err, _db) => {
             db = _db;
             next();
           });
         },
-        teardownDatabase: function(next){
+        teardownDatabase: (next) => {
           databaseTestSupport.teardown(next);
         },
-        executeDownloadScript: function(next){
+        executeDownloadScript: (next) => {
           importScript(config, next);
         }
-      },function(){
-        done();
-      });
+      }, done);
     });
 
-    after(function(done) {
+    after((done) => {
       async.series({
-        teardownDatabase: function(next){
+        teardownDatabase: (next) => {
           databaseTestSupport.teardown(next);
         },
-        closeDb: function(next){
+        closeDb: (next) => {
           databaseTestSupport.close(next);
         }
-      },function(err, results){
-        done();
-      });
+      }, done);
     });
 
-    it('should import the same number of agencies', function(done){
-      db.collection('agencies').count(function(err, res){
+    it('should import the same number of agencies', (done) => {
+      db.collection('agencies').count((err, res) => {
         res.should.equal(countData.agencies);
         done();
       });
     });
 
-    it('should import the same number of calendars', function(done){
-      db.collection('calendars').count(function(err, res){
+    it('should import the same number of calendars', (done) => {
+      db.collection('calendars').count((err, res) => {
         res.should.equal(countData.calendars);
         done();
       });
     });
 
-    it('should import the same number of calendar_dates', function(done){
-      db.collection('calendardates').count(function(err, res){
+    it('should import the same number of calendar_dates', (done) => {
+      db.collection('calendardates').count((err, res) => {
         res.should.equal(countData.calendardates);
         done();
       });
     });
 
-    it('should import the same number of fare_attributes', function(done){
-      db.collection('fareattributes').count(function(err, res){
+    it('should import the same number of fare_attributes', (done) => {
+      db.collection('fareattributes').count((err, res) => {
         res.should.equal(countData.fareattributes);
         done();
       });
     });
 
-    it('should import the same number of fare_rules', function(done){
-      db.collection('farerules').count(function(err, res){
+    it('should import the same number of fare_rules', (done) => {
+      db.collection('farerules').count((err, res) => {
         res.should.equal(countData.farerules);
         done();
       });
     });
 
-    it('should import the same number of feed_info', function(done){
-      db.collection('feedinfos').count(function(err, res){
+    it('should import the same number of feed_info', (done) => {
+      db.collection('feedinfos').count((err, res) => {
         res.should.equal(countData.feedinfos);
         done();
       });
     });
 
-    it('should import the same number of frequencies', function(done){
-      db.collection('frequencies').count(function(err, res){
+    it('should import the same number of frequencies', (done) => {
+      db.collection('frequencies').count((err, res) => {
         res.should.equal(countData.frequencies);
         done();
       });
     });
 
-    it('should import the same number of routes', function(done){
-      db.collection('routes').count(function(err, res){
+    it('should import the same number of routes', (done) => {
+      db.collection('routes').count((err, res) => {
         res.should.equal(countData.routes);
         done();
       });
     });
 
-    it('should import the same number of shapes', function(done){
-      db.collection('shapes').count(function(err, res){
+    it('should import the same number of shapes', (done) => {
+      db.collection('shapes').count((err, res) => {
         res.should.equal(countData.shapes);
         done();
       });
     });
 
-    it('should import the same number of stops', function(done){
-      db.collection('stops').count(function(err, res){
+    it('should import the same number of stops', (done) => {
+      db.collection('stops').count((err, res) => {
         res.should.equal(countData.stops);
         done();
       });
     });
 
-    it('should import the same number of transfers', function(done){
-      db.collection('transfers').count(function(err, res){
+    it('should import the same number of transfers', (done) => {
+      db.collection('transfers').count((err, res) => {
         res.should.equal(countData.transfers);
         done();
       });
     });
 
-    it('should import the same number of trips', function(done){
-      db.collection('trips').count(function(err, res){
+    it('should import the same number of trips', (done) => {
+      db.collection('trips').count((err, res) => {
         res.should.equal(countData.trips);
         done();
       });
