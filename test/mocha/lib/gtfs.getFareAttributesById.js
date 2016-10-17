@@ -1,6 +1,8 @@
 
 const async = require('async');
 const should = require('should');
+const tk = require('timekeeper');
+const timeReference = new Date();
 
 // libraries
 const config = require('./../../config.json');
@@ -17,9 +19,11 @@ const agenciesFixtures = [{
   path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
 }];
 
+const agency_key = agenciesFixtures[0].agency_key;
+
 config.agencies = agenciesFixtures;
 
-describe('gtfs.getStops(): ', () => {
+describe('gtfs.getFareAttributesById(): ', () => {
 
   before((done) => {
     async.series({
@@ -28,6 +32,10 @@ describe('gtfs.getStops(): ', () => {
           db = _db;
           next();
         });
+      },
+      setupMockDate: (next) => {
+        tk.freeze(timeReference);
+        next();
       }
     }, done);
   });
@@ -39,6 +47,10 @@ describe('gtfs.getStops(): ', () => {
       },
       closeDb: (next) => {
         databaseTestSupport.close(next);
+      },
+      resetMockDate: (next) => {
+        tk.reset();
+        next();
       }
     }, done);
   });
@@ -54,44 +66,37 @@ describe('gtfs.getStops(): ', () => {
     }, done);
   });
 
-  it('should return an empty array if no stops exists for given agency', (done) => {
+  it('should return empty array if no fare_attributes', (done) => {
     async.series({
       teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       }
-    },() => {
-      const agency_key = 'non_existing_agency';
-      gtfs.getStops(agency_key, (err, stops) => {
-        should.exist(stops);
-        stops.should.have.length(0);
+    }, () => {
+      const fareId = 'not_real';
+
+      gtfs.getFareAttributesById(agency_key, fareId, (err, fareAttributes) => {
+        should.not.exists(err);
+        should.not.exists(fareAttributes);
         done();
       });
     });
   });
 
-  it('should return array of stops if it exists for given agency', (done) => {
-    const agency_key = 'caltrain';
+  it('should return expected fare_attributes', (done) => {
+    const fareId = 'OW_2_20120701';
 
-    gtfs.getStops(agency_key, (err, stops) => {
+    gtfs.getFareAttributesById(agency_key, fareId, (err, fareAttribute) => {
       should.not.exist(err);
-      should.exist(stops);
+      should.exist(fareAttribute);
 
-      stops.should.have.length(31);
-      done();
-    });
-  });
+      fareAttribute.agency_key.should.equal(agency_key);
+      fareAttribute.fare_id.should.equal('OW_2_20120701');
+      fareAttribute.price.should.equal(5.0000);
+      fareAttribute.currency_type.should.equal('USD');
+      fareAttribute.payment_method.should.equal(1);
+      should.not.exist(fareAttribute.transfers);
+      should.not.exist(fareAttribute.transfer_duration);
 
-  it('should return array of stops if it exists for given agency, and stop_ids', (done) => {
-    const agency_key = 'caltrain';
-    const stop_ids = [
-      'Burlingame Caltrain',
-      '22nd Street Caltrain'
-    ];
-
-    gtfs.getStops(agency_key, stop_ids, (err, stops) => {
-      should.not.exist(err);
-      should.exist(stops);
-      stops.should.have.length(2);
       done();
     });
   });

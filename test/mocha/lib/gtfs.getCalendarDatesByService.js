@@ -1,6 +1,8 @@
 
 const async = require('async');
 const should = require('should');
+const tk = require('timekeeper');
+const timeReference = new Date();
 
 // libraries
 const config = require('./../../config.json');
@@ -17,9 +19,11 @@ const agenciesFixtures = [{
   path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
 }];
 
+const agency_key = agenciesFixtures[0].agency_key;
+
 config.agencies = agenciesFixtures;
 
-describe('gtfs.getStops(): ', () => {
+describe('gtfs.getCalendarDatesByService(): ', () => {
 
   before((done) => {
     async.series({
@@ -28,6 +32,10 @@ describe('gtfs.getStops(): ', () => {
           db = _db;
           next();
         });
+      },
+      setupMockDate: (next) => {
+        tk.freeze(timeReference);
+        next();
       }
     }, done);
   });
@@ -39,6 +47,10 @@ describe('gtfs.getStops(): ', () => {
       },
       closeDb: (next) => {
         databaseTestSupport.close(next);
+      },
+      resetMockDate: (next) => {
+        tk.reset();
+        next();
       }
     }, done);
   });
@@ -54,44 +66,34 @@ describe('gtfs.getStops(): ', () => {
     }, done);
   });
 
-  it('should return an empty array if no stops exists for given agency', (done) => {
+  it('should return empty array if no calendar dates exist', (done) => {
     async.series({
       teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       }
-    },() => {
-      const agency_key = 'non_existing_agency';
-      gtfs.getStops(agency_key, (err, stops) => {
-        should.exist(stops);
-        stops.should.have.length(0);
+    }, () => {
+      gtfs.getCalendarDatesByService(['WD_20120701'], (err, calendarDates) => {
+        should.not.exists(err);
+        should.exists(calendarDates);
+        calendarDates.should.have.length(0);
         done();
       });
     });
   });
 
-  it('should return array of stops if it exists for given agency', (done) => {
-    const agency_key = 'caltrain';
-
-    gtfs.getStops(agency_key, (err, stops) => {
+  it('should return expected calendar dates', (done) => {
+    gtfs.getCalendarDatesByService(['WD_20120701'], (err, calendarDates) => {
       should.not.exist(err);
-      should.exist(stops);
+      should.exist(calendarDates);
+      calendarDates.length.should.equal(4);
 
-      stops.should.have.length(31);
-      done();
-    });
-  });
+      const calendarDate = calendarDates[0].toObject();
 
-  it('should return array of stops if it exists for given agency, and stop_ids', (done) => {
-    const agency_key = 'caltrain';
-    const stop_ids = [
-      'Burlingame Caltrain',
-      '22nd Street Caltrain'
-    ];
+      calendarDate.agency_key.should.equal(agency_key);
+      calendarDate.service_id.should.equal('WD_20120701');
+      calendarDate.date.should.equal(20120903);
+      calendarDate.exception_type.should.equal(2);
 
-    gtfs.getStops(agency_key, stop_ids, (err, stops) => {
-      should.not.exist(err);
-      should.exist(stops);
-      stops.should.have.length(2);
       done();
     });
   });

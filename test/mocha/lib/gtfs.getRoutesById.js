@@ -1,6 +1,8 @@
 
 const async = require('async');
 const should = require('should');
+const tk = require('timekeeper');
+const timeReference = new Date();
 
 // libraries
 const config = require('./../../config.json');
@@ -17,9 +19,11 @@ const agenciesFixtures = [{
   path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
 }];
 
+const agency_key = agenciesFixtures[0].agency_key;
+
 config.agencies = agenciesFixtures;
 
-describe('gtfs.getStops(): ', () => {
+describe('gtfs.getRoutesById(): ', () => {
 
   before((done) => {
     async.series({
@@ -28,6 +32,10 @@ describe('gtfs.getStops(): ', () => {
           db = _db;
           next();
         });
+      },
+      setupMockDate: (next) => {
+        tk.freeze(timeReference);
+        next();
       }
     }, done);
   });
@@ -39,6 +47,10 @@ describe('gtfs.getStops(): ', () => {
       },
       closeDb: (next) => {
         databaseTestSupport.close(next);
+      },
+      resetMockDate: (next) => {
+        tk.reset();
+        next();
       }
     }, done);
   });
@@ -54,44 +66,39 @@ describe('gtfs.getStops(): ', () => {
     }, done);
   });
 
-  it('should return an empty array if no stops exists for given agency', (done) => {
+  it('should return empty array if no route', (done) => {
     async.series({
       teardownDatabase: (next) => {
         databaseTestSupport.teardown(next);
       }
-    },() => {
-      const agency_key = 'non_existing_agency';
-      gtfs.getStops(agency_key, (err, stops) => {
-        should.exist(stops);
-        stops.should.have.length(0);
+    }, () => {
+      const routeId = 'not_real';
+
+      gtfs.getRoutesById(agency_key, routeId, (err, route) => {
+        should.not.exists(err);
+        should.not.exists(route);
         done();
       });
     });
   });
 
-  it('should return array of stops if it exists for given agency', (done) => {
-    const agency_key = 'caltrain';
+  it('should return expected route', (done) => {
+    const routeId = 'ct_limited_20121001';
 
-    gtfs.getStops(agency_key, (err, stops) => {
+    gtfs.getRoutesById(agency_key, routeId, (err, route) => {
       should.not.exist(err);
-      should.exist(stops);
+      should.exist(route);
 
-      stops.should.have.length(31);
-      done();
-    });
-  });
+      route.agency_key.should.equal(agency_key);
+      route.route_id.should.equal('ct_limited_20121001');
+      route.route_short_name.should.equal('');
+      route.route_long_name.should.equal('Limited');
+      route.route_desc.should.equal('');
+      route.route_type.should.equal(2);
+      route.route_url.should.equal('');
+      route.route_color.should.equal('FEF0B5');
+      route.route_text_color.should.equal('');
 
-  it('should return array of stops if it exists for given agency, and stop_ids', (done) => {
-    const agency_key = 'caltrain';
-    const stop_ids = [
-      'Burlingame Caltrain',
-      '22nd Street Caltrain'
-    ];
-
-    gtfs.getStops(agency_key, stop_ids, (err, stops) => {
-      should.not.exist(err);
-      should.exist(stops);
-      stops.should.have.length(2);
       done();
     });
   });
