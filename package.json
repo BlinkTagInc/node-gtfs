@@ -31,18 +31,18 @@
     "Heath Shurtleff"
   ],
   "dependencies": {
-    "async": "2.0.1",
+    "async": "2.1.2",
     "csv": "1.1.0",
-    "lodash": "4.16.2",
+    "lodash": "4.16.4",
     "mkdirp": "0.5.1",
-    "moment": "2.15.1",
-    "mongodb": "2.2.10",
-    "mongoose": "4.6.2",
+    "moment": "2.15.2",
+    "mongodb": "2.2.11",
+    "mongoose": "4.6.5",
     "proj4": "2.3.15",
-    "request": "2.75.0",
+    "request": "2.76.0",
     "rimraf": "2.5.4",
     "unzip2": "0.2.5",
-    "yargs": "6.0.0"
+    "yargs": "6.3.0"
   },
   "repository": {
     "type": "git",
@@ -51,11 +51,11 @@
   "main": "index",
   "devDependencies": {
     "csv-parse": "1.1.7",
-    "eslint": "3.7.0",
-    "mocha": "3.1.0",
-    "should": "11.1.0",
-    "supertest": "2.0.0",
-    "timekeeper": "0.1.1"
+    "eslint": "3.8.1",
+    "mocha": "3.1.2",
+    "should": "11.1.1",
+    "supertest": "2.0.1",
+    "timekeeper": "1.0.0"
   },
   "scripts": {
     "import": "node lib/import.js",
