@@ -1,7 +1,7 @@
 {
   "name": "gtfs",
   "description": "Import GTFS transit data into mongodb and expose routes, stops, times and more",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "keywords": [
     "transit",
     "gtfs",
@@ -59,7 +59,7 @@
   },
   "scripts": {
     "import": "node lib/import.js",
-    "test": "NODE_ENV=test mocha ./test/mocha/**/*.js --reporter spec --timeout 5000",
+    "test": "NODE_ENV=test mocha ./test/mocha/**/*.js --timeout 5000",
     "lint": "eslint ."
   },
   "license": "MIT"
