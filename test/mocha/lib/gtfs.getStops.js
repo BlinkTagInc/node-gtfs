@@ -1,4 +1,3 @@
-
 const async = require('async');
 const should = require('should');
 
@@ -8,8 +7,7 @@ const gtfs = require('./../../../');
 const importScript = require('../../../lib/import');
 
 // test support
-const databaseTestSupport = require('./../../support/database')(config);
-let db;
+const databaseTestSupport = require('./../../support/database');
 
 // setup fixtures
 const agenciesFixtures = [{
@@ -22,14 +20,7 @@ config.agencies = agenciesFixtures;
 describe('gtfs.getStops(): ', () => {
 
   before((done) => {
-    async.series({
-      connectToDb: (next) => {
-        databaseTestSupport.connect((err, _db) => {
-          db = _db;
-          next();
-        });
-      }
-    }, done);
+    databaseTestSupport.connect(config, done);
   });
 
   after((done) => {

@@ -1,8 +1,5 @@
-
 const async = require('async');
 const should = require('should');
-const tk = require('timekeeper');
-const timeReference = new Date();
 
 // libraries
 const config = require('./../../config.json');
@@ -10,8 +7,7 @@ const gtfs = require('./../../../');
 const importScript = require('../../../lib/import');
 
 // test support
-const databaseTestSupport = require('./../../support/database')(config);
-let db;
+const databaseTestSupport = require('./../../support/database');
 
 // setup fixtures
 const agenciesFixtures = [{
@@ -26,18 +22,7 @@ config.agencies = agenciesFixtures;
 describe('gtfs.getCalendarsByService(): ', () => {
 
   before((done) => {
-    async.series({
-      connectToDb: (next) => {
-        databaseTestSupport.connect((err, _db) => {
-          db = _db;
-          next();
-        });
-      },
-      setupMockDate: (next) => {
-        tk.freeze(timeReference);
-        next();
-      }
-    }, done);
+    databaseTestSupport.connect(config, done);
   });
 
   after((done) => {
@@ -47,10 +32,6 @@ describe('gtfs.getCalendarsByService(): ', () => {
       },
       closeDb: (next) => {
         databaseTestSupport.close(next);
-      },
-      resetMockDate: (next) => {
-        tk.reset();
-        next();
       }
     }, done);
   });

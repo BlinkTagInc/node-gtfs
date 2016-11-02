@@ -16,7 +16,7 @@ const agenciesFixturesLocal = [{
   path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
 }];
 
-const databaseTestSupport = require('./../../support/database')(config);
+const databaseTestSupport = require('./../../support/database');
 
 const filenames = require('../../../lib/filenames');
 
@@ -83,9 +83,9 @@ describe('lib/import.js', function() {
           }, next);
         },
         connectToDb: (next) => {
-          databaseTestSupport.connect((err, _db) => {
-            db = _db;
-            next();
+          databaseTestSupport.connect(config, (err, client) => {
+            db = client;
+            next(err);
           });
         },
         teardownDatabase: (next) => {

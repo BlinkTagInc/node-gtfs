@@ -1,4 +1,3 @@
-
 const async = require('async');
 const should = require('should');
 
@@ -8,8 +7,7 @@ const gtfs = require('./../../../');
 const importScript = require('../../../lib/import');
 
 // test support
-const databaseTestSupport = require('./../../support/database')(config);
-let db;
+const databaseTestSupport = require('./../../support/database');
 
 // setup fixtures
 const agenciesFixtures = [{
@@ -22,14 +20,7 @@ config.agencies = agenciesFixtures;
 describe('gtfs.getStopsByRoute(): ', () => {
 
   before((done) => {
-    async.series({
-      connectToDb: (next) => {
-        databaseTestSupport.connect((err, _db) => {
-          db = _db;
-          next();
-        });
-      }
-    }, done);
+    databaseTestSupport.connect(config, done);
   });
 
   after(function(done) {
@@ -172,8 +163,8 @@ describe('gtfs.getStopsByRoute(): ', () => {
     const agency_key = 'caltrain';
     const route_id = 'ct_local_20120701';
 
-    const expectedResults = {
-      0: {
+    const expectedResults = [
+      {
         direction_id: 0,
         stops_count: 24,
         stops: [
@@ -203,7 +194,7 @@ describe('gtfs.getStopsByRoute(): ', () => {
           'San Francisco Caltrain'
         ]
       },
-      1: {
+      {
         direction_id: 1,
         stops_count: 29,
         stops: [
@@ -238,7 +229,7 @@ describe('gtfs.getStopsByRoute(): ', () => {
           'Gilroy Caltrain'
         ]
       }
-    };
+    ];
 
     gtfs.getStopsByRoute(agency_key, route_id, (err, results) => {
       should.not.exist(err);

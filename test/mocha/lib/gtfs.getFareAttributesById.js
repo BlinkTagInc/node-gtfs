@@ -1,8 +1,5 @@
-
 const async = require('async');
 const should = require('should');
-const tk = require('timekeeper');
-const timeReference = new Date();
 
 // libraries
 const config = require('./../../config.json');
@@ -10,8 +7,7 @@ const gtfs = require('./../../../');
 const importScript = require('../../../lib/import');
 
 // test support
-const databaseTestSupport = require('./../../support/database')(config);
-let db;
+const databaseTestSupport = require('./../../support/database');
 
 // setup fixtures
 const agenciesFixtures = [{
@@ -26,18 +22,7 @@ config.agencies = agenciesFixtures;
 describe('gtfs.getFareAttributesById(): ', () => {
 
   before((done) => {
-    async.series({
-      connectToDb: (next) => {
-        databaseTestSupport.connect((err, _db) => {
-          db = _db;
-          next();
-        });
-      },
-      setupMockDate: (next) => {
-        tk.freeze(timeReference);
-        next();
-      }
-    }, done);
+    databaseTestSupport.connect(config, done);
   });
 
   after((done) => {
@@ -47,10 +32,6 @@ describe('gtfs.getFareAttributesById(): ', () => {
       },
       closeDb: (next) => {
         databaseTestSupport.close(next);
-      },
-      resetMockDate: (next) => {
-        tk.reset();
-        next();
       }
     }, done);
   });
@@ -89,13 +70,19 @@ describe('gtfs.getFareAttributesById(): ', () => {
       should.not.exist(err);
       should.exist(fareAttribute);
 
-      fareAttribute.agency_key.should.equal(agency_key);
-      fareAttribute.fare_id.should.equal('OW_2_20120701');
-      fareAttribute.price.should.equal(5.0000);
-      fareAttribute.currency_type.should.equal('USD');
-      fareAttribute.payment_method.should.equal(1);
-      should.not.exist(fareAttribute.transfers);
-      should.not.exist(fareAttribute.transfer_duration);
+      const expectedFareAttribute = {
+        fare_id: 'OW_2_20120701',
+        price: 5.0000,
+        currency_type: 'USD',
+        payment_method: 1,
+        transfers: null,
+        transfer_duration: null,
+        agency_key: 'caltrain'
+      };
+
+      const fareAttributeFormatted = fareAttribute.toObject();
+      delete fareAttributeFormatted._id;
+      expectedFareAttribute.should.match(fareAttributeFormatted);
 
       done();
     });

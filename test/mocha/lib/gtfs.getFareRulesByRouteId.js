@@ -1,8 +1,5 @@
-
 const async = require('async');
 const should = require('should');
-const tk = require('timekeeper');
-const timeReference = new Date();
 
 // libraries
 const config = require('./../../config.json');
@@ -10,8 +7,7 @@ const gtfs = require('./../../../');
 const importScript = require('../../../lib/import');
 
 // test support
-const databaseTestSupport = require('./../../support/database')(config);
-let db;
+const databaseTestSupport = require('./../../support/database');
 
 // setup fixtures
 const agenciesFixtures = [{
@@ -26,18 +22,7 @@ config.agencies = agenciesFixtures;
 describe('gtfs.getFareRulesByRouteId(): ', () => {
 
   before((done) => {
-    async.series({
-      connectToDb: (next) => {
-        databaseTestSupport.connect((err, _db) => {
-          db = _db;
-          next();
-        });
-      },
-      setupMockDate: (next) => {
-        tk.freeze(timeReference);
-        next();
-      }
-    }, done);
+    databaseTestSupport.connect(config, done);
   });
 
   after((done) => {
@@ -47,10 +32,6 @@ describe('gtfs.getFareRulesByRouteId(): ', () => {
       },
       closeDb: (next) => {
         databaseTestSupport.close(next);
-      },
-      resetMockDate: (next) => {
-        tk.reset();
-        next();
       }
     }, done);
   });
@@ -93,21 +74,12 @@ describe('gtfs.getFareRulesByRouteId(): ', () => {
 
       const fareRule = fareRules[0].toObject();
 
-      const expectedFareRule = {
-        fare_id: 'OW_1_20120701',
-        route_id: 'ct_bullet_20120701',
-        origin_id: '1',
-        destination_id: '1',
-        contains_id: '',
-        agency_key: 'caltrain'
-      };
-
-      fareRule.agency_key.should.equal(expectedFareRule.agency_key);
-      fareRule.fare_id.should.equal(expectedFareRule.fare_id);
-      fareRule.route_id.should.equal(expectedFareRule.route_id);
-      fareRule.origin_id.should.equal(expectedFareRule.origin_id);
-      fareRule.destination_id.should.equal(expectedFareRule.destination_id);
-      fareRule.contains_id.should.equal(expectedFareRule.contains_id);
+      fareRule.agency_key.should.equal(agenciesFixtures[0].agency_key);
+      should.exist(fareRule.fare_id);
+      fareRule.route_id.should.equal(routeId);
+      should.exist(fareRule.origin_id);
+      should.exist(fareRule.destination_id);
+      should.exist(fareRule.contains_id);
 
       done();
     });

@@ -1,8 +1,5 @@
-
 const async = require('async');
 const should = require('should');
-const tk = require('timekeeper');
-const timeReference = new Date();
 
 // libraries
 const config = require('./../../config.json');
@@ -10,8 +7,7 @@ const gtfs = require('./../../../');
 const importScript = require('../../../lib/import');
 
 // test support
-const databaseTestSupport = require('./../../support/database')(config);
-let db;
+const databaseTestSupport = require('./../../support/database');
 
 // setup fixtures
 const agenciesFixtures = [{
@@ -26,18 +22,7 @@ config.agencies = agenciesFixtures;
 describe('gtfs.getCalendars(): ', () => {
 
   before((done) => {
-    async.series({
-      connectToDb: (next) => {
-        databaseTestSupport.connect((err, _db) => {
-          db = _db;
-          next();
-        });
-      },
-      setupMockDate: (next) => {
-        tk.freeze(timeReference);
-        next();
-      }
-    }, done);
+    databaseTestSupport.connect(config, done);
   });
 
   after((done) => {
@@ -47,10 +32,6 @@ describe('gtfs.getCalendars(): ', () => {
       },
       closeDb: (next) => {
         databaseTestSupport.close(next);
-      },
-      resetMockDate: (next) => {
-        tk.reset();
-        next();
       }
     }, done);
   });
@@ -107,19 +88,23 @@ describe('gtfs.getCalendars(): ', () => {
       should.exist(calendars);
       calendars.length.should.equal(1);
 
-      const calendar = calendars[0].toObject();
+      const expectedCalendar = {
+        service_id: 'WD_20121001',
+        monday: 1,
+        tuesday: 1,
+        wednesday: 1,
+        thursday: 1,
+        friday: 1,
+        saturday: 0,
+        sunday: 0,
+        start_date: 20121001,
+        end_date: 20131001,
+        agency_key: 'caltrain'
+      };
 
-      calendar.agency_key.should.equal(agency_key);
-      calendar.service_id.should.equal('WD_20121001');
-      calendar.monday.should.equal(1);
-      calendar.tuesday.should.equal(1);
-      calendar.wednesday.should.equal(1);
-      calendar.thursday.should.equal(1);
-      calendar.friday.should.equal(1);
-      calendar.saturday.should.equal(0);
-      calendar.sunday.should.equal(0);
-      calendar.start_date.should.equal(20121001);
-      calendar.end_date.should.equal(20131001);
+      const calendarFormatted = calendars[0].toObject();
+      delete calendarFormatted._id;
+      expectedCalendar.should.match(calendarFormatted);
 
       done();
     });

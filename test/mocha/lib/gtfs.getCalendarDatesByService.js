@@ -1,8 +1,5 @@
-
 const async = require('async');
 const should = require('should');
-const tk = require('timekeeper');
-const timeReference = new Date();
 
 // libraries
 const config = require('./../../config.json');
@@ -10,8 +7,7 @@ const gtfs = require('./../../../');
 const importScript = require('../../../lib/import');
 
 // test support
-const databaseTestSupport = require('./../../support/database')(config);
-let db;
+const databaseTestSupport = require('./../../support/database');
 
 // setup fixtures
 const agenciesFixtures = [{
@@ -26,18 +22,7 @@ config.agencies = agenciesFixtures;
 describe('gtfs.getCalendarDatesByService(): ', () => {
 
   before((done) => {
-    async.series({
-      connectToDb: (next) => {
-        databaseTestSupport.connect((err, _db) => {
-          db = _db;
-          next();
-        });
-      },
-      setupMockDate: (next) => {
-        tk.freeze(timeReference);
-        next();
-      }
-    }, done);
+    databaseTestSupport.connect(config, done);
   });
 
   after((done) => {
@@ -47,10 +32,6 @@ describe('gtfs.getCalendarDatesByService(): ', () => {
       },
       closeDb: (next) => {
         databaseTestSupport.close(next);
-      },
-      resetMockDate: (next) => {
-        tk.reset();
-        next();
       }
     }, done);
   });
@@ -87,12 +68,38 @@ describe('gtfs.getCalendarDatesByService(): ', () => {
       should.exist(calendarDates);
       calendarDates.length.should.equal(4);
 
-      const calendarDate = calendarDates[0].toObject();
+      const expectedCalendarDates = [
+        {
+          service_id: 'WD_20120701',
+          date: 20120903,
+          exception_type: 2,
+          agency_key: 'caltrain'
+        },
+        {
+          service_id: 'WD_20120701',
+          date: 20121122,
+          exception_type: 2,
+          agency_key: 'caltrain'
+        },
+        {
+          service_id: 'WD_20120701',
+          date: 20121225,
+          exception_type: 2,
+          agency_key: 'caltrain'
+        },
+        {
+          service_id: 'WD_20120701',
+          date: 20130101,
+          exception_type: 2,
+          agency_key: 'caltrain'
+        }
+      ];
 
-      calendarDate.agency_key.should.equal(agency_key);
-      calendarDate.service_id.should.equal('WD_20120701');
-      calendarDate.date.should.equal(20120903);
-      calendarDate.exception_type.should.equal(2);
+      calendarDates.forEach((calendarDate) => {
+        const calendarDateFormatted = calendarDate.toObject();
+        delete calendarDateFormatted._id;
+        expectedCalendarDates.should.matchAny(calendarDateFormatted);
+      });
 
       done();
     });

@@ -2,32 +2,22 @@ const async = require('async');
 const MongoClient = require('mongodb').MongoClient;
 const should = require('should');
 
-function DatabaseTestSupport(config) {
-  if (!(this instanceof DatabaseTestSupport)) {
-    return new DatabaseTestSupport(config);
-  }
+let db;
 
-  this.config = config;
-  this.db =  null;
-}
-
-DatabaseTestSupport.prototype.connect = function(cb) {
-  MongoClient.connect(this.config.mongo_url, {w: 1}, (err, db) => {
+exports.connect = (config, cb) => {
+  // Open the connection to the server
+  MongoClient.connect(config.mongo_url, (err, client) => {
     should.not.exists(err);
-    should.exists(db);
-    this.db = db;
-    cb(err, this.db);
+    should.exists(client);
+    db = client;
+    cb(null, db);
   });
 };
 
-DatabaseTestSupport.prototype.teardown = function(cb) {
-  if (!this.db || !this.db.collections) {
-    return cb(new Error('Missing collections'));
-  }
-
-  this.db.collections((err, collections) => {
+exports.teardown = (cb) => {
+  db.collections((err, collections) => {
     if (err) {
-      return cb(err, null);
+      return cb(err);
     }
 
     if (!collections) {
@@ -44,8 +34,6 @@ DatabaseTestSupport.prototype.teardown = function(cb) {
   });
 };
 
-DatabaseTestSupport.prototype.close = function(cb) {
-  this.db.close(cb);
+exports.close = (cb) => {
+  db.close(cb);
 };
-
-module.exports = DatabaseTestSupport;

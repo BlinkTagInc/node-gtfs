@@ -1,4 +1,3 @@
-
 const async = require('async');
 const should = require('should');
 const tk = require('timekeeper');
@@ -10,8 +9,7 @@ const gtfs = require('./../../../');
 const importScript = require('../../../lib/import');
 
 // test support
-const databaseTestSupport = require('./../../support/database')(config);
-let db;
+const databaseTestSupport = require('./../../support/database');
 
 // setup fixtures
 const agenciesFixtures = [{
@@ -26,10 +24,7 @@ describe('gtfs.getAgency(): ', function(){
   before((done) => {
     async.series({
       connectToDb: (next) => {
-        databaseTestSupport.connect((err, _db) => {
-          db = _db;
-          next();
-        });
+        databaseTestSupport.connect(config, next);
       },
       setupMockDate: (next) => {
         tk.freeze(timeReference);
