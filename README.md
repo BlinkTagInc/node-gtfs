@@ -161,9 +161,26 @@ If you don't want all GTFS files to be imported, you can specify an array of fil
 
     npm run import
 
+### Command Line options
+
+Note the two sets of dashes in each command `--`.
+
+#### Skip Delete
 By default, the import script will delete any existing data with the same `agency_key` from your database. If you don't want this to happen, pass the `--skip-delete` flag
 
     npm run import -- --skip-delete
+
+#### Specify path to config JSON file
+You can specify the path to a config file to be used by the import script.
+
+    npm run import -- --config-path /path/to/your/custom-config.json
+
+
+#### Show help
+Show all command line options
+
+    npm run import -- --help
+
 
 ### Scheduling
 
