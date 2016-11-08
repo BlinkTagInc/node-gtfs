@@ -2,6 +2,7 @@ const fs = require('fs');
 const async = require('async');
 const unzip = require('unzip2');
 const parse = require('csv-parse');
+const path = require('path');
 
 const config = require('./../../config.json');
 const importScript = require('../../../lib/import');
@@ -13,19 +14,16 @@ const agenciesFixturesUrl = [{
 
 const agenciesFixturesLocal = [{
   agency_key: 'caltrain',
-  path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
+  path: path.join(__dirname, '/../../fixture/caltrain_20120824_0333.zip')
 }];
 
-const databaseTestSupport = require('./../../support/database');
+const database = require('./../../support/database');
 
 const filenames = require('../../../lib/filenames');
 
-describe('lib/import.js', function() {
-
+describe('lib/import.js', function testImport() {
   this.timeout(10000);
-
-  describe('Download and import from different GTFS sources', function(){
-
+  describe('Download and import from different GTFS sources', () => {
     it('should be able to download and import from HTTP', (done) => {
       config.agencies = agenciesFixturesUrl;
       importScript(config, done);
@@ -38,7 +36,6 @@ describe('lib/import.js', function() {
   });
 
   describe('Verify data imported into database', () => {
-
     config.agencies = agenciesFixturesLocal;
 
     const onError = (err) => {
@@ -47,49 +44,48 @@ describe('lib/import.js', function() {
 
     let db;
     const countData = {};
-    const tmpDir = `${__dirname}/../../fixture/tmp/`;
+    const tmpDir = path.join(__dirname, '/../../fixture/tmp/');
 
     before((done) => {
       async.series({
         extractFixture: (next) => {
-          const agency_path_fixture =  agenciesFixturesLocal[0].path;
-          fs.createReadStream(agency_path_fixture)
+          const agencyPathFixture = agenciesFixturesLocal[0].path;
+          fs.createReadStream(agencyPathFixture)
             .pipe(unzip.Extract({ path: tmpDir }).on('close', next).on('error', onError))
             .on('error', onError);
         },
         countRowsInGTFSFiles: (next) => {
           async.eachSeries(filenames, (file, next) => {
-            const path = [tmpDir, file.fileNameBase, '.txt'].join('');
+            const filePath = path.join(tmpDir, `${file.fileNameBase}.txt`);
 
             // GTFS has optional files
-            if (!fs.existsSync(path)) {
+            if (!fs.existsSync(filePath)) {
               countData[file.collection] = 0;
               return next();
             }
 
-            const parser = parse({columns: true}, (err, data) => {
+            const parser = parse({ columns: true }, (err, data) => {
               countData[file.collection] = data.length;
               next();
             });
 
-            fs.createReadStream(path)
+            return fs.createReadStream(filePath)
               .pipe(parser)
               .on('error', (err) => {
                 onError(err);
                 countData[file.collection] = 0;
                 next();
               });
-
           }, next);
         },
         connectToDb: (next) => {
-          databaseTestSupport.connect(config, (err, client) => {
+          database.connect(config, (err, client) => {
             db = client;
             next(err);
           });
         },
         teardownDatabase: (next) => {
-          databaseTestSupport.teardown(next);
+          database.teardown(next);
         },
         executeDownloadScript: (next) => {
           importScript(config, next);
@@ -100,10 +96,10 @@ describe('lib/import.js', function() {
     after((done) => {
       async.series({
         teardownDatabase: (next) => {
-          databaseTestSupport.teardown(next);
+          database.teardown(next);
         },
         closeDb: (next) => {
-          databaseTestSupport.close(next);
+          database.close(next);
         }
       }, done);
     });

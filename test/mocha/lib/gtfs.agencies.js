@@ -1,6 +1,8 @@
 const async = require('async');
+const path = require('path');
 const should = require('should');
 const tk = require('timekeeper');
+
 const timeReference = new Date();
 
 // libraries
@@ -9,12 +11,12 @@ const gtfs = require('./../../../');
 const importScript = require('../../../lib/import');
 
 // test support
-const databaseTestSupport = require('./../../support/database');
+const database = require('./../../support/database');
 
 // setup fixtures
 const agenciesFixtures = [{
   agency_key: 'caltrain',
-  path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
+  path: path.join(__dirname, '/../../fixture/caltrain_20120824_0333.zip')
 }];
 
 config.agencies = agenciesFixtures;
@@ -23,7 +25,7 @@ describe('gtfs.agencies(): ', () => {
   before((done) => {
     async.series({
       connectToDb: (next) => {
-        databaseTestSupport.connect(config, next);
+        database.connect(config, next);
       },
       setupMockDate: (next) => {
         tk.freeze(timeReference);
@@ -35,10 +37,10 @@ describe('gtfs.agencies(): ', () => {
   after((done) => {
     async.series({
       teardownDatabase: (next) => {
-        databaseTestSupport.teardown(next);
+        database.teardown(next);
       },
       closeDb: (next) => {
-        databaseTestSupport.close(next);
+        database.close(next);
       },
       resetMockDate: (next) => {
         tk.reset();
@@ -47,10 +49,10 @@ describe('gtfs.agencies(): ', () => {
     }, done);
   });
 
-  beforeEach((done)=> {
+  beforeEach((done) => {
     async.series({
       teardownDatabase: (next) => {
-        databaseTestSupport.teardown(next);
+        database.teardown(next);
       },
       executeDownloadScript: (next) => {
         importScript(config, next);
@@ -61,7 +63,7 @@ describe('gtfs.agencies(): ', () => {
   it('should return empty array if no agencies exists', (done) => {
     async.series({
       teardownDatabase: (next) => {
-        databaseTestSupport.teardown(next);
+        database.teardown(next);
       }
     }, () => {
       gtfs.agencies((err, agencies) => {

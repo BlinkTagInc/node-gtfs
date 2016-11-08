@@ -1,4 +1,5 @@
 const async = require('async');
+const path = require('path');
 const should = require('should');
 
 // libraries
@@ -7,12 +8,12 @@ const gtfs = require('./../../../');
 const importScript = require('../../../lib/import');
 
 // test support
-const databaseTestSupport = require('./../../support/database');
+const database = require('./../../support/database');
 
 // setup fixtures
 const agenciesFixtures = [{
   agency_key: 'caltrain',
-  path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
+  path: path.join(__dirname, '/../../fixture/caltrain_20120824_0333.zip')
 }];
 
 const agency_key = agenciesFixtures[0].agency_key;
@@ -23,16 +24,16 @@ config.agencies = agenciesFixtures;
 describe('gtfs.getRoutesByAgency(): ', () => {
 
   before((done) => {
-    databaseTestSupport.connect(config, done);
+    database.connect(config, done);
   });
 
   after((done) => {
     async.series({
       teardownDatabase: (next) => {
-        databaseTestSupport.teardown(next);
+        database.teardown(next);
       },
       closeDb: (next) => {
-        databaseTestSupport.close(next);
+        database.close(next);
       }
     }, done);
   });
@@ -40,7 +41,7 @@ describe('gtfs.getRoutesByAgency(): ', () => {
   beforeEach((done) => {
     async.series({
       teardownDatabase: (next) => {
-        databaseTestSupport.teardown(next);
+        database.teardown(next);
       },
       executeDownloadScript: (next) => {
         importScript(config, next);
@@ -51,7 +52,7 @@ describe('gtfs.getRoutesByAgency(): ', () => {
   it('should return empty array if no routes for given agency exists (agency_id not provided)', (done) => {
     async.series({
       teardownDatabase: (next) => {
-        databaseTestSupport.teardown(next);
+        database.teardown(next);
       }
     }, () => {
       gtfs.getRoutesByAgency(agency_key, (err, res) => {
@@ -162,7 +163,7 @@ describe('gtfs.getRoutesByAgency(): ', () => {
   it('should return empty array if no routes for given agency exists (agency_id provided)', (done) => {
     async.series({
       teardownDatabase: (next) => {
-        databaseTestSupport.teardown(next);
+        database.teardown(next);
       }
     }, () => {
       gtfs.getRoutesByAgency(agency_key, agency_id, (err, res) => {

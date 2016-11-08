@@ -1,4 +1,5 @@
 const async = require('async');
+const path = require('path');
 const should = require('should');
 
 // libraries
@@ -7,12 +8,12 @@ const gtfs = require('./../../../');
 const importScript = require('../../../lib/import');
 
 // test support
-const databaseTestSupport = require('./../../support/database');
+const database = require('./../../support/database');
 
 // setup fixtures
 const agenciesFixtures = [{
   agency_key: 'caltrain',
-  path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
+  path: path.join(__dirname, '/../../fixture/caltrain_20120824_0333.zip')
 }];
 
 config.agencies = agenciesFixtures;
@@ -20,16 +21,16 @@ config.agencies = agenciesFixtures;
 describe('gtfs.getStopsByRoute(): ', () => {
 
   before((done) => {
-    databaseTestSupport.connect(config, done);
+    database.connect(config, done);
   });
 
   after(function(done) {
     async.series({
       teardownDatabase: (next) => {
-        databaseTestSupport.teardown(next);
+        database.teardown(next);
       },
       closeDb: (next) => {
-        databaseTestSupport.close(next);
+        database.close(next);
       }
     }, done);
   });
@@ -37,7 +38,7 @@ describe('gtfs.getStopsByRoute(): ', () => {
   beforeEach((done) => {
     async.series({
       teardownDatabase: (next) => {
-        databaseTestSupport.teardown(next);
+        database.teardown(next);
       },
       executeDownloadScript: (next) => {
         importScript(config, next);
@@ -48,7 +49,7 @@ describe('gtfs.getStopsByRoute(): ', () => {
   it('should return an empty array if no stops exists for given agency, route and direction', (done) => {
     async.series({
       teardownDatabase: (next) => {
-        databaseTestSupport.teardown(next);
+        database.teardown(next);
       }
     }, () => {
       const agency_key = 'non_existing_agency';

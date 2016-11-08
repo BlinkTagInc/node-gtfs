@@ -1,6 +1,8 @@
 const async = require('async');
+const path = require('path');
 const should = require('should');
 const tk = require('timekeeper');
+
 const timeReference = new Date();
 
 // libraries
@@ -9,12 +11,12 @@ const gtfs = require('./../../../');
 const importScript = require('../../../lib/import');
 
 // test support
-const databaseTestSupport = require('./../../support/database');
+const database = require('./../../support/database');
 
 // setup fixtures
 const agenciesFixtures = [{
   agency_key: 'caltrain',
-  path: __dirname + '/../../fixture/caltrain_20120824_0333.zip'
+  path: path.join(__dirname, '/../../fixture/caltrain_20120824_0333.zip')
 }];
 
 config.agencies = agenciesFixtures;
@@ -24,7 +26,7 @@ describe('gtfs.getAgency(): ', function(){
   before((done) => {
     async.series({
       connectToDb: (next) => {
-        databaseTestSupport.connect(config, next);
+        database.connect(config, next);
       },
       setupMockDate: (next) => {
         tk.freeze(timeReference);
@@ -36,10 +38,10 @@ describe('gtfs.getAgency(): ', function(){
   after((done) => {
     async.series({
       teardownDatabase: (next) => {
-        databaseTestSupport.teardown(next);
+        database.teardown(next);
       },
       closeDb: (next) => {
-        databaseTestSupport.close(next);
+        database.close(next);
       },
       resetMockDate: (next) => {
         tk.reset();
@@ -51,7 +53,7 @@ describe('gtfs.getAgency(): ', function(){
   beforeEach((done) => {
     async.series({
       teardownDatabase: (next) => {
-        databaseTestSupport.teardown(next);
+        database.teardown(next);
       },
       executeDownloadScript: (next) => {
         importScript(config, next);
@@ -62,7 +64,7 @@ describe('gtfs.getAgency(): ', function(){
   it('should return null if agency_key does not exist (no agency_id provided)', (done) => {
     async.series({
       teardownDatabase: (next) => {
-        databaseTestSupport.teardown(next);
+        database.teardown(next);
       }
     }, () => {
       const agency_key = 'caltrain-NOT';
@@ -115,7 +117,7 @@ describe('gtfs.getAgency(): ', function(){
   it('should return null if agency_key does not exist (agency_id provided)', (done) => {
     async.series({
       teardownDatabase: (next) => {
-        databaseTestSupport.teardown(next);
+        database.teardown(next);
       }
     }, () => {
       const agency_key = 'caltrain-NOT';
