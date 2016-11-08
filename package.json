@@ -33,13 +33,13 @@
   "dependencies": {
     "async": "2.1.2",
     "csv": "1.1.0",
-    "lodash": "4.16.4",
+    "lodash": "4.16.6",
     "mkdirp": "0.5.1",
     "moment": "2.15.2",
     "mongodb": "2.2.11",
-    "mongoose": "4.6.5",
+    "mongoose": "4.6.6",
     "proj4": "2.3.15",
-    "request": "2.76.0",
+    "request": "2.78.0",
     "rimraf": "2.5.4",
     "unzip2": "0.2.5",
     "yargs": "6.3.0"
@@ -56,7 +56,6 @@
     "eslint-plugin-import": "2.2.0",
     "mocha": "3.1.2",
     "should": "11.1.1",
-    "supertest": "2.0.1",
     "timekeeper": "1.0.0"
   },
   "scripts": {
