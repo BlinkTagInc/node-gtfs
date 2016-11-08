@@ -234,10 +234,11 @@ Returns an array of agencies within a `radius` of the `lat`, `lon` specified.
 
     });
 
+`radius` is optional and in miles. Default: 25 miles.
+
 #### Get a specific agency
 
 Returns an agency.  An `agency_key` is required, optionally you can specify an `agency_id` for GTFS files that have more than one agency listed in `agencies.txt`.
-
 
     gtfs.getAgency(agency_key, function(err, agency) {
 
@@ -275,7 +276,7 @@ Returns an array of routes within a `radius` of the `lat`, `lon` specified.
 
     });
 
-`radius` is optional and in miles.  Default: 1 mile.
+`radius` is optional and in miles. Default: 1 mile.
 
 #### Routes that serve a specific stop
 
@@ -311,7 +312,7 @@ Returns an array of stops within a `radius` of the `lat`, `lon` specified
 
     });
 
-`radius` is optional and in miles.  Default: 1 mile
+`radius` is optional and in miles. Default: 1 mile
 
 #### Stop times for a trip
 
@@ -350,7 +351,7 @@ specified sorted by `shape_pt_sequence`.
 
     });
 
-`service_ids` is optional
+`direction_id` and `service_ids` are  optional
 
 #### Calendars
 
