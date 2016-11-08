@@ -198,6 +198,8 @@ Returns an array of agencies within a `radius` of the `lat`, `lon` specified.
 
     });
 
+`radius` is optional and in miles.  Default: 25 miles.
+
 ### Get a specific agency
 
 Returns an agency.  An `agency_key` is required, optionally you can specify an `agency_id` for GTFS files that have more than one agency listed in `agencies.txt`.
@@ -314,7 +316,7 @@ specified sorted by `shape_pt_sequence`.
 
     });
 
-`service_ids` is optional
+`direction_id` and `service_ids` are  optional
 
 ### Calendars
 

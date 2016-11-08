@@ -28,7 +28,8 @@
     "Adam Pitchie",
     "Daniel Demidov",
     "gerlacdt",
-    "Heath Shurtleff"
+    "Heath Shurtleff",
+    "Marcelo Muñoz Araya <ma.munoz.araya@gmail.com>"
   ],
   "dependencies": {
     "async": "2.1.2",
