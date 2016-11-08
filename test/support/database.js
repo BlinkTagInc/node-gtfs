@@ -1,6 +1,9 @@
 const async = require('async');
 const MongoClient = require('mongodb').MongoClient;
 const should = require('should');
+const mongoose = require('mongoose');
+
+mongoose.Promise = global.Promise;
 
 let db;
 
@@ -10,7 +13,15 @@ exports.connect = (config, cb) => {
     should.not.exists(err);
     should.exists(client);
     db = client;
-    cb(null, db);
+
+    // use mongoose to connect
+    mongoose.connect(config.mongo_url, (err) => {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, db);
+    });
   });
 };
 
@@ -35,5 +46,10 @@ exports.teardown = (cb) => {
 };
 
 exports.close = (cb) => {
-  db.close(cb);
+  db.close((err) => {
+    if (err) {
+      return cb(err);
+    }
+    mongoose.disconnect(cb);
+  });
 };

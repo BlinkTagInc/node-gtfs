@@ -5,9 +5,14 @@
 [![npm](https://img.shields.io/npm/dm/gtfs.svg?style=flat)]()
 
 `node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/),
-unzips it and stores it to a MongoDB database. In addition, it provides some
-methods to query for agencies, routes, stops and times.  It also has spatial
+unzips it and stores it to a MongoDB database. In addition, this library provides some
+methods to query for agencies, routes, stops and times. It also has spatial
 queries to find nearby stops, routes and agencies.
+
+This library has two parts: the [GTFS import script](#gtf-import-script) and the [query methods](#query-methods).
+
+
+
 
 ## Example Application
 
@@ -39,7 +44,7 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 
 ### Agencies
 
-Before you can use gtfs-to-html you must specify the transit agencies you'd
+Before you can use `gtfs-to-html` you must specify the transit agencies you'd
 like to use.
 
 You can specify agencies using a `url` to the GTFS file or a local `path`.
@@ -151,15 +156,23 @@ If you don't want all GTFS files to be imported, you can specify an array of fil
 }
 ```
 
-## Importing Data
+## GTFS Import Script
+
+The GTFS import script reads from a JSON configuration file and imports the GTFS files specified to a MongoDB database. See above for information on setting up your configuration file.
 
 ### Make sure mongo is running
+
+If you want to run this locally, make sure mongo in installed and running.
 
     mongod
 
 ### Run the import script
 
     npm run import
+
+By default, it will look for a `config.json` file in the project root. To specify a different path for the configuration file:
+
+    npm run import -- --config-path /path/to/your/custom-config.json
 
 ### Command Line options
 
@@ -175,31 +188,40 @@ You can specify the path to a config file to be used by the import script.
 
     npm run import -- --config-path /path/to/your/custom-config.json
 
-
 #### Show help
 Show all command line options
 
     npm run import -- --help
 
 
-### Scheduling
+## Query Methods
 
-To keep schedules up to date, you could schedule this to occur once per day.
+This library includes many methods you can use in your project to query GTFS data.
 
-# Querying data
 
-You can include this library in your project to expose some functions for
-querying GTFS data.
-
-## Including
+### Setup
 
 Include this library.
 
     var gtfs = require('gtfs');
 
-## Endpoints
 
-### Agencies
+Connect to mongo via mongoose.
+
+    const mongoose = require('mongoose');
+    mongoose.Promise = global.Promise;
+
+    mongoose.connect('YOUR-MONGODB-URI');
+
+If you are running locally, your MongoDB uri might be something like:
+
+    mongodb://localhost:27017/gtfs
+
+### Query Methods
+
+Once you have included the library and connected to your MongoDB database you can use the following methods.
+
+#### Agencies
 
 Returns an array of all agencies.
 
@@ -207,7 +229,7 @@ Returns an array of all agencies.
 
     });
 
-###Agencies near a point
+#### Agencies near a point
 
 Returns an array of agencies within a `radius` of the `lat`, `lon` specified.
 
@@ -215,7 +237,7 @@ Returns an array of agencies within a `radius` of the `lat`, `lon` specified.
 
     });
 
-### Get a specific agency
+#### Get a specific agency
 
 Returns an agency.  An `agency_key` is required, optionally you can specify an `agency_id` for GTFS files that have more than one agency listed in `agencies.txt`.
 
@@ -228,7 +250,7 @@ Returns an agency.  An `agency_key` is required, optionally you can specify an `
 
     });
 
-### Routes for an agency
+#### Routes for an agency
 
 Returns an array of routes for the `agency_key` specified. An `agency_key` is required, optionally you can specify an `agency_id` for GTFS files that have more than one agency listed in `agencies.txt`.
 
@@ -240,7 +262,7 @@ Returns an array of routes for the `agency_key` specified. An `agency_key` is re
 
     });
 
-### Get a specific route
+#### Get a specific route
 
 Returns a route for the `route_id` specified.
 
@@ -248,7 +270,7 @@ Returns a route for the `route_id` specified.
 
     });
 
-### Routes near a point
+#### Routes near a point
 
 Returns an array of routes within a `radius` of the `lat`, `lon` specified.
 
@@ -258,7 +280,7 @@ Returns an array of routes within a `radius` of the `lat`, `lon` specified.
 
 `radius` is optional and in miles.  Default: 1 mile.
 
-### Routes that serve a specific stop
+#### Routes that serve a specific stop
 
 Returns an array of routes serving the `agency_key` and `stop_id` specified.
 
@@ -266,7 +288,7 @@ Returns an array of routes serving the `agency_key` and `stop_id` specified.
 
     });
 
-### Stops by id
+#### Stops by id
 
 Returns an array of stops, optionally limited to those matching the `stop_ids` specified.
 
@@ -276,7 +298,7 @@ Returns an array of stops, optionally limited to those matching the `stop_ids` s
 
 `stop_ids` is optional and can be a single `stop_id` or an array of `stop_ids`.
 
-### Stops by route
+#### Stops by route
 
 Returns an array of stops along the `route_id` for the `agency_key` and `direction_id` specified
 
@@ -284,7 +306,7 @@ Returns an array of stops along the `route_id` for the `agency_key` and `directi
 
     });
 
-### Stops near a point
+#### Stops near a point
 
 Returns an array of stops within a `radius` of the `lat`, `lon` specified
 
@@ -294,7 +316,7 @@ Returns an array of stops within a `radius` of the `lat`, `lon` specified
 
 `radius` is optional and in miles.  Default: 1 mile
 
-### Stop times for a trip
+#### Stop times for a trip
 
 Returns an array of stoptimes for the `trip_id` specified
 
@@ -302,7 +324,7 @@ Returns an array of stoptimes for the `trip_id` specified
 
     });
 
-### Stop times by stop
+#### Stop times by stop
 
 Returns an array of stoptimes for the `agency_key`, `route_id`, `stop_id` and
 `direction_id` specified.
@@ -311,7 +333,7 @@ Returns an array of stoptimes for the `agency_key`, `route_id`, `stop_id` and
 
     });
 
-### Trips by route and direction
+#### Trips by route and direction
 
 Returns an array of trips for the `agency_key`, `route_id` and `direction_id`
 specified.
@@ -322,7 +344,7 @@ specified.
 
 `service_ids` is optional
 
-### Shapes by route
+#### Shapes by route
 
 Returns an array of shapes for the `agency_key`, `route_id` and `direction_id`
 specified sorted by `shape_pt_sequence`.
@@ -333,7 +355,7 @@ specified sorted by `shape_pt_sequence`.
 
 `service_ids` is optional
 
-### Calendars
+#### Calendars
 
 Returns an array of calendars, optionally bounded by start_date and end_date
 
@@ -341,7 +363,7 @@ Returns an array of calendars, optionally bounded by start_date and end_date
 
     });
 
-### Calendars by serivce
+#### Calendars by serivce
 
 Returns an array of calendars for the `service_ids` specified
 
@@ -351,7 +373,7 @@ Returns an array of calendars for the `service_ids` specified
 
 `service_ids` can be a single `service_id` or an array of `service_ids`.
 
-### Calendar Dates by service
+#### Calendar Dates by service
 
 Returns an array of calendarDates for the `service_ids` specified
 
@@ -361,7 +383,7 @@ Returns an array of calendarDates for the `service_ids` specified
 
 `service_ids` can be a single `service_id` or an array of `service_ids`.
 
-### Feed Info
+#### Feed Info
 
 Returns feed_info for the agency_key specified
 
@@ -369,7 +391,7 @@ Returns feed_info for the agency_key specified
 
     });
 
-### Timetables
+#### Timetables
 
 Returns an array of timetables for the `agency_key` specified
 
@@ -377,7 +399,7 @@ Returns an array of timetables for the `agency_key` specified
 
     });
 
-### Timetables by id
+#### Timetables by id
 
 Returns an array timetable objects matching the `timetable_id` specified. A
 timetable may consist of multiple overlapping routes, so more than one timetable
@@ -387,7 +409,7 @@ object can be returned.
 
     });
 
-### TimetableStopOrders by id
+#### TimetableStopOrders by id
 
 Returns an array of TimetableStopOrder objects matching the `timetable_id`
 specified.
@@ -396,7 +418,7 @@ specified.
 
     });
 
-### Timetable Pages
+#### Timetable Pages
 
 Returns an array of timetable pages for the `agency_key` specified
 
@@ -404,7 +426,7 @@ Returns an array of timetable pages for the `agency_key` specified
 
     });
 
-### Timetable Pages by id
+#### Timetable Pages by id
 
 Returns an array timetable pages matching the `timetable_page_id` specified.
 
@@ -412,13 +434,17 @@ Returns an array timetable pages matching the `timetable_page_id` specified.
 
     });
 
-## Tests
+## Contributing
+
+Pull requests are welcome, as is feedback and [reporting issues](https://github.com/brendannee/node-gtfs/issues).
+
+### Tests
 
 To run tests:
 
     npm test
 
 
-## Linting
+### Linting
 
     npm run lint
