@@ -9,10 +9,7 @@ unzips it and stores it to a MongoDB database. In addition, this library provide
 methods to query for agencies, routes, stops and times. It also has spatial
 queries to find nearby stops, routes and agencies.
 
-This library has two parts: the [GTFS import script](#gtf-import-script) and the [query methods](#query-methods).
-
-
-
+This library has two parts: the [GTFS import script](#gtfs-import-script) and the [query methods](#query-methods).
 
 ## Example Application
 
@@ -158,7 +155,7 @@ If you don't want all GTFS files to be imported, you can specify an array of fil
 
 ## GTFS Import Script
 
-The GTFS import script reads from a JSON configuration file and imports the GTFS files specified to a MongoDB database. See above for information on setting up your configuration file.
+The GTFS import script reads from a JSON configuration file and imports the GTFS files specified to a MongoDB database. [Read more on setting up your configuration file](#configuration).
 
 ### Make sure mongo is running
 
@@ -198,13 +195,11 @@ Show all command line options
 
 This library includes many methods you can use in your project to query GTFS data.
 
-
 ### Setup
 
 Include this library.
 
     var gtfs = require('gtfs');
-
 
 Connect to mongo via mongoose.
 
@@ -216,6 +211,8 @@ Connect to mongo via mongoose.
 If you are running locally, your MongoDB uri might be something like:
 
     mongodb://localhost:27017/gtfs
+
+You probably want to use the same value used in your [configuration JSON file](#configuration) for importing GTFS.
 
 ### Query Methods
 
