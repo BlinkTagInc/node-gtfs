@@ -39,15 +39,20 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 
     cp config-sample.json config.json
 
+| option | type | description |
+| ------ | ---- | ----------- |
+| `agencies` | array | An array of GTFS files to be imported. |
+| `mongo_url` | string | The URL of the MongoDB database to import to. |
+| `verbose` | boolean | Whether or not to print output to the console. |
+
 ### Agencies
 
-Before you can use `gtfs-to-html` you must specify the transit agencies you'd
-like to use.
+Specify the GTFS files to be imported in an `agencies` array. GTFS files can be imported via a `url` or a local `path`.
 
-You can specify agencies using a `url` to the GTFS file or a local `path`.
+Each file needs an `agency_key`, a short name you create that is specific to that GTFS file. For GTFS files that contain more than one agency, you only need to list each GTFS file once in the `agencies` array, not once per agency that it contains.
 
-To find an agency's GTFS URL, visit transitfeeds.com. You can use the direct
-URL from the agency or you can use a URL generated from the transitfeeds.com
+To find an agency's GTFS file, visit [transitfeeds.com](http://transitfeeds.com). You can use the
+URL from the agency's website or you can use a URL generated from the transitfeeds.com
 API along with your API token.
 
 * Specify a download URL:
@@ -79,7 +84,38 @@ API along with your API token.
   "agencies": [
     {
       "agency_key": "myAgency",
-      path: "/path/to/the/unzipped/gtfs/"
+      "path": "/path/to/the/unzipped/gtfs/"
+    }
+  ]
+}
+```
+
+* Exclude files - if you don't want all GTFS files to be imported, you can specify an array of files to exclude.
+
+```
+{
+  "agencies": [
+    {
+      "agency_key": "myAgency",
+      "path": "/path/to/the/unzipped/gtfs/",
+      "exclude": [
+        "shapes",
+        "stops"
+      ]
+    }
+  ]
+}
+```
+
+* Optionally specify a proj4 projection string to correct poorly formed coordinates in the GTFS file
+
+```
+{
+  "agencies": [
+    {
+      "agency_key": "myAgency",
+      "path": "/path/to/the/unzipped/gtfs/",
+      "proj": "+proj=lcc +lat_1=46.8 +lat_0=46.8 +lon_0=0 +k_0=0.99987742 +x_0=600000 +y_0=2200000 +a=6378249.2 +b=6356515 +towgs84=-168,-60,320,0,0,0,0 +pm=paris +units=m +no_defs"
     }
   ]
 }
@@ -94,23 +130,7 @@ Add the MongoDB URI to `config.json` with the key `mongo_url`. Running locally, 
   "agencies": [
     {
       "agency_key": "myAgency",
-      path: "/path/to/the/unzipped/gtfs/"
-    }
-  ]
-}
-```
-
-### Proj4 Projection
-
-You can optionally specify a proj4 projection string to correct poorly formed coordinates:
-```
-{
-  "mongo_url": "mongodb://localhost:27017/gtfs",
-  "agencies": [
-    {
-      agency_key: 'localAgency',
-      path: '/path/to/the/unzipped/gtfs/',
-      proj: '+proj=lcc +lat_1=46.8 +lat_0=46.8 +lon_0=0 +k_0=0.99987742 +x_0=600000 +y_0=2200000 +a=6378249.2 +b=6356515 +towgs84=-168,-60,320,0,0,0,0 +pm=paris +units=m +no_defs'
+      "path": "/path/to/the/unzipped/gtfs/"
     }
   ]
 }
@@ -118,38 +138,18 @@ You can optionally specify a proj4 projection string to correct poorly formed co
 
 ### Logging
 
-If you don't want the import script to print any output to the console, you can set `verbose` to `false`.
+If you don't want the import script to print any output to the console, you can set `verbose` to `false`. Defaults to `true`.
 
 ```
 {
   "mongo_url": "mongodb://localhost:27017/gtfs",
   "agencies": [
     {
-      agency_key: 'localAgency',
-      path: '/path/to/the/unzipped/gtfs/',
+      "agency_key": "localAgency",
+      "path": ""/path/to/the/unzipped/gtfs/"
     }
   ],
   "verbose": false
-}
-```
-
-### Exclude files
-
-If you don't want all GTFS files to be imported, you can specify an array of files to exclude.
-
-```
-{
-  "mongo_url": "mongodb://localhost:27017/gtfs",
-  "agencies": [
-    {
-      agency_key: 'localAgency',
-      path: '/path/to/the/unzipped/gtfs/',
-      exclude: [
-        'shapes',
-        'stops'
-      ]
-    }
-  ]
 }
 ```
 
