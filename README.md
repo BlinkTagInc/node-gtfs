@@ -61,7 +61,7 @@ API along with your API token.
   "agencies": [
     {
       "agency_key": "county-connection",
-      "url": "http://cccta.org/GTFS/google_transit.zip"
+      "url": "http://countyconnection.com/GTFS/google_transit.zip"
     }
   ]
 }
