@@ -34,11 +34,11 @@
   "dependencies": {
     "async": "2.1.2",
     "csv": "1.1.0",
-    "lodash": "4.16.6",
+    "lodash": "4.17.0",
     "mkdirp": "0.5.1",
-    "moment": "2.15.2",
+    "moment": "2.16.0",
     "mongodb": "2.2.11",
-    "mongoose": "4.6.6",
+    "mongoose": "4.6.7",
     "proj4": "2.3.15",
     "request": "2.78.0",
     "rimraf": "2.5.4",
@@ -58,7 +58,7 @@
   "main": "index",
   "devDependencies": {
     "csv-parse": "1.1.7",
-    "eslint": "3.9.1",
+    "eslint": "3.10.0",
     "eslint-config-airbnb-base": "10.0.1",
     "eslint-plugin-import": "2.2.0",
     "mocha": "3.1.2",
