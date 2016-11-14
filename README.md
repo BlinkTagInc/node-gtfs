@@ -17,21 +17,26 @@ The [GTFS-to-HTML](https://github.com/brendannee/gtfs-to-html) app uses
 node-gtfs for downloading, importing and querying GTFS data. It provides a good example of
 how to use this library.
 
-## Setup
+## Installation
 
-You can clone from github:
+Install node-gtfs directly from [npm](https://npmjs.org):
 
-    git clone git@github.com:brendannee/node-gtfs.git
+    npm install gtfs -g
 
-    cd node-gtfs
+## Command-line example
 
-    npm install
+    gtfs-import --config-path /path/to/your/custom-config.json
 
-or install directly from npm:
+## Code example
 
-    npm install gtfs
+    const gtfs = require('gtfs');
+    const config = require('config.json');
 
-    cd node_modules/gtfs
+    gtfs.import(config, (err) => {
+      if (err) return console.error(err);
+
+      console.log('Import Successful')
+    });
 
 ## Configuration
 
@@ -44,6 +49,7 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 | `agencies` | array | An array of GTFS files to be imported. |
 | `mongo_url` | string | The URL of the MongoDB database to import to. |
 | `verbose` | boolean | Whether or not to print output to the console. |
+| `skip_delete` | boolean | Whether or not to skip deleting existing data from the database. |
 
 ### Agencies
 
@@ -153,9 +159,26 @@ If you don't want the import script to print any output to the console, you can 
 }
 ```
 
-## GTFS Import Script
+### Deleting existing data
 
-The GTFS import script reads from a JSON configuration file and imports the GTFS files specified to a MongoDB database. [Read more on setting up your configuration file](#configuration).
+If you don't want the import script to delete all existing data from the database with the same `agency_key`, you can set `skip_delete` to `false`. Defaults to `true`.
+
+```
+{
+  "mongo_url": "mongodb://localhost:27017/gtfs",
+  "agencies": [
+    {
+      "agency_key": "localAgency",
+      "path": ""/path/to/the/unzipped/gtfs/"
+    }
+  ],
+  "skip_delete": true
+}
+```
+
+## `gtfs-import` Script
+
+The `gtfs-import` script reads from a JSON configuration file and imports the GTFS files specified to a MongoDB database. [Read more on setting up your configuration file](#configuration).
 
 ### Make sure mongo is running
 
@@ -163,33 +186,66 @@ If you want to run this locally, make sure mongo in installed and running.
 
     mongod
 
-### Run the import script
+### Run the `gtfs-import` script from Command-line
 
-    npm run import
+    gtfs-import
 
 By default, it will look for a `config.json` file in the project root. To specify a different path for the configuration file:
 
-    npm run import -- --config-path /path/to/your/custom-config.json
+    gtfs-import --config-path /path/to/your/custom-config.json
 
 ### Command Line options
-
-Note the two sets of dashes in each command `--`.
 
 #### Skip Delete
 By default, the import script will delete any existing data with the same `agency_key` from your database. If you don't want this to happen, pass the `--skip-delete` flag
 
-    npm run import -- --skip-delete
+    gtfs-import --skip-delete
 
 #### Specify path to config JSON file
 You can specify the path to a config file to be used by the import script.
 
-    npm run import -- --config-path /path/to/your/custom-config.json
+    gtfs-import --config-path /path/to/your/custom-config.json
 
 #### Show help
 Show all command line options
 
-    npm run import -- --help
+    gtfs-import --help
 
+
+### Use GTFS import script in code
+
+Use `gtfs.import()` in your code to run an import of a GTFS file specified in a config.json file.
+
+    const gtfs = require('gtfs');
+    const config = require('config.json');
+
+    gtfs.import(config, (err) => {
+      if (err) return console.error(err);
+
+      console.log('Import Successful')
+    });
+
+Configuration can be a JSON object in your code
+
+    const gtfs = require('gtfs');
+    const config = {
+      mongo_url: 'mongodb://localhost:27017/gtfs',
+      agencies: [
+        {
+          agency_key: 'county-connection',
+          url: 'http://countyconnection.com/GTFS/google_transit.zip',
+          exclude: [
+            'shapes'
+          ]
+        }
+      ]
+    };
+
+    gtfs.import(config, (err) => {
+      if (err) return console.error(err);
+
+      console.log('Import Successful')
+    });
 
 ## Query Methods
 
@@ -222,7 +278,7 @@ Once you have included the library and connected to your MongoDB database you ca
 
 Returns an array of all agencies.
 
-    gtfs.agencies(function(err, agencies) {
+    gtfs.agencies((err, agencies) => {
 
     });
 
@@ -230,7 +286,7 @@ Returns an array of all agencies.
 
 Returns an array of agencies within a `radius` of the `lat`, `lon` specified.
 
-    gtfs.getAgenciesByDistance(lat, lon, radius, function(err, agencies) {
+    gtfs.getAgenciesByDistance(lat, lon, radius, (err, agencies) => {
 
     });
 
@@ -240,11 +296,11 @@ Returns an array of agencies within a `radius` of the `lat`, `lon` specified.
 
 Returns an agency.  An `agency_key` is required, optionally you can specify an `agency_id` for GTFS files that have more than one agency listed in `agencies.txt`.
 
-    gtfs.getAgency(agency_key, function(err, agency) {
+    gtfs.getAgency(agency_key, (err, agency) => {
 
     });
 
-    gtfs.getAgency(agency_key, agency_id, function(err, agency) {
+    gtfs.getAgency(agency_key, agency_id, (err, agency) => {
 
     });
 
@@ -252,11 +308,11 @@ Returns an agency.  An `agency_key` is required, optionally you can specify an `
 
 Returns an array of routes for the `agency_key` specified. An `agency_key` is required, optionally you can specify an `agency_id` for GTFS files that have more than one agency listed in `agencies.txt`.
 
-    gtfs.getRoutesByAgency(agency_key, function(err, routes) {
+    gtfs.getRoutesByAgency(agency_key, (err, routes) => {
 
     });
 
-    gtfs.getRoutesByAgency(agency_key, agency_id, function(err, routes) {
+    gtfs.getRoutesByAgency(agency_key, agency_id, (err, routes) => {
 
     });
 
@@ -264,7 +320,7 @@ Returns an array of routes for the `agency_key` specified. An `agency_key` is re
 
 Returns a route for the `route_id` specified.
 
-    gtfs.getRoutesById(agency_key, route_id, function(err, routes) {
+    gtfs.getRoutesById(agency_key, route_id, (err, routes) => {
 
     });
 
@@ -272,7 +328,7 @@ Returns a route for the `route_id` specified.
 
 Returns an array of routes within a `radius` of the `lat`, `lon` specified.
 
-    gtfs.getRoutesByDistance(lat, lon, radius, function(err, routes) {
+    gtfs.getRoutesByDistance(lat, lon, radius, (err, routes) => {
 
     });
 
@@ -282,7 +338,7 @@ Returns an array of routes within a `radius` of the `lat`, `lon` specified.
 
 Returns an array of routes serving the `agency_key` and `stop_id` specified.
 
-    gtfs.getRoutesByStop(agency_key, stop_id, function(err, routes) {
+    gtfs.getRoutesByStop(agency_key, stop_id, (err, routes) => {
 
     });
 
@@ -290,7 +346,7 @@ Returns an array of routes serving the `agency_key` and `stop_id` specified.
 
 Returns an array of stops, optionally limited to those matching the `stop_ids` specified.
 
-    gtfs.getStops(agency_key, stop_ids, function(err, stops) {
+    gtfs.getStops(agency_key, stop_ids, (err, stops) => {
 
     });
 
@@ -300,7 +356,7 @@ Returns an array of stops, optionally limited to those matching the `stop_ids` s
 
 Returns an array of stops along the `route_id` for the `agency_key` and `direction_id` specified
 
-    gtfs.getStopsByRoute(agency_key, route_id, direction_id, function(err, stops) {
+    gtfs.getStopsByRoute(agency_key, route_id, direction_id, (err, stops) => {
 
     });
 
@@ -308,7 +364,7 @@ Returns an array of stops along the `route_id` for the `agency_key` and `directi
 
 Returns an array of stops within a `radius` of the `lat`, `lon` specified
 
-    gtfs.getStopsByDistance(lat, lon, radius, function(err, stops) {
+    gtfs.getStopsByDistance(lat, lon, radius, (err, stops) => {
 
     });
 
@@ -318,7 +374,7 @@ Returns an array of stops within a `radius` of the `lat`, `lon` specified
 
 Returns an array of stoptimes for the `trip_id` specified
 
-    gtfs.getStoptimesByTrip(agency_key, trip_id, function(err, stoptimes) {
+    gtfs.getStoptimesByTrip(agency_key, trip_id, (err, stoptimes) => {
 
     });
 
@@ -327,7 +383,7 @@ Returns an array of stoptimes for the `trip_id` specified
 Returns an array of stoptimes for the `agency_key`, `route_id`, `stop_id` and
 `direction_id` specified.
 
-    gtfs.getStoptimesByStop(agency_key, route_id, stop_id, direction_id, function(err, stoptimes) {
+    gtfs.getStoptimesByStop(agency_key, route_id, stop_id, direction_id, (err, stoptimes) => {
 
     });
 
@@ -336,7 +392,7 @@ Returns an array of stoptimes for the `agency_key`, `route_id`, `stop_id` and
 Returns an array of trips for the `agency_key`, `route_id` and `direction_id`
 specified.
 
-    gtfs.getTripsByRouteAndDirection(agency_key, route_id, direction_id, service_ids, function(err, trips) {
+    gtfs.getTripsByRouteAndDirection(agency_key, route_id, direction_id, service_ids, (err, trips) => {
 
     });
 
@@ -347,7 +403,7 @@ specified.
 Returns an array of shapes for the `agency_key`, `route_id` and `direction_id`
 specified sorted by `shape_pt_sequence`.
 
-    gtfs.getShapesByRoute(agency_key, route_id, direction_id, service_ids, function(err, shapes) {
+    gtfs.getShapesByRoute(agency_key, route_id, direction_id, service_ids, (err, shapes) => {
 
     });
 
@@ -357,7 +413,7 @@ specified sorted by `shape_pt_sequence`.
 
 Returns an array of calendars, optionally bounded by start_date and end_date
 
-    gtfs.getCalendars(agency_key, start_date, end_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday, function(err, calendars) {
+    gtfs.getCalendars(agency_key, start_date, end_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday, (err, calendars) => {
 
     });
 
@@ -365,7 +421,7 @@ Returns an array of calendars, optionally bounded by start_date and end_date
 
 Returns an array of calendars for the `service_ids` specified
 
-    gtfs.getCalendarsByService(service_ids, function(err, calendars) {
+    gtfs.getCalendarsByService(service_ids, (err, calendars) => {
 
     });
 
@@ -375,7 +431,7 @@ Returns an array of calendars for the `service_ids` specified
 
 Returns an array of calendarDates for the `service_ids` specified
 
-    gtfs.getCalendarDatesByService(service_ids, function(err, calendars) {
+    gtfs.getCalendarDatesByService(service_ids, (err, calendars) => {
 
     });
 
@@ -385,7 +441,7 @@ Returns an array of calendarDates for the `service_ids` specified
 
 Returns feed_info for the agency_key specified
 
-    gtfs.getFeedInfo(agency_key, function(err, feedinfo) {
+    gtfs.getFeedInfo(agency_key, (err, feedinfo) => {
 
     });
 
@@ -393,7 +449,7 @@ Returns feed_info for the agency_key specified
 
 Returns an array of timetables for the `agency_key` specified
 
-    gtfs.getTimetablesByAgency(agency_key, function(err, timetables) {
+    gtfs.getTimetablesByAgency(agency_key, (err, timetables) => {
 
     });
 
@@ -403,7 +459,7 @@ Returns an array timetable objects matching the `timetable_id` specified. A
 timetable may consist of multiple overlapping routes, so more than one timetable
 object can be returned.
 
-    gtfs.getTimetable(agency_key, timetable_id, function(err, timetable) {
+    gtfs.getTimetable(agency_key, timetable_id, (err, timetable) => {
 
     });
 
@@ -412,7 +468,7 @@ object can be returned.
 Returns an array of TimetableStopOrder objects matching the `timetable_id`
 specified.
 
-    gtfs.getTimetableStopOrders(agency_key, timetable_id, function(err, timetableStopOrders) {
+    gtfs.getTimetableStopOrders(agency_key, timetable_id, (err, timetableStopOrders) => {
 
     });
 
@@ -420,7 +476,7 @@ specified.
 
 Returns an array of timetable pages for the `agency_key` specified
 
-    gtfs.getTimetablePagesByAgency(agency_key, function(err, timetablePages) {
+    gtfs.getTimetablePagesByAgency(agency_key, (err, timetablePages) => {
 
     });
 
@@ -428,7 +484,7 @@ Returns an array of timetable pages for the `agency_key` specified
 
 Returns an array timetable pages matching the `timetable_page_id` specified.
 
-    gtfs.getTimetablePage(agency_key, timetable_page_id, function(err, timetable) {
+    gtfs.getTimetablePage(agency_key, timetable_page_id, (err, timetable) => {
 
     });
 

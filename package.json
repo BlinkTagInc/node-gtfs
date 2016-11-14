@@ -49,6 +49,12 @@
     "type": "git",
     "url": "git://github.com/brendannee/node-gtfs.git"
   },
+  "bugs": {
+    "url": "https://github.com/brendannee/node-gtfs/issues"
+  },
+  "bin": {
+    "gtfs-import": "bin/gtfs-import.js"
+  },
   "main": "index",
   "devDependencies": {
     "csv-parse": "1.1.7",
@@ -60,7 +66,6 @@
     "timekeeper": "1.0.0"
   },
   "scripts": {
-    "import": "node lib/import.js",
     "test": "NODE_ENV=test mocha ./test/mocha/**/*.js --timeout 5000",
     "lint": "eslint ."
   },
