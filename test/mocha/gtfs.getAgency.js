@@ -6,17 +6,17 @@ const tk = require('timekeeper');
 const timeReference = new Date();
 
 // libraries
-const config = require('./../../config.json');
-const gtfs = require('./../../../');
-const importScript = require('../../../lib/import');
+const config = require('../config.json');
+const gtfs = require('../../');
+
 
 // test support
-const database = require('./../../support/database');
+const database = require('../support/database');
 
 // setup fixtures
 const agenciesFixtures = [{
   agency_key: 'caltrain',
-  path: path.join(__dirname, '/../../fixture/caltrain_20120824_0333.zip')
+  path: path.join(__dirname, '../fixture/caltrain_20120824_0333.zip')
 }];
 
 config.agencies = agenciesFixtures;
@@ -56,7 +56,7 @@ describe('gtfs.getAgency(): ', function(){
         database.teardown(next);
       },
       executeDownloadScript: (next) => {
-        importScript(config, next);
+        gtfs.import(config, next);
       }
     }, done);
   });

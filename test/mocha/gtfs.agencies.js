@@ -1,27 +1,36 @@
 const async = require('async');
 const path = require('path');
 const should = require('should');
+const tk = require('timekeeper');
+
+const timeReference = new Date();
 
 // libraries
-const config = require('./../../config.json');
-const gtfs = require('./../../../');
-const importScript = require('../../../lib/import');
+const config = require('../config.json');
+const gtfs = require('../../');
 
 // test support
-const database = require('./../../support/database');
+const database = require('../support/database');
 
 // setup fixtures
-var agenciesFixtures = [{
+const agenciesFixtures = [{
   agency_key: 'caltrain',
-  path: path.join(__dirname, '/../../fixture/caltrain_20120824_0333.zip')
+  path: path.join(__dirname, '../fixture/caltrain_20120824_0333.zip')
 }];
 
 config.agencies = agenciesFixtures;
 
-describe('gtfs.getAgenciesByDistance(): ', () => {
-
+describe('gtfs.agencies(): ', () => {
   before((done) => {
-    database.connect(config, done);
+    async.series({
+      connectToDb: (next) => {
+        database.connect(config, next);
+      },
+      setupMockDate: (next) => {
+        tk.freeze(timeReference);
+        next();
+      }
+    }, done);
   });
 
   after((done) => {
@@ -31,6 +40,10 @@ describe('gtfs.getAgenciesByDistance(): ', () => {
       },
       closeDb: (next) => {
         database.close(next);
+      },
+      resetMockDate: (next) => {
+        tk.reset();
+        next();
       }
     }, done);
   });
@@ -41,7 +54,7 @@ describe('gtfs.getAgenciesByDistance(): ', () => {
         database.teardown(next);
       },
       executeDownloadScript: (next) => {
-        importScript(config, next);
+        gtfs.import(config, next);
       }
     }, done);
   });
@@ -51,53 +64,24 @@ describe('gtfs.getAgenciesByDistance(): ', () => {
       teardownDatabase: (next) => {
         database.teardown(next);
       }
-    },function(){
-      const lon = -121.9867495;
-      const lat = 37.38976166855;
-      const radius = 100;
-      gtfs.getAgenciesByDistance(lat, lon, radius, (err, res) => {
-        should.not.exist(err);
-        should.exist(res);
-        res.should.have.length(0);
+    }, () => {
+      gtfs.agencies((err, agencies) => {
+        should.not.exists(err);
+        should.exists(agencies);
+        agencies.should.have.length(0);
         done();
       });
     });
   });
 
-  it('should return empty array if no agencies within given distance exists', (done) => {
-    const lon = -127.9867495;
-    const lat = 40.38976166855;
-    const radius = 100;
-    gtfs.getAgenciesByDistance(lat, lon, radius, (err, res) => {
-      should.not.exist(err);
-      should.exist(res);
-      res.should.have.length(0);
-      done();
-    });
-  });
-
-  it('should return expected agencies within given distance if exists', (done) => {
-    const lon = -121.9867495;
-    const lat = 37.38976166855;
-    const radius = 100;
-    gtfs.getAgenciesByDistance(lat, lon, radius, (err, agencies) => {
+  it('should return expected agency', (done) => {
+    gtfs.agencies((err, agencies) => {
       should.not.exist(err);
       should.exist(agencies);
-      agencies.should.have.length(1);
-      agencies[0].agency_key.should.equal('caltrain');
-      done();
-    });
-  });
-
-  it('should return expected agencies within given distance (without specifying radius) if exists', (done) => {
-    const lon = -121.9867495;
-    const lat = 37.38976166855;
-    gtfs.getAgenciesByDistance(lat, lon, (err, agencies) => {
-      should.not.exist(err);
-      should.exist(agencies);
-      agencies.should.have.length(1);
+      agencies.length.should.equal(1);
 
       const agency = agencies[0].toObject();
+
       agency.agency_key.should.equal('caltrain');
       agency.agency_id.should.equal('caltrain-ca-us');
       agency.agency_name.should.equal('Caltrain');
@@ -120,6 +104,9 @@ describe('gtfs.getAgenciesByDistance(): ', () => {
       agency.agency_center.should.have.length(2);
       agency.agency_center[0].should.eql(-121.9867495);
       agency.agency_center[1].should.eql(37.38976166855);
+
+      agency.date_last_updated.should.eql(timeReference.getTime());
+
       done();
     });
   });

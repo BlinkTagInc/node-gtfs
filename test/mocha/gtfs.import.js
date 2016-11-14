@@ -4,8 +4,9 @@ const unzip = require('unzip2');
 const parse = require('csv-parse');
 const path = require('path');
 
-const config = require('./../../config.json');
-const importScript = require('../../../lib/import');
+// libraries
+const config = require('../config.json');
+const gtfs = require('../../');
 
 const agenciesFixturesUrl = [{
   agency_key: 'caltrain',
@@ -14,24 +15,24 @@ const agenciesFixturesUrl = [{
 
 const agenciesFixturesLocal = [{
   agency_key: 'caltrain',
-  path: path.join(__dirname, '/../../fixture/caltrain_20120824_0333.zip')
+  path: path.join(__dirname, '../fixture/caltrain_20120824_0333.zip')
 }];
 
-const database = require('./../../support/database');
+const database = require('../support/database');
 
-const filenames = require('../../../lib/filenames');
+const filenames = require('../../lib/filenames');
 
 describe('lib/import.js', function testImport() {
   this.timeout(10000);
   describe('Download and import from different GTFS sources', () => {
     it('should be able to download and import from HTTP', (done) => {
       config.agencies = agenciesFixturesUrl;
-      importScript(config, done);
+      gtfs.import(config, done);
     });
 
     it('should be able to download and import from local filesystem', (done) => {
       config.agencies = agenciesFixturesLocal;
-      importScript(config, done);
+      gtfs.import(config, done);
     });
   });
 
@@ -44,7 +45,7 @@ describe('lib/import.js', function testImport() {
 
     let db;
     const countData = {};
-    const tmpDir = path.join(__dirname, '/../../fixture/tmp/');
+    const tmpDir = path.join(__dirname, '../fixture/tmp/');
 
     before((done) => {
       async.series({
@@ -88,7 +89,7 @@ describe('lib/import.js', function testImport() {
           database.teardown(next);
         },
         executeDownloadScript: (next) => {
-          importScript(config, next);
+          gtfs.import(config, next);
         }
       }, done);
     });
