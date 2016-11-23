@@ -1,7 +1,7 @@
 {
   "name": "gtfs",
   "description": "Import GTFS transit data into mongodb and query routes, stops, times, fares and more",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "keywords": [
     "transit",
     "gtfs",
@@ -32,18 +32,18 @@
     "Marcelo Muñoz Araya <ma.munoz.araya@gmail.com>"
   ],
   "dependencies": {
-    "async": "2.1.2",
+    "async": "2.1.4",
     "csv": "1.1.0",
-    "lodash": "4.17.0",
+    "lodash": "4.17.2",
     "mkdirp": "0.5.1",
-    "moment": "2.16.0",
+    "moment": "2.17.0",
     "mongodb": "2.2.11",
     "mongoose": "4.6.7",
     "proj4": "2.3.15",
-    "request": "2.78.0",
+    "request": "2.79.0",
     "rimraf": "2.5.4",
     "unzip2": "0.2.5",
-    "yargs": "6.3.0"
+    "yargs": "6.4.0"
   },
   "repository": {
     "type": "git",
@@ -58,7 +58,7 @@
   "main": "index",
   "devDependencies": {
     "csv-parse": "1.1.7",
-    "eslint": "3.10.0",
+    "eslint": "3.10.2",
     "eslint-config-airbnb-base": "10.0.1",
     "eslint-plugin-import": "2.2.0",
     "mocha": "3.1.2",
