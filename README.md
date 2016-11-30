@@ -398,6 +398,35 @@ specified.
 
 `service_ids` is optional
 
+#### Directions by route
+
+Returns an array of directions for the `agency_key` and `route_id` specified.
+
+    gtfs.getDirectionsByRoute(agency_key, route_id, service_ids, (err, directions) => {
+
+    });
+
+Example result:
+
+    [
+      {
+        route_id: 'Bu-16APR',
+        trip_headsign: 'SAN FRANCISCO STATION',
+        direction_id: 0
+      },
+      {
+        route_id: 'Bu-16APR',
+        trip_headsign: 'DIRIDON STATION',
+        direction_id: 1
+      },
+      { route_id: 'Bu-16APR',
+        trip_headsign: 'TAMIEN STATION',
+        direction_id: 1
+      }
+    ];
+
+`service_ids` is optional
+
 #### Shapes by route
 
 Returns an array of shapes for the `agency_key`, `route_id` and `direction_id`
