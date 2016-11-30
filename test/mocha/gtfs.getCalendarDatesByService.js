@@ -13,7 +13,7 @@ const database = require('../support/database');
 // setup fixtures
 const agenciesFixtures = [{
   agency_key: 'caltrain',
-  path: path.join(__dirname, '../fixture/caltrain_20120824_0333.zip')
+  path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
 }];
 
 const agency_key = agenciesFixtures[0].agency_key;
@@ -54,7 +54,8 @@ describe('gtfs.getCalendarDatesByService(): ', () => {
         database.teardown(next);
       }
     }, () => {
-      gtfs.getCalendarDatesByService(['WD_20120701'], (err, calendarDates) => {
+      const serviceIds = ['CT-16APR-Caltrain-Weekday-01'];
+      gtfs.getCalendarDatesByService(serviceIds, (err, calendarDates) => {
         should.not.exists(err);
         should.exists(calendarDates);
         calendarDates.should.have.length(0);
@@ -64,33 +65,34 @@ describe('gtfs.getCalendarDatesByService(): ', () => {
   });
 
   it('should return expected calendar dates', (done) => {
-    gtfs.getCalendarDatesByService(['WD_20120701'], (err, calendarDates) => {
+    const serviceIds = ['CT-16APR-Caltrain-Weekday-01'];
+    gtfs.getCalendarDatesByService(serviceIds, (err, calendarDates) => {
       should.not.exist(err);
       should.exist(calendarDates);
       calendarDates.length.should.equal(4);
 
       const expectedCalendarDates = [
         {
-          service_id: 'WD_20120701',
-          date: 20120903,
+          service_id: 'CT-16APR-Caltrain-Weekday-01',
+          date: 20161124,
           exception_type: 2,
           agency_key: 'caltrain'
         },
         {
-          service_id: 'WD_20120701',
-          date: 20121122,
+          service_id: 'CT-16APR-Caltrain-Weekday-01',
+          date: 20160905,
           exception_type: 2,
           agency_key: 'caltrain'
         },
         {
-          service_id: 'WD_20120701',
-          date: 20121225,
+          service_id: 'CT-16APR-Caltrain-Weekday-01',
+          date: 20160704,
           exception_type: 2,
           agency_key: 'caltrain'
         },
         {
-          service_id: 'WD_20120701',
-          date: 20130101,
+          service_id: 'CT-16APR-Caltrain-Weekday-01',
+          date: 20160530,
           exception_type: 2,
           agency_key: 'caltrain'
         }

@@ -13,7 +13,7 @@ const database = require('../support/database');
 // setup fixtures
 const agenciesFixtures = [{
   agency_key: 'caltrain',
-  path: path.join(__dirname, '../fixture/caltrain_20120824_0333.zip')
+  path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
 }];
 
 const agency_key = agenciesFixtures[0].agency_key;
@@ -65,18 +65,18 @@ describe('gtfs.getFareAttributesById(): ', () => {
   });
 
   it('should return expected fare_attributes', (done) => {
-    const fareId = 'OW_2_20120701';
+    const fareId = 'OW_1_20160228';
 
     gtfs.getFareAttributesById(agency_key, fareId, (err, fareAttribute) => {
       should.not.exist(err);
       should.exist(fareAttribute);
 
       const expectedFareAttribute = {
-        fare_id: 'OW_2_20120701',
-        price: 5.0000,
+        fare_id: 'OW_1_20160228',
+        price: 3.75,
         currency_type: 'USD',
         payment_method: 1,
-        transfers: null,
+        transfers: 0,
         transfer_duration: null,
         agency_key: 'caltrain'
       };

@@ -13,7 +13,7 @@ const database = require('../support/database');
 // setup fixtures
 const agenciesFixtures = [{
   agency_key: 'caltrain',
-  path: path.join(__dirname, '../fixture/caltrain_20120824_0333.zip')
+  path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
 }];
 
 const agency_key = agenciesFixtures[0].agency_key;
@@ -65,21 +65,18 @@ describe('gtfs.getRoutesById(): ', () => {
   });
 
   it('should return expected route', (done) => {
-    const routeId = 'ct_limited_20121001';
+    const routeId = 'TaSj-16APR';
 
     gtfs.getRoutesById(agency_key, routeId, (err, route) => {
       should.not.exist(err);
       should.exist(route);
 
       route.agency_key.should.equal(agency_key);
-      route.route_id.should.equal('ct_limited_20121001');
-      route.route_short_name.should.equal('');
-      route.route_long_name.should.equal('Limited');
-      route.route_desc.should.equal('');
-      route.route_type.should.equal(2);
-      route.route_url.should.equal('');
-      route.route_color.should.equal('FEF0B5');
-      route.route_text_color.should.equal('');
+      route.route_id.should.equal('TaSj-16APR');
+      route.route_short_name.should.equal(' ');
+      route.route_long_name.should.equal('Tamien / San Jose Diridon Caltrain Shuttle');
+      route.route_type.should.equal(3);
+      route.route_color.should.equal('41AD49');
 
       done();
     });

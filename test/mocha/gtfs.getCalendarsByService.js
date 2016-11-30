@@ -13,7 +13,7 @@ const database = require('../support/database');
 // setup fixtures
 const agenciesFixtures = [{
   agency_key: 'caltrain',
-  path: path.join(__dirname, '../fixture/caltrain_20120824_0333.zip')
+  path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
 }];
 
 const agency_key = agenciesFixtures[0].agency_key;
@@ -54,7 +54,7 @@ describe('gtfs.getCalendarsByService(): ', () => {
         database.teardown(next);
       }
     }, () => {
-      const serviceIds = ['WD_20120701_not_real'];
+      const serviceIds = ['CT-16APR-Caltrain-Weekday-01-not-real'];
 
       gtfs.getCalendarsByService(serviceIds, (err, calendars) => {
         should.not.exists(err);
@@ -66,7 +66,7 @@ describe('gtfs.getCalendarsByService(): ', () => {
   });
 
   it('should return expected calendars', (done) => {
-    const serviceIds = ['WD_20120701'];
+    const serviceIds = ['CT-16APR-Caltrain-Weekday-01'];
 
     gtfs.getCalendarsByService(serviceIds, (err, calendars) => {
       should.not.exist(err);
@@ -76,7 +76,7 @@ describe('gtfs.getCalendarsByService(): ', () => {
       const calendar = calendars[0].toObject();
 
       calendar.agency_key.should.equal(agency_key);
-      calendar.service_id.should.equal('WD_20120701');
+      calendar.service_id.should.equal('CT-16APR-Caltrain-Weekday-01');
       calendar.monday.should.equal(1);
       calendar.tuesday.should.equal(1);
       calendar.wednesday.should.equal(1);
@@ -84,8 +84,8 @@ describe('gtfs.getCalendarsByService(): ', () => {
       calendar.friday.should.equal(1);
       calendar.saturday.should.equal(0);
       calendar.sunday.should.equal(0);
-      calendar.start_date.should.equal(20120701);
-      calendar.end_date.should.equal(20120930);
+      calendar.start_date.should.equal(20160404);
+      calendar.end_date.should.equal(20190331);
 
       done();
     });

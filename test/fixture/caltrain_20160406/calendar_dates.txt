@@ -1,0 +1,9 @@
+service_id,date,exception_type
+CT-16APR-Caltrain-Weekday-01,20160530,2
+CT-16APR-Caltrain-Sunday-02,20160530,1
+CT-16APR-Caltrain-Weekday-01,20160704,2
+CT-16APR-Caltrain-Sunday-02,20160704,1
+CT-16APR-Caltrain-Weekday-01,20160905,2
+CT-16APR-Caltrain-Sunday-02,20160905,1
+CT-16APR-Caltrain-Weekday-01,20161124,2
+CT-16APR-Caltrain-Sunday-02,20161124,1

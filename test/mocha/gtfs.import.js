@@ -15,7 +15,7 @@ const agenciesFixturesUrl = [{
 
 const agenciesFixturesLocal = [{
   agency_key: 'caltrain',
-  path: path.join(__dirname, '../fixture/caltrain_20120824_0333.zip')
+  path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
 }];
 
 const database = require('../support/database');

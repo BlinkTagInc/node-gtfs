@@ -13,7 +13,7 @@ const database = require('../support/database');
 // setup fixtures
 const agenciesFixtures = [{
   agency_key: 'caltrain',
-  path: path.join(__dirname, '../fixture/caltrain_20120824_0333.zip')
+  path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
 }];
 
 config.agencies = agenciesFixtures;
@@ -66,41 +66,26 @@ describe('gtfs.getStopsByRoute(): ', () => {
 
   it('should return array of stops if it exists for given agency, route and direction', (done) => {
     const agency_key = 'caltrain';
-    const route_id = 'ct_local_20120701';
+    const route_id = 'Bu-16APR';
     const direction_id = '0';
 
     const expectedStopIds = [
-      'San Jose Caltrain',
-      'Santa Clara Caltrain',
-      'Lawrence Caltrain',
-      'Sunnyvale Caltrain',
-      'Mountain View Caltrain',
-      'San Antonio Caltrain',
-      'California Ave Caltrain',
-      'Palo Alto Caltrain',
-      'Menlo Park Caltrain',
-      'Atherton Caltrain',
-      'Redwood City Caltrain',
-      'San Carlos Caltrain',
-      'Belmont Caltrain',
-      'Hillsdale Caltrain',
-      'Hayward Park Caltrain',
-      'San Mateo Caltrain',
-      'Burlingame Caltrain',
-      'Broadway Caltrain',
-      'Millbrae Caltrain',
-      'San Bruno Caltrain',
-      'So. San Francisco Caltrain',
-      'Bayshore Caltrain',
-      '22nd Street Caltrain',
-      'San Francisco Caltrain'
+      '70261',
+      '70221',
+      '70211',
+      '70171',
+      '70141',
+      '70111',
+      '70091',
+      '70061',
+      '70011'
     ];
 
     gtfs.getStopsByRoute(agency_key, route_id, direction_id, (err, stops) => {
       should.not.exist(err);
       should.exist(stops);
 
-      stops.should.have.length(24);
+      stops.should.have.length(9);
 
       stops.forEach((stop, idx) => {
         expectedStopIds[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
@@ -112,45 +97,25 @@ describe('gtfs.getStopsByRoute(): ', () => {
 
   it('should return array of stops if it exists for given agency, route and direction (opposite direction)', (done) => {
     const agency_key = 'caltrain';
-    const route_id = 'ct_local_20120701';
+    const route_id = 'Bu-16APR';
     const direction_id = '1';
 
     const expectedStopIds = [
-      'San Francisco Caltrain',
-      '22nd Street Caltrain',
-      'Bayshore Caltrain',
-      'So. San Francisco Caltrain',
-      'San Bruno Caltrain',
-      'Millbrae Caltrain',
-      'Burlingame Caltrain',
-      'San Mateo Caltrain',
-      'Hayward Park Caltrain',
-      'Hillsdale Caltrain',
-      'Belmont Caltrain',
-      'San Carlos Caltrain',
-      'Redwood City Caltrain',
-      'Menlo Park Caltrain',
-      'Palo Alto Caltrain',
-      'California Ave Caltrain',
-      'San Antonio Caltrain',
-      'Mountain View Caltrain',
-      'Sunnyvale Caltrain',
-      'Lawrence Caltrain',
-      'Santa Clara Caltrain',
-      'College Park Caltrain',
-      'San Jose Caltrain',
-      'Tamien Caltrain',
-      'Capitol Caltrain',
-      'Blossom Hill Caltrain',
-      'Morgan Hill Caltrain',
-      'San Martin Caltrain',
-      'Gilroy Caltrain'
+      '70012',
+      '70062',
+      '70092',
+      '70112',
+      '70142',
+      '70172',
+      '70212',
+      '70222',
+      '70262'
     ];
 
     gtfs.getStopsByRoute(agency_key, route_id, direction_id, (err, stops) => {
       should.not.exist(err);
       should.exist(stops);
-      stops.should.have.length(29);
+      stops.should.have.length(9);
 
       stops.forEach((stop, idx) => {
         expectedStopIds[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
@@ -162,72 +127,37 @@ describe('gtfs.getStopsByRoute(): ', () => {
 
   it('should return array of all stops for all directions if it exists for given agency and route (without specifying direction)', (done) => {
     const agency_key = 'caltrain';
-    const route_id = 'ct_local_20120701';
+    const route_id = 'Bu-16APR';
 
     const expectedResults = [
       {
         direction_id: 0,
-        stops_count: 24,
+        stops_count: 9,
         stops: [
-          'San Jose Caltrain',
-          'Santa Clara Caltrain',
-          'Lawrence Caltrain',
-          'Sunnyvale Caltrain',
-          'Mountain View Caltrain',
-          'San Antonio Caltrain',
-          'California Ave Caltrain',
-          'Palo Alto Caltrain',
-          'Menlo Park Caltrain',
-          'Atherton Caltrain',
-          'Redwood City Caltrain',
-          'San Carlos Caltrain',
-          'Belmont Caltrain',
-          'Hillsdale Caltrain',
-          'Hayward Park Caltrain',
-          'San Mateo Caltrain',
-          'Burlingame Caltrain',
-          'Broadway Caltrain',
-          'Millbrae Caltrain',
-          'San Bruno Caltrain',
-          'So. San Francisco Caltrain',
-          'Bayshore Caltrain',
-          '22nd Street Caltrain',
-          'San Francisco Caltrain'
+          '70261',
+          '70221',
+          '70211',
+          '70171',
+          '70141',
+          '70111',
+          '70091',
+          '70061',
+          '70011'
         ]
       },
       {
         direction_id: 1,
-        stops_count: 29,
+        stops_count: 9,
         stops: [
-          'San Francisco Caltrain',
-          '22nd Street Caltrain',
-          'Bayshore Caltrain',
-          'So. San Francisco Caltrain',
-          'San Bruno Caltrain',
-          'Millbrae Caltrain',
-          'Burlingame Caltrain',
-          'San Mateo Caltrain',
-          'Hayward Park Caltrain',
-          'Hillsdale Caltrain',
-          'Belmont Caltrain',
-          'San Carlos Caltrain',
-          'Redwood City Caltrain',
-          'Menlo Park Caltrain',
-          'Palo Alto Caltrain',
-          'California Ave Caltrain',
-          'San Antonio Caltrain',
-          'Mountain View Caltrain',
-          'Sunnyvale Caltrain',
-          'Lawrence Caltrain',
-          'Santa Clara Caltrain',
-          'College Park Caltrain',
-          'San Jose Caltrain',
-          'Tamien Caltrain',
-          'Capitol Caltrain',
-          'Blossom Hill Caltrain',
-          'Morgan Hill Caltrain',
-          'San Martin Caltrain',
-          'Gilroy Caltrain'
+          '70012',
+          '70062',
+          '70092',
+          '70112',
+          '70142',
+          '70172',
+          '70212',
+          '70222',
+          '70262'
         ]
       }
     ];

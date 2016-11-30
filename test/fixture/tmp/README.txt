@@ -1,1 +1,0 @@
-Temporary folder for test fixtures

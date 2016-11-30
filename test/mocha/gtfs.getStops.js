@@ -13,7 +13,7 @@ const database = require('../support/database');
 // setup fixtures
 const agenciesFixtures = [{
   agency_key: 'caltrain',
-  path: path.join(__dirname, '../fixture/caltrain_20120824_0333.zip')
+  path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
 }];
 
 config.agencies = agenciesFixtures;
@@ -68,7 +68,7 @@ describe('gtfs.getStops(): ', () => {
       should.not.exist(err);
       should.exist(stops);
 
-      stops.should.have.length(31);
+      stops.should.have.length(95);
       done();
     });
   });
@@ -76,8 +76,8 @@ describe('gtfs.getStops(): ', () => {
   it('should return array of stops if it exists for given agency, and stop_ids', (done) => {
     const agency_key = 'caltrain';
     const stop_ids = [
-      'Burlingame Caltrain',
-      '22nd Street Caltrain'
+      '70031',
+      '70061'
     ];
 
     gtfs.getStops(agency_key, stop_ids, (err, stops) => {

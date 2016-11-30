@@ -1,0 +1,96 @@
+stop_id,stop_code,stop_name,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,platform_code,wheelchair_boarding
+70011,70011,San Francisco Caltrain,37.77639,-122.394992,1,http://www.caltrain.com/stations/sanfranciscostation.html,0,ctsf,NB,1
+70012,70012,San Francisco Caltrain,37.776348,-122.394935,1,http://www.caltrain.com/stations/sanfranciscostation.html,0,ctsf,SB,1
+70021,70021,22nd St Caltrain,37.757599,-122.39188,1,http://www.caltrain.com/stations/22ndstreetstation.html,0,ct22,NB,2
+70022,70022,22nd St Caltrain,37.757583,-122.392404,1,http://www.caltrain.com/stations/22ndstreetstation.html,0,ct22,SB,2
+70031,70031,Bayshore Caltrain,37.709537,-122.401586,1,http://www.caltrain.com/stations/bayshorestation.html,0,ctba,NB,1
+70032,70032,Bayshore Caltrain,37.709544,-122.40198,1,http://www.caltrain.com/stations/bayshorestation.html,0,ctba,SB,1
+70041,70041,So. San Francisco Caltrain Station,37.65589,-122.40487,1,http://www.caltrain.com/stations/southsanfranciscostation.html,0,ctssf,NB,2
+70042,70042,So. San Francisco Caltrain Station,37.655946,-122.405018,1,http://www.caltrain.com/stations/southsanfranciscostation.html,0,ctssf,SB,2
+70051,70051,San Bruno Caltrain,37.631128,-122.411968,1,http://www.caltrain.com/stations/sanbrunostation.html,0,ctsb,NB,1
+70052,70052,San Bruno Caltrain,37.631108,-122.412076,1,http://www.caltrain.com/stations/sanbrunostation.html,0,ctsb,SB,1
+70061,70061,Millbrae Caltrain,37.59988,-122.386647,2,http://www.caltrain.com/stations/millbraetransitcenter.html,0,ctmi,NB,1
+70062,70062,Millbrae Caltrain,37.599797,-122.386832,2,http://www.caltrain.com/stations/millbraetransitcenter.html,0,ctmi,SB,1
+70071,70071,Broadway Caltrain,37.58764,-122.36265,2,http://www.caltrain.com/stations/broadwaystation.html,0,ctbr,NB,2
+70072,70072,Broadway Caltrain,37.587552,-122.362708,2,http://www.caltrain.com/stations/broadwaystation.html,0,ctbr,SB,2
+70081,70081,Burlingame Caltrain,37.580197,-122.3449,2,http://www.caltrain.com/stations/burlingamestation.html,0,ctbu,NB,1
+70082,70082,Burlingame Caltrain,37.580186,-122.345075,2,http://www.caltrain.com/stations/burlingamestation.html,0,ctbu,SB,1
+70091,70091,San Mateo Caltrain,37.568087,-122.323851,2,http://www.caltrain.com/stations/sanmateostation.html,0,ctsmat,NB,1
+70092,70092,San Mateo Caltrain,37.568294,-122.324092,2,http://www.caltrain.com/stations/sanmateostation.html,0,ctsmat,SB,1
+70101,70101,Hayward Park Caltrain,37.552938,-122.309338,2,http://www.caltrain.com/stations/haywardparkstation.html,0,ctha,NB,1
+70102,70102,Hayward Park Caltrain,37.552994,-122.309608,2,http://www.caltrain.com/stations/haywardparkstation.html,0,ctha,SB,1
+70111,70111,Hillsdale Caltrain,37.537868,-122.297349,2,http://www.caltrain.com/stations/hillsdalestation.html,0,cthi,NB,1
+70112,70112,Hillsdale Caltrain,37.537814,-122.297461,2,http://www.caltrain.com/stations/hillsdalestation.html,0,cthi,SB,1
+70121,70121,Belmont Caltrain,37.52089,-122.275738,2,http://www.caltrain.com/stations/belmontstation.html,0,ctbe,NB,1
+70122,70122,Belmont Caltrain,37.520844,-122.275816,2,http://www.caltrain.com/stations/belmontstation.html,0,ctbe,SB,1
+70131,70131,San Carlos Caltrain,37.50805,-122.26015,2,http://www.caltrain.com/stations/sancarlosstation.html,0,ctsc,NB,1
+70132,70132,San Carlos Caltrain,37.507933,-122.260266,2,http://www.caltrain.com/stations/sancarlosstation.html,0,ctsc,SB,1
+70141,70141,Redwood City Caltrain,37.486159,-122.231936,2,http://www.caltrain.com/stations/redwoodcitystation.html,0,ctrwc,NB,1
+70142,70142,Redwood City Caltrain,37.486101,-122.232,2,http://www.caltrain.com/stations/redwoodcitystation.html,0,ctrwc,SB,1
+70151,70151,Atherton Caltrain,37.464645,-122.19779,3,http://www.caltrain.com/stations/athertonstation.html,0,ctat,NB,2
+70152,70152,Atherton Caltrain,37.464584,-122.197869,3,http://www.caltrain.com/stations/athertonstation.html,0,ctat,SB,2
+70161,70161,Menlo Park Caltrain,37.454856,-122.182297,3,http://www.caltrain.com/stations/menloparkstation.html,0,ctmp,NB,1
+70162,70162,Menlo Park Caltrain,37.454745,-122.182405,3,http://www.caltrain.com/stations/menloparkstation.html,0,ctmp,SB,1
+70171,70171,Palo Alto Caltrain,37.443475,-122.164614,3,http://www.caltrain.com/stations/paloaltostation.html,0,ctpa,NB,1
+70172,70172,Palo Alto Caltrain,37.443405,-122.164697,3,http://www.caltrain.com/stations/paloaltostation.html,0,ctpa,SB,1
+70191,70191,California Ave Caltrain,37.429365,-122.141927,3,http://www.caltrain.com/stations/californiaavenuestation.html,0,ctca,NB,1
+70192,70192,California Ave Caltrain,37.429333,-122.141978,3,http://www.caltrain.com/stations/californiaavenuestation.html,0,ctca,SB,1
+70201,70201,San Antonio Caltrain,37.407323,-122.107069,3,http://www.caltrain.com/stations/sanantoniostation.html,0,ctsa,NB,1
+70202,70202,San Antonio Caltrain,37.407277,-122.107125,3,http://www.caltrain.com/stations/sanantoniostation.html,0,ctsa,SB,1
+70211,70211,Mt View Caltrain,37.394459,-122.075956,3,http://www.caltrain.com/stations/mountainviewstation.html,0,ctmv,NB,1
+70212,70212,Mt View Caltrain,37.394402,-122.075994,3,http://www.caltrain.com/stations/mountainviewstation.html,0,ctmv,SB,1
+70221,70221,Sunnyvale Caltrain,37.378916,-122.031372,3,http://www.caltrain.com/stations/sunnyvalestation.html,0,ctsu,NB,1
+70222,70222,Sunnyvale Caltrain,37.378789,-122.031423,3,http://www.caltrain.com/stations/sunnyvalestation.html,0,ctsu,SB,1
+70231,70231,Lawrence Caltrain,37.370598,-121.997114,4,http://www.caltrain.com/stations/lawrencestation.html,0,ctla,NB,1
+70232,70232,Lawrence Caltrain,37.370484,-121.997135,4,http://www.caltrain.com/stations/lawrencestation.html,0,ctla,SB,1
+70241,70241,Santa Clara Caltrain,37.353238,-121.93608,4,http://www.caltrain.com/stations/santaclarastation.html,0,ctscl,NB,1
+70242,70242,Santa Clara Caltrain,37.353189,-121.936135,4,http://www.caltrain.com/stations/santaclarastation.html,0,ctscl,SB,1
+70251,70251,College Park Caltrain,37.342384,-121.9146,4,http://www.caltrain.com/stations/collegeparkstation.html,0,ctco,NB,2
+70252,70252,College Park Caltrain,37.342338,-121.914677,4,http://www.caltrain.com/stations/collegeparkstation.html,0,ctco,SB,2
+70261,70261,San Jose Diridon Caltrain,37.329239,-121.903011,4,http://www.caltrain.com/stations/sanjosediridonstation.html,0,ctsj,NB,1
+70262,70262,San Jose Diridon Caltrain,37.329231,-121.903173,4,http://www.caltrain.com/stations/sanjosediridonstation.html,0,ctsj,SB,1
+70271,70271,Tamien Caltrain,37.31174,-121.883721,4,http://www.caltrain.com/stations/tamienstation.html,0,ctta,NB,1
+70272,70272,Tamien Caltrain,37.31175,-121.883999,4,http://www.caltrain.com/stations/tamienstation.html,0,ctta,SB,1
+70281,70281,Capitol Caltrain,37.284102,-121.841955,5,http://www.caltrain.com/stations/capitolstation.html,0,ctcap,NB,1
+70282,70282,Capitol Caltrain,37.284062,-121.842037,5,http://www.caltrain.com/stations/capitolstation.html,0,ctcap,SB,1
+70291,70291,Blossom Hill Caltrain,37.252422,-121.797643,5,http://www.caltrain.com/stations/blossomhillstation.html,0,ctbl,NB,1
+70292,70292,Blossom Hill Caltrain,37.252379,-121.797683,5,http://www.caltrain.com/stations/blossomhillstation.html,0,ctbl,SB,1
+70301,70301,Morgan Hill Caltrain,37.129363,-121.650244,6,http://www.caltrain.com/stations/morganhillstation.html,0,ctmh,NB,1
+70302,70302,Morgan Hill Caltrain,37.129321,-121.650304,6,http://www.caltrain.com/stations/morganhillstation.html,0,ctmh,SB,1
+70311,70311,San Martin Caltrain,37.085225,-121.610049,6,http://www.caltrain.com/stations/sanmartinstation.html,0,ctsmar,NB,1
+70312,70312,San Martin Caltrain,37.086653,-121.610936,6,http://www.caltrain.com/stations/sanmartinstation.html,0,ctsmar,SB,1
+70321,70321,Gilroy Caltrain,37.003538,-121.566088,6,http://www.caltrain.com/stations/gilroystation.html,0,ctgi,NB,1
+70322,70322,Gilroy Caltrain,37.003485,-121.566225,6,http://www.caltrain.com/stations/gilroystation.html,0,ctgi,SB,1
+777402,777402,San Jose Caltrain Station,37.330196,-121.901985,4,http://www.caltrain.com/stations/sanjosediridonstation.html,0,ctsj,,1
+777403,777403,Tamien Caltrain Station,37.311638,-121.883403,4,http://www.caltrain.com/stations/tamienstation.html,0,ctta,,1
+ctsf,,San Francisco Caltrain,37.776439,-122.394323,,http://www.caltrain.com/stations/sanfranciscostation.html,1,,,1
+ct22,,22nd St Caltrain,37.757674,-122.392636,,http://www.caltrain.com/stations/22ndstreetstation.html,1,,,2
+ctba,,Bayshore Caltrain,37.709544,-122.401318,,http://www.caltrain.com/stations/bayshorestation.html,1,,,1
+ctssf,,So. San Francisco Caltrain Station,37.655852,-122.405429,,http://www.caltrain.com/stations/southsanfranciscostation.html,1,,,2
+ctsb,,San Bruno Caltrain,37.631106,-122.412018,,http://www.caltrain.com/stations/sanbrunostation.html,1,,,1
+ctmi,,Millbrae Caltrain,37.600006,-122.386534,,http://www.caltrain.com/stations/millbraetransitcenter.html,1,,,1
+ctbr,,Broadway Caltrain,37.587466,-122.363233,,http://www.caltrain.com/stations/broadwaystation.html,1,,,2
+ctbu,,Burlingame Caltrain,37.579719,-122.345266,,http://www.caltrain.com/stations/burlingamestation.html,1,,,1
+ctsmat,,San Mateo Caltrain,37.568209,-122.323933,,http://www.caltrain.com/stations/sanmateostation.html,1,,,1
+ctha,,Hayward Park Caltrain,37.552346,-122.308916,,http://www.caltrain.com/stations/haywardparkstation.html,1,,,1
+cthi,,Hillsdale Caltrain,37.537503,-122.298001,,http://www.caltrain.com/stations/hillsdalestation.html,1,,,1
+ctbe,,Belmont Caltrain,37.520504,-122.276075,,http://www.caltrain.com/stations/belmontstation.html,1,,,1
+ctsc,,San Carlos Caltrain,37.507361,-122.260365,,http://www.caltrain.com/stations/sancarlosstation.html,1,,,1
+ctrwc,,Redwood City Caltrain,37.485412,-122.231957,,http://www.caltrain.com/stations/redwoodcitystation.html,1,,,1
+ctat,,Atherton Caltrain,37.464349,-122.198106,,http://www.caltrain.com/stations/athertonstation.html,1,,,2
+ctmp,,Menlo Park Caltrain,37.454604,-122.182518,,http://www.caltrain.com/stations/menloparkstation.html,1,,,1
+ctpa,,Palo Alto Caltrain,37.44307,-122.1649,,http://www.caltrain.com/stations/paloaltostation.html,1,,,1
+ctca,,California Ave Caltrain,37.428835,-122.142703,,http://www.caltrain.com/stations/californiaavenuestation.html,1,,,1
+ctsa,,San Antonio Caltrain,37.407157,-122.107231,,http://www.caltrain.com/stations/sanantoniostation.html,1,,,1
+ctmv,,Mt View Caltrain,37.393879,-122.076327,,http://www.caltrain.com/stations/mountainviewstation.html,1,,,1
+ctsu,,Sunnyvale Caltrain,37.378427,-122.030742,,http://www.caltrain.com/stations/sunnyvalestation.html,1,,,1
+ctla,,Lawrence Caltrain,37.370815,-121.997258,,http://www.caltrain.com/stations/lawrencestation.html,1,,,1
+ctscl,,Santa Clara Caltrain,37.352915,-121.936376,,http://www.caltrain.com/stations/santaclarastation.html,1,,,1
+ctco,,College Park Caltrain,37.34217,-121.914998,,http://www.caltrain.com/stations/collegeparkstation.html,1,,,2
+ctsj,,San Jose Diridon Caltrain,37.329392,-121.902181,,http://www.caltrain.com/stations/sanjosediridonstation.html,1,,,1
+ctta,,Tamien Caltrain,37.31164,-121.8839,,http://www.caltrain.com/stations/tamienstation.html,1,,,1
+ctcap,,Capitol Caltrain,37.284359,-121.841589,,http://www.caltrain.com/stations/capitolstation.html,1,,,1
+ctbl,,Blossom Hill Caltrain,37.252801,-121.797369,,http://www.caltrain.com/stations/blossomhillstation.html,1,,,1
+ctmh,,Morgan Hill Caltrain,37.129081,-121.650721,,http://www.caltrain.com/stations/morganhillstation.html,1,,,1
+ctsmar,,San Martin Caltrain,37.085775,-121.610809,,http://www.caltrain.com/stations/sanmartinstation.html,1,,,1
+ctgi,,Gilroy Caltrain,37.003606,-121.566497,,http://www.caltrain.com/stations/gilroystation.html,1,,,1

@@ -1,0 +1,5 @@
+route_id,route_short_name,route_long_name,route_type,route_color
+TaSj-16APR, ,Tamien / San Jose Diridon Caltrain Shuttle,3,41AD49
+Lo-16APR, ,Local,2,FFFFFF
+Li-16APR, ,Limited,2,FEF0B5
+Bu-16APR, ,Baby Bullet,2,E31837

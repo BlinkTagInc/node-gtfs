@@ -13,7 +13,7 @@ const database = require('../support/database');
 // setup fixtures
 const agenciesFixtures = [{
   agency_key: 'caltrain',
-  path: path.join(__dirname, '../fixture/caltrain_20120824_0333.zip')
+  path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
 }];
 
 const agency_key = agenciesFixtures[0].agency_key;
@@ -66,12 +66,12 @@ describe('gtfs.getFareRulesByRouteId(): ', () => {
   });
 
   it('should return expected fare_rules', (done) => {
-    const routeId = 'ct_bullet_20120701';
+    const routeId = 'Bu-16APR';
 
     gtfs.getFareRulesByRouteId(agency_key, routeId, (err, fareRules) => {
       should.not.exist(err);
       should.exist(fareRules);
-      fareRules.length.should.equal(108);
+      fareRules.length.should.equal(36);
 
       const fareRule = fareRules[0].toObject();
 
@@ -80,7 +80,6 @@ describe('gtfs.getFareRulesByRouteId(): ', () => {
       fareRule.route_id.should.equal(routeId);
       should.exist(fareRule.origin_id);
       should.exist(fareRule.destination_id);
-      should.exist(fareRule.contains_id);
 
       done();
     });

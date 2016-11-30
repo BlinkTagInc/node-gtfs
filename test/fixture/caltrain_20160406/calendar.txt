@@ -1,0 +1,4 @@
+service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+CT-16APR-Caltrain-Weekday-01,1,1,1,1,1,0,0,20160404,20190331
+CT-16APR-Caltrain-Saturday-02,0,0,0,0,0,1,0,20140329,20190331
+CT-16APR-Caltrain-Sunday-02,0,0,0,0,0,0,1,20140323,20190331

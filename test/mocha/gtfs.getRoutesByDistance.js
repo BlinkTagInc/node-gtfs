@@ -13,7 +13,7 @@ const database = require('../support/database');
 // setup fixtures
 const agenciesFixtures = [{
   agency_key: 'caltrain',
-  path: path.join(__dirname, '../fixture/caltrain_20120824_0333.zip')
+  path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
 }];
 
 config.agencies = agenciesFixtures;
@@ -79,52 +79,41 @@ describe('gtfs.getRoutesByDistance(): ', () => {
   });
 
 
-
   it('should return expected routes within given distance if they exist', (done) => {
     const lon = -121.9867495;
     const lat = 37.38976166855;
     const radius = 2;
     const expectedRoutes = {
-      ct_limited_20120701: {
-        route_id: 'ct_limited_20120701',
-        route_short_name: '',
-        route_long_name: 'Limited',
-        route_desc: '',
+      'Bu-16APR': {
+        route_id: 'Bu-16APR',
+        route_short_name: ' ',
+        route_long_name: 'Baby Bullet',
         route_type: 2,
-        route_url: '',
-        route_color: 'FEF0B5',
-        route_text_color: '',
+        route_color: 'E31837',
         agency_key: 'caltrain'
       },
-      ct_local_20120701: {
-        route_id: 'ct_local_20120701',
-        route_short_name: '',
-        route_long_name: 'Local',
-        route_desc: '',
-        route_type: 2,
-        route_url: '',
-        route_color: '',
-        route_text_color: '',
-        agency_key: 'caltrain'},
-      ct_limited_20121001: {
-        route_id: 'ct_limited_20121001',
-        route_short_name: '',
+      'Li-16APR': {
+        route_id: 'Li-16APR',
+        route_short_name: ' ',
         route_long_name: 'Limited',
-        route_desc: '',
         route_type: 2,
-        route_url: '',
         route_color: 'FEF0B5',
-        route_text_color: '',
-        agency_key: 'caltrain'},
-      ct_local_20121001: {
-        route_id: 'ct_local_20121001',
-        route_short_name: '',
+        agency_key: 'caltrain'
+      },
+      'Lo-16APR': {
+        route_id: 'Lo-16APR',
+        route_short_name: ' ',
         route_long_name: 'Local',
-        route_desc: '',
         route_type: 2,
-        route_url: '',
-        route_color: '',
-        route_text_color: '',
+        route_color: 'FFFFFF',
+        agency_key: 'caltrain'
+      },
+      'TaSj-16APR': {
+        route_id: 'TaSj-16APR',
+        route_short_name: ' ',
+        route_long_name: 'Tamien / San Jose Diridon Caltrain Shuttle',
+        route_type: 3,
+        route_color: '41AD49',
         agency_key: 'caltrain'
       }
     };
@@ -132,7 +121,7 @@ describe('gtfs.getRoutesByDistance(): ', () => {
     gtfs.getRoutesByDistance(lat, lon, radius, (err, routes) => {
       should.not.exist(err);
       should.exist(routes);
-      routes.should.have.length(4);
+      routes.should.have.length(2);
 
       routes.forEach((route) => {
         const expectedRoute = expectedRoutes[route.route_id];
@@ -141,12 +130,8 @@ describe('gtfs.getRoutesByDistance(): ', () => {
         route.route_id.should.equal(expectedRoute.route_id);
         route.route_short_name.should.equal(expectedRoute.route_short_name);
         route.route_long_name.should.equal(expectedRoute.route_long_name);
-        route.route_desc.should.equal(expectedRoute.route_desc);
         route.route_type.should.equal(expectedRoute.route_type);
-        route.route_long_name.should.equal(expectedRoute.route_long_name);
-        route.route_url.should.equal(expectedRoute.route_url);
         route.route_color.should.equal(expectedRoute.route_color);
-        route.route_text_color.should.equal(expectedRoute.route_text_color);
         route.agency_key.should.equal(expectedRoute.agency_key);
       });
       done();
@@ -157,53 +142,44 @@ describe('gtfs.getRoutesByDistance(): ', () => {
     const lon = -122.39797353744507;
     const lat = 37.7210684234136;
     const expectedRoutes = {
-      ct_limited_20120701: {
-        route_id: 'ct_limited_20120701',
-        route_short_name: '',
-        route_long_name: 'Limited',
-        route_desc: '',
+      'Bu-16APR': {
+        route_id: 'Bu-16APR',
+        route_short_name: ' ',
+        route_long_name: 'Baby Bullet',
         route_type: 2,
-        route_url: '',
-        route_color: 'FEF0B5',
-        route_text_color: '',
+        route_color: 'E31837',
         agency_key: 'caltrain'
       },
-      ct_local_20120701: {
-        route_id: 'ct_local_20120701',
-        route_short_name: '',
-        route_long_name: 'Local',
-        route_desc: '',
-        route_type: 2,
-        route_url: '',
-        route_color: '',
-        route_text_color: '',
-        agency_key: 'caltrain'},
-      ct_limited_20121001: {
-        route_id: 'ct_limited_20121001',
-        route_short_name: '',
+      'Li-16APR': {
+        route_id: 'Li-16APR',
+        route_short_name: ' ',
         route_long_name: 'Limited',
-        route_desc: '',
         route_type: 2,
-        route_url: '',
         route_color: 'FEF0B5',
-        route_text_color: '',
-        agency_key: 'caltrain'},
-      ct_local_20121001: {
-        route_id: 'ct_local_20121001',
-        route_short_name: '',
+        agency_key: 'caltrain'
+      },
+      'Lo-16APR': {
+        route_id: 'Lo-16APR',
+        route_short_name: ' ',
         route_long_name: 'Local',
-        route_desc: '',
         route_type: 2,
-        route_url: '',
-        route_color: '',
-        route_text_color: '',
+        route_color: 'FFFFFF',
+        agency_key: 'caltrain'
+      },
+      'TaSj-16APR': {
+        route_id: 'TaSj-16APR',
+        route_short_name: ' ',
+        route_long_name: 'Tamien / San Jose Diridon Caltrain Shuttle',
+        route_type: 3,
+        route_color: '41AD49',
         agency_key: 'caltrain'
       }
     };
+
     gtfs.getRoutesByDistance(lat, lon, (err, routes) => {
       should.not.exist(err);
       should.exist(routes);
-      routes.should.have.length(4);
+      routes.should.have.length(2);
 
       routes.forEach((route) => {
         const expectedRoute = expectedRoutes[route.route_id];
@@ -212,12 +188,8 @@ describe('gtfs.getRoutesByDistance(): ', () => {
         route.route_id.should.equal(expectedRoute.route_id);
         route.route_short_name.should.equal(expectedRoute.route_short_name);
         route.route_long_name.should.equal(expectedRoute.route_long_name);
-        route.route_desc.should.equal(expectedRoute.route_desc);
         route.route_type.should.equal(expectedRoute.route_type);
-        route.route_long_name.should.equal(expectedRoute.route_long_name);
-        route.route_url.should.equal(expectedRoute.route_url);
         route.route_color.should.equal(expectedRoute.route_color);
-        route.route_text_color.should.equal(expectedRoute.route_text_color);
         route.agency_key.should.equal(expectedRoute.agency_key);
       });
       done();

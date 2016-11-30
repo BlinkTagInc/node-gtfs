@@ -13,7 +13,7 @@ const database = require('../support/database');
 // setup fixtures
 const agenciesFixtures = [{
   agency_key: 'caltrain',
-  path: path.join(__dirname, '../fixture/caltrain_20120824_0333.zip')
+  path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
 }];
 
 const agency_key = agenciesFixtures[0].agency_key;
@@ -54,8 +54,8 @@ describe('gtfs.getCalendars(): ', () => {
         database.teardown(next);
       }
     }, () => {
-      const startDate = 20110701;
-      const endDate = 20110801;
+      const startDate = 20160404;
+      const endDate = 20160405;
       const monday = 1;
       const tuesday = 1;
       const wednesday = 1;
@@ -74,8 +74,8 @@ describe('gtfs.getCalendars(): ', () => {
   });
 
   it('should return expected calendars', (done) => {
-    const startDate = 20121005;
-    const endDate = 20121101;
+    const startDate = 20160404;
+    const endDate = 20160405;
     const monday = 0;
     const tuesday = 1;
     const wednesday = 0;
@@ -90,7 +90,7 @@ describe('gtfs.getCalendars(): ', () => {
       calendars.length.should.equal(1);
 
       const expectedCalendar = {
-        service_id: 'WD_20121001',
+        service_id: 'CT-16APR-Caltrain-Weekday-01',
         monday: 1,
         tuesday: 1,
         wednesday: 1,
@@ -98,8 +98,8 @@ describe('gtfs.getCalendars(): ', () => {
         friday: 1,
         saturday: 0,
         sunday: 0,
-        start_date: 20121001,
-        end_date: 20131001,
+        start_date: 20160404,
+        end_date: 20190331,
         agency_key: 'caltrain'
       };
 

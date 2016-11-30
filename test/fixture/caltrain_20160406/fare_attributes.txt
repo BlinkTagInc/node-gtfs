@@ -1,0 +1,7 @@
+fare_id,price,currency_type,payment_method,transfers,transfer_duration
+OW_1_20160228,3.75,USD,1,0,
+OW_2_20160228,5.75,USD,1,0,
+OW_3_20160228,7.75,USD,1,0,
+OW_4_20160228,9.75,USD,1,0,
+OW_5_20160228,11.75,USD,1,0,
+OW_6_20160228,13.75,USD,1,0,

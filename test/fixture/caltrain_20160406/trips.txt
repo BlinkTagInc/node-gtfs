@@ -1,0 +1,219 @@
+route_id,service_id,trip_id,trip_headsign,trip_short_name,direction_id,shape_id,wheelchair_accessible,bikes_allowed
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,23a,DIRIDON STATION,23,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,25a,DIRIDON STATION,25,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,27a,DIRIDON STATION,27,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,01a,DIRIDON STATION,1,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,29a,DIRIDON STATION,29,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,31a,DIRIDON STATION,31,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,33a,DIRIDON STATION,33,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,35a,DIRIDON STATION,35,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,37a,DIRIDON STATION,37,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,39a,DIRIDON STATION,39,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,41a,DIRIDON STATION,41,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,03a,DIRIDON STATION,3,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,43a,DIRIDON STATION,43,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,45a,DIRIDON STATION,45,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,47a,DIRIDON STATION,47,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,49a,DIRIDON STATION,49,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,22a,TAMIEN STATION,22,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,24a,TAMIEN STATION,24,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,26a,TAMIEN STATION,26,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,02a,TAMIEN STATION,2,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,30a,TAMIEN STATION,30,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,32a,TAMIEN STATION,32,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,34a,TAMIEN STATION,34,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,36a,TAMIEN STATION,36,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,38a,TAMIEN STATION,38,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,40a,TAMIEN STATION,40,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,04a,TAMIEN STATION,4,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,44a,TAMIEN STATION,44,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Saturday-02,46a,TAMIEN STATION,46,1,cal_sj_tam,,
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,421a,SAN FRANCISCO STATION,421,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,423a,SAN FRANCISCO STATION,423,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,425a,SAN FRANCISCO STATION,425,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,427a,SAN FRANCISCO STATION,427,0,cal_sj_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Saturday-02,801a,SAN FRANCISCO STATION,801,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,429a,SAN FRANCISCO STATION,429,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,431a,SAN FRANCISCO STATION,431,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,433a,SAN FRANCISCO STATION,433,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,435a,SAN FRANCISCO STATION,435,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,437a,SAN FRANCISCO STATION,437,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,439a,SAN FRANCISCO STATION,439,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,441a,SAN FRANCISCO STATION,441,0,cal_sj_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Saturday-02,803a,SAN FRANCISCO STATION,803,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,443a,SAN FRANCISCO STATION,443,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,445a,SAN FRANCISCO STATION,445,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,447a,SAN FRANCISCO STATION,447,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,449a,SAN FRANCISCO STATION,449,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,451a,SAN FRANCISCO STATION,451,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,422a,DIRIDON STATION,422,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,424a,DIRIDON STATION,424,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,426a,DIRIDON STATION,426,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,428a,DIRIDON STATION,428,1,cal_sj_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Saturday-02,802a,DIRIDON STATION,802,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,430a,DIRIDON STATION,430,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,432a,DIRIDON STATION,432,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,434a,DIRIDON STATION,434,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,436a,DIRIDON STATION,436,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,438a,DIRIDON STATION,438,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,440a,DIRIDON STATION,440,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,442a,DIRIDON STATION,442,1,cal_sj_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Saturday-02,804a,DIRIDON STATION,804,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,444a,DIRIDON STATION,444,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,446a,DIRIDON STATION,446,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,448a,DIRIDON STATION,448,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,450a,DIRIDON STATION,450,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Saturday-02,454a,DIRIDON STATION,454,1,cal_sj_sf,1,1
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,23u,DIRIDON STATION,23,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,25u,DIRIDON STATION,25,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,27u,DIRIDON STATION,27,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,01u,DIRIDON STATION,1,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,29u,DIRIDON STATION,29,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,31u,DIRIDON STATION,31,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,33u,DIRIDON STATION,33,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,35u,DIRIDON STATION,35,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,37u,DIRIDON STATION,37,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,39u,DIRIDON STATION,39,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,41u,DIRIDON STATION,41,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,03u,DIRIDON STATION,3,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,43u,DIRIDON STATION,43,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,45u,DIRIDON STATION,45,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,47u,DIRIDON STATION,47,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,49u,DIRIDON STATION,49,0,cal_tam_sj,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,22u,TAMIEN STATION,22,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,24u,TAMIEN STATION,24,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,26u,TAMIEN STATION,26,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,02u,TAMIEN STATION,2,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,30u,TAMIEN STATION,30,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,32u,TAMIEN STATION,32,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,34u,TAMIEN STATION,34,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,36u,TAMIEN STATION,36,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,38u,TAMIEN STATION,38,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,40u,TAMIEN STATION,40,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,04u,TAMIEN STATION,4,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,44u,TAMIEN STATION,44,1,cal_sj_tam,,
+TaSj-16APR,CT-16APR-Caltrain-Sunday-02,46u,TAMIEN STATION,46,1,cal_sj_tam,,
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,423u,SAN FRANCISCO STATION,423,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,425u,SAN FRANCISCO STATION,425,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,427u,SAN FRANCISCO STATION,427,0,cal_sj_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Sunday-02,801u,SAN FRANCISCO STATION,801,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,429u,SAN FRANCISCO STATION,429,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,431u,SAN FRANCISCO STATION,431,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,433u,SAN FRANCISCO STATION,433,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,435u,SAN FRANCISCO STATION,435,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,437u,SAN FRANCISCO STATION,437,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,439u,SAN FRANCISCO STATION,439,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,441u,SAN FRANCISCO STATION,441,0,cal_sj_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Sunday-02,803u,SAN FRANCISCO STATION,803,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,443u,SAN FRANCISCO STATION,443,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,445u,SAN FRANCISCO STATION,445,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,447u,SAN FRANCISCO STATION,447,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,449u,SAN FRANCISCO STATION,449,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,422u,DIRIDON STATION,422,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,424u,DIRIDON STATION,424,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,426u,DIRIDON STATION,426,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,428u,DIRIDON STATION,428,1,cal_sj_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Sunday-02,802u,DIRIDON STATION,802,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,430u,DIRIDON STATION,430,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,432u,DIRIDON STATION,432,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,434u,DIRIDON STATION,434,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,436u,DIRIDON STATION,436,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,438u,DIRIDON STATION,438,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,440u,DIRIDON STATION,440,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,442u,DIRIDON STATION,442,1,cal_sj_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Sunday-02,804u,DIRIDON STATION,804,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,444u,DIRIDON STATION,444,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,446u,DIRIDON STATION,446,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Sunday-02,448u,DIRIDON STATION,448,1,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,101,SAN FRANCISCO STATION,101,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,103,SAN FRANCISCO STATION,103,0,cal_tam_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,305,SAN FRANCISCO STATION,305,0,cal_sj_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,207,SAN FRANCISCO STATION,207,0,cal_tam_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,309,SAN FRANCISCO STATION,309,0,cal_tam_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,211,SAN FRANCISCO STATION,211,0,cal_sj_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,313,SAN FRANCISCO STATION,313,0,cal_sj_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,215,SAN FRANCISCO STATION,215,0,cal_sj_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,217,SAN FRANCISCO STATION,217,0,cal_gil_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,319,SAN FRANCISCO STATION,319,0,cal_tam_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,221,SAN FRANCISCO STATION,221,0,cal_gil_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,323,SAN FRANCISCO STATION,323,0,cal_sj_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,225,SAN FRANCISCO STATION,225,0,cal_sj_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,227,SAN FRANCISCO STATION,227,0,cal_gil_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,329,SAN FRANCISCO STATION,329,0,cal_tam_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,231,SAN FRANCISCO STATION,231,0,cal_sj_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,233,SAN FRANCISCO STATION,233,0,cal_tam_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,135,SAN FRANCISCO STATION,135,0,cal_sj_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,237,SAN FRANCISCO STATION,237,0,cal_tam_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,139,SAN FRANCISCO STATION,139,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,143,SAN FRANCISCO STATION,143,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,147,SAN FRANCISCO STATION,147,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,151,SAN FRANCISCO STATION,151,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,155,SAN FRANCISCO STATION,155,0,cal_sj_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,257,SAN FRANCISCO STATION,257,0,cal_tam_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,159,SAN FRANCISCO STATION,159,0,cal_tam_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,261,SAN FRANCISCO STATION,261,0,cal_tam_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,263,SAN FRANCISCO STATION,263,0,cal_tam_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,365,SAN FRANCISCO STATION,365,0,cal_sj_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,267,SAN FRANCISCO STATION,267,0,cal_sj_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,269,SAN FRANCISCO STATION,269,0,cal_tam_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,371,SAN FRANCISCO STATION,371,0,cal_sj_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,273,SAN FRANCISCO STATION,273,0,cal_tam_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,375,SAN FRANCISCO STATION,375,0,cal_sj_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,277,SAN FRANCISCO STATION,277,0,cal_sj_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,279,SAN FRANCISCO STATION,279,0,cal_tam_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,381,SAN FRANCISCO STATION,381,0,cal_sj_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,283,SAN FRANCISCO STATION,283,0,cal_tam_sf,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,385,SAN FRANCISCO STATION,385,0,cal_sj_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,287,SAN FRANCISCO STATION,287,0,cal_tam_sf,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,289,SAN FRANCISCO STATION,289,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,191,SAN FRANCISCO STATION,191,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,193,SAN FRANCISCO STATION,193,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,195,SAN FRANCISCO STATION,195,0,cal_tam_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,197,SAN FRANCISCO STATION,197,0,cal_tam_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,199,SAN FRANCISCO STATION,199,0,cal_sj_sf,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,102,DIRIDON STATION,102,1,cal_sf_sj,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,104,TAMIEN STATION,104,1,cal_sf_tam,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,206,DIRIDON STATION,206,1,cal_sf_sj,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,208,TAMIEN STATION,208,1,cal_sf_tam,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,210,TAMIEN STATION,210,1,cal_sf_tam,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,312,DIRIDON STATION,312,1,cal_sf_sj,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,314,DIRIDON STATION,314,1,cal_sf_sj,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,216,DIRIDON STATION,216,1,cal_sf_sj,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,218,TAMIEN STATION,218,1,cal_sf_tam,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,220,TAMIEN STATION,220,1,cal_sf_tam,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,322,DIRIDON STATION,322,1,cal_sf_sj,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,324,DIRIDON STATION,324,1,cal_sf_sj,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,226,DIRIDON STATION,226,1,cal_sf_sj,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,228,TAMIEN STATION,228,1,cal_sf_tam,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,230,TAMIEN STATION,230,1,cal_sf_tam,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,332,DIRIDON STATION,332,1,cal_sf_sj,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,134,DIRIDON STATION,134,1,cal_sf_sj,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,236,TAMIEN STATION,236,1,cal_sf_tam,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,138,DIRIDON STATION,138,1,cal_sf_sj,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,142,DIRIDON STATION,142,1,cal_sf_sj,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,146,DIRIDON STATION,146,1,cal_sf_sj,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,150,DIRIDON STATION,150,1,cal_sf_sj,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,152,DIRIDON STATION,152,1,cal_sf_sj,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,254,TAMIEN STATION,254,1,cal_sf_tam,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,156,GILROY STATION,156,1,cal_sf_gil,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,258,TAMIEN STATION,258,1,cal_sf_tam,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,360,DIRIDON STATION,360,1,cal_sf_sj,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,262,DIRIDON STATION,262,1,cal_sf_sj,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,264,DIRIDON STATION,264,1,cal_sf_sj,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,366,TAMIEN STATION,366,1,cal_sf_tam,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,268,GILROY STATION,268,1,cal_sf_gil,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,370,DIRIDON STATION,370,1,cal_sf_sj,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,272,DIRIDON STATION,272,1,cal_sf_sj,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,274,GILROY STATION,274,1,cal_sf_gil,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,376,TAMIEN STATION,376,1,cal_sf_tam,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,278,TAMIEN STATION,278,1,cal_sf_tam,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,380,DIRIDON STATION,380,1,cal_sf_sj,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,282,DIRIDON STATION,282,1,cal_sf_sj,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,284,DIRIDON STATION,284,1,cal_sf_sj,1,1
+Bu-16APR,CT-16APR-Caltrain-Weekday-01,386,TAMIEN STATION,386,1,cal_sf_tam,1,1
+Li-16APR,CT-16APR-Caltrain-Weekday-01,288,TAMIEN STATION,288,1,cal_sf_tam,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,190,DIRIDON STATION,190,1,cal_sf_sj,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,192,TAMIEN STATION,192,1,cal_sf_tam,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,194,TAMIEN STATION,194,1,cal_sf_tam,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,196,DIRIDON STATION,196,1,cal_sf_sj,1,1
+Lo-16APR,CT-16APR-Caltrain-Weekday-01,198,DIRIDON STATION,198,1,cal_sf_sj,1,1
