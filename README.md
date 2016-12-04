@@ -474,9 +474,20 @@ Returns feed_info for the agency_key specified
 
     });
 
+#### Stop Attributes
+
+Returns an array of stop attributes, optionally limited to those matching the
+`stop_ids` specified. These are from the non-standard `stop_attributes.txt`
+file.
+
+    gtfs.getStopAttributes(agency_key, stop_ids, (err, stopAttributes) => {
+
+    });
+
 #### Timetables
 
-Returns an array of timetables for the `agency_key` specified
+Returns an array of timetables for the `agency_key` specified. These are from
+the non-standard `timetables.txt` file.
 
     gtfs.getTimetablesByAgency(agency_key, (err, timetables) => {
 
@@ -486,7 +497,7 @@ Returns an array of timetables for the `agency_key` specified
 
 Returns an array timetable objects matching the `timetable_id` specified. A
 timetable may consist of multiple overlapping routes, so more than one timetable
-object can be returned.
+object can be returned. These are from the non-standard `timetables.txt` file.
 
     gtfs.getTimetable(agency_key, timetable_id, (err, timetable) => {
 
@@ -495,7 +506,7 @@ object can be returned.
 #### TimetableStopOrders by id
 
 Returns an array of TimetableStopOrder objects matching the `timetable_id`
-specified.
+specified. These are from the non-standard `timetable_stop_order.txt` file.
 
     gtfs.getTimetableStopOrders(agency_key, timetable_id, (err, timetableStopOrders) => {
 
@@ -503,7 +514,8 @@ specified.
 
 #### Timetable Pages
 
-Returns an array of timetable pages for the `agency_key` specified
+Returns an array of timetable pages for the `agency_key` specified. These are
+from the non-standard `timetable_pages.txt` file.
 
     gtfs.getTimetablePagesByAgency(agency_key, (err, timetablePages) => {
 
@@ -512,6 +524,7 @@ Returns an array of timetable pages for the `agency_key` specified
 #### Timetable Pages by id
 
 Returns an array timetable pages matching the `timetable_page_id` specified.
+These are from the non-standard `timetable_pages.txt` file.
 
     gtfs.getTimetablePage(agency_key, timetable_page_id, (err, timetable) => {
 
