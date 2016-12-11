@@ -25,7 +25,7 @@ Install node-gtfs directly from [npm](https://npmjs.org):
 
 ## Command-line example
 
-    gtfs-import --config-path /path/to/your/custom-config.json
+    gtfs-import --configPath /path/to/your/custom-config.json
 
 ## Code example
 
@@ -47,9 +47,9 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 | option | type | description |
 | ------ | ---- | ----------- |
 | `agencies` | array | An array of GTFS files to be imported. |
-| `mongo_url` | string | The URL of the MongoDB database to import to. |
+| `mongoUrl` | string | The URL of the MongoDB database to import to. |
 | `verbose` | boolean | Whether or not to print output to the console. |
-| `skip_delete` | boolean | Whether or not to skip deleting existing data from the database. |
+| `skipDelete` | boolean | Whether or not to skip deleting existing data from the database. |
 
 ### Agencies
 
@@ -129,10 +129,10 @@ API along with your API token.
 
 ### MongoDB URI
 
-Add the MongoDB URI to `config.json` with the key `mongo_url`. Running locally, you may want to use `mongodb://localhost:27017/gtfs`.
+Add the MongoDB URI to `config.json` with the key `mongoUrl`. Running locally, you may want to use `mongodb://localhost:27017/gtfs`.
 ```
 {
-  "mongo_url": "mongodb://localhost:27017/gtfs",
+  "mongoUrl": "mongodb://localhost:27017/gtfs",
   "agencies": [
     {
       "agency_key": "myAgency",
@@ -148,7 +148,7 @@ If you don't want the import script to print any output to the console, you can 
 
 ```
 {
-  "mongo_url": "mongodb://localhost:27017/gtfs",
+  "mongoUrl": "mongodb://localhost:27017/gtfs",
   "agencies": [
     {
       "agency_key": "localAgency",
@@ -161,18 +161,18 @@ If you don't want the import script to print any output to the console, you can 
 
 ### Deleting existing data
 
-If you don't want the import script to delete all existing data from the database with the same `agency_key`, you can set `skip_delete` to `false`. Defaults to `true`.
+If you don't want the import script to delete all existing data from the database with the same `agency_key`, you can set `skipDelete` to `false`. Defaults to `true`.
 
 ```
 {
-  "mongo_url": "mongodb://localhost:27017/gtfs",
+  "mongoUrl": "mongodb://localhost:27017/gtfs",
   "agencies": [
     {
       "agency_key": "localAgency",
       "path": ""/path/to/the/unzipped/gtfs/"
     }
   ],
-  "skip_delete": true
+  "skipDelete": true
 }
 ```
 
@@ -192,19 +192,19 @@ If you want to run this locally, make sure mongo in installed and running.
 
 By default, it will look for a `config.json` file in the project root. To specify a different path for the configuration file:
 
-    gtfs-import --config-path /path/to/your/custom-config.json
+    gtfs-import --configPath /path/to/your/custom-config.json
 
 ### Command Line options
 
 #### Skip Delete
-By default, the import script will delete any existing data with the same `agency_key` from your database. If you don't want this to happen, pass the `--skip-delete` flag
+By default, the import script will delete any existing data with the same `agency_key` from your database. If you don't want this to happen, pass the `--skipDelete` flag
 
-    gtfs-import --skip-delete
+    gtfs-import --skipDelete
 
 #### Specify path to config JSON file
 You can specify the path to a config file to be used by the import script.
 
-    gtfs-import --config-path /path/to/your/custom-config.json
+    gtfs-import --configPath /path/to/your/custom-config.json
 
 #### Show help
 Show all command line options
@@ -229,7 +229,7 @@ Configuration can be a JSON object in your code
 
     const gtfs = require('gtfs');
     const config = {
-      mongo_url: 'mongodb://localhost:27017/gtfs',
+      mongoUrl: 'mongodb://localhost:27017/gtfs',
       agencies: [
         {
           agency_key: 'county-connection',

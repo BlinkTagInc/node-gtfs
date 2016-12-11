@@ -1,5 +1,5 @@
 {
-  "mongo_url": "mongodb://localhost:27017/gtfs",
+  "mongoUrl": "mongodb://localhost:27017/gtfs",
   "agencies": [
     {
       "agency_key": "county-connection",

@@ -6,20 +6,20 @@ const argv = require('yargs')
     .usage('Usage: $0 --config ./config.json')
     .help()
     .option('c', {
-      alias: 'config-path',
+      alias: 'configPath',
       describe: 'Path to config file',
       default: './config.json',
       type: 'string'
     })
     .option('s', {
-      alias: 'skip-delete',
+      alias: 'skipDelete',
       describe: 'Don\'t delete existing data for `agency_key` on import',
       type: 'boolean',
       default: false
     })
     .argv;
 
-const configPath = path.join(process.cwd(), argv['config-path']);
+const configPath = path.join(process.cwd(), argv['configPath']);
 
 
 function handleError(err) {
@@ -32,13 +32,13 @@ function getConfig() {
   try {
     const config = require(configPath);
 
-    if (argv['skip-delete']) {
-      config.skip_delete = argv['skip-delete'];
+    if (argv['skipDelete']) {
+      config.skipDelete = argv['skipDelete'];
     }
 
     return config;
   } catch (err) {
-    handleError(new Error(`Cannot find configuration file at \`${configPath}\`. Use config-sample.json as a starting point, pass --config-path option`));
+    handleError(new Error(`Cannot find configuration file at \`${configPath}\`. Use config-sample.json as a starting point, pass --configPath option`));
   }
 }
 

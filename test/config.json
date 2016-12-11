@@ -1,5 +1,5 @@
 {
-  "mongo_url": "mongodb://localhost:27017/gtfs-test",
+  "mongoUrl": "mongodb://localhost:27017/gtfs-test",
   "agencies": [],
   "verbose": false
 }

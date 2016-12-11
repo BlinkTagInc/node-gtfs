@@ -9,13 +9,13 @@ let db;
 
 exports.connect = (config, cb) => {
   // Open the connection to the server
-  MongoClient.connect(config.mongo_url, (err, client) => {
+  MongoClient.connect(config.mongoUrl, (err, client) => {
     should.not.exists(err);
     should.exists(client);
     db = client;
 
     // use mongoose to connect
-    mongoose.connect(config.mongo_url, (err) => {
+    mongoose.connect(config.mongoUrl, (err) => {
       if (err) {
         return cb(err);
       }
