@@ -1,7 +1,7 @@
 {
   "name": "gtfs",
   "description": "Import GTFS transit data into mongodb and query routes, stops, times, fares and more",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "keywords": [
     "transit",
     "gtfs",
@@ -38,12 +38,23 @@
     "mkdirp": "0.5.1",
     "moment": "2.17.1",
     "mongodb": "2.2.15",
-    "mongoose": "4.7.2",
     "proj4": "2.3.15",
     "request": "2.79.0",
     "rimraf": "2.5.4",
     "unzip2": "0.2.5",
     "yargs": "6.5.0"
+  },
+  "devDependencies": {
+    "csv-parse": "1.1.7",
+    "eslint": "3.12.0",
+    "eslint-config-airbnb-base": "10.0.1",
+    "eslint-plugin-import": "2.2.0",
+    "mocha": "3.2.0",
+    "should": "11.1.2",
+    "timekeeper": "1.0.0"
+  },
+  "peerDependencies": {
+    "mongoose": ">= 4.7.2"
   },
   "repository": {
     "type": "git",
@@ -56,18 +67,12 @@
     "gtfs-import": "bin/gtfs-import.js"
   },
   "main": "index",
-  "devDependencies": {
-    "csv-parse": "1.1.7",
-    "eslint": "3.12.0",
-    "eslint-config-airbnb-base": "10.0.1",
-    "eslint-plugin-import": "2.2.0",
-    "mocha": "3.2.0",
-    "should": "11.1.2",
-    "timekeeper": "1.0.0"
-  },
   "scripts": {
     "test": "NODE_ENV=test mocha ./test/mocha/**/*.js --timeout 5000",
     "lint": "eslint ."
   },
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "node": ">= 6.9.0"
+  }
 }

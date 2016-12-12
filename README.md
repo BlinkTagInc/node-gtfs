@@ -21,7 +21,7 @@ how to use this library.
 
 Install node-gtfs directly from [npm](https://npmjs.org):
 
-    npm install gtfs -g
+    npm install mongoose gtfs -g
 
 ## Command-line example
 
