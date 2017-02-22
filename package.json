@@ -45,13 +45,11 @@
     "yargs": "6.6.0"
   },
   "devDependencies": {
-    "csv-parse": "1.1.7",
-    "eslint": "3.12.0",
-    "eslint-config-airbnb-base": "10.0.1",
-    "eslint-plugin-import": "2.2.0",
+    "csv-parse": "1.2.0",
     "mocha": "3.2.0",
-    "should": "11.1.2",
-    "timekeeper": "1.0.0"
+    "should": "11.2.0",
+    "timekeeper": "1.0.0",
+    "xo": "0.17.1"
   },
   "peerDependencies": {
     "mongoose": ">= 4.8.4"
@@ -69,10 +67,14 @@
   "main": "index",
   "scripts": {
     "test": "NODE_ENV=test mocha ./test/mocha/**/*.js --timeout 5000",
-    "lint": "eslint ."
+    "lint": "xo"
   },
   "license": "MIT",
   "engines": {
     "node": ">= 6.9.0"
+  },
+  "xo": {
+    "esnext": true,
+    "space": true
   }
 }
