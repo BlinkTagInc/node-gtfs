@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const StopAttributes = mongoose.model('StopAttributes', new mongoose.Schema({
   agency_key: {
     type: String,
+    required: true,
     index: true
   },
   stop_id: {

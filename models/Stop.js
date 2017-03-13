@@ -3,20 +3,35 @@ const mongoose = require('mongoose');
 const Stop = mongoose.model('Stop', new mongoose.Schema({
   agency_key: {
     type: String,
+    required: true,
     index: true
   },
   stop_id: {
     type: String,
+    required: true,
     index: true
   },
   stop_code: {
     type: String,
     index: true
   },
-  stop_name: String,
+  stop_name: {
+    type: String,
+    required: true
+  },
   stop_desc: String,
-  stop_lat: Number,
-  stop_lon: Number,
+  stop_lat: {
+    type: Number,
+    required: true,
+    min: -90,
+    max: 90
+  },
+  stop_lon: {
+    type: Number,
+    required: true,
+    min: -180,
+    max: 180
+  },
   loc: {
     type: Array,
     index: '2d'

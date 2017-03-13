@@ -3,12 +3,22 @@ const mongoose = require('mongoose');
 const Agency = mongoose.model('Agency', new mongoose.Schema({
   agency_key: {
     type: String,
+    required: true,
     index: true
   },
   agency_id: String,
-  agency_name: String,
-  agency_url: String,
-  agency_timezone: String,
+  agency_name: {
+    type: String,
+    required: true
+  },
+  agency_url: {
+    type: String,
+    required: true
+  },
+  agency_timezone: {
+    type: String,
+    required: true
+  },
   agency_lang: String,
   agency_phone: String,
   agency_fare_url: String,

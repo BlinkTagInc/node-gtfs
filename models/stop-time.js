@@ -4,18 +4,31 @@ const utils = require('../lib/utils');
 const StopTime = mongoose.model('StopTime', new mongoose.Schema({
   agency_key: {
     type: String,
+    required: true,
     index: true
   },
   trip_id: {
     type: String,
+    required: true,
     index: true
   },
-  arrival_time: String,
-  departure_time: String,
-  stop_id: String,
+  arrival_time: {
+    type: String,
+    required: true
+  },
+  departure_time: {
+    type: String,
+    required: true
+  },
+  stop_id: {
+    type: String,
+    required: true
+  },
   stop_sequence: {
     type: Number,
-    index: true
+    required: true,
+    index: true,
+    min: 0
   },
   stop_headsign: String,
   pickup_type: {

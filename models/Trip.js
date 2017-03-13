@@ -3,17 +3,23 @@ const mongoose = require('mongoose');
 const Trip = mongoose.model('Trip', new mongoose.Schema({
   agency_key: {
     type: String,
+    required: true,
     index: true
   },
   route_id: {
     type: String,
+    required: true,
     index: true
   },
   service_id: {
     type: String,
+    required: true,
     index: true
   },
-  trip_id: String,
+  trip_id: {
+    type: String,
+    required: true
+  },
   trip_headsign: String,
   trip_short_name: String,
   direction_id: {
