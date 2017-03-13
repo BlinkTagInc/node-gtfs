@@ -1,6 +1,6 @@
 const fs = require('fs');
 const async = require('async');
-const unzip = require('unzip2');
+const extract = require('extract-zip');
 const parse = require('csv-parse');
 const path = require('path');
 
@@ -50,10 +50,7 @@ describe('lib/import.js', function testImport() {
     before((done) => {
       async.series({
         extractFixture: (next) => {
-          const agencyPathFixture = agenciesFixturesLocal[0].path;
-          fs.createReadStream(agencyPathFixture)
-            .pipe(unzip.Extract({ path: tmpDir }).on('close', next).on('error', onError))
-            .on('error', onError);
+          extract(agenciesFixturesLocal[0].path, {dir: tmpDir}, next);
         },
         countRowsInGTFSFiles: (next) => {
           async.eachSeries(filenames, (file, next) => {
