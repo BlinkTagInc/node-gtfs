@@ -76,7 +76,6 @@
   },
   "xo": {
     "esnext": true,
-    "space": true,
-    "maxParams": false
+    "space": true
   }
 }
