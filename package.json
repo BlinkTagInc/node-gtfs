@@ -29,7 +29,8 @@
     "Daniel Demidov",
     "gerlacdt",
     "Heath Shurtleff",
-    "Marcelo Muñoz Araya <ma.munoz.araya@gmail.com>"
+    "Marcelo Muñoz Araya <ma.munoz.araya@gmail.com>",
+    "David Aghassi"
   ],
   "dependencies": {
     "async": "2.1.5",
