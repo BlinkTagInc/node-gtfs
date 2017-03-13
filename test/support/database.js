@@ -15,7 +15,7 @@ exports.connect = (config, cb) => {
     db = client;
 
     // use mongoose to connect
-    mongoose.connect(config.mongoUrl, (err) => {
+    mongoose.connect(config.mongoUrl, err => {
       if (err) {
         return cb(err);
       }
@@ -25,7 +25,7 @@ exports.connect = (config, cb) => {
   });
 };
 
-exports.teardown = (cb) => {
+exports.teardown = cb => {
   db.collections((err, collections) => {
     if (err) {
       return cb(err);
@@ -45,8 +45,8 @@ exports.teardown = (cb) => {
   });
 };
 
-exports.close = (cb) => {
-  db.close((err) => {
+exports.close = cb => {
+  db.close(err => {
     if (err) {
       return cb(err);
     }

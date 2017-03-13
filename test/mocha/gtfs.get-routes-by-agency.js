@@ -1,11 +1,11 @@
-const async = require('async');
 const path = require('path');
+
+const async = require('async');
 const should = require('should');
 
 // libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 // test support
 const database = require('../support/database');
@@ -16,46 +16,45 @@ const agenciesFixtures = [{
   path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
 }];
 
-const agency_key = agenciesFixtures[0].agency_key;
-const agency_id = agenciesFixtures[0].agency_id;
+const agencyKey = agenciesFixtures[0].agency_key;
+const agencyId = agenciesFixtures[0].agency_id;
 
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getRoutesByAgency(): ', () => {
-
-  before((done) => {
+  before(done => {
     database.connect(config, done);
   });
 
-  after((done) => {
+  after(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      closeDb: (next) => {
+      closeDb: next => {
         database.close(next);
       }
     }, done);
   });
 
-  beforeEach((done) => {
+  beforeEach(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      executeDownloadScript: (next) => {
+      executeDownloadScript: next => {
         gtfs.import(config, next);
       }
     }, done);
   });
 
-  it('should return empty array if no routes for given agency exists (agency_id not provided)', (done) => {
+  it('should return empty array if no routes for given agency exists (agencyId not provided)', done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       }
     }, () => {
-      gtfs.getRoutesByAgency(agency_key, (err, res) => {
+      gtfs.getRoutesByAgency(agencyKey, (err, res) => {
         should.not.exist(err);
         should.exist(res);
         res.should.have.length(0);
@@ -64,8 +63,8 @@ describe('gtfs.getRoutesByAgency(): ', () => {
     });
   });
 
-  it('should return expected routes for given agency (agency_id not provided)', (done) => {
-    gtfs.getRoutesByAgency(agency_key, (err, routes) => {
+  it('should return expected routes for given agency (agencyId not provided)', done => {
+    gtfs.getRoutesByAgency(agencyKey, (err, routes) => {
       should.not.exist(err);
       should.exist(routes);
 
@@ -106,7 +105,7 @@ describe('gtfs.getRoutesByAgency(): ', () => {
 
       routes.should.have.length(4);
 
-      routes.forEach((route) => {
+      routes.forEach(route => {
         const expectedRoute = expectedRoutes[route.route_id];
 
         should.exist(expectedRoute);
@@ -122,13 +121,13 @@ describe('gtfs.getRoutesByAgency(): ', () => {
     });
   });
 
-  it('should return empty array if no routes for given agency exists (agency_id provided)', (done) => {
+  it('should return empty array if no routes for given agency exists (agencyId provided)', done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       }
     }, () => {
-      gtfs.getRoutesByAgency(agency_key, agency_id, (err, res) => {
+      gtfs.getRoutesByAgency(agencyKey, agencyId, (err, res) => {
         should.not.exist(err);
         should.exist(res);
         res.should.have.length(0);
@@ -137,8 +136,8 @@ describe('gtfs.getRoutesByAgency(): ', () => {
     });
   });
 
-  it('should return expected routes for given agency and agency_id', (done) => {
-    gtfs.getRoutesByAgency(agency_key, agency_id, (err, routes) => {
+  it('should return expected routes for given agency and agencyId', done => {
+    gtfs.getRoutesByAgency(agencyKey, agencyId, (err, routes) => {
       should.not.exist(err);
       should.exist(routes);
 
@@ -179,7 +178,7 @@ describe('gtfs.getRoutesByAgency(): ', () => {
 
       routes.should.have.length(4);
 
-      routes.forEach((route) => {
+      routes.forEach(route => {
         const expectedRoute = expectedRoutes[route.route_id];
 
         should.exist(expectedRoute);

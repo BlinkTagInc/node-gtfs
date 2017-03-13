@@ -1,11 +1,11 @@
-const async = require('async');
 const path = require('path');
+
+const async = require('async');
 const should = require('should');
 
 // libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 // test support
 const database = require('../support/database');
@@ -19,36 +19,35 @@ const agenciesFixtures = [{
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getRoutesByDistance(): ', () => {
-
-  before((done) => {
+  before(done => {
     database.connect(config, done);
   });
 
-  after((done) => {
+  after(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      closeDb: (next) => {
+      closeDb: next => {
         database.close(next);
       }
     }, done);
   });
 
-  beforeEach((done) => {
+  beforeEach(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      executeDownloadScript: (next) => {
+      executeDownloadScript: next => {
         gtfs.import(config, next);
       }
     }, done);
   });
 
-  it('should return an empty array if no routes exist', (done) => {
+  it('should return an empty array if no routes exist', done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       }
     }, () => {
@@ -65,7 +64,7 @@ describe('gtfs.getRoutesByDistance(): ', () => {
     });
   });
 
-  it('should return an empty array if no routes within given distance exist', (done) => {
+  it('should return an empty array if no routes within given distance exist', done => {
     const lon = -127.9867495;
     const lat = 40.38976166855;
     const radius = 100;
@@ -79,7 +78,7 @@ describe('gtfs.getRoutesByDistance(): ', () => {
   });
 
 
-  it('should return expected routes within given distance if they exist', (done) => {
+  it('should return expected routes within given distance if they exist', done => {
     const lon = -121.9867495;
     const lat = 37.38976166855;
     const radius = 2;
@@ -138,7 +137,7 @@ describe('gtfs.getRoutesByDistance(): ', () => {
     });
   });
 
-  it('should return expected routes within given distance (without specifying radius) if exists', (done) => {
+  it('should return expected routes within given distance (without specifying radius) if exists', done => {
     const lon = -122.39797353744507;
     const lat = 37.7210684234136;
     const expectedRoutes = {
@@ -181,7 +180,7 @@ describe('gtfs.getRoutesByDistance(): ', () => {
       should.exist(routes);
       routes.should.have.length(2);
 
-      routes.forEach((route) => {
+      routes.forEach(route => {
         const expectedRoute = expectedRoutes[route.route_id];
 
         should.exist(expectedRoute);

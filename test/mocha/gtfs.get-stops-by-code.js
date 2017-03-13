@@ -1,11 +1,11 @@
-const async = require('async');
 const path = require('path');
+
+const async = require('async');
 const should = require('should');
 
 // libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 // test support
 const database = require('../support/database');
@@ -19,36 +19,35 @@ const agenciesFixtures = [{
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getStopsByStopCode(): ', () => {
-
-  before((done) => {
+  before(done => {
     database.connect(config, done);
   });
 
-  after((done) => {
+  after(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      closeDb: (next) => {
+      closeDb: next => {
         database.close(next);
       }
     }, done);
   });
 
-  beforeEach((done) => {
+  beforeEach(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      executeDownloadScript: (next) => {
+      executeDownloadScript: next => {
         gtfs.import(config, next);
       }
     }, done);
   });
 
-  it('should return an empty array if no stops exists for given agency', (done) => {
+  it('should return an empty array if no stops exists for given agency', done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       }
     },() => {
@@ -61,7 +60,7 @@ describe('gtfs.getStopsByStopCode(): ', () => {
     });
   });
 
-  it('should return array of stops if it exists for given agency', (done) => {
+  it('should return array of stops if it exists for given agency', done => {
     const agency_key = 'caltrain';
 
     gtfs.getStopsByStopCode(agency_key, (err, stops) => {
@@ -73,7 +72,7 @@ describe('gtfs.getStopsByStopCode(): ', () => {
     });
   });
 
-  it('should return array of stops if it exists for given agency, and stop_ids', (done) => {
+  it('should return array of stops if it exists for given agency, and stop_ids', done => {
     const agency_key = 'caltrain';
     const stop_codes = [
       '70031',

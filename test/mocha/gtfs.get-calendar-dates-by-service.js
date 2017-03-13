@@ -1,11 +1,11 @@
-const async = require('async');
 const path = require('path');
+
+const async = require('async');
 const should = require('should');
 
 // libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 // test support
 const database = require('../support/database');
@@ -16,41 +16,38 @@ const agenciesFixtures = [{
   path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
 }];
 
-const agency_key = agenciesFixtures[0].agency_key;
-
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getCalendarDatesByService(): ', () => {
-
-  before((done) => {
+  before(done => {
     database.connect(config, done);
   });
 
-  after((done) => {
+  after(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      closeDb: (next) => {
+      closeDb: next => {
         database.close(next);
       }
     }, done);
   });
 
-  beforeEach((done) => {
+  beforeEach(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      executeDownloadScript: (next) => {
+      executeDownloadScript: next => {
         gtfs.import(config, next);
       }
     }, done);
   });
 
-  it('should return empty array if no calendar dates exist', (done) => {
+  it('should return empty array if no calendar dates exist', done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       }
     }, () => {
@@ -64,7 +61,7 @@ describe('gtfs.getCalendarDatesByService(): ', () => {
     });
   });
 
-  it('should return expected calendar dates', (done) => {
+  it('should return expected calendar dates', done => {
     const serviceIds = ['CT-16APR-Caltrain-Weekday-01'];
     gtfs.getCalendarDatesByService(serviceIds, (err, calendarDates) => {
       should.not.exist(err);
@@ -98,7 +95,7 @@ describe('gtfs.getCalendarDatesByService(): ', () => {
         }
       ];
 
-      calendarDates.forEach((calendarDate) => {
+      calendarDates.forEach(calendarDate => {
         const calendarDateFormatted = calendarDate.toObject();
         delete calendarDateFormatted._id;
         expectedCalendarDates.should.matchAny(calendarDateFormatted);

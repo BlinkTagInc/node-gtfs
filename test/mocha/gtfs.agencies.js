@@ -1,5 +1,6 @@
-const async = require('async');
 const path = require('path');
+
+const async = require('async');
 const should = require('should');
 const tk = require('timekeeper');
 
@@ -21,47 +22,47 @@ const agenciesFixtures = [{
 config.agencies = agenciesFixtures;
 
 describe('gtfs.agencies(): ', () => {
-  before((done) => {
+  before(done => {
     async.series({
-      connectToDb: (next) => {
+      connectToDb: next => {
         database.connect(config, next);
       },
-      setupMockDate: (next) => {
+      setupMockDate: next => {
         tk.freeze(timeReference);
         next();
       }
     }, done);
   });
 
-  after((done) => {
+  after(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      closeDb: (next) => {
+      closeDb: next => {
         database.close(next);
       },
-      resetMockDate: (next) => {
+      resetMockDate: next => {
         tk.reset();
         next();
       }
     }, done);
   });
 
-  beforeEach((done) => {
+  beforeEach(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      executeDownloadScript: (next) => {
+      executeDownloadScript: next => {
         gtfs.import(config, next);
       }
     }, done);
   });
 
-  it('should return empty array if no agencies exists', (done) => {
+  it('should return empty array if no agencies exists', done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       }
     }, () => {
@@ -74,7 +75,7 @@ describe('gtfs.agencies(): ', () => {
     });
   });
 
-  it('should return expected agency', (done) => {
+  it('should return expected agency', done => {
     gtfs.agencies((err, agencies) => {
       should.not.exist(err);
       should.exist(agencies);

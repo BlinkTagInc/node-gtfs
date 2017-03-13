@@ -1,17 +1,17 @@
-const async = require('async');
 const path = require('path');
+
+const async = require('async');
 const should = require('should');
 
 // libraries
 const config = require('../config.json');
 const gtfs = require('../../');
 
-
 // test support
 const database = require('../support/database');
 
 // setup fixtures
-var agenciesFixtures = [{
+const agenciesFixtures = [{
   agency_key: 'caltrain',
   path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
 }];
@@ -19,39 +19,38 @@ var agenciesFixtures = [{
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getAgenciesByDistance(): ', () => {
-
-  before((done) => {
+  before(done => {
     database.connect(config, done);
   });
 
-  after((done) => {
+  after(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      closeDb: (next) => {
+      closeDb: next => {
         database.close(next);
       }
     }, done);
   });
 
-  beforeEach((done) => {
+  beforeEach(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      executeDownloadScript: (next) => {
+      executeDownloadScript: next => {
         gtfs.import(config, next);
       }
     }, done);
   });
 
-  it('should return empty array if no agencies exists', (done) => {
+  it('should return empty array if no agencies exists', done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       }
-    },function(){
+    }, () => {
       const lon = -121.9867495;
       const lat = 37.38976166855;
       const radius = 100;
@@ -64,7 +63,7 @@ describe('gtfs.getAgenciesByDistance(): ', () => {
     });
   });
 
-  it('should return empty array if no agencies within given distance exists', (done) => {
+  it('should return empty array if no agencies within given distance exists', done => {
     const lon = -127.9867495;
     const lat = 40.38976166855;
     const radius = 100;
@@ -76,7 +75,7 @@ describe('gtfs.getAgenciesByDistance(): ', () => {
     });
   });
 
-  it('should return expected agencies within given distance if exists', (done) => {
+  it('should return expected agencies within given distance if exists', done => {
     const lon = -121.9867495;
     const lat = 37.38976166855;
     const radius = 100;
@@ -89,7 +88,7 @@ describe('gtfs.getAgenciesByDistance(): ', () => {
     });
   });
 
-  it('should return expected agencies within given distance (without specifying radius) if exists', (done) => {
+  it('should return expected agencies within given distance (without specifying radius) if exists', done => {
     const lon = -121.9867495;
     const lat = 37.38976166855;
     gtfs.getAgenciesByDistance(lat, lon, (err, agencies) => {

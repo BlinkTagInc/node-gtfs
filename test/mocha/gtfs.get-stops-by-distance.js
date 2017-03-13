@@ -1,11 +1,11 @@
-const async = require('async');
 const path = require('path');
+
+const async = require('async');
 const should = require('should');
 
 // libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 // test support
 const database = require('../support/database');
@@ -19,36 +19,35 @@ const agenciesFixtures = [{
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getStopsByDistance(): ', () => {
-
-  before((done) => {
+  before(done => {
     database.connect(config, done);
   });
 
-  after((done) => {
+  after(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      closeDb: (next) => {
+      closeDb: next => {
         database.close(next);
       }
     }, done);
   });
 
-  beforeEach((done) => {
+  beforeEach(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      executeDownloadScript: (next) => {
+      executeDownloadScript: next => {
         gtfs.import(config, next);
       }
     }, done);
   });
 
-  it('should return an empty array if no stops exist', (done) => {
+  it('should return an empty array if no stops exist', done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       }
     }, () => {
@@ -64,13 +63,12 @@ describe('gtfs.getStopsByDistance(): ', () => {
     });
   });
 
-
-  it('should return expected stops within given distance if they exist', (done) => {
+  it('should return expected stops within given distance if they exist', done => {
     const lon = -121.9867495;
     const lat = 37.38976166855;
     const radius = 2;
     const expectedStops = {
-      'ctla': {
+      ctla: {
         stop_id: 'ctla',
         stop_code: '',
         stop_name: 'Lawrence Caltrain',
@@ -83,9 +81,9 @@ describe('gtfs.getStopsByDistance(): ', () => {
         platform_code: '',
         wheelchair_boarding: 1,
         agency_key: 'caltrain',
-        loc: [ -121.997258, 37.370815 ]
+        loc: [-121.997258, 37.370815]
       },
-      '70231': {
+      70231: {
         stop_id: '70231',
         stop_code: '70231',
         stop_name: 'Lawrence Caltrain',
@@ -98,9 +96,9 @@ describe('gtfs.getStopsByDistance(): ', () => {
         platform_code: 'NB',
         wheelchair_boarding: 1,
         agency_key: 'caltrain',
-        loc: [ -121.997114, 37.370598 ]
+        loc: [-121.997114, 37.370598]
       },
-      '70232': {
+      70232: {
         stop_id: '70232',
         stop_code: '70232',
         stop_name: 'Lawrence Caltrain',
@@ -113,7 +111,7 @@ describe('gtfs.getStopsByDistance(): ', () => {
         platform_code: 'SB',
         wheelchair_boarding: 1,
         agency_key: 'caltrain',
-        loc: [ -121.997135, 37.370484 ]
+        loc: [-121.997135, 37.370484]
       }
     };
 
@@ -122,7 +120,7 @@ describe('gtfs.getStopsByDistance(): ', () => {
       should.exist(stops);
       stops.should.have.length(3);
 
-      stops.forEach((stop) => {
+      stops.forEach(stop => {
         const expectedStop = expectedStops[stop.stop_id];
 
         should.exist(expectedStop);
@@ -143,11 +141,11 @@ describe('gtfs.getStopsByDistance(): ', () => {
     });
   });
 
-  it('should return expected stops within given distance (without specifying radius) if they exist', (done) => {
+  it('should return expected stops within given distance (without specifying radius) if they exist', done => {
     const lon = -121.915671;
     const lat = 37.340902;
     const expectedStops = {
-      'ctco': {
+      ctco: {
         stop_id: 'ctco',
         stop_code: '',
         stop_name: 'College Park Caltrain',
@@ -160,9 +158,9 @@ describe('gtfs.getStopsByDistance(): ', () => {
         platform_code: '',
         wheelchair_boarding: 2,
         agency_key: 'caltrain',
-        loc: [ -121.914998, 37.34217 ]
+        loc: [-121.914998, 37.34217]
       },
-      '70252': {
+      70252: {
         stop_id: '70252',
         stop_code: '70252',
         stop_name: 'College Park Caltrain',
@@ -175,9 +173,9 @@ describe('gtfs.getStopsByDistance(): ', () => {
         platform_code: 'SB',
         wheelchair_boarding: 2,
         agency_key: 'caltrain',
-        loc: [ -121.914677, 37.342338 ]
+        loc: [-121.914677, 37.342338]
       },
-      '70251': {
+      70251: {
         stop_id: '70251',
         stop_code: '70251',
         stop_name: 'College Park Caltrain',
@@ -190,7 +188,7 @@ describe('gtfs.getStopsByDistance(): ', () => {
         platform_code: 'NB',
         wheelchair_boarding: 2,
         agency_key: 'caltrain',
-        loc: [ -121.9146, 37.342384 ]
+        loc: [-121.9146, 37.342384]
       }
     };
 
@@ -199,7 +197,7 @@ describe('gtfs.getStopsByDistance(): ', () => {
       should.exist(stops);
       stops.should.have.length(3);
 
-      stops.forEach((stop) => {
+      stops.forEach(stop => {
         const expectedStop = expectedStops[stop.stop_id];
 
         should.exist(expectedStop);

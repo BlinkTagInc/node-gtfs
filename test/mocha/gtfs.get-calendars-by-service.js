@@ -1,11 +1,11 @@
-const async = require('async');
 const path = require('path');
+
+const async = require('async');
 const should = require('should');
 
 // libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 // test support
 const database = require('../support/database');
@@ -16,41 +16,40 @@ const agenciesFixtures = [{
   path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
 }];
 
-const agency_key = agenciesFixtures[0].agency_key;
+const agencyKey = agenciesFixtures[0].agency_key;
 
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getCalendarsByService(): ', () => {
-
-  before((done) => {
+  before(done => {
     database.connect(config, done);
   });
 
-  after((done) => {
+  after(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      closeDb: (next) => {
+      closeDb: next => {
         database.close(next);
       }
     }, done);
   });
 
-  beforeEach((done) => {
+  beforeEach(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      executeDownloadScript: (next) => {
+      executeDownloadScript: next => {
         gtfs.import(config, next);
       }
     }, done);
   });
 
-  it('should return empty array if no calendars', (done) => {
+  it('should return empty array if no calendars', done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       }
     }, () => {
@@ -65,7 +64,7 @@ describe('gtfs.getCalendarsByService(): ', () => {
     });
   });
 
-  it('should return expected calendars', (done) => {
+  it('should return expected calendars', done => {
     const serviceIds = ['CT-16APR-Caltrain-Weekday-01'];
 
     gtfs.getCalendarsByService(serviceIds, (err, calendars) => {
@@ -75,7 +74,7 @@ describe('gtfs.getCalendarsByService(): ', () => {
 
       const calendar = calendars[0].toObject();
 
-      calendar.agency_key.should.equal(agency_key);
+      calendar.agency_key.should.equal(agencyKey);
       calendar.service_id.should.equal('CT-16APR-Caltrain-Weekday-01');
       calendar.monday.should.equal(1);
       calendar.tuesday.should.equal(1);

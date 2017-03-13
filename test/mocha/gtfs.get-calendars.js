@@ -1,56 +1,55 @@
-const async = require('async');
 const path = require('path');
+
+const async = require('async');
 const should = require('should');
 
 // libraries
 const config = require('../config.json');
 const gtfs = require('../../');
 
-
 // test support
 const database = require('../support/database');
 
 // setup fixtures
 const agenciesFixtures = [{
-  agency_key: 'caltrain',
+  agencyKey: 'caltrain',
   path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
 }];
 
-const agency_key = agenciesFixtures[0].agency_key;
+const agencyKey = agenciesFixtures[0].agencyKey;
 
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getCalendars(): ', () => {
-
-  before((done) => {
+  before(done => {
     database.connect(config, done);
   });
 
-  after((done) => {
+  after(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      closeDb: (next) => {
+      closeDb: next => {
         database.close(next);
       }
     }, done);
   });
 
-  beforeEach((done) => {
+  beforeEach(done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       },
-      executeDownloadScript: (next) => {
+      executeDownloadScript: next => {
         gtfs.import(config, next);
       }
     }, done);
   });
 
-  it('should return empty array if no calendars', (done) => {
+  it('should return empty array if no calendars', done => {
     async.series({
-      teardownDatabase: (next) => {
+      teardownDatabase: next => {
         database.teardown(next);
       }
     }, () => {
@@ -64,7 +63,7 @@ describe('gtfs.getCalendars(): ', () => {
       const saturday = 1;
       const sunday = 1;
 
-      gtfs.getCalendars(agency_key, startDate, endDate, monday, tuesday, wednesday, thursday, friday, saturday, sunday, (err, calendars) => {
+      gtfs.getCalendars(agencyKey, startDate, endDate, monday, tuesday, wednesday, thursday, friday, saturday, sunday, (err, calendars) => {
         should.not.exists(err);
         should.exists(calendars);
         calendars.should.have.length(0);
@@ -73,7 +72,7 @@ describe('gtfs.getCalendars(): ', () => {
     });
   });
 
-  it('should return expected calendars', (done) => {
+  it('should return expected calendars', done => {
     const startDate = 20160404;
     const endDate = 20160405;
     const monday = 0;
@@ -84,7 +83,7 @@ describe('gtfs.getCalendars(): ', () => {
     const saturday = 0;
     const sunday = 0;
 
-    gtfs.getCalendars(agency_key, startDate, endDate, monday, tuesday, wednesday, thursday, friday, saturday, sunday, (err, calendars) => {
+    gtfs.getCalendars(agencyKey, startDate, endDate, monday, tuesday, wednesday, thursday, friday, saturday, sunday, (err, calendars) => {
       should.not.exist(err);
       should.exist(calendars);
       calendars.length.should.equal(1);
