@@ -9,7 +9,10 @@ const Stop = mongoose.model('Stop', new mongoose.Schema({
     type: String,
     index: true
   },
-  stop_code: String,
+  stop_code: {
+    type: String,
+    index: true
+  },
   stop_name: String,
   stop_desc: String,
   stop_lat: Number,
