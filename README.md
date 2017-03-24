@@ -361,6 +361,16 @@ Returns an array of stops, optionally limited to those matching the `stop_ids` s
 
 `stop_ids` is optional and can be a single `stop_id` or an array of `stop_ids`.
 
+#### Stops by id as geoJSON
+
+Returns geoJSON of stops, optionally limited to those matching the `stop_ids` specified.
+
+    gtfs.getStopsAsGeoJSON(agency_key, stop_ids, (err, geojson) => {
+
+    });
+
+`stop_ids` is optional and can be a single `stop_id` or an array of `stop_ids`.
+
 #### Stops by stop_code
 
 Returns an array of stops matching the `stop_codes` specified.
@@ -371,11 +381,29 @@ Returns an array of stops matching the `stop_codes` specified.
 
 `stop_codes` is required and can be a single `stop_code` or an array of `stop_codes`.
 
+#### Stops by stop_code as geoJSON
+
+Returns geoJSON of stops matching the `stop_codes` specified.
+
+    gtfs.getStopsByStopCodeAsGeoJSON(agency_key, stop_codes, (err, geojson) => {
+
+    });
+
+`stop_codes` is required and can be a single `stop_code` or an array of `stop_codes`.
+
 #### Stops by route
 
-Returns an array of stops along the `route_id` for the `agency_key` and `direction_id` specified
+Returns an array of stops along the `route_id` for the `agency_key` and `direction_id` specified.
 
     gtfs.getStopsByRoute(agency_key, route_id, direction_id, (err, stops) => {
+
+    });
+
+#### Stops by route as geoJSON
+
+Returns geoJSON of stops along the `route_id` for the `agency_key` and `direction_id` specified.
+
+    gtfs.getStopsByRouteAsGeoJSON(agency_key, route_id, direction_id, (err, geojson) => {
 
     });
 
@@ -452,6 +480,16 @@ Returns an array of shapes for the `agency_key`, `route_id` and `direction_id`
 specified sorted by `shape_pt_sequence`.
 
     gtfs.getShapesByRoute(agency_key, route_id, direction_id, service_ids, (err, shapes) => {
+
+    });
+
+`direction_id` and `service_ids` are  optional
+
+#### Shapes by route as geoJSON
+
+Returns geoJSON of shapes for the `agency_key`, `route_id` and `direction_id`.
+
+    gtfs.getShapesByRouteAsGeoJSON(agency_key, route_id, direction_id, service_ids, (err, geoJSON) => {
 
     });
 
