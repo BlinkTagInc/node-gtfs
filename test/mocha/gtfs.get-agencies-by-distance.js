@@ -45,7 +45,7 @@ describe('gtfs.getAgenciesByDistance(): ', () => {
     }, done);
   });
 
-  it('should return empty array if no agencies exists', done => {
+  it('should return empty array if no agencies exist', done => {
     async.series({
       teardownDatabase: next => {
         database.teardown(next);
@@ -63,7 +63,7 @@ describe('gtfs.getAgenciesByDistance(): ', () => {
     });
   });
 
-  it('should return empty array if no agencies within given distance exists', done => {
+  it('should return empty array if no agencies within given distance exist', done => {
     const lon = -127.9867495;
     const lat = 40.38976166855;
     const radius = 100;
@@ -75,7 +75,7 @@ describe('gtfs.getAgenciesByDistance(): ', () => {
     });
   });
 
-  it('should return expected agencies within given distance if exists', done => {
+  it('should return expected agencies within given distance', done => {
     const lon = -121.9867495;
     const lat = 37.38976166855;
     const radius = 100;
@@ -88,7 +88,7 @@ describe('gtfs.getAgenciesByDistance(): ', () => {
     });
   });
 
-  it('should return expected agencies within given distance (without specifying radius) if exists', done => {
+  it('should return expected agencies within given distance (without specifying radius)', done => {
     const lon = -121.9867495;
     const lat = 37.38976166855;
     gtfs.getAgenciesByDistance(lat, lon, (err, agencies) => {

@@ -48,7 +48,7 @@ describe('gtfs.getRoutesByAgency(): ', () => {
     }, done);
   });
 
-  it('should return empty array if no routes for given agency exists (agencyId not provided)', done => {
+  it('should return empty array if no routes for given agency exist (agencyId not provided)', done => {
     async.series({
       teardownDatabase: next => {
         database.teardown(next);
@@ -121,7 +121,7 @@ describe('gtfs.getRoutesByAgency(): ', () => {
     });
   });
 
-  it('should return empty array if no routes for given agency exists (agencyId provided)', done => {
+  it('should return empty array if no routes for given agency exist (agencyId provided)', done => {
     async.series({
       teardownDatabase: next => {
         database.teardown(next);

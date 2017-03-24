@@ -60,7 +60,7 @@ describe('gtfs.agencies(): ', () => {
     }, done);
   });
 
-  it('should return empty array if no agencies exists', done => {
+  it('should return empty array if no agencies exist', done => {
     async.series({
       teardownDatabase: next => {
         database.teardown(next);

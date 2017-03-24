@@ -137,7 +137,7 @@ describe('gtfs.getRoutesByDistance(): ', () => {
     });
   });
 
-  it('should return expected routes within given distance (without specifying radius) if exists', done => {
+  it('should return expected routes within given distance (without specifying radius)', done => {
     const lon = -122.39797353744507;
     const lat = 37.7210684234136;
     const expectedRoutes = {

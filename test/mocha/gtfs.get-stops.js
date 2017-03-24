@@ -45,7 +45,7 @@ describe('gtfs.getStops(): ', () => {
     }, done);
   });
 
-  it('should return an empty array if no stops exists for given agency', done => {
+  it('should return an empty array if no stops exist for given agency', done => {
     async.series({
       teardownDatabase: next => {
         database.teardown(next);
@@ -61,7 +61,7 @@ describe('gtfs.getStops(): ', () => {
     });
   });
 
-  it('should return array of stops if it exists for given agency', done => {
+  it('should return array of stops for given agency', done => {
     const agencyKey = 'caltrain';
 
     gtfs.getStops(agencyKey, (err, stops) => {
@@ -73,7 +73,7 @@ describe('gtfs.getStops(): ', () => {
     });
   });
 
-  it('should return array of stops if it exists for given agency, and stopIds', done => {
+  it('should return array of stops for given agency, and stopIds', done => {
     const agencyKey = 'caltrain';
     const stopIds = [
       '70031',
