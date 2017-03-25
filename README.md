@@ -1,23 +1,20 @@
 # Node-GTFS
 
 [![NPM version](https://img.shields.io/npm/v/gtfs.svg?style=flat)](https://www.npmjs.com/package/gtfs)
-[![David](https://img.shields.io/david/brendannee/node-gtfs.svg)]()
+[![David](https://img.shields.io/david/blinktaginc/node-gtfs.svg)]()
 [![npm](https://img.shields.io/npm/dm/gtfs.svg?style=flat)]()
 
 [![NPM](https://nodei.co/npm/gtfs.png?downloads=true)](https://nodei.co/npm/gtfs/)
 
-`node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/),
-unzips it and stores it to a MongoDB database. In addition, this library provides some
-methods to query for agencies, routes, stops, times, fares and calendars. It also offers spatial
-queries to find nearby stops, routes and agencies.
+`node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/), unzips it and stores it to a MongoDB database. In addition, this library provides some methods to query for agencies, routes, stops, times, fares and calendars. It also offers spatial queries to find nearby stops, routes and agencies.
 
 This library has two parts: the [GTFS import script](#gtfs-import-script) and the [query methods](#query-methods).
 
 ## Example Application
 
-The [GTFS-to-HTML](https://github.com/brendannee/gtfs-to-html) app uses
-node-gtfs for downloading, importing and querying GTFS data. It provides a good example of
-how to use this library.
+The [GTFS-to-HTML](https://github.com/blinktaginc/gtfs-to-html) app uses node-gtfs for downloading, importing and querying GTFS data. It provides a good example of how to use this library.
+
+The [GTFS-to-geojson](https://github.com/blinktaginc/gtfs-to-geojson) app creates geoJSON files for transit routes for use in mapping. It uses node-gtfs for downloading, importing and querying GTFS data. It provides a good example of how to use this library.
 
 ## Installation
 
@@ -589,7 +586,7 @@ These are from the non-standard `timetable_pages.txt` file.
 
 ## Contributing
 
-Pull requests are welcome, as is feedback and [reporting issues](https://github.com/brendannee/node-gtfs/issues).
+Pull requests are welcome, as is feedback and [reporting issues](https://github.com/blinktaginc/node-gtfs/issues).
 
 ### Tests
 

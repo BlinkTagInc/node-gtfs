@@ -1,13 +1,13 @@
 {
   "name": "gtfs",
   "description": "Import GTFS transit data into mongodb and query routes, stops, times, fares and more",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "keywords": [
     "transit",
     "gtfs",
     "transportation"
   ],
-  "author": "Brendan Nee <me@bn.ee>",
+  "author": "Brendan Nee <brendan@blinktag.com>",
   "contributors": [
     "Alessio Bogon",
     "Jacob Childress <jacobc@gmail.com>",
@@ -57,10 +57,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/brendannee/node-gtfs.git"
+    "url": "git://github.com/blinktaginc/node-gtfs.git"
   },
   "bugs": {
-    "url": "https://github.com/brendannee/node-gtfs/issues"
+    "url": "https://github.com/blinktaginc/node-gtfs/issues"
   },
   "bin": {
     "gtfs-import": "bin/gtfs-import.js"
