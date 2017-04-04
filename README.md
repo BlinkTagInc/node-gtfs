@@ -471,6 +471,22 @@ Example result:
 
 `service_ids` is optional
 
+#### Shapes
+
+Returns an array of shapes for the `agency_key` specified sorted by `shape_pt_sequence`.
+
+    gtfs.getShapes(agency_key, (err, shapes) => {
+
+    });
+
+#### Shapes as geoJSON
+
+Returns geoJSON of shapes for the `agency_key` specified.
+
+    gtfs.getShapesAsGeoJSON(agency_key, (err, geoJSON) => {
+
+    });
+
 #### Shapes by route
 
 Returns an array of shapes for the `agency_key`, `route_id` and `direction_id`
@@ -484,7 +500,7 @@ specified sorted by `shape_pt_sequence`.
 
 #### Shapes by route as geoJSON
 
-Returns geoJSON of shapes for the `agency_key`, `route_id` and `direction_id`.
+Returns geoJSON of shapes for the `agency_key`, `route_id` and `direction_id` specified.
 
     gtfs.getShapesByRouteAsGeoJSON(agency_key, route_id, direction_id, service_ids, (err, geoJSON) => {
 
