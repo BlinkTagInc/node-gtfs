@@ -6,7 +6,7 @@
 
 [![NPM](https://nodei.co/npm/gtfs.png?downloads=true)](https://nodei.co/npm/gtfs/)
 
-`node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/), unzips it and stores it to a MongoDB database. In addition, this library provides some methods to query for agencies, routes, stops, times, fares and calendars. It also offers spatial queries to find nearby stops, routes and agencies.
+`node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/), unzips it and stores it to a MongoDB database. In addition, this library provides some methods to query for agencies, routes, stops, times, fares and calendars. It also offers spatial queries to find nearby stops, routes and agencies. In addition, it can convert stops and shapes to geoJSON.
 
 This library has two parts: the [GTFS import script](#gtfs-import-script) and the [query methods](#query-methods).
 
