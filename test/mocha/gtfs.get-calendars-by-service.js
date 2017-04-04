@@ -7,10 +7,10 @@ const should = require('should');
 const config = require('../config.json');
 const gtfs = require('../../');
 
-// test support
+
 const database = require('../support/database');
 
-// setup fixtures
+// Setup fixtures
 const agenciesFixtures = [{
   agency_key: 'caltrain',
   path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
