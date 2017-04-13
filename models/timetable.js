@@ -61,15 +61,9 @@ const Timetable = mongoose.model('Timetable', new mongoose.Schema({
     min: 0,
     max: 1
   },
-  route_label: String,
+  timetable_label: String,
   service_notes: String,
   orientation: String,
-  timetable_file_name: String,
-  use_stop_sequence: {
-    type: Number,
-    min: 0,
-    max: 1
-  },
   timetable_page_id: {
     type: String,
     index: true

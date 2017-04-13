@@ -1,7 +1,7 @@
 {
   "name": "gtfs",
   "description": "Import GTFS transit data into mongodb and query routes, stops, times, fares and more",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "keywords": [
     "transit",
     "gtfs",

@@ -10,7 +10,7 @@ const TimetablePage = mongoose.model('TimetablePage', new mongoose.Schema({
     type: String,
     index: true
   },
-  route_label: String,
+  timetable_page_label: String,
   filename: String
 }));
 
