@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const path = require('path');
+const untildify = require('untildify');
 const argv = require('yargs')
     .usage('Usage: $0 --config ./config.json')
     .help()
@@ -19,7 +20,7 @@ const argv = require('yargs')
 
 const gtfs = require('../');
 
-const configPath = path.join(process.cwd(), argv.configPath);
+const configPath = path.resolve(untildify(argv.configPath));
 
 function handleError(err) {
   console.error(err || 'Unknown Error');
