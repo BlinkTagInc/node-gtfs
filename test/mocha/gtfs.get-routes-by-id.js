@@ -72,7 +72,7 @@ describe('gtfs.getRoutesById(): ', () => {
 
       route.agency_key.should.equal(agencyKey);
       route.route_id.should.equal('TaSj-16APR');
-      route.route_short_name.should.equal(' ');
+      route.route_short_name.should.equal('');
       route.route_long_name.should.equal('Tamien / San Jose Diridon Caltrain Shuttle');
       route.route_type.should.equal(3);
       route.route_color.should.equal('41AD49');

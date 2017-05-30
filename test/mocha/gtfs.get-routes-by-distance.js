@@ -85,7 +85,7 @@ describe('gtfs.getRoutesByDistance(): ', () => {
     const expectedRoutes = {
       'Bu-16APR': {
         route_id: 'Bu-16APR',
-        route_short_name: ' ',
+        route_short_name: '',
         route_long_name: 'Baby Bullet',
         route_type: 2,
         route_color: 'E31837',
@@ -93,7 +93,7 @@ describe('gtfs.getRoutesByDistance(): ', () => {
       },
       'Li-16APR': {
         route_id: 'Li-16APR',
-        route_short_name: ' ',
+        route_short_name: '',
         route_long_name: 'Limited',
         route_type: 2,
         route_color: 'FEF0B5',
@@ -101,7 +101,7 @@ describe('gtfs.getRoutesByDistance(): ', () => {
       },
       'Lo-16APR': {
         route_id: 'Lo-16APR',
-        route_short_name: ' ',
+        route_short_name: '',
         route_long_name: 'Local',
         route_type: 2,
         route_color: 'FFFFFF',
@@ -109,7 +109,7 @@ describe('gtfs.getRoutesByDistance(): ', () => {
       },
       'TaSj-16APR': {
         route_id: 'TaSj-16APR',
-        route_short_name: ' ',
+        route_short_name: '',
         route_long_name: 'Tamien / San Jose Diridon Caltrain Shuttle',
         route_type: 3,
         route_color: '41AD49',
@@ -143,7 +143,7 @@ describe('gtfs.getRoutesByDistance(): ', () => {
     const expectedRoutes = {
       'Bu-16APR': {
         route_id: 'Bu-16APR',
-        route_short_name: ' ',
+        route_short_name: '',
         route_long_name: 'Baby Bullet',
         route_type: 2,
         route_color: 'E31837',
@@ -151,7 +151,7 @@ describe('gtfs.getRoutesByDistance(): ', () => {
       },
       'Li-16APR': {
         route_id: 'Li-16APR',
-        route_short_name: ' ',
+        route_short_name: '',
         route_long_name: 'Limited',
         route_type: 2,
         route_color: 'FEF0B5',
@@ -159,7 +159,7 @@ describe('gtfs.getRoutesByDistance(): ', () => {
       },
       'Lo-16APR': {
         route_id: 'Lo-16APR',
-        route_short_name: ' ',
+        route_short_name: '',
         route_long_name: 'Local',
         route_type: 2,
         route_color: 'FFFFFF',
@@ -167,7 +167,7 @@ describe('gtfs.getRoutesByDistance(): ', () => {
       },
       'TaSj-16APR': {
         route_id: 'TaSj-16APR',
-        route_short_name: ' ',
+        route_short_name: '',
         route_long_name: 'Tamien / San Jose Diridon Caltrain Shuttle',
         route_type: 3,
         route_color: '41AD49',
