@@ -71,7 +71,8 @@ const Timetable = mongoose.model('Timetable', new mongoose.Schema({
   timetable_sequence: {
     type: Number,
     index: true
-  }
+  },
+  direction_name: String
 }));
 
 module.exports = Timetable;
