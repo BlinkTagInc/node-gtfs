@@ -29,7 +29,7 @@ Install node-gtfs directly from [npm](https://npmjs.org):
 ## Code example
 
     const gtfs = require('gtfs');
-    const config = require('config.json');
+    const config = require('./config.json');
 
     gtfs.import(config, (err) => {
       if (err) return console.error(err);
