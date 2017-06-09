@@ -30,7 +30,8 @@
     "gerlacdt",
     "Heath Shurtleff",
     "Marcelo Muñoz Araya <ma.munoz.araya@gmail.com>",
-    "David Aghassi"
+    "David Aghassi",
+    "Steven Prins"
   ],
   "dependencies": {
     "async": "2.4.1",
@@ -41,8 +42,8 @@
     "mkdirp": "0.5.1",
     "moment": "2.18.1",
     "mongodb": "2.2.27",
+    "node-fetch": "1.7.1",
     "proj4": "2.4.3",
-    "request": "2.81.0",
     "rimraf": "2.6.1",
     "untildify": "3.0.2",
     "yargs": "8.0.1"
