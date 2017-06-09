@@ -20,10 +20,6 @@ const Trip = mongoose.model('Trip', new mongoose.Schema({
     type: String,
     required: true
   },
-  realtime_trip_id: {
-    type: String,
-    index: true
-  },
   trip_headsign: String,
   trip_short_name: String,
   direction_id: {
