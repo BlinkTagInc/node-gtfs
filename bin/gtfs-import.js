@@ -37,7 +37,7 @@ function getConfig() {
 
     return config;
   } catch (err) {
-    handleError(new Error(`Cannot find configuration file at \`${configPath}\`. Use config-sample.json as a starting point, pass --configPath option`));
+    handleError(new Error('Cannot find configuration file at \`${configPath}\`. Use config-sample.json as a starting point, pass --configPath option'));
   }
 }
 
