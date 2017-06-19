@@ -29,12 +29,16 @@ describe('lib/import.js', function () {
   describe('Download and import from different GTFS sources', () => {
     it('should be able to download and import from HTTP', done => {
       config.agencies = agenciesFixturesUrl;
-      gtfs.import(config, done);
+      gtfs.import(config)
+      .then(done)
+      .catch(done);
     });
 
     it('should be able to download and import from local filesystem', done => {
       config.agencies = agenciesFixturesLocal;
-      gtfs.import(config, done);
+      gtfs.import(config)
+      .then(done)
+      .catch(done);
     });
   });
 
@@ -92,7 +96,9 @@ describe('lib/import.js', function () {
           database.teardown(next);
         },
         executeDownloadScript: next => {
-          gtfs.import(config, next);
+          gtfs.import(config)
+          .then(next)
+          .catch(next);
         }
       }, done);
     });

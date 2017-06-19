@@ -40,7 +40,9 @@ describe('gtfs.getAgenciesByDistance(): ', () => {
         database.teardown(next);
       },
       executeDownloadScript: next => {
-        gtfs.import(config, next);
+        gtfs.import(config)
+        .then(next)
+        .catch(next);
       }
     }, done);
   });
@@ -110,15 +112,15 @@ describe('gtfs.getAgenciesByDistance(): ', () => {
 
       agency.agency_bounds.should.have.keys('sw', 'ne');
       agency.agency_bounds.sw.should.have.length(2);
-      agency.agency_bounds.sw[0].should.eql(-122.412076);
+      agency.agency_bounds.sw[0].should.eql(-122.4131441116333);
       agency.agency_bounds.sw[1].should.eql(37.003485);
       agency.agency_bounds.ne.should.have.length(2);
       agency.agency_bounds.ne[0].should.eql(-121.566088);
-      agency.agency_bounds.ne[1].should.eql(37.776439);
+      agency.agency_bounds.ne[1].should.eql(37.776439059278346);
 
       agency.agency_center.should.have.length(2);
-      agency.agency_center[0].should.eql(-121.989082);
-      agency.agency_center[1].should.eql(37.389962);
+      agency.agency_center[0].should.eql(-121.98961605581664);
+      agency.agency_center[1].should.eql(37.38996202963917);
       done();
     });
   });

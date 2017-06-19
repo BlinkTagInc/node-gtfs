@@ -31,10 +31,12 @@ Install node-gtfs directly from [npm](https://npmjs.org):
     const gtfs = require('gtfs');
     const config = require('./config.json');
 
-    gtfs.import(config, (err) => {
-      if (err) return console.error(err);
-
-      console.log('Import Successful')
+    gtfs.import(config)
+    .then(() => {
+      console.log('Import Successful');
+    })
+    .catch(err => {
+      console.error(err);
     });
 
 ## Configuration
@@ -222,10 +224,12 @@ Use `gtfs.import()` in your code to run an import of a GTFS file specified in a 
     mongoose.Promise = global.Promise;
     mongoose.connect(config.mongoUrl);
 
-    gtfs.import(config, (err) => {
-      if (err) return console.error(err);
-
-      console.log('Import Successful')
+    gtfs.import(config)
+    .then(() => {
+      console.log('Import Successful');
+    })
+    .catch(err => {
+      console.error(err);
     });
 
 Configuration can be a JSON object in your code
@@ -248,10 +252,12 @@ Configuration can be a JSON object in your code
     mongoose.Promise = global.Promise;
     mongoose.connect(config.mongoUrl);
 
-    gtfs.import(config, (err) => {
-      if (err) return console.error(err);
-
-      console.log('Import Successful')
+    gtfs.import(config)
+    .then(() => {
+      console.log('Import Successful');
+    })
+    .catch(err => {
+      console.error(err);
     });
 
 ## Query Methods

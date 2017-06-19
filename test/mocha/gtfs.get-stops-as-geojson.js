@@ -40,7 +40,9 @@ describe('gtfs.getStopsAsGeoJSON(): ', () => {
         database.teardown(next);
       },
       executeDownloadScript: next => {
-        gtfs.import(config, next);
+        gtfs.import(config)
+        .then(next)
+        .catch(next);
       }
     }, done);
   });
