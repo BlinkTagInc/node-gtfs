@@ -6,7 +6,7 @@ const tk = require('timekeeper');
 
 const timeReference = new Date();
 
-// libraries
+// Libraries
 const config = require('../config.json');
 const gtfs = require('../../');
 

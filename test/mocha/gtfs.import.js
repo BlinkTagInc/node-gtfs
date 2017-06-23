@@ -6,7 +6,7 @@ const extract = require('extract-zip');
 const parse = require('csv-parse');
 const should = require('should');
 
-// libraries
+// Libraries
 const config = require('../config.json');
 const gtfs = require('../../');
 

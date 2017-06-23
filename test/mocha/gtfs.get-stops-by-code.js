@@ -3,7 +3,7 @@ const path = require('path');
 const async = require('async');
 const should = require('should');
 
-// libraries
+// Libraries
 const config = require('../config.json');
 const gtfs = require('../../');
 
