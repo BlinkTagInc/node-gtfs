@@ -1,7 +1,7 @@
 {
   "name": "gtfs",
   "description": "Import GTFS transit data into mongodb and query routes, stops, times, fares and more",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "keywords": [
     "transit",
     "gtfs",
@@ -31,7 +31,8 @@
     "Heath Shurtleff",
     "Marcelo Muñoz Araya <ma.munoz.araya@gmail.com>",
     "David Aghassi",
-    "Steven Prins"
+    "Steven Prins",
+    "W3stside"
   ],
   "dependencies": {
     "bluebird": "^3.5.0",
@@ -40,8 +41,8 @@
     "fs-extra": "^3.0.1",
     "lodash": "4.17.4",
     "moment": "2.18.1",
-    "mongodb": "^2.2.28",
-    "mongoose": "^4.10.7",
+    "mongodb": "^2.2.29",
+    "mongoose": "^4.10.8",
     "node-fetch": "1.7.1",
     "proj4": "2.4.3",
     "untildify": "3.0.2",
