@@ -14,14 +14,10 @@ exports.connect = (config, cb) => {
     should.exists(client);
     db = client;
 
-    // use mongoose to connect
-    mongoose.connect(config.mongoUrl, err => {
-      if (err) {
-        return cb(err);
-      }
-
-      cb(null, db);
-    });
+    // Also use mongoose to connect
+    mongoose.connect(config.mongoUrl, {
+      useMongoClient: true
+    }, cb);
   });
 };
 
