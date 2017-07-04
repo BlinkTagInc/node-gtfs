@@ -1,12 +1,9 @@
 const path = require('path');
 
-const async = require('async');
 const should = require('should');
 
-// Libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 const database = require('../support/database');
 
@@ -19,53 +16,34 @@ const agenciesFixtures = [{
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getStopsByDistance(): ', () => {
-  before(done => {
-    database.connect(config, done);
+  before(() => database.connect(config));
+
+  after(() => {
+    return database.teardown()
+    .then(database.close);
   });
 
-  after(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      closeDb: next => {
-        database.close(next);
-      }
-    }, done);
+  beforeEach(() => {
+    return database.teardown()
+    .then(() => gtfs.import(config));
   });
 
-  beforeEach(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      executeDownloadScript: next => {
-        gtfs.import(config)
-        .then(next)
-        .catch(next);
-      }
-    }, done);
-  });
-
-  it('should return an empty array if no stops exist', done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      }
-    }, () => {
+  it('should return an empty array if no stops exist', () => {
+    return database.teardown()
+    .then(() => {
       const lon = -121.9867495;
       const lat = 37.38976166855;
       const radius = 100;
-      gtfs.getStopsByDistance(lat, lon, radius, (err, res) => {
-        should.not.exist(err);
-        should.exist(res);
-        res.should.have.length(0);
-        done();
-      });
+
+      return gtfs.getStopsByDistance(lat, lon, radius);
+    })
+    .then(stops => {
+      should.exist(stops);
+      stops.should.have.length(0);
     });
   });
 
-  it('should return expected stops within given distance if they exist', done => {
+  it('should return expected stops within given distance if they exist', () => {
     const lon = -121.9867495;
     const lat = 37.38976166855;
     const radius = 2;
@@ -117,8 +95,8 @@ describe('gtfs.getStopsByDistance(): ', () => {
       }
     };
 
-    gtfs.getStopsByDistance(lat, lon, radius, (err, stops) => {
-      should.not.exist(err);
+    return gtfs.getStopsByDistance(lat, lon, radius)
+    .then(stops => {
       should.exist(stops);
       stops.should.have.length(3);
 
@@ -138,12 +116,10 @@ describe('gtfs.getStopsByDistance(): ', () => {
         stop.wheelchair_boarding.should.equal(expectedStop.wheelchair_boarding);
         stop.agency_key.should.equal(expectedStop.agency_key);
       });
-
-      done();
     });
   });
 
-  it('should return expected stops within given distance (without specifying radius) if they exist', done => {
+  it('should return expected stops within given distance (without specifying radius) if they exist', () => {
     const lon = -121.915671;
     const lat = 37.340902;
     const expectedStops = {
@@ -194,8 +170,8 @@ describe('gtfs.getStopsByDistance(): ', () => {
       }
     };
 
-    gtfs.getStopsByDistance(lat, lon, (err, stops) => {
-      should.not.exist(err);
+    return gtfs.getStopsByDistance(lat, lon)
+    .then(stops => {
       should.exist(stops);
       stops.should.have.length(3);
 
@@ -215,8 +191,6 @@ describe('gtfs.getStopsByDistance(): ', () => {
         stop.wheelchair_boarding.should.equal(expectedStop.wheelchair_boarding);
         stop.agency_key.should.equal(expectedStop.agency_key);
       });
-
-      done();
     });
   });
 });

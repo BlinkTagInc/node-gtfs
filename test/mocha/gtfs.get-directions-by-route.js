@@ -1,12 +1,9 @@
 const path = require('path');
 
-const async = require('async');
 const should = require('should');
 
-// Libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 const database = require('../support/database');
 
@@ -21,56 +18,36 @@ const agencyKey = agenciesFixtures[0].agency_key;
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getDirectionsByRoute(): ', () => {
-  before(done => {
-    database.connect(config, done);
+  before(() => database.connect(config));
+
+  after(() => {
+    return database.teardown()
+    .then(database.close);
   });
 
-  after(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      closeDb: next => {
-        database.close(next);
-      }
-    }, done);
+  beforeEach(() => {
+    return database.teardown()
+    .then(() => gtfs.import(config));
   });
 
-  beforeEach(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      executeDownloadScript: next => {
-        gtfs.import(config)
-        .then(next)
-        .catch(next);
-      }
-    }, done);
-  });
-
-  it('should return empty array if no route', done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      }
-    }, () => {
+  it('should return empty array if no route', () => {
+    return database.teardown()
+    .then(() => {
       const routeId = 'not_real';
 
-      gtfs.getDirectionsByRoute(agencyKey, routeId, (err, directions) => {
-        should.not.exists(err);
-        should.exist(directions);
-        directions.should.have.length(0);
-        done();
-      });
+      return gtfs.getDirectionsByRoute(agencyKey, routeId);
+    })
+    .then(directions => {
+      should.exist(directions);
+      directions.should.have.length(0);
     });
   });
 
-  it('should return expected directions', done => {
+  it('should return expected directions', () => {
     const routeId = 'Bu-16APR';
 
-    gtfs.getDirectionsByRoute(agencyKey, routeId, (err, directions) => {
-      should.not.exist(err);
+    return gtfs.getDirectionsByRoute(agencyKey, routeId)
+    .then(directions => {
       should.exist(directions);
       directions.should.have.length(3);
 
@@ -79,8 +56,6 @@ describe('gtfs.getDirectionsByRoute(): ', () => {
       should.exist(direction.route_id);
       should.exist(direction.trip_headsign);
       should.exist(direction.direction_id);
-
-      done();
     });
   });
 });

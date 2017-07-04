@@ -1,12 +1,9 @@
 const path = require('path');
 
-const async = require('async');
 const should = require('should');
 
-// Libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 const database = require('../support/database');
 
@@ -21,56 +18,36 @@ const agencyKey = agenciesFixtures[0].agency_key;
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getFareRulesByRouteId(): ', () => {
-  before(done => {
-    database.connect(config, done);
+  before(() => database.connect(config));
+
+  after(() => {
+    return database.teardown()
+    .then(database.close);
   });
 
-  after(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      closeDb: next => {
-        database.close(next);
-      }
-    }, done);
+  beforeEach(() => {
+    return database.teardown()
+    .then(() => gtfs.import(config));
   });
 
-  beforeEach(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      executeDownloadScript: next => {
-        gtfs.import(config)
-        .then(next)
-        .catch(next);
-      }
-    }, done);
-  });
-
-  it('should return empty array if no fare_rules', done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      }
-    }, () => {
+  it('should return empty array if no fare_rules', () => {
+    return database.teardown()
+    .then(() => {
       const routeId = 'not_real';
 
-      gtfs.getFareRulesByRouteId(agencyKey, routeId, (err, fareRules) => {
-        should.not.exists(err);
-        should.exists(fareRules);
-        fareRules.should.have.length(0);
-        done();
-      });
+      return gtfs.getFareRulesByRouteId(agencyKey, routeId);
+    })
+    .then(fareRules => {
+      should.exists(fareRules);
+      fareRules.should.have.length(0);
     });
   });
 
-  it('should return expected fare_rules', done => {
+  it('should return expected fare_rules', () => {
     const routeId = 'Bu-16APR';
 
-    gtfs.getFareRulesByRouteId(agencyKey, routeId, (err, fareRules) => {
-      should.not.exist(err);
+    return gtfs.getFareRulesByRouteId(agencyKey, routeId)
+    .then(fareRules => {
       should.exist(fareRules);
       fareRules.length.should.equal(36);
 
@@ -81,8 +58,6 @@ describe('gtfs.getFareRulesByRouteId(): ', () => {
       fareRule.route_id.should.equal(routeId);
       should.exist(fareRule.origin_id);
       should.exist(fareRule.destination_id);
-
-      done();
     });
   });
 });

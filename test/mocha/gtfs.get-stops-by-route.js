@@ -1,12 +1,9 @@
 const path = require('path');
 
-const async = require('async');
 const should = require('should');
 
-// Libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 const database = require('../support/database');
 
@@ -19,53 +16,33 @@ const agenciesFixtures = [{
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getStopsByRoute(): ', () => {
-  before(done => {
-    database.connect(config, done);
+  before(() => database.connect(config));
+
+  after(() => {
+    return database.teardown()
+    .then(database.close);
   });
 
-  after(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      closeDb: next => {
-        database.close(next);
-      }
-    }, done);
+  beforeEach(() => {
+    return database.teardown()
+    .then(() => gtfs.import(config));
   });
 
-  beforeEach(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      executeDownloadScript: next => {
-        gtfs.import(config)
-        .then(next)
-        .catch(next);
-      }
-    }, done);
-  });
-
-  it('should return an empty array if no stops exists for given agency, route and direction', done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      }
-    }, () => {
+  it('should return an empty array if no stops exists for given agency, route and direction', () => {
+    return database.teardown()
+    .then(() => {
       const agencyKey = 'non_existing_agency';
       const routeId = 'non_existing_route_id';
       const directionId = '0';
-      gtfs.getStopsByRoute(agencyKey, routeId, directionId, (err, stops) => {
-        should.not.exist(err);
-        should.exist(stops);
-        stops.should.have.length(0);
-        done();
-      });
+      return gtfs.getStopsByRoute(agencyKey, routeId, directionId);
+    })
+    .then(stops => {
+      should.exist(stops);
+      stops.should.have.length(0);
     });
   });
 
-  it('should return array of stops if it exists for given agency, route and direction', done => {
+  it('should return array of stops if it exists for given agency, route and direction', () => {
     const agencyKey = 'caltrain';
     const routeId = 'Bu-16APR';
     const directionId = '0';
@@ -82,21 +59,18 @@ describe('gtfs.getStopsByRoute(): ', () => {
       '70011'
     ];
 
-    gtfs.getStopsByRoute(agencyKey, routeId, directionId, (err, stops) => {
-      should.not.exist(err);
+    return gtfs.getStopsByRoute(agencyKey, routeId, directionId)
+    .then(stops => {
       should.exist(stops);
-
       stops.should.have.length(9);
 
       stops.forEach((stop, idx) => {
         expectedStopIds[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
       });
-
-      done();
     });
   });
 
-  it('should return array of stops if it exists for given agency, route and direction (opposite direction)', done => {
+  it('should return array of stops if it exists for given agency, route and direction (opposite direction)', () => {
     const agencyKey = 'caltrain';
     const routeId = 'Bu-16APR';
     const directionId = '1';
@@ -113,20 +87,18 @@ describe('gtfs.getStopsByRoute(): ', () => {
       '70262'
     ];
 
-    gtfs.getStopsByRoute(agencyKey, routeId, directionId, (err, stops) => {
-      should.not.exist(err);
+    return gtfs.getStopsByRoute(agencyKey, routeId, directionId)
+    .then(stops => {
       should.exist(stops);
       stops.should.have.length(9);
 
       stops.forEach((stop, idx) => {
         expectedStopIds[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
       });
-
-      done();
     });
   });
 
-  it('should return array of all stops for all directions if it exists for given agency and route (without specifying direction)', done => {
+  it('should return array of all stops for all directions if it exists for given agency and route (without specifying direction)', () => {
     const agencyKey = 'caltrain';
     const routeId = 'Bu-16APR';
 
@@ -163,8 +135,8 @@ describe('gtfs.getStopsByRoute(): ', () => {
       }
     ];
 
-    gtfs.getStopsByRoute(agencyKey, routeId, (err, results) => {
-      should.not.exist(err);
+    return gtfs.getStopsByRoute(agencyKey, routeId)
+    .then(results => {
       should.exist(results);
 
       results.should.have.length(2, 'Should have 2 directions');
@@ -176,8 +148,6 @@ describe('gtfs.getStopsByRoute(): ', () => {
           expectedResults[row.direction_id].stops[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
         });
       });
-
-      done();
     });
   });
 });

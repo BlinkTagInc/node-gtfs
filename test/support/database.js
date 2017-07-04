@@ -1,4 +1,3 @@
-const async = require('async');
 const MongoClient = require('mongodb').MongoClient;
 const should = require('should');
 const mongoose = require('mongoose');
@@ -7,45 +6,38 @@ mongoose.Promise = global.Promise;
 
 let db;
 
-exports.connect = (config, cb) => {
+exports.connect = config => {
   // Open the connection to the server
-  MongoClient.connect(config.mongoUrl, (err, client) => {
-    should.not.exists(err);
+  return MongoClient.connect(config.mongoUrl)
+  .then(client => {
     should.exists(client);
     db = client;
 
     // Also use mongoose to connect
-    mongoose.connect(config.mongoUrl, {
-      useMongoClient: true
-    }, cb);
+    return mongoose.connect(config.mongoUrl, {useMongoClient: true});
   });
 };
 
-exports.teardown = cb => {
-  db.collections((err, collections) => {
-    if (err) {
-      return cb(err);
-    }
-
+exports.teardown = () => {
+  return db.collections()
+  .then(collections => {
     if (!collections) {
-      return cb(new Error('Missing collections'));
+      throw new Error('Missing collections');
     }
 
-    async.eachSeries(collections, (collection, next) => {
+    return Promise.all(collections.map(collection => {
       if (collection.collectionName.substring(0, 6) === 'system') {
-        return next();
+        return false;
       }
 
-      collection.remove({}, next);
-    }, cb);
+      return collection.remove({});
+    }));
   });
 };
 
-exports.close = cb => {
-  db.close(err => {
-    if (err) {
-      return cb(err);
-    }
-    mongoose.disconnect(cb);
+exports.close = () => {
+  return db.close()
+  .then(() => {
+    mongoose.disconnect();
   });
 };

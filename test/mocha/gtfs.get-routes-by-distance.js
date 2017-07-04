@@ -1,12 +1,9 @@
 const path = require('path');
 
-const async = require('async');
 const should = require('should');
 
-// Libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 const database = require('../support/database');
 
@@ -19,68 +16,47 @@ const agenciesFixtures = [{
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getRoutesByDistance(): ', () => {
-  before(done => {
-    database.connect(config, done);
+  before(() => database.connect(config));
+
+  after(() => {
+    return database.teardown()
+    .then(database.close);
   });
 
-  after(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      closeDb: next => {
-        database.close(next);
-      }
-    }, done);
+  beforeEach(() => {
+    return database.teardown()
+    .then(() => gtfs.import(config));
   });
 
-  beforeEach(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      executeDownloadScript: next => {
-        gtfs.import(config)
-        .then(next)
-        .catch(next);
-      }
-    }, done);
-  });
-
-  it('should return an empty array if no routes exist', done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      }
-    }, () => {
+  it('should return an empty array if no routes exist', () => {
+    return database.teardown()
+    .then(() => {
       const lon = -121.9867495;
       const lat = 37.38976166855;
       const radius = 100;
 
-      gtfs.getRoutesByDistance(lat, lon, radius, (err, res) => {
-        should.not.exist(err);
-        should.exist(res);
-        res.should.have.length(0);
-        done();
-      });
+      return gtfs.getRoutesByDistance(lat, lon, radius);
+    })
+    .then(routes => {
+      should.exist(routes);
+      routes.should.have.length(0);
     });
   });
 
-  it('should return an empty array if no routes within given distance exist', done => {
+  it('should return an empty array if no routes within given distance exist', () => {
     const lon = -127.9867495;
     const lat = 40.38976166855;
     const radius = 100;
 
-    gtfs.getRoutesByDistance(lat, lon, radius, (err, res) => {
-      should.not.exist(err);
-      should.exist(res);
-      res.should.have.length(0);
-      done();
+    return gtfs.getRoutesByDistance(lat, lon, radius)
+    .then(routes => {
+      should.exist(routes);
+      routes.should.have.length(0);
     });
   });
 
 
-  it('should return expected routes within given distance if they exist', done => {
+  it('should return expected routes within given distance if they exist', () => {
     const lon = -121.9867495;
     const lat = 37.38976166855;
     const radius = 2;
@@ -119,8 +95,8 @@ describe('gtfs.getRoutesByDistance(): ', () => {
       }
     };
 
-    gtfs.getRoutesByDistance(lat, lon, radius, (err, routes) => {
-      should.not.exist(err);
+    return gtfs.getRoutesByDistance(lat, lon, radius)
+    .then(routes => {
       should.exist(routes);
       routes.should.have.length(2);
 
@@ -135,11 +111,10 @@ describe('gtfs.getRoutesByDistance(): ', () => {
         route.route_color.should.equal(expectedRoute.route_color);
         route.agency_key.should.equal(expectedRoute.agency_key);
       });
-      done();
     });
   });
 
-  it('should return expected routes within given distance (without specifying radius)', done => {
+  it('should return expected routes within given distance (without specifying radius)', () => {
     const lon = -122.39797353744507;
     const lat = 37.7210684234136;
     const expectedRoutes = {
@@ -177,8 +152,8 @@ describe('gtfs.getRoutesByDistance(): ', () => {
       }
     };
 
-    gtfs.getRoutesByDistance(lat, lon, (err, routes) => {
-      should.not.exist(err);
+    return gtfs.getRoutesByDistance(lat, lon)
+    .then(routes => {
       should.exist(routes);
       routes.should.have.length(2);
 
@@ -193,7 +168,6 @@ describe('gtfs.getRoutesByDistance(): ', () => {
         route.route_color.should.equal(expectedRoute.route_color);
         route.agency_key.should.equal(expectedRoute.agency_key);
       });
-      done();
     });
   });
 });

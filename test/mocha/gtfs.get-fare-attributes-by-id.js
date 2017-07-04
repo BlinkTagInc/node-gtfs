@@ -1,12 +1,9 @@
 const path = require('path');
 
-const async = require('async');
 const should = require('should');
 
-// Libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 const database = require('../support/database');
 
@@ -21,55 +18,35 @@ const agencyKey = agenciesFixtures[0].agency_key;
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getFareAttributesById(): ', () => {
-  before(done => {
-    database.connect(config, done);
+  before(() => database.connect(config));
+
+  after(() => {
+    return database.teardown()
+    .then(database.close);
   });
 
-  after(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      closeDb: next => {
-        database.close(next);
-      }
-    }, done);
+  beforeEach(() => {
+    return database.teardown()
+    .then(() => gtfs.import(config));
   });
 
-  beforeEach(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      executeDownloadScript: next => {
-        gtfs.import(config)
-        .then(next)
-        .catch(next);
-      }
-    }, done);
-  });
-
-  it('should return empty array if no fare_attributes', done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      }
-    }, () => {
+  it('should return empty array if no fare_attributes', () => {
+    return database.teardown()
+    .then(() => {
       const fareId = 'not_real';
 
-      gtfs.getFareAttributesById(agencyKey, fareId, (err, fareAttributes) => {
-        should.not.exists(err);
-        should.not.exists(fareAttributes);
-        done();
-      });
+      return gtfs.getFareAttributesById(agencyKey, fareId);
+    })
+    .then(fareAttributes => {
+      should.not.exists(fareAttributes);
     });
   });
 
-  it('should return expected fare_attributes', done => {
+  it('should return expected fare_attributes', () => {
     const fareId = 'OW_1_20160228';
 
-    gtfs.getFareAttributesById(agencyKey, fareId, (err, fareAttribute) => {
-      should.not.exist(err);
+    return gtfs.getFareAttributesById(agencyKey, fareId)
+    .then(fareAttribute => {
       should.exist(fareAttribute);
 
       const expectedFareAttribute = {
@@ -85,8 +62,6 @@ describe('gtfs.getFareAttributesById(): ', () => {
       const fareAttributeFormatted = fareAttribute.toObject();
       delete fareAttributeFormatted._id;
       expectedFareAttribute.should.match(fareAttributeFormatted);
-
-      done();
     });
   });
 });

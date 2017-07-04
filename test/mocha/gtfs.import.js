@@ -1,12 +1,10 @@
 const path = require('path');
 const fs = require('fs');
 
-const async = require('async');
 const extract = require('extract-zip');
 const parse = require('csv-parse');
 const should = require('should');
 
-// Libraries
 const config = require('../config.json');
 const gtfs = require('../../');
 
@@ -27,18 +25,14 @@ const filenames = require('../../lib/filenames');
 describe('lib/import.js', function () {
   this.timeout(10000);
   describe('Download and import from different GTFS sources', () => {
-    it('should be able to download and import from HTTP', done => {
+    it('should be able to download and import from HTTP', () => {
       config.agencies = agenciesFixturesUrl;
-      gtfs.import(config)
-      .then(done)
-      .catch(done);
+      return gtfs.import(config);
     });
 
-    it('should be able to download and import from local filesystem', done => {
+    it('should be able to download and import from local filesystem', () => {
       config.agencies = agenciesFixturesLocal;
-      gtfs.import(config)
-      .then(done)
-      .catch(done);
+      return gtfs.import(config);
     });
   });
 
@@ -53,65 +47,54 @@ describe('lib/import.js', function () {
     const countData = {};
     const tmpDir = path.join(__dirname, '../fixture/tmp/');
 
-    before(done => {
-      async.series({
-        extractFixture: (next) => {
-          extract(agenciesFixturesLocal[0].path, {dir: tmpDir}, next);
-        },
-        countRowsInGTFSFiles: next => {
-          async.eachSeries(filenames, (file, next) => {
-            const filePath = path.join(tmpDir, `${file.fileNameBase}.txt`);
+    before(() => {
+      return new Promise((resolve, reject) => {
+        extract(agenciesFixturesLocal[0].path, {dir: tmpDir}, err => {
+          if (err) {
+            return reject(err);
+          }
+          resolve();
+        });
+      })
+      .then(() => {
+        return Promise.all(filenames.map(file => {
+          const filePath = path.join(tmpDir, `${file.fileNameBase}.txt`);
 
-            // GTFS has optional files
-            if (!fs.existsSync(filePath)) {
-              countData[file.collection] = 0;
-              return next();
+          // GTFS has optional files
+          if (!fs.existsSync(filePath)) {
+            countData[file.collection] = 0;
+            return false;
+          }
+
+          const parser = parse({columns: true}, (err, data) => {
+            if (err) {
+              throw new Error(err);
             }
 
-            const parser = parse({columns: true}, (err, data) => {
-              if (err) {
-                return next(err);
-              }
-
-              countData[file.collection] = data.length;
-              next();
-            });
-
-            return fs.createReadStream(filePath)
-              .pipe(parser)
-              .on('error', err => {
-                onError(err);
-                countData[file.collection] = 0;
-                next();
-              });
-          }, next);
-        },
-        connectToDb: next => {
-          database.connect(config, (err, client) => {
-            db = client;
-            next(err);
+            countData[file.collection] = data.length;
           });
-        },
-        teardownDatabase: next => {
-          database.teardown(next);
-        },
-        executeDownloadScript: next => {
-          gtfs.import(config)
-          .then(next)
-          .catch(next);
-        }
-      }, done);
+
+          return fs.createReadStream(filePath)
+          .pipe(parser)
+          .on('error', err => {
+            countData[file.collection] = 0;
+            throw new Error(err);
+          });
+        }));
+      })
+      .then(() => {
+        return database.connect(config)
+        .then(client => {
+          db = client;
+        });
+      })
+      .then(() => database.teardown())
+      .then(() => gtfs.import(config))
     });
 
-    after(done => {
-      async.series({
-        teardownDatabase: next => {
-          database.teardown(next);
-        },
-        closeDb: next => {
-          database.close(next);
-        }
-      }, done);
+    after(() => {
+      return database.teardown()
+      .then(() => database.close());
     });
 
     it('should import the same number of agencies', done => {

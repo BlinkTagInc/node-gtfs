@@ -1,15 +1,12 @@
 const path = require('path');
 
-const async = require('async');
 const should = require('should');
 const tk = require('timekeeper');
 
 const timeReference = new Date();
 
-// Libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 const database = require('../support/database');
 
@@ -22,64 +19,34 @@ const agenciesFixtures = [{
 config.agencies = agenciesFixtures;
 
 describe('gtfs.agencies(): ', () => {
-  before(done => {
-    async.series({
-      connectToDb: next => {
-        database.connect(config, next);
-      },
-      setupMockDate: next => {
-        tk.freeze(timeReference);
-        next();
-      }
-    }, done);
+  before(() => {
+    return database.connect(config)
+    .then(() => tk.freeze(timeReference))
   });
 
-  after(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      closeDb: next => {
-        database.close(next);
-      },
-      resetMockDate: next => {
-        tk.reset();
-        next();
-      }
-    }, done);
+  after(() => {
+    return database.teardown()
+    .then(database.close)
+    .then(() => tk.reset());
   });
 
-  beforeEach(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      executeDownloadScript: next => {
-        gtfs.import(config)
-        .then(next)
-        .catch(next);
-      }
-    }, done);
+  beforeEach(() => {
+    return database.teardown()
+    .then(() => gtfs.import(config));
   });
 
-  it('should return empty array if no agencies exist', done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      }
-    }, () => {
-      gtfs.agencies((err, agencies) => {
-        should.not.exists(err);
-        should.exists(agencies);
-        agencies.should.have.length(0);
-        done();
-      });
+  it('should return empty array if no agencies exist', () => {
+    return database.teardown()
+    .then(() => gtfs.agencies())
+    .then(agencies => {
+      should.exists(agencies);
+      agencies.should.have.length(0);
     });
   });
 
-  it('should return expected agency', done => {
-    gtfs.agencies((err, agencies) => {
-      should.not.exist(err);
+  it('should return expected agency', () => {
+    return gtfs.agencies()
+    .then(agencies => {
       should.exist(agencies);
       agencies.length.should.equal(1);
 
@@ -109,8 +76,6 @@ describe('gtfs.agencies(): ', () => {
       agency.agency_center[1].should.eql(37.38996202963917);
 
       agency.date_last_updated.should.eql(timeReference.getTime());
-
-      done();
     });
   });
 });

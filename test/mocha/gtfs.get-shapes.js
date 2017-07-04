@@ -1,12 +1,9 @@
 const path = require('path');
 
-const async = require('async');
 const should = require('should');
 
-// Libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 const database = require('../support/database');
 
@@ -19,59 +16,38 @@ const agenciesFixtures = [{
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getShapes(): ', () => {
-  before(done => {
-    database.connect(config, done);
+  before(() => database.connect(config));
+
+  after(() => {
+    return database.teardown()
+    .then(database.close);
   });
 
-  after(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      closeDb: next => {
-        database.close(next);
-      }
-    }, done);
+  beforeEach(() => {
+    return database.teardown()
+    .then(() => gtfs.import(config));
   });
 
-  beforeEach(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      executeDownloadScript: next => {
-        gtfs.import(config)
-        .then(next)
-        .catch(next);
-      }
-    }, done);
-  });
-
-  it('should return an empty array if no shapes exist for given agency', done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      }
-    }, () => {
+  it('should return an empty array if no shapes exist for given agency', () => {
+    return database.teardown()
+    .then(() => {
       const agencyKey = 'non_existing_agency';
-      gtfs.getShapes(agencyKey, (err, shapes) => {
-        should.not.exist(err);
-        should.exist(shapes);
-        shapes.should.have.length(0);
-        done();
-      });
+      return gtfs.getShapes(agencyKey);
+    })
+    .then(shapes => {
+      should.exist(shapes);
+      shapes.should.have.length(0);
     });
   });
 
-  it('should return array of shapes for given agency', done => {
+  it('should return array of shapes for given agency', () => {
     const agencyKey = 'caltrain';
 
-    gtfs.getShapes(agencyKey, (err, shapes) => {
-      should.not.exist(err);
+    return gtfs.getShapes(agencyKey)
+    .then(shapes => {
       should.exist(shapes);
 
       shapes.should.have.length(8);
-      done();
     });
   });
 });

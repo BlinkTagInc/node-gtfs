@@ -8,6 +8,20 @@
 
 `node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/), unzips it and stores it to a MongoDB database. In addition, this library provides some methods to query for agencies, routes, stops, times, fares and calendars. It also offers spatial queries to find nearby stops, routes and agencies. In addition, it can convert stops and shapes to geoJSON.
 
+---
+
+As of version 0.11.0, Node-GTFS methods don't support callbacks. Use promises instead:
+
+    gtfs.getAgenciesByDistance(lat, lon, radius)
+    .then(agencies => {
+      // do something with the array of `agencies`
+    })
+    .catch(err => {
+      // handle errors here
+    });
+
+---
+
 This library has two parts: the [GTFS import script](#gtfs-import-script) and the [query methods](#query-methods).
 
 ## Example Application
@@ -262,26 +276,16 @@ Configuration can be a JSON object in your code
 
 ## Query Methods
 
-This library includes many methods you can use in your project to query GTFS data. These methods return promises but also can take a callback function as an optional parameter.
+This library includes many methods you can use in your project to query GTFS data. These methods return promises.
 
-For example, to get a list of all agencies near a specific point, you could use promises:
+For example, to get a list of all agencies near a specific point:
 
     gtfs.getAgenciesByDistance(lat, lon, radius)
     .then(agencies => {
-      // do something with the array of `agencies`
+      // Do something with the array of `agencies`
     })
     .catch(err => {
-      // handle errors here
-    });
-
-or a callback function:
-
-    gtfs.getAgenciesByDistance(lat, lon, radius, (err, agencies) => {
-      if (err) {
-        // handle errors here
-      }
-
-      // do something with the array of `agencies`
+      // Be sure to handle errors here
     });
 
 ### Setup
@@ -315,8 +319,6 @@ Returns an array of all agencies.
 
     });
 
-    gtfs.agencies(cb);
-
 #### Agencies near a point
 
 Returns an array of agencies within a `radius` of the `lat`, `lon` specified.
@@ -325,8 +327,6 @@ Returns an array of agencies within a `radius` of the `lat`, `lon` specified.
     .then(agencies => {
 
     });
-
-    gtfs.getAgenciesByDistance(lat, lon, radius, cb);
 
 `radius` is optional and in miles. Default: 25 miles.
 
@@ -339,8 +339,6 @@ Returns an agency.  An `agency_key` is required, optionally you can specify an `
 
     });
 
-    gtfs.getAgency(agency_key, agency_id, cb);
-
 #### Routes for an agency
 
 Returns an array of routes for the `agency_key` specified. An `agency_key` is required, optionally you can specify an `agency_id` for GTFS files that have more than one agency listed in `agencies.txt`.
@@ -349,8 +347,6 @@ Returns an array of routes for the `agency_key` specified. An `agency_key` is re
     .then(routes => {
 
     });
-
-    gtfs.getRoutesByAgency(agency_key, agency_id, cb);
 
 #### Get a specific route
 
@@ -361,8 +357,6 @@ Returns a route for the `route_id` specified.
 
     });
 
-    gtfs.getRoutesById(agency_key, route_id, cb);
-
 #### Routes near a point
 
 Returns an array of routes within a `radius` of the `lat`, `lon` specified.
@@ -371,8 +365,6 @@ Returns an array of routes within a `radius` of the `lat`, `lon` specified.
     .then(routes => {
 
     });
-
-    gtfs.getRoutesByDistance(lat, lon, radius, cb);
 
 `radius` is optional and in miles. Default: 1 mile.
 
@@ -385,8 +377,6 @@ Returns an array of routes serving the `agency_key` and `stop_id` specified.
 
     });
 
-    gtfs.getRoutesByStop(agency_key, stop_id, cb);
-
 #### Stops by id
 
 Returns an array of stops, optionally limited to those matching the `stop_ids` specified.
@@ -395,8 +385,6 @@ Returns an array of stops, optionally limited to those matching the `stop_ids` s
     .then(stops => {
 
     });
-
-    gtfs.getStops(agency_key, stop_ids, cb);
 
 `stop_ids` is optional and can be a single `stop_id` or an array of `stop_ids`.
 
@@ -409,8 +397,6 @@ Returns geoJSON of stops, optionally limited to those matching the `stop_ids` sp
 
     });
 
-    gtfs.getStopsAsGeoJSON(agency_key, stop_ids, cb);
-
 `stop_ids` is optional and can be a single `stop_id` or an array of `stop_ids`.
 
 #### Stops by stop_code
@@ -421,8 +407,6 @@ Returns an array of stops matching the `stop_codes` specified.
     .then(stops => {
 
     });
-
-    gtfs.getStopsByStopCode(agency_key, stop_codes, cb);
 
 `stop_codes` is required and can be a single `stop_code` or an array of `stop_codes`.
 
@@ -435,8 +419,6 @@ Returns geoJSON of stops matching the `stop_codes` specified.
 
     });
 
-    gtfs.getStopsByStopCodeAsGeoJSON(agency_key, stop_codes, cb);
-
 `stop_codes` is required and can be a single `stop_code` or an array of `stop_codes`.
 
 #### Stops by route
@@ -448,8 +430,6 @@ Returns an array of stops along the `route_id` for the `agency_key` and `directi
 
     });
 
-    gtfs.getStopsByRoute(agency_key, route_id, direction_id, cb);
-
 #### Stops by route as geoJSON
 
 Returns geoJSON of stops along the `route_id` for the `agency_key` and `direction_id` specified.
@@ -459,8 +439,6 @@ Returns geoJSON of stops along the `route_id` for the `agency_key` and `directio
 
     });
 
-    gtfs.getStopsByRouteAsGeoJSON(agency_key, route_id, direction_id, cb);
-
 #### Stops near a point
 
 Returns an array of stops within a `radius` of the `lat`, `lon` specified
@@ -469,8 +447,6 @@ Returns an array of stops within a `radius` of the `lat`, `lon` specified
     .then(stops => {
 
     });
-
-    gtfs.getStopsByDistance(lat, lon, radius, cb);
 
 `radius` is optional and in miles. Default: 1 mile
 
@@ -483,8 +459,6 @@ Returns an array of stoptimes for the `trip_id` specified
 
     });
 
-    gtfs.getStoptimesByTrip(agency_key, trip_id, cb);
-
 #### Stop times by stop
 
 Returns an array of stoptimes for the `agency_key`, `route_id`, `stop_id` and
@@ -494,8 +468,6 @@ Returns an array of stoptimes for the `agency_key`, `route_id`, `stop_id` and
     .then(stoptimes => {
 
     });
-
-    gtfs.getStoptimesByStop(agency_key, route_id, stop_id, direction_id, cb);
 
 #### Trips by route and direction
 
@@ -507,8 +479,6 @@ specified.
 
     });
 
-    gtfs.getTripsByRouteAndDirection(agency_key, route_id, direction_id, service_ids, cb);
-
 `service_ids` is optional
 
 #### Directions by route
@@ -519,8 +489,6 @@ Returns an array of directions for the `agency_key` and `route_id` specified.
     .then(directions => {
 
     });
-
-    gtfs.getDirectionsByRoute(agency_key, route_id, service_ids, cb);
 
 Example result:
 
@@ -552,8 +520,6 @@ Returns an array of shapes for the `agency_key` specified sorted by `shape_pt_se
 
     });
 
-    gtfs.getShapes(agency_key, cb);
-
 #### Shapes as geoJSON
 
 Returns geoJSON of shapes for the `agency_key` specified.
@@ -562,8 +528,6 @@ Returns geoJSON of shapes for the `agency_key` specified.
     .then(geojson => {
 
     });
-
-    gtfs.getShapesAsGeoJSON(agency_key, cb);
 
 #### Shapes by route
 
@@ -574,8 +538,6 @@ specified sorted by `shape_pt_sequence`.
     .then(shapes => {
 
     });
-
-    gtfs.getShapesByRoute(agency_key, route_id, direction_id, service_ids, cb);
 
 `direction_id` and `service_ids` are  optional
 
@@ -588,8 +550,6 @@ Returns geoJSON of shapes for the `agency_key`, `route_id` and `direction_id` sp
 
     });
 
-    gtfs.getShapesByRouteAsGeoJSON(agency_key, route_id, direction_id, service_ids, cb);
-
 `direction_id` and `service_ids` are  optional
 
 #### Calendars
@@ -601,8 +561,6 @@ Returns an array of calendars, optionally bounded by start_date and end_date
 
     });
 
-    gtfs.getCalendars(agency_key, start_date, end_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday, cb);
-
 #### Calendars by serivce
 
 Returns an array of calendars for the `service_ids` specified
@@ -611,8 +569,6 @@ Returns an array of calendars for the `service_ids` specified
     .then(calendars => {
 
     });
-
-    gtfs.getCalendarsByService(service_ids, cb);
 
 `service_ids` can be a single `service_id` or an array of `service_ids`.
 
@@ -625,8 +581,6 @@ Returns an array of calendarDates for the `service_ids` specified
 
     });
 
-    gtfs.getCalendarDatesByService(service_ids, cb);
-
 `service_ids` can be a single `service_id` or an array of `service_ids`.
 
 #### Feed Info
@@ -637,8 +591,6 @@ Returns feed_info for the agency_key specified
     .then(feedInfo => {
 
     });
-
-    gtfs.getFeedInfo(agency_key, cb);
 
 #### Stop Attributes
 
@@ -651,8 +603,6 @@ file.
 
     });
 
-    gtfs.getStopAttributes(agency_key, stop_ids, cb);
-
 #### Timetables
 
 Returns an array of timetables for the `agency_key` specified. These are from
@@ -662,8 +612,6 @@ the non-standard `timetables.txt` file.
     .then(timetables => {
 
     });
-
-    gtfs.getTimetablesByAgency(agency_key, cb);
 
 #### Timetables by id
 
@@ -676,8 +624,6 @@ object can be returned. These are from the non-standard `timetables.txt` file.
 
     });
 
-    gtfs.getTimetable(agency_key, timetable_id, cb);
-
 #### TimetableStopOrders by id
 
 Returns an array of TimetableStopOrder objects matching the `timetable_id`
@@ -687,8 +633,6 @@ specified. These are from the non-standard `timetable_stop_order.txt` file.
     .then(TimetableStopOrders => {
 
     });
-
-    gtfs.getTimetableStopOrders(agency_key, timetable_id, cb);
 
 #### Timetable Pages
 
@@ -700,8 +644,6 @@ from the non-standard `timetable_pages.txt` file.
 
     });
 
-    gtfs.getTimetablePagesByAgency(agency_key, cb);
-
 #### Timetable Pages by id
 
 Returns an array timetablePage objects matching the `timetable_page_id` specified.
@@ -711,8 +653,6 @@ These are from the non-standard `timetable_pages.txt` file.
     .then(timetablePages => {
 
     });
-
-    gtfs.getTimetablePage(agency_key, timetable_page_id, cb);
 
 ## Contributing
 

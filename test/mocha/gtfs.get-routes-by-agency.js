@@ -1,12 +1,9 @@
 const path = require('path');
 
-const async = require('async');
 const should = require('should');
 
-// Libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 const database = require('../support/database');
 
@@ -22,52 +19,30 @@ const agencyId = agenciesFixtures[0].agency_id;
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getRoutesByAgency(): ', () => {
-  before(done => {
-    database.connect(config, done);
+  before(() => database.connect(config));
+
+  after(() => {
+    return database.teardown()
+    .then(database.close);
   });
 
-  after(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      closeDb: next => {
-        database.close(next);
-      }
-    }, done);
+  beforeEach(() => {
+    return database.teardown()
+    .then(() => gtfs.import(config));
   });
 
-  beforeEach(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      executeDownloadScript: next => {
-        gtfs.import(config)
-        .then(next)
-        .catch(next);
-      }
-    }, done);
-  });
-
-  it('should return empty array if no routes for given agency exist (agencyId not provided)', done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      }
-    }, () => {
-      gtfs.getRoutesByAgency(agencyKey, (err, res) => {
-        should.not.exist(err);
-        should.exist(res);
-        res.should.have.length(0);
-        done();
-      });
+  it('should return empty array if no routes for given agency exist (agencyId not provided)', () => {
+    return database.teardown()
+    .then(() => gtfs.getRoutesByAgency(agencyKey))
+    .then(routes => {
+      should.exist(routes);
+      routes.should.have.length(0);
     });
   });
 
-  it('should return expected routes for given agency (agencyId not provided)', done => {
-    gtfs.getRoutesByAgency(agencyKey, (err, routes) => {
-      should.not.exist(err);
+  it('should return expected routes for given agency (agencyId not provided)', () => {
+    return gtfs.getRoutesByAgency(agencyKey)
+    .then(routes => {
       should.exist(routes);
 
       const expectedRoutes = {
@@ -118,29 +93,21 @@ describe('gtfs.getRoutesByAgency(): ', () => {
         route.route_color.should.equal(expectedRoute.route_color);
         route.agency_key.should.equal(expectedRoute.agency_key);
       });
-
-      done();
     });
   });
 
-  it('should return empty array if no routes for given agency exist (agencyId provided)', done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      }
-    }, () => {
-      gtfs.getRoutesByAgency(agencyKey, agencyId, (err, res) => {
-        should.not.exist(err);
-        should.exist(res);
-        res.should.have.length(0);
-        done();
-      });
+  it('should return empty array if no routes for given agency exist (agencyId provided)', () => {
+    return database.teardown()
+    .then(() => gtfs.getRoutesByAgency(agencyKey, agencyId))
+    .then(routes => {
+      should.exist(routes);
+      routes.should.have.length(0);
     });
   });
 
-  it('should return expected routes for given agency and agencyId', done => {
-    gtfs.getRoutesByAgency(agencyKey, agencyId, (err, routes) => {
-      should.not.exist(err);
+  it('should return expected routes for given agency and agencyId', () => {
+    return gtfs.getRoutesByAgency(agencyKey, agencyId)
+    .then(routes => {
       should.exist(routes);
 
       const expectedRoutes = {
@@ -191,8 +158,6 @@ describe('gtfs.getRoutesByAgency(): ', () => {
         route.route_color.should.equal(expectedRoute.route_color);
         route.agency_key.should.equal(expectedRoute.agency_key);
       });
-
-      done();
     });
   });
 });

@@ -1,15 +1,12 @@
 const path = require('path');
 
-const async = require('async');
 const should = require('should');
 const tk = require('timekeeper');
 
 const timeReference = new Date();
 
-// Libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 const database = require('../support/database');
 
@@ -22,66 +19,39 @@ const agenciesFixtures = [{
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getAgency(): ', () => {
-  before(done => {
-    async.series({
-      connectToDb: next => {
-        database.connect(config, next);
-      },
-      setupMockDate: next => {
-        tk.freeze(timeReference);
-        next();
-      }
-    }, done);
+  before(() => {
+    return database.connect(config)
+    .then(() => tk.freeze(timeReference))
   });
 
-  after(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      closeDb: next => {
-        database.close(next);
-      },
-      resetMockDate: next => {
-        tk.reset();
-        next();
-      }
-    }, done);
+  after(() => {
+    return database.teardown()
+    .then(database.close)
+    .then(() => tk.reset());
   });
 
-  beforeEach(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      executeDownloadScript: next => {
-        gtfs.import(config)
-        .then(next)
-        .catch(next);
-      }
-    }, done);
+  beforeEach(() => {
+    return database.teardown()
+    .then(() => gtfs.import(config));
   });
 
-  it('should return null if agencyKey does not exist (no agencyId provided)', done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      }
-    }, () => {
+  it('should return null if agencyKey does not exist (no agencyId provided)', () => {
+    return database.teardown()
+    .then(() => {
       const agencyKey = 'caltrain-NOT';
-      gtfs.getAgency(agencyKey, (err, agencies) => {
-        should.not.exists(err);
-        should.not.exists(agencies);
 
-        done();
-      });
+      return gtfs.getAgency(agencyKey);
+    })
+    .then(agencies => {
+      should.not.exists(agencies);
     });
   });
 
-  it('should return expected agency for agencyKey (no agencyId provided)', done => {
+  it('should return expected agency for agencyKey (no agencyId provided)', () => {
     const agencyKey = 'caltrain';
-    gtfs.getAgency(agencyKey, (err, agencies) => {
-      should.not.exist(err);
+
+    return gtfs.getAgency(agencyKey)
+    .then(agencies => {
       should.exist(agencies);
 
       const agency = agencies.toObject();
@@ -110,33 +80,27 @@ describe('gtfs.getAgency(): ', () => {
       agency.agency_center[1].should.eql(37.38996202963917);
 
       agency.date_last_updated.should.eql(timeReference.getTime());
-
-      done();
     });
   });
 
-  it('should return null if agencyKey does not exist (agencyId provided)', done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      }
-    }, () => {
+  it('should return null if agencyKey does not exist (agencyId provided)', () => {
+    return database.teardown()
+    .then(() => {
       const agencyKey = 'caltrain-NOT';
       const agencyId = 'CT';
-      gtfs.getAgency(agencyKey, agencyId, (err, agencies) => {
-        should.not.exists(err);
-        should.not.exists(agencies);
-
-        done();
-      });
+      return gtfs.getAgency(agencyKey, agencyId);
+    })
+    .then(agencies => {
+      should.not.exists(agencies);
     });
   });
 
-  it('should return expected agency for agencyKey and agencyId', done => {
+  it('should return expected agency for agencyKey and agencyId', () => {
     const agencyKey = 'caltrain';
     const agencyId = 'CT';
-    gtfs.getAgency(agencyKey, agencyId, (err, agencies) => {
-      should.not.exist(err);
+
+    return gtfs.getAgency(agencyKey, agencyId)
+    .then(agencies => {
       should.exist(agencies);
 
       const agency = agencies.toObject();
@@ -165,8 +129,6 @@ describe('gtfs.getAgency(): ', () => {
       agency.agency_center[1].should.eql(37.38996202963917);
 
       agency.date_last_updated.should.eql(timeReference.getTime());
-
-      done();
     });
   });
 });

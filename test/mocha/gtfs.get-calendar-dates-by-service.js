@@ -1,12 +1,9 @@
 const path = require('path');
 
-const async = require('async');
 const should = require('should');
 
-// Libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 const database = require('../support/database');
 
@@ -19,54 +16,36 @@ const agenciesFixtures = [{
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getCalendarDatesByService(): ', () => {
-  before(done => {
-    database.connect(config, done);
+  before(() => database.connect(config));
+
+  after(() => {
+    return database.teardown()
+    .then(database.close);
   });
 
-  after(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      closeDb: next => {
-        database.close(next);
-      }
-    }, done);
+  beforeEach(() => {
+    return database.teardown()
+    .then(() => gtfs.import(config));
   });
 
-  beforeEach(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      executeDownloadScript: next => {
-        gtfs.import(config)
-        .then(next)
-        .catch(next);
-      }
-    }, done);
-  });
-
-  it('should return empty array if no calendar dates exist', done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      }
-    }, () => {
+  it('should return empty array if no calendar dates exist', () => {
+    return database.teardown()
+    .then(() => {
       const serviceIds = ['CT-16APR-Caltrain-Weekday-01'];
-      gtfs.getCalendarDatesByService(serviceIds, (err, calendarDates) => {
-        should.not.exists(err);
-        should.exists(calendarDates);
-        calendarDates.should.have.length(0);
-        done();
-      });
+
+      return gtfs.getCalendarDatesByService(serviceIds);
+    })
+    .then(calendarDates => {
+      should.exists(calendarDates);
+      calendarDates.should.have.length(0);
     });
   });
 
-  it('should return expected calendar dates', done => {
+  it('should return expected calendar dates', () => {
     const serviceIds = ['CT-16APR-Caltrain-Weekday-01'];
-    gtfs.getCalendarDatesByService(serviceIds, (err, calendarDates) => {
-      should.not.exist(err);
+
+    return gtfs.getCalendarDatesByService(serviceIds)
+    .then(calendarDates => {
       should.exist(calendarDates);
       calendarDates.length.should.equal(4);
 
@@ -102,8 +81,6 @@ describe('gtfs.getCalendarDatesByService(): ', () => {
         delete calendarDateFormatted._id;
         expectedCalendarDates.should.matchAny(calendarDateFormatted);
       });
-
-      done();
     });
   });
 });

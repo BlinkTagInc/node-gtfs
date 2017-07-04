@@ -1,12 +1,9 @@
 const path = require('path');
 
-const async = require('async');
 const should = require('should');
 
-// Libraries
 const config = require('../config.json');
 const gtfs = require('../../');
-
 
 const database = require('../support/database');
 
@@ -19,73 +16,52 @@ const agenciesFixtures = [{
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getStopsByStopCode(): ', () => {
-  before(done => {
-    database.connect(config, done);
+  before(() => database.connect(config));
+
+  after(() => {
+    return database.teardown()
+    .then(database.close);
   });
 
-  after(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      closeDb: next => {
-        database.close(next);
-      }
-    }, done);
+  beforeEach(() => {
+    return database.teardown()
+    .then(() => gtfs.import(config));
   });
 
-  beforeEach(done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      },
-      executeDownloadScript: next => {
-        gtfs.import(config)
-        .then(next)
-        .catch(next);
-      }
-    }, done);
-  });
-
-  it('should return an empty array if no stops exist for given agency', done => {
-    async.series({
-      teardownDatabase: next => {
-        database.teardown(next);
-      }
-    },() => {
+  it('should return an empty array if no stops exist for given agency', () => {
+    return database.teardown()
+    .then(() => {
       const agency_key = 'non_existing_agency';
-      gtfs.getStops(agency_key, (err, stops) => {
-        should.exist(stops);
-        stops.should.have.length(0);
-        done();
-      });
+      return gtfs.getStops(agency_key);
+    })
+    .then(stops => {
+      should.exist(stops);
+      stops.should.have.length(0);
     });
   });
 
-  it('should return array of stops for given agency', done => {
+  it('should return array of stops for given agency', () => {
     const agency_key = 'caltrain';
 
-    gtfs.getStopsByStopCode(agency_key, (err, stops) => {
-      should.not.exist(err);
+    return gtfs.getStopsByStopCode(agency_key)
+    .then(stops => {
       should.exist(stops);
 
       stops.should.have.length(95);
-      done();
     });
   });
 
-  it('should return array of stops for given agency, and stop_ids', done => {
+  it('should return array of stops for given agency, and stop_ids', () => {
     const agency_key = 'caltrain';
     const stop_codes = [
       '70031',
       '70061'
     ];
 
-    gtfs.getStopsByStopCode(agency_key, stop_codes, (err, stops) => {
-      should.not.exist(err);
+    return gtfs.getStopsByStopCode(agency_key, stop_codes)
+    .then(stops => {
       should.exist(stops);
       stops.should.have.length(2);
-      done();
     });
   });
 });
