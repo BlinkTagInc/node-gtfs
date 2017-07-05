@@ -1,5 +1,5 @@
 node_modules
 downloads
-/config.json
-.idea
+config*
+!config-sample.json
 test/fixture/tmp/*.txt
