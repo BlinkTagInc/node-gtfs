@@ -18,7 +18,8 @@ const Trip = mongoose.model('Trip', new mongoose.Schema({
   },
   trip_id: {
     type: String,
-    required: true
+    required: true,
+    index: true
   },
   trip_headsign: String,
   trip_short_name: String,

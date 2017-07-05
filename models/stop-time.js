@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
-const utils = require('../lib/utils');
 
-const StopTime = mongoose.model('StopTime', new mongoose.Schema({
+const stopTimeSchema = new mongoose.Schema({
   agency_key: {
     type: String,
     required: true,
@@ -49,6 +48,12 @@ const StopTime = mongoose.model('StopTime', new mongoose.Schema({
     min: 0,
     max: 1
   }
-}));
+});
 
-module.exports = StopTime;
+stopTimeSchema.index({
+  agency_key: 1,
+  stop_id: 1,
+  trip_id: 1
+});
+
+module.exports = mongoose.model('StopTime', stopTimeSchema);

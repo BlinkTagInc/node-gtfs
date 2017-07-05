@@ -8,7 +8,8 @@ const Route = mongoose.model('Route', new mongoose.Schema({
   },
   route_id: {
     type: String,
-    required: true
+    required: true,
+    index: true
   },
   agency_id: String,
   route_short_name: {
