@@ -48,21 +48,24 @@ describe('gtfs.getStopsByRoute(): ', () => {
     const directionId = '0';
 
     const expectedStopIds = [
-      '70261',
-      '70221',
-      '70211',
-      '70171',
-      '70141',
-      '70111',
-      '70091',
+      '70011',
+      '70021',
       '70061',
-      '70011'
+      '70091',
+      '70111',
+      '70141',
+      '70161',
+      '70171',
+      '70211',
+      '70221',
+      '70261',
+      '70271'
     ];
 
     return gtfs.getStopsByRoute(agencyKey, routeId, directionId)
     .then(stops => {
       should.exist(stops);
-      stops.should.have.length(9);
+      stops.should.have.length(12);
 
       stops.forEach((stop, idx) => {
         expectedStopIds[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
@@ -77,20 +80,23 @@ describe('gtfs.getStopsByRoute(): ', () => {
 
     const expectedStopIds = [
       '70012',
+      '70022',
       '70062',
       '70092',
       '70112',
       '70142',
+      '70162',
       '70172',
       '70212',
       '70222',
-      '70262'
+      '70262',
+      '70272'
     ];
 
     return gtfs.getStopsByRoute(agencyKey, routeId, directionId)
     .then(stops => {
       should.exist(stops);
-      stops.should.have.length(9);
+      stops.should.have.length(12);
 
       stops.forEach((stop, idx) => {
         expectedStopIds[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
@@ -105,32 +111,38 @@ describe('gtfs.getStopsByRoute(): ', () => {
     const expectedResults = [
       {
         direction_id: 0,
-        stops_count: 9,
+        stops_count: 12,
         stops: [
-          '70261',
-          '70221',
-          '70211',
-          '70171',
-          '70141',
-          '70111',
-          '70091',
+          '70011',
+          '70021',
           '70061',
-          '70011'
+          '70091',
+          '70111',
+          '70141',
+          '70161',
+          '70171',
+          '70211',
+          '70221',
+          '70261',
+          '70271'
         ]
       },
       {
         direction_id: 1,
-        stops_count: 9,
+        stops_count: 12,
         stops: [
           '70012',
+          '70022',
           '70062',
           '70092',
           '70112',
           '70142',
+          '70162',
           '70172',
           '70212',
           '70222',
-          '70262'
+          '70262',
+          '70272'
         ]
       }
     ];

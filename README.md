@@ -423,7 +423,10 @@ Returns geoJSON of stops matching the `stop_codes` specified.
 
 #### Stops by route
 
-Returns an array of stops along the `route_id` for the `agency_key` and `direction_id` specified.
+Returns an array of stops along the `route_id` for the `agency_key` and `direction_id` specified. If no `direction_id` specified, then it will return an array of objects,
+with each object having a `direction_id` and array of `stops`. Stops are ordered
+by `stop_sequence`, but this can be confused when there are multiple trips for the
+route with different stops.
 
     gtfs.getStopsByRoute(agency_key, route_id, direction_id)
     .then(stops => {
