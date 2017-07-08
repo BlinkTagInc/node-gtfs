@@ -426,21 +426,25 @@ Returns geoJSON of stops matching the `stop_codes` specified.
 Returns an array of stops along the `route_id` for the `agency_key` and `direction_id` specified. If no `direction_id` specified, then it will return an array of objects,
 with each object having a `direction_id` and array of `stops`. Stops are ordered
 by `stop_sequence`, but this can be confused when there are multiple trips for the
-route with different stops.
+route with different stops. `direction_id` should be an integer.
 
     gtfs.getStopsByRoute(agency_key, route_id, direction_id)
     .then(stops => {
 
     });
 
+`direction_id` is optional.
+
 #### Stops by route as geoJSON
 
-Returns geoJSON of stops along the `route_id` for the `agency_key` and `direction_id` specified.
+Returns geoJSON of stops along the `route_id` for the `agency_key` and `direction_id` specified. `direction_id` should be an integer.
 
     gtfs.getStopsByRouteAsGeoJSON(agency_key, route_id, direction_id)
     .then(stops => {
 
     });
+
+`direction_id` is optional.
 
 #### Stops near a point
 
@@ -465,24 +469,26 @@ Returns an array of stoptimes for the `trip_id` specified
 #### Stop times by stop
 
 Returns an array of stoptimes for the `agency_key`, `route_id`, `stop_id` and
-`direction_id` specified.
+`direction_id` specified. `direction_id` should be an integer.
 
     gtfs.getStoptimesByStop(agency_key, route_id, stop_id, direction_id)
     .then(stoptimes => {
 
     });
 
+`direction_id` is optional.
+
 #### Trips by route and direction
 
 Returns an array of trips for the `agency_key`, `route_id` and `direction_id`
-specified.
+specified. `direction_id` should be an integer.
 
     gtfs.getTripsByRouteAndDirection(agency_key, route_id, direction_id)
     .then(trips => {
 
     });
 
-`service_ids` is optional
+`direction_id` and `service_ids` is optional
 
 #### Directions by route
 
@@ -535,9 +541,9 @@ Returns geoJSON of shapes for the `agency_key` specified.
 #### Shapes by route
 
 Returns an array of shapes for the `agency_key`, `route_id` and `direction_id`
-specified sorted by `shape_pt_sequence`.
+specified sorted by `shape_pt_sequence`. `direction_id` should be an integer.
 
-    gtfs.getShapesByRoute(agency_key, route_id)
+    gtfs.getShapesByRoute(agency_key, route_id, direction_id)
     .then(shapes => {
 
     });
@@ -546,7 +552,8 @@ specified sorted by `shape_pt_sequence`.
 
 #### Shapes by route as geoJSON
 
-Returns geoJSON of shapes for the `agency_key`, `route_id` and `direction_id` specified.
+Returns geoJSON of shapes for the `agency_key`, `route_id` and `direction_id`
+specified. `direction_id` should be an integer.
 
     gtfs.getShapesByRouteAsGeoJSON(agency_key, route_id)
     .then(shapes => {
