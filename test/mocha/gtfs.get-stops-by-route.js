@@ -45,7 +45,7 @@ describe('gtfs.getStopsByRoute(): ', () => {
   it('should return array of stops if it exists for given agency, route and direction', () => {
     const agencyKey = 'caltrain';
     const routeId = 'Bu-16APR';
-    const directionId = '0';
+    const directionId = 0;
 
     const expectedStopIds = [
       '70011',
@@ -76,7 +76,7 @@ describe('gtfs.getStopsByRoute(): ', () => {
   it('should return array of stops if it exists for given agency, route and direction (opposite direction)', () => {
     const agencyKey = 'caltrain';
     const routeId = 'Bu-16APR';
-    const directionId = '1';
+    const directionId = 1;
 
     const expectedStopIds = [
       '70012',
