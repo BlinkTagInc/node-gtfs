@@ -17,7 +17,7 @@ const agencyKey = agenciesFixtures[0].agency_key;
 
 config.agencies = agenciesFixtures;
 
-describe('gtfs.getFareRulesByRouteId(): ', () => {
+describe('gtfs.getFareRulesByRoute(): ', () => {
   before(() => database.connect(config));
 
   after(() => {
@@ -35,7 +35,7 @@ describe('gtfs.getFareRulesByRouteId(): ', () => {
     .then(() => {
       const routeId = 'not_real';
 
-      return gtfs.getFareRulesByRouteId(agencyKey, routeId);
+      return gtfs.getFareRulesByRoute(agencyKey, routeId);
     })
     .then(fareRules => {
       should.exists(fareRules);
@@ -46,7 +46,7 @@ describe('gtfs.getFareRulesByRouteId(): ', () => {
   it('should return expected fare_rules', () => {
     const routeId = 'Bu-16APR';
 
-    return gtfs.getFareRulesByRouteId(agencyKey, routeId)
+    return gtfs.getFareRulesByRoute(agencyKey, routeId)
     .then(fareRules => {
       should.exist(fareRules);
       fareRules.length.should.equal(36);

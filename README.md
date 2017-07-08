@@ -606,6 +606,16 @@ file.
 
     });
 
+
+#### Fare Rules
+
+Returns fare_rules for the `agency_key` and `route_id` specified.
+
+    gtfs.getFareRulesByRoute(agency_key, route_id)
+    .then(fareRules => {
+
+    });
+
 #### Timetables
 
 Returns an array of timetables for the `agency_key` specified. These are from
