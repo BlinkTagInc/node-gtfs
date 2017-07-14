@@ -16,54 +16,59 @@ const agenciesFixtures = [{
 config.agencies = agenciesFixtures;
 
 describe('gtfs.getStopsAsGeoJSON(): ', () => {
-  before(() => database.connect(config));
-
-  after(() => {
-    return database.teardown()
-    .then(database.close);
+  before(async () => {
+    await database.connect(config);
   });
 
-  beforeEach(() => {
-    return database.teardown()
-    .then(() => gtfs.import(config));
+  after(async () => {
+    await database.teardown();
+    await database.close();
   });
 
-  it('should return geojson with an empty features array if no stops exist for given agency', () => {
-    return database.teardown()
-    .then(() => {
-      const agencyKey = 'non_existing_agency';
-      return gtfs.getStopsAsGeoJSON(agencyKey);
-    })
-    .then(geojson => {
-      should.exist(geojson);
-      geojson.type.should.equal('FeatureCollection');
-      geojson.features.should.have.length(0);
+  beforeEach(async () => {
+    await database.teardown();
+    await gtfs.import(config);
+  });
+
+  it('should return geojson with an empty features array if no stops exist for given agency', async () => {
+    await database.teardown();
+
+    const agencyKey = 'non_existing_agency';
+    const geojson = await gtfs.getStopsAsGeoJSON({
+      agency_key: agencyKey
     });
+
+    should.exist(geojson);
+    geojson.type.should.equal('FeatureCollection');
+    geojson.features.should.have.length(0);
   });
 
-  it('should return geojson with stops if they exist for given agency', () => {
+  it('should return geojson with stops if they exist for given agency', async () => {
     const agencyKey = 'caltrain';
 
-    return gtfs.getStopsAsGeoJSON(agencyKey)
-    .then(geojson => {
-      should.exist(geojson);
-      geojson.type.should.equal('FeatureCollection');
-      geojson.features.should.have.length(95);
-    });
+    const geojson = await gtfs.getStopsAsGeoJSON({
+      agency_key: agencyKey
+    })
+
+    should.exist(geojson);
+    geojson.type.should.equal('FeatureCollection');
+    geojson.features.should.have.length(95);
   });
 
-  it('should return geojson with stops if they exist for given agency and stopIds', () => {
+  it('should return geojson with stops if they exist for given agency and stopIds', async () => {
     const agencyKey = 'caltrain';
     const stopIds = [
       '70031',
       '70061'
     ];
 
-    return gtfs.getStopsAsGeoJSON(agencyKey, stopIds)
-    .then(geojson => {
-      should.exist(geojson);
-      geojson.type.should.equal('FeatureCollection');
-      geojson.features.should.have.length(2);
+    const geojson = await gtfs.getStopsAsGeoJSON({
+      agency_key: agencyKey,
+      stop_id: {$in: stopIds}
     });
+
+    should.exist(geojson);
+    geojson.type.should.equal('FeatureCollection');
+    geojson.features.should.have.length(2);
   });
 });

@@ -10,15 +10,27 @@
 
 ---
 
+As of version 1.0.0, all Node-GTFS methods have changed to accept a query object instead of individual arguments. This allows for all fields of all GTFS files to be queried using this library.
+
 As of version 0.11.0, Node-GTFS methods don't support callbacks. Use promises instead:
 
-    gtfs.getAgenciesByDistance(lat, lon, radius)
+    gtfs.getAgencies()
     .then(agencies => {
       // do something with the array of `agencies`
     })
     .catch(err => {
       // handle errors here
     });
+
+Or, you could use async/await:
+
+    const myAwesomeFunction = async () => {
+      try {
+        const agencies = await gtfs.getAgencies();
+      } catch (error) {
+        // handle errors here
+      }
+    }
 
 ---
 
@@ -34,7 +46,7 @@ The [GTFS-to-geojson](https://github.com/blinktaginc/gtfs-to-geojson) app create
 
 Install node-gtfs directly from [npm](https://npmjs.org):
 
-    npm install mongoose gtfs -g
+    npm install gtfs -g
 
 ## Command-line example
 
@@ -195,9 +207,9 @@ If you don't want the import script to delete all existing data from the databas
 
 The `gtfs-import` script reads from a JSON configuration file and imports the GTFS files specified to a MongoDB database. [Read more on setting up your configuration file](#configuration).
 
-### Make sure mongo is running
+### Make sure MongoDB is running
 
-If you want to run this locally, make sure mongo in installed and running.
+If you want to run this locally, make sure MongoDB in installed and running.
 
     mongod
 
@@ -236,7 +248,7 @@ Use `gtfs.import()` in your code to run an import of a GTFS file specified in a 
     const config = require('config.json');
 
     mongoose.Promise = global.Promise;
-    mongoose.connect(config.mongoUrl, { useMongoClient: true });
+    mongoose.connect(config.mongoUrl);
 
     gtfs.import(config)
     .then(() => {
@@ -264,7 +276,7 @@ Configuration can be a JSON object in your code
     };
 
     mongoose.Promise = global.Promise;
-    mongoose.connect(config.mongoUrl, { useMongoClient: true });
+    mongoose.connect(config.mongoUrl);
 
     gtfs.import(config)
     .then(() => {
@@ -278,9 +290,15 @@ Configuration can be a JSON object in your code
 
 This library includes many methods you can use in your project to query GTFS data. These methods return promises.
 
-For example, to get a list of all agencies near a specific point:
+For example, to get a list of all agencies within 5 miles of a specific point:
 
-    gtfs.getAgenciesByDistance(lat, lon, radius)
+    gtfs.getAgencies({
+      within: {
+        lat: 37.7749,
+        lon: -122.4194,
+        radius: 5
+      }
+    })
     .then(agencies => {
       // Do something with the array of `agencies`
     })
@@ -298,7 +316,7 @@ Connect to mongo via mongoose.
 
     const mongoose = require('mongoose');
     mongoose.Promise = global.Promise;
-    mongoose.connect('YOUR-MONGODB-URI', { useMongoClient: true });
+    mongoose.connect('YOUR-MONGODB-URI');
 
 If you are running locally, your MongoDB uri might be something like:
 
@@ -310,191 +328,280 @@ You probably want to use the same value used in your [configuration JSON file](#
 
 Once you have included the library and connected to your MongoDB database you can use the following methods.
 
-#### Agencies
+#### gtfs.getAgencies()
 
-Returns an array of all agencies.
+Queries agencies and returns a promise. The result of the promise is an array of agencies.
 
-    gtfs.agencies()
+    // Get all agencies
+    gtfs.getAgencies()
     .then(agencies => {
 
     });
 
-#### Agencies near a point
-
-Returns an array of agencies within a `radius` of the `lat`, `lon` specified.
-
-    gtfs.getAgenciesByDistance(lat, lon, radius)
+    // Get all agencies within a a `radius` of the `lat`, `lon` specified.
+    // `radius` is optional and in miles. Default: 25 miles.
+    gtfs.getAgencies({
+      within: {
+        lat: 37.7749,
+        lon: -122.4194,
+        radius: 5
+      }
+    })
     .then(agencies => {
 
     });
 
-`radius` is optional and in miles. Default: 25 miles.
-
-#### Get a specific agency
-
-Returns an agency.  An `agency_key` is required, optionally you can specify an `agency_id` for GTFS files that have more than one agency listed in `agencies.txt`.
-
-    gtfs.getAgency(agency_key)
+    // Get a specific agency
+    gtfs.getAgencies({
+      agency_key: 'caltrain'
+    })
     .then(agencies => {
 
     });
 
-#### Routes for an agency
+    // Get a specific agency by `agency_name`
+    gtfs.getAgencies({
+      agency_name: 'Caltrain'
+    })
+    .then(agencies => {
 
-Returns an array of routes for the `agency_key` specified. An `agency_key` is required, optionally you can specify an `agency_id` for GTFS files that have more than one agency listed in `agencies.txt`.
+    });
 
-    gtfs.getRoutesByAgency(agency_key)
+    // Get all agencies in a specific timezone
+    gtfs.getAgencies({
+      agency_timezone: 'America/Los_Angeles'
+    })
+    .then(agencies => {
+
+    });
+
+
+#### gtfs.getRoutes()
+
+Queries routes and returns a promise. The result of the promise is an array of routes.
+
+    // Get all routes for an agency
+    gtfs.getRoutes({
+      agency_key: 'caltrain'
+    })
     .then(routes => {
 
     });
 
-#### Get a specific route
-
-Returns a route for the `route_id` specified.
-
-    gtfs.getRoutesById(agency_key, route_id)
+    // Get a specific route
+    gtfs.getRoutes({
+      agency_key: 'caltrain',
+      route_id: 'Lo-16APR'
+    })
     .then(routes => {
 
     });
 
-#### Routes near a point
-
-Returns an array of routes within a `radius` of the `lat`, `lon` specified.
-
-    gtfs.getRoutesByDistance(lat, lon, radius)
+    // Get a few routes
+    const routeIds = [
+      'Bu-16APR',
+      'Lo-16APR'
+    ]
+    gtfs.getRoutes({
+      agency_key: 'caltrain',
+      route_id: {
+        $in: routeIds
+      }
+    })
     .then(routes => {
 
     });
 
-`radius` is optional and in miles. Default: 1 mile.
-
-#### Routes that serve a specific stop
-
-Returns an array of routes serving the `agency_key` and `stop_id` specified.
-
-    gtfs.getRoutesByStop(agency_key, stop_id)
+    // Get all routes within a radius of the `lat`, `lon` specified.
+    // `radius` is optional and in miles. Default: 1 mile.
+    gtfs.getRoutes({
+      within: {
+        lat: 37.7749,
+        lon: -122.4194,
+        radius: 5
+      }
+    })
     .then(routes => {
 
     });
 
-#### Stops by id
 
-Returns an array of stops, optionally limited to those matching the `stop_ids` specified.
+    // Get routes that serve a specific stop.
+    gtfs.getRoutes({
+      agency_key: 'caltrain',
+      stop_id: '70011'
+    })
+    .then(routes => {
 
-    gtfs.getStops(agency_key)
+    });
+
+#### gtfs.getStops()
+
+Queries stops and returns a promise. The result of the promise is an array of stops.
+
+    // Get all stops for an agency
+    gtfs.getStops({
+      agency_key: 'caltrain'
+    })
     .then(stops => {
 
     });
 
-`stop_ids` is optional and can be a single `stop_id` or an array of `stop_ids`.
+    // Get a specific stop by stop_id
+    gtfs.getStops({
+      agency_key: 'caltrain',
+      stop_id: '70011'
+    })
+    .then(stops => {
 
-#### Stops by id as geoJSON
+    });
 
-Returns geoJSON of stops, optionally limited to those matching the `stop_ids` specified.
+    // Get a few stops
+    const stopIds = [
+      '70011',
+      '70012'
+    ];
+    gtfs.getStops({
+      agency_key: 'caltrain',
+      stop_id: {
+        $in: stopIds
+      }
+    })
+    .then(stops => {
 
-    gtfs.getStopsAsGeoJSON(agency_key)
+    });
+
+    // Get all stops for a specific route and direction
+    gtfs.getStops({
+      agency_key: 'caltrain',
+      route_id: 'Lo-16APR',
+      direction_id: 1
+    })
+    .then(stops => {
+
+    });
+
+    // Get all stops within a `radius` of the `lat`, `lon` specified.
+    // `radius` is optional and in miles. Default: 1 mile.
+    gtfs.getStops({
+      within: {
+        lat: 37.7749,
+        lon: -122.4194,
+        radius: 5
+      }
+    })
+    .then(stops => {
+
+    });
+
+#### gtfs.getStopsAsGeoJSON()
+
+Queries stops and returns a promise. The result of the promise is an geoJSON object of stops. All valid queries for `gtfs.getStops()` work for `gtfs.getStopsAsGeoJSON()`.
+
+    // Get all stops for an agency as geoJSON
+    gtfs.getStopsAsGeoJSON({
+      agency_key: 'caltrain'
+    })
+    .then(stops => {
+
+    });
+
+    // Get all stops for a specific route and direction as geoJSON
+    gtfs.getStopsAsGeoJSON({
+      agency_key: 'caltrain',
+      route_id: 'Lo-16APR',
+      direction_id: 1
+    })
     .then(geojson => {
 
     });
 
 `stop_ids` is optional and can be a single `stop_id` or an array of `stop_ids`.
 
-#### Stops by stop_code
+#### gtfs.getStoptimes()
 
-Returns an array of stops matching the `stop_codes` specified.
+Queries stop_times and returns a promise. The result of the promise is an array of stop_times. `agency_key` and `stop_id` are required.
 
-    gtfs.getStopsByStopCode(agency_key, stop_codes)
-    .then(stops => {
-
-    });
-
-`stop_codes` is required and can be a single `stop_code` or an array of `stop_codes`.
-
-#### Stops by stop_code as geoJSON
-
-Returns geoJSON of stops matching the `stop_codes` specified.
-
-    gtfs.getStopsByStopCodeAsGeoJSON(agency_key, stop_codes)
-    .then(stops => {
-
-    });
-
-`stop_codes` is required and can be a single `stop_code` or an array of `stop_codes`.
-
-#### Stops by route
-
-Returns an array of stops along the `route_id` for the `agency_key` and `direction_id` specified. If no `direction_id` specified, then it will return an array of objects,
-with each object having a `direction_id` and array of `stops`. Stops are ordered
-by `stop_sequence`, but this can be confused when there are multiple trips for the
-route with different stops. `direction_id` should be an integer.
-
-    gtfs.getStopsByRoute(agency_key, route_id, direction_id)
-    .then(stops => {
-
-    });
-
-`direction_id` is optional.
-
-#### Stops by route as geoJSON
-
-Returns geoJSON of stops along the `route_id` for the `agency_key` and `direction_id` specified. `direction_id` should be an integer.
-
-    gtfs.getStopsByRouteAsGeoJSON(agency_key, route_id, direction_id)
-    .then(stops => {
-
-    });
-
-`direction_id` is optional.
-
-#### Stops near a point
-
-Returns an array of stops within a `radius` of the `lat`, `lon` specified
-
-    gtfs.getStopsByDistance(lat, lon, radius)
-    .then(stops => {
-
-    });
-
-`radius` is optional and in miles. Default: 1 mile
-
-#### Stop times for a trip
-
-Returns an array of stoptimes for the `trip_id` specified
-
-    gtfs.getStoptimesByTrip(agency_key, trip_id)
+    // Get all stoptimes for a specific stop
+    gtfs.getStoptimes({
+      agency_key: 'caltrain',
+      stop_id: '70011'
+    })
     .then(stoptimes => {
 
     });
 
-#### Stop times by stop
-
-Returns an array of stoptimes for the `agency_key`, `route_id`, `stop_id` and
-`direction_id` specified. `direction_id` should be an integer.
-
-    gtfs.getStoptimesByStop(agency_key, route_id, stop_id, direction_id)
+    // Get all stoptimes for a specific stop, route and direction
+    gtfs.getStoptimes({
+      agency_key: 'caltrain',
+      stop_id: '70011',
+      route_id: 'Lo-16APR',
+      direction_id: 0
+    })
     .then(stoptimes => {
 
     });
 
-`direction_id` is optional.
+    // Get all stoptimes for a specific stop and service_id
+    gtfs.getStoptimes({
+      agency_key: 'caltrain',
+      stop_id: '70011',
+      service_id: 'CT-16APR-Caltrain-Weekday-01'
+    })
+    .then(stoptimes => {
 
-#### Trips by route and direction
+    });
 
-Returns an array of trips for the `agency_key`, `route_id` and `direction_id`
-specified. `direction_id` should be an integer.
+#### gtfs.getTrips()
 
-    gtfs.getTripsByRouteAndDirection(agency_key, route_id, direction_id)
+Queries trips and returns a promise. The result of the promise is an array of trips.
+
+    // Get trips for a specific route and direction
+    gtfs.getTrips({
+      agency_key: 'caltrain',
+      route_id: 'Lo-16APR',
+      direction_id: 0
+    })
     .then(trips => {
 
     });
 
-`direction_id` and `service_ids` is optional
+    // Get trips for a specific route and direction limited by service_ids
+    const serviceIds = [
+      'CT-16APR-Caltrain-Saturday-02',
+      'CT-16APR-Caltrain-Sunday-02'
+    ];
+    gtfs.getTrips({
+      agency_key: 'caltrain',
+      route_id: 'Lo-16APR',
+      direction_id: 0,
+      service_id: {
+        $in: serviceIds
+      }
+    })
+    .then(trips => {
 
-#### Directions by route
+    });
 
-Returns an array of directions for the `agency_key` and `route_id` specified.
+#### gtfs.getDirectionsByRoute()
 
-    gtfs.getDirectionsByRoute(agency_key, route_id)
+Queries trips and returns a promise. The result of the promise is an array of direction_ids. Useful to determine if a route has two directions or just one. `agency_key` and `route_id` are required.
+
+    // Find all directions for a specific route
+    gtfs.getDirectionsByRoute({
+      agency_key: 'caltrain',
+      route_id: 'Lo-16APR'
+    })
+    .then(directions => {
+
+    });
+
+    // Find all directions for a specific route and service_id
+    gtfs.getDirectionsByRoute({
+      agency_key: 'caltrain',
+      route_id: 'Lo-16APR',
+      service_id: 'CT-16APR-Caltrain-Sunday-02'
+    })
     .then(directions => {
 
     });
@@ -518,158 +625,215 @@ Example result:
       }
     ];
 
-`service_ids` is optional
+#### gtfs.getShapes()
 
-#### Shapes
+Queries shapes and returns a promise. The result of the promise is an array of shapes sorted by `shape_pt_sequence`.
 
-Returns an array of shapes for the `agency_key` specified sorted by `shape_pt_sequence`.
-
-    gtfs.getShapes(agency_key)
+    // Get all shapes for an agency
+    gtfs.getShapes({
+      agency_key: 'caltrain'
+    })
     .then(shapes => {
 
     });
 
-#### Shapes as geoJSON
+    // Get all shapes for a specific route and direction
+    gtfs.getShapes({
+      agency_key: 'caltrain',
+      route_id: 'Lo-16APR',
+      direction_id: 0
+    })
+    .then(shapes => {
+
+    });
+
+    // Get all shapes for a specific trip_id
+    gtfs.getShapes({
+      agency_key: 'caltrain',
+      trip_id: '37a'
+    })
+    .then(shapes => {
+
+    });
+
+    // Get all shapes for a few trip_ids
+    const tripIds = [
+      '37a',
+      '39a'
+    ];
+    gtfs.getShapes({
+      agency_key: 'caltrain',
+      trip_id: {
+        $in: tripIds
+      }
+    })
+    .then(shapes => {
+
+    });
+
+#### gtfs.getShapesAsGeoJSON()
+
+Queries shapes and returns a promise. The result of the promise is an geoJSON object of shapes. All valid queries for `gtfs.getShapes()` work for `gtfs.getShapesAsGeoJSON()`.
 
 Returns geoJSON of shapes for the `agency_key` specified.
 
-    gtfs.getShapesAsGeoJSON(agency_key)
+    // Get geoJSON of all routes in an agency
+    gtfs.getShapesAsGeoJSON({
+      agency_key: 'caltrain'
+    })
     .then(geojson => {
 
     });
 
-#### Shapes by route
-
-Returns an array of shapes for the `agency_key`, `route_id` and `direction_id`
-specified sorted by `shape_pt_sequence`. `direction_id` should be an integer.
-
-    gtfs.getShapesByRoute(agency_key, route_id, direction_id)
-    .then(shapes => {
-
-    });
-
-`direction_id` and `service_ids` are  optional
-
-#### Shapes by route as geoJSON
-
-Returns geoJSON of shapes for the `agency_key`, `route_id` and `direction_id`
-specified. `direction_id` should be an integer.
-
-    gtfs.getShapesByRouteAsGeoJSON(agency_key, route_id)
-    .then(shapes => {
+    // Get geoJSON of a specific route in an agency
+    gtfs.getShapesAsGeoJSON({
+      agency_key: 'caltrain',
+      route_id: 'Lo-16APR'
+    })
+    .then(geojson => {
 
     });
 
-`direction_id` and `service_ids` are  optional
+    // Get geoJSON of a specific route and direction in an agency
+    gtfs.getShapesAsGeoJSON({
+      agency_key: 'caltrain',
+      route_id: 'Lo-16APR',
+      direction_id: 0
+    })
+    .then(geojson => {
 
-#### Calendars
+    });
 
-Returns an array of calendars, optionally bounded by start_date and end_date
+#### gtfs.getCalendars()
 
-    gtfs.getCalendars(agency_key, start_date, end_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday)
+Queries calendars and returns a promise. The result of the promise is an array of calendars.
+
+    // Get all calendars for an agency
+    gtfs.getCalendars({
+      agency_key: 'caltrain'
+    })
     .then(calendars => {
 
     });
 
-#### Calendars by serivce
-
-Returns an array of calendars for the `service_ids` specified
-
-    gtfs.getCalendarsByService(service_ids)
+    // Get calendars for an agency between two dates that apply on a Tuesday
+    gtfs.getCalendars({
+      agency_key: 'caltrain',
+      start_date: {$lt: 20160405},
+      end_date: {$gte: 20160404},
+      tuesday: 1
+    })
     .then(calendars => {
 
     });
 
-`service_ids` can be a single `service_id` or an array of `service_ids`.
-
-#### Calendar Dates by service
-
-Returns an array of calendarDates for the `service_ids` specified
-
-    gtfs.getCalendarDatesByService(service_ids)
-    .then(calendarDates => {
+    // Get calendars for an agency by service_ids
+    gtfs.getCalendars({
+      agency_key: 'caltrain',
+      service_id: 'CT-16APR-Caltrain-Sunday-02'
+    })
+    .then(calendars => {
 
     });
 
-`service_ids` can be a single `service_id` or an array of `service_ids`.
 
-#### Feed Info
+#### gtfs.getFeedInfo()
 
-Returns feed_info for the agency_key specified
+Queries feed_info and returns a promise. The result of the promise is an array of feed_infos.
 
-    gtfs.getFeedInfo(agency_key)
+    // Get feed_info for a specified agency
+    gtfs.getFeedInfo({
+      agency_key: 'caltrain'
+    })
     .then(feedInfo => {
 
     });
 
-#### Stop Attributes
 
-Returns an array of stop attributes, optionally limited to those matching the
-`stop_ids` specified. These are from the non-standard `stop_attributes.txt`
-file.
+#### gtfs.getFareRules()
 
-    gtfs.getStopAttributes(agency_key, stop_ids)
-    .then(stopAttributes => {
+Queries fare_rules and returns a promise. The result of the promise is an array of fare_rules.
 
-    });
-
-
-#### Fare Rules
-
-Returns fare_rules for the `agency_key` and `route_id` specified.
-
-    gtfs.getFareRulesByRoute(agency_key, route_id)
+    // Get fare_rules for a route
+    gtfs.getFareRules({
+      agency_key: 'caltrain',
+      route_id: 'Lo-16APR'
+    })
     .then(fareRules => {
 
     });
 
-#### Timetables
+#### gtfs.getStopAttributes()
 
-Returns an array of timetables for the `agency_key` specified. These are from
-the non-standard `timetables.txt` file.
+Queries stop_attributes and returns a promise. The result of the promise is an array of stop_attributes. These are from the non-standard `stop_attributes.txt`
+file.
 
-    gtfs.getTimetablesByAgency(agency_key)
+    // Get stop attributes for a few stops
+    const stopIds = [
+      '70011',
+      '70012'
+    ];
+    gtfs.getStopAttributes({
+      agency_key: 'caltrain',
+      stop_id: {
+        $in: stopIds
+      }
+    })
+    .then(stopAttributes => {
+
+    });
+
+#### gtfs.getTimetables()
+
+Queries timetables and returns a promise. The result of the promise is an array of timetables. These are from the non-standard `timetables.txt` file.
+
+    // Get all timetables for an agency
+    gtfs.getTimetables({
+      agency_key: 'caltrain'
+    })
     .then(timetables => {
 
     });
 
-#### Timetables by id
-
-Returns an array timetable objects matching the `timetable_id` specified. A
-timetable may consist of multiple overlapping routes, so more than one timetable
-object can be returned. These are from the non-standard `timetables.txt` file.
-
-    gtfs.getTimetable(agency_key, timetable_id)
+    // Get a specific timetable
+    gtfs.getTimetables({
+      agency_key: 'caltrain',
+      timetable_id: '1'
+    })
     .then(timetables => {
 
     });
 
-#### TimetableStopOrders by id
+#### gtfs.getTimetableStopOrders()
 
-Returns an array of TimetableStopOrder objects matching the `timetable_id`
-specified. These are from the non-standard `timetable_stop_order.txt` file.
+Queries timetable_stop_orders and returns a promise. The result of the promise is an array of timetable_stop_orders. These are from the non-standard `timetable_stop_order.txt` file.
 
-    gtfs.getTimetableStopOrders(agency_key, timetable_id)
+    // Get timetable_stop_orders for a specific timetable
+    gtfs.getTimetableStopOrders({
+      agency_key: 'caltrain',
+      timetable_id: '1'
+    })
     .then(TimetableStopOrders => {
 
     });
 
 #### Timetable Pages
 
-Returns an array of timetablePage objects for the `agency_key` specified. These are
-from the non-standard `timetable_pages.txt` file.
+Queries timetable_pages and returns a promise. The result of the promise is an array of timetable_pages. These are from the non-standard `timetable_pages.txt` file.
 
-    gtfs.getTimetablePagesByAgency(agency_key)
+    // Get all timetable_pages for an agency
+    gtfs.getTimetablePages({
+      agency_key: 'caltrain'
+    })
     .then(timetablePages => {
 
     });
 
-#### Timetable Pages by id
-
-Returns an array timetablePage objects matching the `timetable_page_id` specified.
-These are from the non-standard `timetable_pages.txt` file.
-
-    gtfs.getTimetablePage(agency_key, timetable_page_id)
+    // Get a specific timetable_page
+    gtfs.getTimetablePages({
+      agency_key: 'caltrain',
+      timetable_page_id: '2'
+    })
     .then(timetablePages => {
 
     });

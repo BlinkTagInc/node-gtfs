@@ -15,52 +15,57 @@ const agenciesFixtures = [{
 
 config.agencies = agenciesFixtures;
 
-describe('gtfs.getShapesAsGeoJSON(): ', () => {
-  before(() => database.connect(config));
-
-  after(() => {
-    return database.teardown()
-    .then(database.close);
+describe('gtfs.getShapesAsGeoJSON():', () => {
+  before(async () => {
+    await database.connect(config);
   });
 
-  beforeEach(() => {
-    return database.teardown()
-    .then(() => gtfs.import(config));
+  after(async () => {
+    await database.teardown();
+    await database.close();
   });
 
-  it('should return geojson with an empty features array if no shapes exist for given agency', () => {
-    return database.teardown()
-    .then(() => {
-      const agencyKey = 'non_existing_agency';
-      return gtfs.getShapesAsGeoJSON(agencyKey)
-    })
-    .then(geojson => {
-      should.exist(geojson);
-      geojson.type.should.equal('FeatureCollection');
-      geojson.features.should.have.length(0);
+  beforeEach(async () => {
+    await database.teardown();
+    await gtfs.import(config);
+  });
+
+  it('should return geojson with an empty features array if no shapes exist for given agency', async () => {
+    await database.teardown();
+
+    const agencyKey = 'non_existing_agency';
+    const geojson = await gtfs.getShapesAsGeoJSON({
+      agency_key: agencyKey
     });
+
+    should.exist(geojson);
+    geojson.type.should.equal('FeatureCollection');
+    geojson.features.should.have.length(0);
   });
 
-  it('should return geojson with shapes if they exist for given agency', () => {
+  it('should return geojson with shapes if they exist for given agency', async () => {
     const agencyKey = 'caltrain';
 
-    return gtfs.getShapesAsGeoJSON(agencyKey)
-    .then(geojson => {
-      should.exist(geojson);
-      geojson.type.should.equal('FeatureCollection');
-      geojson.features.length.should.be.above(1);
+    const geojson = await gtfs.getShapesAsGeoJSON({
+      agency_key: agencyKey
     });
+
+    should.exist(geojson);
+    geojson.type.should.equal('FeatureCollection');
+    geojson.features.length.should.be.above(1);
   });
 
-  it('should return geojson with shapes if they exist for given agency and routeId', () => {
+  it('should return geojson with shapes if they exist for given agency and routeId', async () => {
     const agencyKey = 'caltrain';
     const routeId = 'Lo-16APR';
 
-    return gtfs.getShapesByRouteAsGeoJSON(agencyKey, routeId)
-    .then(geojson => {
-      should.exist(geojson);
-      geojson.type.should.equal('FeatureCollection');
-      geojson.features.length.should.be.above(1);
+    const geojson = await gtfs.getShapesAsGeoJSON({
+      agency_key: agencyKey,
+      route_id: routeId
     });
+
+    should.exist(geojson);
+    geojson.type.should.equal('FeatureCollection');
+    geojson.features.length.should.be.above(1);
   });
 });

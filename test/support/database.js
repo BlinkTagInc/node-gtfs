@@ -6,38 +6,28 @@ mongoose.Promise = global.Promise;
 
 let db;
 
-exports.connect = config => {
+exports.connect = async config => {
   // Open the connection to the server
-  return MongoClient.connect(config.mongoUrl)
-  .then(client => {
-    should.exists(client);
-    db = client;
+  db = await MongoClient.connect(config.mongoUrl);
+  should.exists(db);
 
-    // Also use mongoose to connect
-    return mongoose.connect(config.mongoUrl, {useMongoClient: true});
-  });
+  // Also use mongoose to connect
+  await mongoose.connect(config.mongoUrl);
+  return db;
 };
 
-exports.teardown = () => {
-  return db.collections()
-  .then(collections => {
-    if (!collections) {
-      throw new Error('Missing collections');
-    }
+exports.teardown = async () => {
+  const collections = await db.collections();
+  if (!collections) {
+    throw new Error('Missing collections');
+  }
 
-    return Promise.all(collections.map(collection => {
-      if (collection.collectionName.substring(0, 6) === 'system') {
-        return false;
-      }
-
-      return collection.remove({});
-    }));
-  });
+  for (const collection of collections) {
+    await collection.remove({});
+  }
 };
 
-exports.close = () => {
-  return db.close()
-  .then(() => {
-    mongoose.disconnect();
-  });
+exports.close = async () => {
+  await db.close();
+  await mongoose.disconnect();
 };

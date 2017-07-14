@@ -17,73 +17,101 @@ const agencyKey = agenciesFixtures[0].agency_key;
 
 config.agencies = agenciesFixtures;
 
-describe('gtfs.getCalendars(): ', () => {
-  before(() => database.connect(config));
-
-  after(() => {
-    return database.teardown()
-    .then(database.close);
+describe('gtfs.getCalendars():', () => {
+  before(async () => {
+    await database.connect(config);
   });
 
-  beforeEach(() => {
-    return database.teardown()
-    .then(() => gtfs.import(config));
+  after(async () => {
+    await database.teardown();
+    await database.close();
   });
 
-  it('should return empty array if no calendars', () => {
-    return database.teardown()
-    .then(() => {
-      const startDate = 20160404;
-      const endDate = 20160405;
-      const monday = 1;
-      const tuesday = 1;
-      const wednesday = 1;
-      const thursday = 1;
-      const friday = 1;
-      const saturday = 1;
-      const sunday = 1;
+  beforeEach(async () => {
+    await database.teardown();
+    await gtfs.import(config);
+  });
 
-      return gtfs.getCalendars(agencyKey, startDate, endDate, monday, tuesday, wednesday, thursday, friday, saturday, sunday);
-    })
-    .then(calendars => {
-      should.exists(calendars);
-      calendars.should.have.length(0);
+  it('should return empty array if no calendars', async () => {
+    await database.teardown();
+
+    const calendars = await gtfs.getCalendars({
+      agency_key: agencyKey
     });
+
+    should.exists(calendars);
+    calendars.should.have.length(0);
   });
 
-  it('should return expected calendars', () => {
+  it('should return expected calendars', async () => {
     const startDate = 20160404;
     const endDate = 20160405;
-    const monday = 0;
     const tuesday = 1;
-    const wednesday = 0;
-    const thursday = 0;
-    const friday = 0;
-    const saturday = 0;
-    const sunday = 0;
 
-    return gtfs.getCalendars(agencyKey, startDate, endDate, monday, tuesday, wednesday, thursday, friday, saturday, sunday)
-    .then(calendars => {
-      should.exist(calendars);
-      calendars.length.should.equal(1);
-
-      const expectedCalendar = {
-        service_id: 'CT-16APR-Caltrain-Weekday-01',
-        monday: 1,
-        tuesday: 1,
-        wednesday: 1,
-        thursday: 1,
-        friday: 1,
-        saturday: 0,
-        sunday: 0,
-        start_date: 20160404,
-        end_date: 20190331,
-        agency_key: 'caltrain'
-      };
-
-      const calendarFormatted = calendars[0].toObject();
-      delete calendarFormatted._id;
-      expectedCalendar.should.match(calendarFormatted);
+    const calendars = await gtfs.getCalendars({
+      agency_key: agencyKey,
+      start_date: {$lt: endDate},
+      end_date: {$gte: startDate},
+      tuesday
     });
+
+    should.exist(calendars);
+    calendars.length.should.equal(1);
+
+    const expectedCalendar = {
+      service_id: 'CT-16APR-Caltrain-Weekday-01',
+      monday: 1,
+      tuesday: 1,
+      wednesday: 1,
+      thursday: 1,
+      friday: 1,
+      saturday: 0,
+      sunday: 0,
+      start_date: 20160404,
+      end_date: 20190331,
+      agency_key: 'caltrain'
+    };
+
+    const calendarFormatted = calendars[0].toObject();
+    delete calendarFormatted._id;
+    expectedCalendar.should.match(calendarFormatted);
+  });
+
+  it('should return empty array if no calendars', async () => {
+    await database.teardown();
+
+    const serviceIds = ['CT-16APR-Caltrain-Weekday-01-No'];
+
+    const calendars = await gtfs.getCalendars({
+      service_id: {$in: serviceIds}
+    });
+
+    should.exists(calendars);
+    calendars.should.have.length(0);
+  });
+
+  it('should return expected calendars', async () => {
+    const serviceIds = ['CT-16APR-Caltrain-Weekday-01'];
+
+    const calendars = await gtfs.getCalendars({
+      service_id: {$in: serviceIds}
+    });
+
+    should.exist(calendars);
+    calendars.length.should.equal(1);
+
+    const calendar = calendars[0].toObject();
+
+    calendar.agency_key.should.equal(agencyKey);
+    calendar.service_id.should.equal('CT-16APR-Caltrain-Weekday-01');
+    calendar.monday.should.equal(1);
+    calendar.tuesday.should.equal(1);
+    calendar.wednesday.should.equal(1);
+    calendar.thursday.should.equal(1);
+    calendar.friday.should.equal(1);
+    calendar.saturday.should.equal(0);
+    calendar.sunday.should.equal(0);
+    calendar.start_date.should.equal(20160404);
+    calendar.end_date.should.equal(20190331);
   });
 });

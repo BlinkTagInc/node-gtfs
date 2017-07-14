@@ -25,14 +25,14 @@ const filenames = require('../../lib/filenames');
 describe('lib/import.js', function () {
   this.timeout(10000);
   describe('Download and import from different GTFS sources', () => {
-    it('should be able to download and import from HTTP', () => {
+    it('should be able to download and import from HTTP', async () => {
       config.agencies = agenciesFixturesUrl;
-      return gtfs.import(config);
+      await gtfs.import(config);
     });
 
-    it('should be able to download and import from local filesystem', () => {
+    it('should be able to download and import from local filesystem', async () => {
       config.agencies = agenciesFixturesLocal;
-      return gtfs.import(config);
+      await gtfs.import(config);
     });
   });
 
@@ -82,19 +82,16 @@ describe('lib/import.js', function () {
           });
         }));
       })
-      .then(() => {
-        return database.connect(config)
-        .then(client => {
-          db = client;
-        });
-      })
-      .then(() => database.teardown())
-      .then(() => gtfs.import(config))
+      .then(async () => {
+        db = await database.connect(config);
+        await database.teardown();
+        await gtfs.import(config);
+      });
     });
 
-    after(() => {
-      return database.teardown()
-      .then(() => database.close());
+    after(async () => {
+      await database.teardown();
+      await database.close();
     });
 
     it('should import the same number of agencies', done => {
