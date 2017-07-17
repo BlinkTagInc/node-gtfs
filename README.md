@@ -10,9 +10,26 @@
 
 ---
 
-As of version 1.0.0, all Node-GTFS methods have changed to accept a query object instead of individual arguments. This allows for all fields of all GTFS files to be queried using this library.
+## Breaking changes in version 1.0.0
 
-As of version 0.11.0, Node-GTFS methods don't support callbacks. Use promises instead:
+As of version 1.0.0, all `node-gtfs` methods have changed to accept a query object instead of individual arguments. This allows for all fields of all GTFS files to be queried using this library. Most method names have been changed to be more general and more specific methods have been removed. For example, `getRoutes` now replaces `getRoutesByAgency`, `getRoutesById`, `getRoutesByDistance` and `getRoutesByStop`.
+
+    // Old method with individual arguments, no longer supported in `node-gtfs` 1.0.0
+    gtfs.getRoutesByStop(agency_key, stop_id)
+    .then(routes => {
+      // do something with the array of `routes`
+    })
+
+    // Query in `node-gtfs` version 1.0.0
+    gtfs.getRoutes({
+      agency_key: 'caltrain',
+      stop_id: '123'
+    })
+    .then(routes => {
+      // do something with the array of `routes`
+    })
+
+Additionally, as of version 0.11.0, `node-gtfs` methods don't support callbacks. Use promises instead:
 
     gtfs.getAgencies()
     .then(agencies => {
@@ -22,7 +39,7 @@ As of version 0.11.0, Node-GTFS methods don't support callbacks. Use promises in
       // handle errors here
     });
 
-Or, you could use async/await:
+Or, you use async/await:
 
     const myAwesomeFunction = async () => {
       try {
@@ -38,13 +55,13 @@ This library has two parts: the [GTFS import script](#gtfs-import-script) and th
 
 ## Example Application
 
-The [GTFS-to-HTML](https://github.com/blinktaginc/gtfs-to-html) app uses node-gtfs for downloading, importing and querying GTFS data. It provides a good example of how to use this library.
+The [GTFS-to-HTML](https://github.com/blinktaginc/gtfs-to-html) app uses `node-gtfs` for downloading, importing and querying GTFS data. It provides a good example of how to use this library.
 
-The [GTFS-to-geojson](https://github.com/blinktaginc/gtfs-to-geojson) app creates geoJSON files for transit routes for use in mapping. It uses node-gtfs for downloading, importing and querying GTFS data. It provides a good example of how to use this library.
+The [GTFS-to-geojson](https://github.com/blinktaginc/gtfs-to-geojson) app creates geoJSON files for transit routes for use in mapping. It uses `node-gtfs` for downloading, importing and querying GTFS data. It provides a good example of how to use this library.
 
 ## Installation
 
-Install node-gtfs directly from [npm](https://npmjs.org):
+Install `node-gtfs` directly from [npm](https://npmjs.org):
 
     npm install gtfs -g
 
@@ -156,7 +173,7 @@ API along with your API token.
 
 ### MongoDB URI
 
-Add the MongoDB URI to `config.json` with the key `mongoUrl`. Running locally, you may want to use `mongodb://localhost:27017/gtfs`.
+Add the MongoDB URI to `config.json` with the key `mongoUrl`. Running locally, you could use something like `mongodb://localhost:27017/gtfs`.
 ```
 {
   "mongoUrl": "mongodb://localhost:27017/gtfs",
