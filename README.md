@@ -205,7 +205,7 @@ If you don't want the import script to print any output to the console, you can 
 
 ### Deleting existing data
 
-If you don't want the import script to delete all existing data from the database with the same `agency_key`, you can set `skipDelete` to `false`. Defaults to `true`.
+If you don't want the import script to delete all existing data from the database with the same `agency_key`, you can set `skipDelete` to `true`. Defaults to `false`.
 
 ```
 {
