@@ -265,7 +265,7 @@ Use `gtfs.import()` in your code to run an import of a GTFS file specified in a 
     const config = require('config.json');
 
     mongoose.Promise = global.Promise;
-    mongoose.connect(config.mongoUrl);
+    mongoose.connect(config.mongoUrl, {useMongoClient: true});
 
     gtfs.import(config)
     .then(() => {
@@ -293,7 +293,7 @@ Configuration can be a JSON object in your code
     };
 
     mongoose.Promise = global.Promise;
-    mongoose.connect(config.mongoUrl);
+    mongoose.connect(config.mongoUrl, {useMongoClient: true});
 
     gtfs.import(config)
     .then(() => {
@@ -333,7 +333,7 @@ Connect to mongo via mongoose.
 
     const mongoose = require('mongoose');
     mongoose.Promise = global.Promise;
-    mongoose.connect('YOUR-MONGODB-URI');
+    mongoose.connect('YOUR-MONGODB-URI', {useMongoClient: true});
 
 If you are running locally, your MongoDB uri might be something like:
 
