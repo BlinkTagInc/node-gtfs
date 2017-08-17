@@ -17,7 +17,7 @@ const agencyKey = agenciesFixtures[0].agency_key;
 
 config.agencies = agenciesFixtures;
 
-describe('gtfs.getFareRulesByRoute():', () => {
+describe('gtfs.getFareRules():', () => {
   before(async () => {
     await database.connect(config);
   });

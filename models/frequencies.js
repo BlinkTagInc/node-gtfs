@@ -8,7 +8,8 @@ const Frequencies = mongoose.model('Frequencies', new mongoose.Schema({
   },
   trip_id: {
     type: String,
-    required: true
+    required: true,
+    index: true
   },
   start_time: {
     type: String,

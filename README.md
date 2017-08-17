@@ -3,6 +3,7 @@
 [![NPM version](https://img.shields.io/npm/v/gtfs.svg?style=flat)](https://www.npmjs.com/package/gtfs)
 [![David](https://img.shields.io/david/blinktaginc/node-gtfs.svg)]()
 [![npm](https://img.shields.io/npm/dm/gtfs.svg?style=flat)]()
+[![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
 
 [![NPM](https://nodei.co/npm/gtfs.png?downloads=true)](https://nodei.co/npm/gtfs/)
 
@@ -753,7 +754,6 @@ Queries calendars and returns a promise. The result of the promise is an array o
 
     });
 
-
 #### gtfs.getFeedInfo()
 
 Queries feed_info and returns a promise. The result of the promise is an array of feed_infos.
@@ -766,7 +766,6 @@ Queries feed_info and returns a promise. The result of the promise is an array o
 
     });
 
-
 #### gtfs.getFareRules()
 
 Queries fare_rules and returns a promise. The result of the promise is an array of fare_rules.
@@ -777,6 +776,19 @@ Queries fare_rules and returns a promise. The result of the promise is an array 
       route_id: 'Lo-16APR'
     })
     .then(fareRules => {
+
+    });
+
+#### gtfs.getFrequencies()
+
+Queries frequencies and returns a promise. The result of the promise is an array of frequencies.
+
+    // Get frequencies for a trip
+    gtfs.getFrequencies({
+      agency_key: 'caltrain',
+      trip_id: '1234'
+    })
+    .then(frequencies => {
 
     });
 
