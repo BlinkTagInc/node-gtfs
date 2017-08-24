@@ -754,6 +754,24 @@ Queries calendars and returns a promise. The result of the promise is an array o
 
     });
 
+    // Get calendars for an specific route
+    gtfs.getCalendars({
+      agency_key: 'caltrain',
+      route_id: 'TaSj-16APR'
+    })
+    .then(calendars => {
+
+    });
+
+    // Get calendars for several routes
+    gtfs.getCalendars({
+      agency_key: 'caltrain',
+      route_id: {$in: ['TaSj-16APR', 'Lo-16APR']}
+    })
+    .then(calendars => {
+
+    });
+
 #### gtfs.getFeedInfo()
 
 Queries feed_info and returns a promise. The result of the promise is an array of feed_infos.

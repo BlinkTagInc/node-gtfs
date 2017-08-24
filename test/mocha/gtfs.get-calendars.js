@@ -90,7 +90,7 @@ describe('gtfs.getCalendars():', () => {
     calendars.should.have.length(0);
   });
 
-  it('should return expected calendars', async () => {
+  it('should return expected calendars limited by service_id', async () => {
     const serviceIds = ['CT-16APR-Caltrain-Weekday-01'];
 
     const calendars = await gtfs.getCalendars({
@@ -113,5 +113,24 @@ describe('gtfs.getCalendars():', () => {
     calendar.sunday.should.equal(0);
     calendar.start_date.should.equal(20160404);
     calendar.end_date.should.equal(20190331);
+  });
+
+  it('should return expected calendars limited by route_id', async () => {
+    const routeIds = ['TaSj-16APR'];
+
+    const calendars = await gtfs.getCalendars({
+      route_id: {$in: routeIds}
+    });
+
+    should.exist(calendars);
+    calendars.length.should.equal(2);
+
+    const calendar1 = calendars[0].toObject();
+    const calendar2 = calendars[1].toObject();
+
+    const serviceIds = ['CT-16APR-Caltrain-Sunday-02', 'CT-16APR-Caltrain-Saturday-02'];
+
+    serviceIds.should.containEql(calendar1.service_id);
+    serviceIds.should.containEql(calendar2.service_id);
   });
 });
