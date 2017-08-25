@@ -26,19 +26,16 @@ const stopTimeSchema = new mongoose.Schema({
   stop_sequence: {
     type: Number,
     required: true,
-    index: true,
     min: 0
   },
   stop_headsign: String,
   pickup_type: {
     type: Number,
-    index: true,
     min: 0,
     max: 3
   },
   drop_off_type: {
     type: Number,
-    index: true,
     min: 0,
     max: 3
   },
@@ -53,7 +50,8 @@ const stopTimeSchema = new mongoose.Schema({
 stopTimeSchema.index({
   agency_key: 1,
   stop_id: 1,
-  trip_id: 1
+  trip_id: 1,
+  stop_sequence: 1
 });
 
 module.exports = mongoose.model('StopTime', stopTimeSchema);
