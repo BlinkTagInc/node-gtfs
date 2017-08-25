@@ -51,6 +51,10 @@ describe('gtfs.getStops():', () => {
 
     should.exist(stops);
     stops.should.have.length(95);
+
+    for (const stop of stops) {
+      stop.should.not.have.any.keys('_id');
+    }
   });
 
   it('should return array of stops for given agency, and stopIds', async () => {
@@ -67,6 +71,10 @@ describe('gtfs.getStops():', () => {
 
     should.exist(stops);
     stops.should.have.length(2);
+
+    for (const stop of stops) {
+      stop.should.not.have.any.keys('_id');
+    }
   });
 
   it('should return array of stops for given agency and stop_code', async () => {
@@ -83,6 +91,10 @@ describe('gtfs.getStops():', () => {
 
     should.exist(stops);
     stops.should.have.length(2);
+
+    for (const stop of stops) {
+      stop.should.not.have.any.keys('_id');
+    }
   });
 
   it('should return an empty array if no stops exists for given agency, route and direction', async () => {
@@ -133,6 +145,10 @@ describe('gtfs.getStops():', () => {
     stops.forEach((stop, idx) => {
       expectedStopIds[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
     });
+
+    for (const stop of stops) {
+      stop.should.not.have.any.keys('_id');
+    }
   });
 
   it('should return array of stops if it exists for given agency, route and direction (opposite direction)', async () => {
@@ -167,6 +183,10 @@ describe('gtfs.getStops():', () => {
     stops.forEach((stop, idx) => {
       expectedStopIds[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
     });
+
+    for (const stop of stops) {
+      stop.should.not.have.any.keys('_id');
+    }
   });
 
   it('should return an empty array if no stops exist', async () => {
@@ -251,22 +271,12 @@ describe('gtfs.getStops():', () => {
     should.exist(stops);
     stops.should.have.length(3);
 
-    stops.forEach(stop => {
+    for (const stop of stops) {
       const expectedStop = expectedStops[stop.stop_id];
 
       should.exist(expectedStop);
-      stop.stop_id.should.equal(expectedStop.stop_id);
-      stop.stop_code.should.equal(expectedStop.stop_code);
-      stop.stop_name.should.equal(expectedStop.stop_name);
-      stop.stop_lat.should.equal(expectedStop.stop_lat);
-      stop.stop_lon.should.equal(expectedStop.stop_lon);
-      stop.zone_id.should.equal(expectedStop.zone_id);
-      stop.stop_url.should.equal(expectedStop.stop_url);
-      stop.location_type.should.equal(expectedStop.location_type);
-      stop.parent_station.should.equal(expectedStop.parent_station);
-      stop.wheelchair_boarding.should.equal(expectedStop.wheelchair_boarding);
-      stop.agency_key.should.equal(expectedStop.agency_key);
-    });
+      expectedStop.should.match(stop);
+    }
   });
 
   it('should return expected stops within given distance (without specifying radius) if they exist', async () => {
@@ -330,21 +340,11 @@ describe('gtfs.getStops():', () => {
     should.exist(stops);
     stops.should.have.length(3);
 
-    stops.forEach(stop => {
+    for (const stop of stops) {
       const expectedStop = expectedStops[stop.stop_id];
 
       should.exist(expectedStop);
-      stop.stop_id.should.equal(expectedStop.stop_id);
-      stop.stop_code.should.equal(expectedStop.stop_code);
-      stop.stop_name.should.equal(expectedStop.stop_name);
-      stop.stop_lat.should.equal(expectedStop.stop_lat);
-      stop.stop_lon.should.equal(expectedStop.stop_lon);
-      stop.zone_id.should.equal(expectedStop.zone_id);
-      stop.stop_url.should.equal(expectedStop.stop_url);
-      stop.location_type.should.equal(expectedStop.location_type);
-      stop.parent_station.should.equal(expectedStop.parent_station);
-      stop.wheelchair_boarding.should.equal(expectedStop.wheelchair_boarding);
-      stop.agency_key.should.equal(expectedStop.agency_key);
-    });
+      expectedStop.should.match(stop);
+    }
   });
 });

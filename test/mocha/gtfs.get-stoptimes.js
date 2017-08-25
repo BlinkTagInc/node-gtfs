@@ -55,6 +55,10 @@ describe('gtfs.getStoptimes():', () => {
 
     should.exist(stoptimes);
     stoptimes.should.have.length(80);
+
+    for (const stoptime of stoptimes) {
+      stoptime.should.not.have.any.keys('_id');
+    }
   });
 
   it('should return array of stoptimes for given agency and trip_ids', async () => {
@@ -70,5 +74,9 @@ describe('gtfs.getStoptimes():', () => {
 
     should.exist(stoptimes);
     stoptimes.should.have.length(1);
+
+    for (const stoptime of stoptimes) {
+      stoptime.should.not.have.any.keys('_id');
+    }
   });
 });

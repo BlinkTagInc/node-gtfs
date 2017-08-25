@@ -89,12 +89,7 @@ describe('gtfs.getRoutes():', () => {
       const expectedRoute = expectedRoutes[route.route_id];
 
       should.exist(expectedRoute);
-      route.route_id.should.equal(expectedRoute.route_id);
-      route.route_short_name.should.equal(expectedRoute.route_short_name);
-      route.route_long_name.should.equal(expectedRoute.route_long_name);
-      route.route_type.should.equal(expectedRoute.route_type);
-      route.route_color.should.equal(expectedRoute.route_color);
-      route.agency_key.should.equal(expectedRoute.agency_key);
+      expectedRoute.should.match(route);
     });
   });
 
@@ -189,12 +184,7 @@ describe('gtfs.getRoutes():', () => {
       const expectedRoute = expectedRoutes[route.route_id];
 
       should.exist(expectedRoute);
-      route.route_id.should.equal(expectedRoute.route_id);
-      route.route_short_name.should.equal(expectedRoute.route_short_name);
-      route.route_long_name.should.equal(expectedRoute.route_long_name);
-      route.route_type.should.equal(expectedRoute.route_type);
-      route.route_color.should.equal(expectedRoute.route_color);
-      route.agency_key.should.equal(expectedRoute.agency_key);
+      expectedRoute.should.match(route);
     });
   });
 
@@ -250,12 +240,7 @@ describe('gtfs.getRoutes():', () => {
       const expectedRoute = expectedRoutes[route.route_id];
 
       should.exist(expectedRoute);
-      route.route_id.should.equal(expectedRoute.route_id);
-      route.route_short_name.should.equal(expectedRoute.route_short_name);
-      route.route_long_name.should.equal(expectedRoute.route_long_name);
-      route.route_type.should.equal(expectedRoute.route_type);
-      route.route_color.should.equal(expectedRoute.route_color);
-      route.agency_key.should.equal(expectedRoute.agency_key);
+      expectedRoute.should.match(route);
     });
   });
 
@@ -267,13 +252,17 @@ describe('gtfs.getRoutes():', () => {
     should.exist(routes);
     routes.should.have.length(1);
 
-    const route = routes[0].toObject();
+    const route = routes[0];
 
-    route.agency_key.should.equal(agencyKey);
-    route.route_id.should.equal('TaSj-16APR');
-    route.route_short_name.should.equal('');
-    route.route_long_name.should.equal('Tamien / San Jose Diridon Caltrain Shuttle');
-    route.route_type.should.equal(3);
-    route.route_color.should.equal('41AD49');
+    const expectedRoute = {
+      route_id: 'TaSj-16APR',
+      route_short_name: '',
+      route_long_name: 'Tamien / San Jose Diridon Caltrain Shuttle',
+      route_type: 3,
+      route_color: '41AD49',
+      agency_key: 'caltrain'
+    };
+
+    expectedRoute.should.match(route);
   });
 });

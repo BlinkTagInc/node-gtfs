@@ -48,7 +48,7 @@ describe('gtfs.getAgencies():', () => {
     should.exist(agencies);
     agencies.length.should.equal(1);
 
-    const agency = agencies[0].toObject();
+    const agency = agencies[0];
 
     agency.agency_key.should.equal('caltrain');
     agency.agency_id.should.equal('CT');
@@ -96,8 +96,9 @@ describe('gtfs.getAgencies():', () => {
     should.exist(agencies);
     agencies.length.should.equal(1);
 
-    const agency = agencies[0].toObject();
+    const agency = agencies[0];
 
+    agency.should.not.have.any.keys('_id');
     agency.agency_key.should.equal('caltrain');
     agency.agency_id.should.equal('CT');
     agency.agency_name.should.equal('Caltrain');
@@ -157,6 +158,7 @@ describe('gtfs.getAgencies():', () => {
     should.exist(agencies);
     agencies.should.have.length(1);
     agencies[0].agency_key.should.equal('caltrain');
+    agencies[0].should.not.have.any.keys('_id');
   });
 
   it('should return expected agencies within given distance (without specifying radius)', async () => {
@@ -173,7 +175,8 @@ describe('gtfs.getAgencies():', () => {
     should.exist(agencies);
     agencies.should.have.length(1);
 
-    const agency = agencies[0].toObject();
+    const agency = agencies[0];
+    agency.should.not.have.any.keys('_id');
     agency.agency_key.should.equal('caltrain');
     agency.agency_id.should.equal('CT');
     agency.agency_name.should.equal('Caltrain');

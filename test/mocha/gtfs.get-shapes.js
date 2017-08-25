@@ -51,6 +51,10 @@ describe('gtfs.getShapes():', () => {
 
     should.exist(shapes);
     shapes.should.have.length(8);
+
+    for (const shape of shapes) {
+      shape.should.not.have.any.keys('_id');
+    }
   });
 
   it('should return array of shapes for given agency by route', async () => {
@@ -62,6 +66,10 @@ describe('gtfs.getShapes():', () => {
 
     should.exist(shapes);
     shapes.should.have.length(2);
+
+    for (const shape of shapes) {
+      shape.should.not.have.any.keys('_id');
+    }
   });
 
   it('should return array of shapes for given agency by route and direction', async () => {
@@ -75,9 +83,11 @@ describe('gtfs.getShapes():', () => {
 
     should.exist(shapes);
     shapes.should.have.length(1);
+
     const shape = shapes[0];
     shape.should.have.length(114);
     shape[0].shape_id.should.equal('cal_tam_sj');
+    shape.should.not.have.any.keys('_id');
   });
 
   it('should return array of shapes for given agency and service_id', async () => {
@@ -89,6 +99,10 @@ describe('gtfs.getShapes():', () => {
 
     should.exist(shapes);
     shapes.should.have.length(3);
+
+    for (const shape of shapes) {
+      shape.should.not.have.any.keys('_id');
+    }
   });
 
   it('should return array of shapes for given agency and shape_ids', async () => {
@@ -103,5 +117,9 @@ describe('gtfs.getShapes():', () => {
 
     should.exist(shapes);
     shapes.should.have.length(2);
+
+    for (const shape of shapes) {
+      shape.should.not.have.any.keys('_id');
+    }
   });
 });

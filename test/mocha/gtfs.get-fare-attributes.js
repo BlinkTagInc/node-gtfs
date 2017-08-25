@@ -55,7 +55,7 @@ describe('gtfs.getFareAttributes():', () => {
     should.exist(fareAttributes);
     fareAttributes.length.should.equal(1);
 
-    const fareAttribute = fareAttributes[0].toObject();
+    const fareAttribute = fareAttributes[0];
 
     const expectedFareAttribute = {
       fare_id: 'OW_1_20160228',
@@ -63,7 +63,7 @@ describe('gtfs.getFareAttributes():', () => {
       currency_type: 'USD',
       payment_method: 1,
       transfers: 0,
-      transfer_duration: null,
+      transfer_duration: '',
       agency_key: 'caltrain'
     };
 

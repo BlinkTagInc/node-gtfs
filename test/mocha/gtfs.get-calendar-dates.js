@@ -82,9 +82,7 @@ describe('gtfs.getCalendarDates():', () => {
     ];
 
     calendarDates.forEach(calendarDate => {
-      const calendarDateFormatted = calendarDate.toObject();
-      delete calendarDateFormatted._id;
-      expectedCalendarDates.should.matchAny(calendarDateFormatted);
+      expectedCalendarDates.should.matchAny(calendarDate);
     });
   });
 });

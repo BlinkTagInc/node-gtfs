@@ -57,8 +57,9 @@ describe('gtfs.getFareRules():', () => {
     should.exist(fareRules);
     fareRules.length.should.equal(36);
 
-    const fareRule = fareRules[0].toObject();
+    const fareRule = fareRules[0];
 
+    fareRule.should.not.have.any.keys('_id');
     fareRule.agency_key.should.equal(agenciesFixtures[0].agency_key);
     should.exist(fareRule.fare_id);
     fareRule.route_id.should.equal(routeId);

@@ -72,7 +72,7 @@ describe('gtfs.getCalendars():', () => {
       agency_key: 'caltrain'
     };
 
-    const calendarFormatted = calendars[0].toObject();
+    const calendarFormatted = calendars[0];
     delete calendarFormatted._id;
     expectedCalendar.should.match(calendarFormatted);
   });
@@ -100,8 +100,9 @@ describe('gtfs.getCalendars():', () => {
     should.exist(calendars);
     calendars.length.should.equal(1);
 
-    const calendar = calendars[0].toObject();
+    const calendar = calendars[0];
 
+    calendar.should.not.have.any.keys('_id');
     calendar.agency_key.should.equal(agencyKey);
     calendar.service_id.should.equal('CT-16APR-Caltrain-Weekday-01');
     calendar.monday.should.equal(1);
@@ -125,12 +126,10 @@ describe('gtfs.getCalendars():', () => {
     should.exist(calendars);
     calendars.length.should.equal(2);
 
-    const calendar1 = calendars[0].toObject();
-    const calendar2 = calendars[1].toObject();
+    const expectedServiceIds = ['CT-16APR-Caltrain-Sunday-02', 'CT-16APR-Caltrain-Saturday-02'];
 
-    const serviceIds = ['CT-16APR-Caltrain-Sunday-02', 'CT-16APR-Caltrain-Saturday-02'];
-
-    serviceIds.should.containEql(calendar1.service_id);
-    serviceIds.should.containEql(calendar2.service_id);
+    for (const calendar of calendars) {
+      expectedServiceIds.should.matchAny(calendar.service_id);
+    }
   });
 });
