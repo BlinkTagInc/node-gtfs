@@ -65,6 +65,8 @@ The [GTFS-to-geojson](https://github.com/blinktaginc/gtfs-to-geojson) app create
 Install `node-gtfs` directly from [npm](https://npmjs.org):
 
     npm install gtfs -g
+    
+Note: Do __not__ install mongoose. If you do choose to install it, install it as a peerDependency.
 
 ## Command-line example
 
