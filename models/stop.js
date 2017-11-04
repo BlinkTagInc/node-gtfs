@@ -34,7 +34,7 @@ const Stop = mongoose.model('Stop', new mongoose.Schema({
   },
   loc: {
     type: Array,
-    index: '2d'
+    index: '2dsphere'
   },
   zone_id: String,
   stop_url: String,

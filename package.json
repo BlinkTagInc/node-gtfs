@@ -33,7 +33,8 @@
     "Marcelo Muñoz Araya <ma.munoz.araya@gmail.com>",
     "David Aghassi",
     "Steven Prins",
-    "W3stside"
+    "W3stside",
+    "pitrz"
   ],
   "dependencies": {
     "csv": "^1.1.1",

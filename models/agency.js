@@ -25,16 +25,16 @@ const Agency = mongoose.model('Agency', new mongoose.Schema({
   agency_bounds: {
     sw: {
       type: Array,
-      index: '2d'
+      index: '2dsphere'
     },
     ne: {
       type: Array,
-      index: '2d'
+      index: '2dsphere'
     }
   },
   agency_center: {
     type: Array,
-    index: '2d'
+    index: '2dsphere'
   },
   date_last_updated: Number
 }));
