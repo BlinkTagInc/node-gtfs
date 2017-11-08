@@ -68,4 +68,20 @@ describe('gtfs.getShapesAsGeoJSON():', () => {
     geojson.type.should.equal('FeatureCollection');
     geojson.features.length.should.be.above(1);
   });
+
+  it('should return geojson with shapes if they exist for given agency and routeId and directionId', async () => {
+    const agencyKey = 'caltrain';
+    const routeId = 'Lo-16APR';
+    const directionId = 0;
+
+    const geojson = await gtfs.getShapesAsGeoJSON({
+      agency_key: agencyKey,
+      route_id: routeId,
+      direction_id: directionId
+    });
+
+    should.exist(geojson);
+    geojson.type.should.equal('FeatureCollection');
+    geojson.features.length.should.be.above(1);
+  });
 });
