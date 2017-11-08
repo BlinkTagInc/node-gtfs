@@ -1,7 +1,7 @@
 {
   "name": "gtfs",
   "description": "Import GTFS transit data into mongodb and query routes, stops, times, fares and more",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "keywords": [
     "transit",
     "gtfs",
@@ -37,28 +37,28 @@
     "pitrz"
   ],
   "dependencies": {
-    "csv": "^1.1.1",
-    "extract-zip": "^1.6.5",
-    "fs-extra": "^4.0.1",
+    "csv": "^2.0.0",
+    "extract-zip": "^1.6.6",
+    "fs-extra": "^4.0.2",
     "lodash": "^4.17.4",
-    "moment": "^2.18.1",
-    "mongodb": "2.2.31",
-    "mongoose": "4.11.8",
-    "node-fetch": "^1.7.2",
+    "moment": "^2.19.1",
+    "mongodb": "2.2.33",
+    "mongoose": "4.13.0",
+    "node-fetch": "^1.7.3",
     "proj4": "^2.4.4",
     "untildify": "^3.0.2",
-    "yargs": "^8.0.2"
+    "yargs": "^10.0.3"
   },
   "devDependencies": {
-    "csv-parse": "1.2.1",
-    "eslint-config-xo": "^0.18.2",
-    "eslint-plugin-ava": "^4.2.1",
-    "eslint-plugin-import": "^2.7.0",
+    "csv-parse": "2.0.0",
+    "eslint-config-xo": "^0.19.0",
+    "eslint-plugin-ava": "^4.2.2",
+    "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-unicorn": "^2.1.2",
-    "mocha": "3.5.0",
-    "should": "11.2.1",
-    "timekeeper": "1.0.0",
-    "xo": "0.18.2"
+    "mocha": "^4.0.1",
+    "should": "^13.1.3",
+    "timekeeper": "^2.0.0",
+    "xo": "^0.18.2"
   },
   "repository": {
     "type": "git",
