@@ -348,7 +348,34 @@ You probably want to use the same value used in your [configuration JSON file](#
 
 Once you have included the library and connected to your MongoDB database you can use the following methods.
 
-#### gtfs.getAgencies()
+Most methods accept three arguments: `query`, `projection` and `options`. `projection` and `options` are optional and are passed to the mongoose query.
+
+#### Projection
+By default, `projection` is set to exclude mongo `_id`. `projection` allows specifying which fields you would like returned. For instance:
+
+    // Gets all agencies but limits results to only include `agency_name` and `agency_lang`.
+    gtfs.getAgencies({}, {
+      _id: 0,
+      agency_name: 1,
+      agency_lang: 1
+    })
+    .then(agencies => {
+      // each Agency only has `agency_name` and `agency_lang`
+    });
+
+
+#### Options
+By default, `options` is set to `lean: true` to return a raw javascript object. You can specify things like `sort` using `options`.
+
+    // Gets all agencies sorted by `agency_name`
+    gtfs.getAgencies({}, {}, {
+      sort: {agency_name: 1}
+    })
+    .then(agencies => {
+
+    });
+
+#### gtfs.getAgencies(query, projection, options)
 
 Queries agencies and returns a promise. The result of the promise is an array of agencies.
 
@@ -387,16 +414,21 @@ Queries agencies and returns a promise. The result of the promise is an array of
 
     });
 
-    // Get all agencies in a specific timezone
+    // Get all agencies in a specific timezone, limited to just `agency_name` sorted alphabetically
     gtfs.getAgencies({
       agency_timezone: 'America/Los_Angeles'
+    }, {
+      _id: 0,
+      agency_name: 1
+    }, {
+      sort: {agency_name: 1}  
     })
     .then(agencies => {
 
     });
 
 
-#### gtfs.getRoutes()
+#### gtfs.getRoutes(query, projection, options)
 
 Queries routes and returns a promise. The result of the promise is an array of routes.
 
@@ -446,16 +478,20 @@ Queries routes and returns a promise. The result of the promise is an array of r
     });
 
 
-    // Get routes that serve a specific stop.
+    // Get routes that serve a specific stop, sorted by `stop_name`.
     gtfs.getRoutes({
       agency_key: 'caltrain',
       stop_id: '70011'
+    }, {
+      _id: 0
+    }, {
+      stop_name: 1
     })
     .then(routes => {
 
     });
 
-#### gtfs.getStops()
+#### gtfs.getStops(query, projection, options)
 
 Queries stops and returns a promise. The result of the promise is an array of stops.
 
@@ -514,7 +550,7 @@ Queries stops and returns a promise. The result of the promise is an array of st
 
     });
 
-#### gtfs.getStopsAsGeoJSON()
+#### gtfs.getStopsAsGeoJSON(query)
 
 Queries stops and returns a promise. The result of the promise is an geoJSON object of stops. All valid queries for `gtfs.getStops()` work for `gtfs.getStopsAsGeoJSON()`.
 
@@ -538,9 +574,9 @@ Queries stops and returns a promise. The result of the promise is an geoJSON obj
 
 `stop_ids` is optional and can be a single `stop_id` or an array of `stop_ids`.
 
-#### gtfs.getStoptimes()
+#### gtfs.getStoptimes(query, projection, options)
 
-Queries stop_times and returns a promise. The result of the promise is an array of stop_times. `agency_key` and `stop_id` are required.
+Queries `stop_times` and returns a promise. The result of the promise is an array of `stop_times`. `agency_key` is required. `stop_times` are sorted by `stop_sequence` by default, but can be overridden by passing a `sort` parameter in an options object.
 
     // Get all stoptimes for a specific stop
     gtfs.getStoptimes({
@@ -572,7 +608,20 @@ Queries stop_times and returns a promise. The result of the promise is an array 
 
     });
 
-#### gtfs.getTrips()
+    // Get all stoptimes for a route and sort by stop_id
+    gtfs.getStoptimes({
+      agency_key: 'caltrain',
+      route_id: '10'
+    }, {
+      _id: 0
+    }, {
+      sort: {stop_id: 1}
+    })
+    .then(stoptimes => {
+
+    });
+
+#### gtfs.getTrips(query, projection, options)
 
 Queries trips and returns a promise. The result of the promise is an array of trips.
 
@@ -603,7 +652,22 @@ Queries trips and returns a promise. The result of the promise is an array of tr
 
     });
 
-#### gtfs.getDirectionsByRoute()
+    // Get only trip_ids for trips on a specific route and direction, sorted by trip_id
+    gtfs.getTrips({
+      agency_key: 'caltrain',
+      route_id: 'Lo-16APR',
+      direction_id: 0
+    }, {
+      _id: 0,
+      trip_id: 1
+    }, {
+      sort: {trip_id: 1}
+    })
+    .then(trips => {
+
+    });
+
+#### gtfs.getDirectionsByRoute(query)
 
 Queries trips and returns a promise. The result of the promise is an array of direction_ids. Useful to determine if a route has two directions or just one. `agency_key` and `route_id` are required.
 
@@ -645,9 +709,9 @@ Example result:
       }
     ];
 
-#### gtfs.getShapes()
+#### gtfs.getShapes(query, projection, options)
 
-Queries shapes and returns a promise. The result of the promise is an array of shapes sorted by `shape_pt_sequence`.
+Queries shapes and returns a promise. The result of the promise is an array of shapes sorted by `shape_pt_sequence`. Sort can be overridden using the `sort` option.
 
     // Get all shapes for an agency
     gtfs.getShapes({
@@ -691,7 +755,7 @@ Queries shapes and returns a promise. The result of the promise is an array of s
 
     });
 
-#### gtfs.getShapesAsGeoJSON()
+#### gtfs.getShapesAsGeoJSON(query)
 
 Queries shapes and returns a promise. The result of the promise is an geoJSON object of shapes. All valid queries for `gtfs.getShapes()` work for `gtfs.getShapesAsGeoJSON()`.
 
@@ -724,7 +788,7 @@ Returns geoJSON of shapes for the `agency_key` specified.
 
     });
 
-#### gtfs.getCalendars()
+#### gtfs.getCalendars(query, projection, options)
 
 Queries calendars and returns a promise. The result of the promise is an array of calendars.
 
@@ -774,7 +838,7 @@ Queries calendars and returns a promise. The result of the promise is an array o
 
     });
 
-#### gtfs.getFeedInfo()
+#### gtfs.getFeedInfo(query, projection, options)
 
 Queries feed_info and returns a promise. The result of the promise is an array of feed_infos.
 
@@ -786,7 +850,7 @@ Queries feed_info and returns a promise. The result of the promise is an array o
 
     });
 
-#### gtfs.getFareRules()
+#### gtfs.getFareRules(query, projection, options)
 
 Queries fare_rules and returns a promise. The result of the promise is an array of fare_rules.
 
@@ -799,7 +863,7 @@ Queries fare_rules and returns a promise. The result of the promise is an array 
 
     });
 
-#### gtfs.getFrequencies()
+#### gtfs.getFrequencies(query, projection, options)
 
 Queries frequencies and returns a promise. The result of the promise is an array of frequencies.
 
@@ -812,7 +876,7 @@ Queries frequencies and returns a promise. The result of the promise is an array
 
     });
 
-#### gtfs.getStopAttributes()
+#### gtfs.getStopAttributes(query, projection, options)
 
 Queries stop_attributes and returns a promise. The result of the promise is an array of stop_attributes. These are from the non-standard `stop_attributes.txt`
 file.
@@ -832,7 +896,7 @@ file.
 
     });
 
-#### gtfs.getTimetables()
+#### gtfs.getTimetables(query, projection, options)
 
 Queries timetables and returns a promise. The result of the promise is an array of timetables. These are from the non-standard `timetables.txt` file.
 
@@ -853,7 +917,7 @@ Queries timetables and returns a promise. The result of the promise is an array 
 
     });
 
-#### gtfs.getTimetableStopOrders()
+#### gtfs.getTimetableStopOrders(query, projection, options)
 
 Queries timetable_stop_orders and returns a promise. The result of the promise is an array of timetable_stop_orders. These are from the non-standard `timetable_stop_order.txt` file.
 
@@ -866,7 +930,7 @@ Queries timetable_stop_orders and returns a promise. The result of the promise i
 
     });
 
-#### Timetable Pages
+#### gtfs.getTimetablePages(query, projection, options)
 
 Queries timetable_pages and returns a promise. The result of the promise is an array of timetable_pages. These are from the non-standard `timetable_pages.txt` file.
 

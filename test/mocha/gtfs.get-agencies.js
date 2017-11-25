@@ -90,8 +90,8 @@ describe('gtfs.getAgencies():', () => {
     const agencyId = 'CT';
 
     const agencies = await gtfs.getAgencies({
-      agency_key: 'caltrain',
-      agency_id: 'CT'
+      agency_key: agencyKey,
+      agency_id: agencyId
     });
     should.exist(agencies);
     agencies.length.should.equal(1);
@@ -123,6 +123,32 @@ describe('gtfs.getAgencies():', () => {
     agency.agency_center[1].should.eql(37.38996202963917);
 
     agency.date_last_updated.should.eql(timeReference.getTime());
+  });
+
+  it('should return only specific keys for expected agency for agency_key and agency_id', async () => {
+    const agencyKey = 'caltrain';
+    const agencyId = 'CT';
+
+    const agencies = await gtfs.getAgencies({
+      agency_key: agencyKey,
+      agency_id: agencyId
+    }, {
+      _id: 0,
+      agency_url: 1,
+      agency_lang: 1
+    });
+
+    const expectedAgency = {
+      agency_url: 'http://www.caltrain.com',
+      agency_lang: 'en'
+    };
+
+    should.exist(agencies);
+    agencies.length.should.equal(1);
+
+    const agency = agencies[0];
+
+    expectedAgency.should.match(agency);
   });
 
   it('should return empty array if no agencies exist within radius', async () => {

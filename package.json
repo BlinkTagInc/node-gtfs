@@ -1,7 +1,7 @@
 {
   "name": "gtfs",
   "description": "Import GTFS transit data into mongodb and query routes, stops, times, fares and more",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "keywords": [
     "transit",
     "gtfs",
@@ -35,7 +35,8 @@
     "Steven Prins",
     "W3stside",
     "pitrz",
-    "pusztaienike"
+    "pusztaienike",
+    "Andrea Gilardoni"
   ],
   "dependencies": {
     "csv": "^2.0.0",

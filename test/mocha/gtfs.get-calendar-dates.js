@@ -85,4 +85,43 @@ describe('gtfs.getCalendarDates():', () => {
       expectedCalendarDates.should.matchAny(calendarDate);
     });
   });
+
+  it('should return only specific keys for expected calendar dates, sorted by date', async () => {
+    const serviceIds = ['CT-16APR-Caltrain-Weekday-01'];
+
+    const calendarDates = await gtfs.getCalendarDates({
+      service_id: {
+        $in: serviceIds
+      }
+    }, {
+      _id: 0,
+      service_id: 1,
+      date: 1
+    }, {
+      sort: {date: 1},
+      lean: true
+    });
+
+    const expectedCalendarDates = [
+      {
+        service_id: 'CT-16APR-Caltrain-Weekday-01',
+        date: 20160530
+      },
+      {
+        service_id: 'CT-16APR-Caltrain-Weekday-01',
+        date: 20160704
+      },
+      {
+        service_id: 'CT-16APR-Caltrain-Weekday-01',
+        date: 20160905
+      },
+      {
+        service_id: 'CT-16APR-Caltrain-Weekday-01',
+        date: 20161124
+      }
+    ];
+
+    calendarDates.length.should.equal(4);
+    expectedCalendarDates.should.match(calendarDates);
+  });
 });
