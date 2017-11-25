@@ -33,7 +33,7 @@ const Stop = mongoose.model('Stop', new mongoose.Schema({
     max: 180
   },
   loc: {
-    type: Array,
+    type: [Number],
     index: '2dsphere'
   },
   zone_id: String,

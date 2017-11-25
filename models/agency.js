@@ -33,7 +33,7 @@ const Agency = mongoose.model('Agency', new mongoose.Schema({
     }
   },
   agency_center: {
-    type: Array,
+    type: [Number],
     index: '2dsphere'
   },
   date_last_updated: Number

@@ -93,26 +93,6 @@ describe('gtfs.getRoutes():', () => {
     });
   });
 
-
-  it('should return an empty array if no routes exist', async () => {
-    await database.teardown();
-
-    const lon = -121.9867495;
-    const lat = 37.38976166855;
-    const radius = 100;
-
-    const routes = await gtfs.getRoutes({
-      within: {
-        lat,
-        lon,
-        radius
-      }
-    });
-
-    should.exist(routes);
-    routes.should.have.length(0);
-  });
-
   it('should return an empty array if no routes within given distance exist', async () => {
     const lon = -130.9867495;
     const lat = 45.38976166855;
@@ -135,14 +115,6 @@ describe('gtfs.getRoutes():', () => {
     const lat = 37.38976166855;
     const radius = 2;
     const expectedRoutes = {
-      'Bu-16APR': {
-        route_id: 'Bu-16APR',
-        route_short_name: '',
-        route_long_name: 'Baby Bullet',
-        route_type: 2,
-        route_color: 'E31837',
-        agency_key: 'caltrain'
-      },
       'Li-16APR': {
         route_id: 'Li-16APR',
         route_short_name: '',
@@ -157,14 +129,6 @@ describe('gtfs.getRoutes():', () => {
         route_long_name: 'Local',
         route_type: 2,
         route_color: 'FFFFFF',
-        agency_key: 'caltrain'
-      },
-      'TaSj-16APR': {
-        route_id: 'TaSj-16APR',
-        route_short_name: '',
-        route_long_name: 'Tamien / San Jose Diridon Caltrain Shuttle',
-        route_type: 3,
-        route_color: '41AD49',
         agency_key: 'caltrain'
       }
     };
@@ -192,14 +156,6 @@ describe('gtfs.getRoutes():', () => {
     const lon = -122.39797353744507;
     const lat = 37.7210684234136;
     const expectedRoutes = {
-      'Bu-16APR': {
-        route_id: 'Bu-16APR',
-        route_short_name: '',
-        route_long_name: 'Baby Bullet',
-        route_type: 2,
-        route_color: 'E31837',
-        agency_key: 'caltrain'
-      },
       'Li-16APR': {
         route_id: 'Li-16APR',
         route_short_name: '',
@@ -214,14 +170,6 @@ describe('gtfs.getRoutes():', () => {
         route_long_name: 'Local',
         route_type: 2,
         route_color: 'FFFFFF',
-        agency_key: 'caltrain'
-      },
-      'TaSj-16APR': {
-        route_id: 'TaSj-16APR',
-        route_short_name: '',
-        route_long_name: 'Tamien / San Jose Diridon Caltrain Shuttle',
-        route_type: 3,
-        route_color: '41AD49',
         agency_key: 'caltrain'
       }
     };

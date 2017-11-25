@@ -24,7 +24,7 @@ const Shape = mongoose.model('Shape', new mongoose.Schema({
     max: 180
   },
   loc: {
-    type: Array,
+    type: [Number],
     index: '2dsphere'
   },
   shape_pt_sequence: {
