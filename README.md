@@ -326,6 +326,33 @@ For example, to get a list of all agencies within 5 miles of a specific point:
       // Be sure to handle errors here
     });
 
+Most methods accept three arguments: `query`, `projection` and `options`. `projection` and `options` are optional and are passed to the [mongoose `find` query](http://mongoosejs.com/docs/api.html#model_Model.find).
+
+#### Projection
+By default, `projection` is set to exclude mongo `_id`. [`projection`](http://mongoosejs.com/docs/api.html#query_Query-select) allows specifying which fields you would like returned. For instance:
+
+    // Gets all agencies but limits results to only include `agency_name` and `agency_lang`.
+    gtfs.getAgencies({}, {
+      _id: 0,
+      agency_name: 1,
+      agency_lang: 1
+    })
+    .then(agencies => {
+      // each Agency only has `agency_name` and `agency_lang`
+    });
+
+
+#### Options
+Mongoose allows [numerous options to be set on the query](http://mongoosejs.com/docs/api.html#query_Query-setOptions). You can specify things like `sort` and `limit` using the `options` parameter.  By default, `options` is set to `lean: true` to return a plain javascript object.
+
+    // Gets all agencies sorted by `agency_name`
+    gtfs.getAgencies({}, {}, {
+      sort: {agency_name: 1}
+    })
+    .then(agencies => {
+
+    });
+
 ### Setup
 
 Include this library.
@@ -344,38 +371,8 @@ If you are running locally, your MongoDB uri might be something like:
 
 You probably want to use the same value used in your [configuration JSON file](#configuration) for importing GTFS.
 
-### Query Methods
 
-Once you have included the library and connected to your MongoDB database you can use the following methods.
-
-Most methods accept three arguments: `query`, `projection` and `options`. `projection` and `options` are optional and are passed to the mongoose query.
-
-#### Projection
-By default, `projection` is set to exclude mongo `_id`. `projection` allows specifying which fields you would like returned. For instance:
-
-    // Gets all agencies but limits results to only include `agency_name` and `agency_lang`.
-    gtfs.getAgencies({}, {
-      _id: 0,
-      agency_name: 1,
-      agency_lang: 1
-    })
-    .then(agencies => {
-      // each Agency only has `agency_name` and `agency_lang`
-    });
-
-
-#### Options
-By default, `options` is set to `lean: true` to return a raw javascript object. You can specify things like `sort` using `options`.
-
-    // Gets all agencies sorted by `agency_name`
-    gtfs.getAgencies({}, {}, {
-      sort: {agency_name: 1}
-    })
-    .then(agencies => {
-
-    });
-
-#### gtfs.getAgencies(query, projection, options)
+### gtfs.getAgencies(query, projection, options)
 
 Queries agencies and returns a promise. The result of the promise is an array of agencies.
 
@@ -428,7 +425,7 @@ Queries agencies and returns a promise. The result of the promise is an array of
     });
 
 
-#### gtfs.getRoutes(query, projection, options)
+### gtfs.getRoutes(query, projection, options)
 
 Queries routes and returns a promise. The result of the promise is an array of routes.
 
@@ -491,7 +488,7 @@ Queries routes and returns a promise. The result of the promise is an array of r
 
     });
 
-#### gtfs.getStops(query, projection, options)
+### gtfs.getStops(query, projection, options)
 
 Queries stops and returns a promise. The result of the promise is an array of stops.
 
@@ -550,7 +547,7 @@ Queries stops and returns a promise. The result of the promise is an array of st
 
     });
 
-#### gtfs.getStopsAsGeoJSON(query)
+### gtfs.getStopsAsGeoJSON(query)
 
 Queries stops and returns a promise. The result of the promise is an geoJSON object of stops. All valid queries for `gtfs.getStops()` work for `gtfs.getStopsAsGeoJSON()`.
 
@@ -574,7 +571,7 @@ Queries stops and returns a promise. The result of the promise is an geoJSON obj
 
 `stop_ids` is optional and can be a single `stop_id` or an array of `stop_ids`.
 
-#### gtfs.getStoptimes(query, projection, options)
+### gtfs.getStoptimes(query, projection, options)
 
 Queries `stop_times` and returns a promise. The result of the promise is an array of `stop_times`. `agency_key` is required. `stop_times` are sorted by `stop_sequence` by default, but can be overridden by passing a `sort` parameter in an options object.
 
@@ -621,7 +618,7 @@ Queries `stop_times` and returns a promise. The result of the promise is an arra
 
     });
 
-#### gtfs.getTrips(query, projection, options)
+### gtfs.getTrips(query, projection, options)
 
 Queries trips and returns a promise. The result of the promise is an array of trips.
 
@@ -667,7 +664,7 @@ Queries trips and returns a promise. The result of the promise is an array of tr
 
     });
 
-#### gtfs.getDirectionsByRoute(query)
+### gtfs.getDirectionsByRoute(query)
 
 Queries trips and returns a promise. The result of the promise is an array of direction_ids. Useful to determine if a route has two directions or just one. `agency_key` and `route_id` are required.
 
@@ -709,7 +706,7 @@ Example result:
       }
     ];
 
-#### gtfs.getShapes(query, projection, options)
+### gtfs.getShapes(query, projection, options)
 
 Queries shapes and returns a promise. The result of the promise is an array of shapes sorted by `shape_pt_sequence`. Sort can be overridden using the `sort` option.
 
@@ -755,7 +752,7 @@ Queries shapes and returns a promise. The result of the promise is an array of s
 
     });
 
-#### gtfs.getShapesAsGeoJSON(query)
+### gtfs.getShapesAsGeoJSON(query)
 
 Queries shapes and returns a promise. The result of the promise is an geoJSON object of shapes. All valid queries for `gtfs.getShapes()` work for `gtfs.getShapesAsGeoJSON()`.
 
@@ -788,7 +785,7 @@ Returns geoJSON of shapes for the `agency_key` specified.
 
     });
 
-#### gtfs.getCalendars(query, projection, options)
+### gtfs.getCalendars(query, projection, options)
 
 Queries calendars and returns a promise. The result of the promise is an array of calendars.
 
@@ -838,7 +835,7 @@ Queries calendars and returns a promise. The result of the promise is an array o
 
     });
 
-#### gtfs.getFeedInfo(query, projection, options)
+### gtfs.getFeedInfo(query, projection, options)
 
 Queries feed_info and returns a promise. The result of the promise is an array of feed_infos.
 
@@ -850,7 +847,7 @@ Queries feed_info and returns a promise. The result of the promise is an array o
 
     });
 
-#### gtfs.getFareRules(query, projection, options)
+### gtfs.getFareRules(query, projection, options)
 
 Queries fare_rules and returns a promise. The result of the promise is an array of fare_rules.
 
@@ -863,7 +860,7 @@ Queries fare_rules and returns a promise. The result of the promise is an array 
 
     });
 
-#### gtfs.getFrequencies(query, projection, options)
+### gtfs.getFrequencies(query, projection, options)
 
 Queries frequencies and returns a promise. The result of the promise is an array of frequencies.
 
@@ -876,7 +873,7 @@ Queries frequencies and returns a promise. The result of the promise is an array
 
     });
 
-#### gtfs.getStopAttributes(query, projection, options)
+### gtfs.getStopAttributes(query, projection, options)
 
 Queries stop_attributes and returns a promise. The result of the promise is an array of stop_attributes. These are from the non-standard `stop_attributes.txt`
 file.
@@ -896,7 +893,7 @@ file.
 
     });
 
-#### gtfs.getTimetables(query, projection, options)
+### gtfs.getTimetables(query, projection, options)
 
 Queries timetables and returns a promise. The result of the promise is an array of timetables. These are from the non-standard `timetables.txt` file.
 
@@ -917,7 +914,7 @@ Queries timetables and returns a promise. The result of the promise is an array 
 
     });
 
-#### gtfs.getTimetableStopOrders(query, projection, options)
+### gtfs.getTimetableStopOrders(query, projection, options)
 
 Queries timetable_stop_orders and returns a promise. The result of the promise is an array of timetable_stop_orders. These are from the non-standard `timetable_stop_order.txt` file.
 
@@ -930,7 +927,7 @@ Queries timetable_stop_orders and returns a promise. The result of the promise i
 
     });
 
-#### gtfs.getTimetablePages(query, projection, options)
+### gtfs.getTimetablePages(query, projection, options)
 
 Queries timetable_pages and returns a promise. The result of the promise is an array of timetable_pages. These are from the non-standard `timetable_pages.txt` file.
 
