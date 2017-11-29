@@ -864,12 +864,26 @@ Queries fare_rules and returns a promise. The result of the promise is an array 
 
 Queries frequencies and returns a promise. The result of the promise is an array of frequencies.
 
-    // Get frequencies for a trip
+    // Get frequencies for a specific trip
     gtfs.getFrequencies({
       agency_key: 'caltrain',
       trip_id: '1234'
     })
     .then(frequencies => {
+
+    });
+
+
+### gtfs.getTransfers(query, projection, options)
+
+Queries transfers and returns a promise. The result of the promise is an array of transfers.
+
+    // Get transfers for a specific stop_id
+    gtfs.getTransfers({
+      agency_key: 'caltrain',
+      from_stop_id: '1234'
+    })
+    .then(feedInfo => {
 
     });
 
