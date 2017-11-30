@@ -1,7 +1,7 @@
 # Node-GTFS
 
 [![NPM version](https://img.shields.io/npm/v/gtfs.svg?style=flat)](https://www.npmjs.com/package/gtfs)
-[![David](https://img.shields.io/david/blinktaginc/node-gtfs.svg)]()
+[![David](https://img.shields.io/david/blinktaginc/node-gtfs.svg)](https://david-dm.org/blinktaginc/node-gtfs)
 [![npm](https://img.shields.io/npm/dm/gtfs.svg?style=flat)]()
 [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
 
@@ -555,7 +555,7 @@ Queries stops and returns a promise. The result of the promise is an geoJSON obj
     gtfs.getStopsAsGeoJSON({
       agency_key: 'caltrain'
     })
-    .then(stops => {
+    .then(geojson => {
 
     });
 
@@ -843,7 +843,7 @@ Queries feed_info and returns a promise. The result of the promise is an array o
     gtfs.getFeedInfo({
       agency_key: 'caltrain'
     })
-    .then(feedInfo => {
+    .then(feedInfos => {
 
     });
 
@@ -883,7 +883,7 @@ Queries transfers and returns a promise. The result of the promise is an array o
       agency_key: 'caltrain',
       from_stop_id: '1234'
     })
-    .then(feedInfo => {
+    .then(transfers => {
 
     });
 
@@ -971,6 +971,10 @@ Pull requests are welcome, as is feedback and [reporting issues](https://github.
 To run tests:
 
     npm test
+
+To run a specific test:
+
+    NODE_ENV=test mocha ./test/mocha/gtfs.get-stoptimes.js
 
 
 ### Linting
