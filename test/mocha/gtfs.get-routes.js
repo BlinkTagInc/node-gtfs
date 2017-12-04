@@ -144,7 +144,7 @@ describe('gtfs.getRoutes():', () => {
     should.exist(routes);
     routes.should.have.length(2);
 
-    routes.forEach((route) => {
+    routes.forEach(route => {
       const expectedRoute = expectedRoutes[route.route_id];
 
       should.exist(expectedRoute);

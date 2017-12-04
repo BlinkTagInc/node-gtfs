@@ -22,9 +22,7 @@ exports.teardown = async () => {
     throw new Error('Missing collections');
   }
 
-  for (const collection of collections) {
-    await collection.remove({});
-  }
+  await Promise.all(collections.map(collection => collection.remove({})));
 };
 
 exports.close = async () => {

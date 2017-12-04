@@ -48,7 +48,7 @@ describe('gtfs.getStopsAsGeoJSON(): ', () => {
 
     const geojson = await gtfs.getStopsAsGeoJSON({
       agency_key: agencyKey
-    })
+    });
 
     should.exist(geojson);
     geojson.type.should.equal('FeatureCollection');

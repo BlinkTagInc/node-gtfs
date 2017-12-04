@@ -47,7 +47,7 @@ describe('gtfs.getFareAttributes():', () => {
   it('should return expected fare_attributes', async () => {
     const fareId = 'OW_1_20160228';
 
-    const fareAttributes = await  gtfs.getFareAttributes({
+    const fareAttributes = await gtfs.getFareAttributes({
       agency_key: agencyKey,
       fare_id: fareId
     });
