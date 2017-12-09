@@ -52,7 +52,7 @@ Or, you use async/await:
 
 ---
 
-This library has two parts: the [GTFS import script](#gtfs-import-script) and the [query methods](#query-methods).
+This library has three parts: the [GTFS import script](#gtfs-import-script), the [GTFS-realtime import script](#gtfs-realtime-import-script), and the [query methods](#query-methods).
 
 ## Example Application
 
@@ -305,6 +305,66 @@ Configuration can be a JSON object in your code
     .catch(err => {
       console.error(err);
     });
+
+## `gtfs-realtime-import` Script
+The gtfs-realtime import script reads from the same JSON configuration file and imports the GTFS-realtime files specified to the same MongoDB database.
+
+### GTFS-realtime configuration
+
+Use the same configuration file as you may have for the gtfs-import script. This keeps the agency_keys consistent for your imports.
+Add a `realtime` property to each Agency for which you wish to import GTFS-realtime data.
+GTFS-realtime feeds have 3 potential entities: Trip Updates, Service Alerts, and Vehicle Positions. You can read more about the spec [here](https://developers.google.com/transit/gtfs-realtime/).
+
+| key | description |
+| ------- | -------- |
+| alerts | Specify the url for the Service Alerts |
+| trip_update | Specify the url for the Trip Updates |
+| vehicle_position | Specify the url for the Vehicle Positions |
+| basic_username | username to be used for basic http authentication |
+| basic_password | password to be used for basic http authentication |
+| poll_seconds | How often to refresh the data. Check with the transit agency or your provider for limits. |
+
+
+
+
+    {
+      mongoUrl: 'mongodb://localhost:27017/gtfs',
+      agencies: [
+        {
+          agency_key: 'county-connection',
+          url: 'http://countyconnection.com/GTFS/google_transit.zip',
+          realtime: {
+            "alerts": "http://countyconnection.com/GTFS/realtime/alerts.pb",
+            "trip_update": ""http://countyconnection.com/GTFS/realtime/tripupdate.pb",
+            "vehicle_position": ""http://countyconnection.com/GTFS/realtime/vehicleposition.pb",
+            "basic_username": "root",
+            "basic_password": ""
+            "poll_seconds"
+          }
+        }
+      ]
+    }
+
+
+### Running the realtime import in code
+The gtfs-realtime-import script runs continuously until stopped, attempting to update data at the specified polling periods. When implementing with large numbers of transit providers consider sharding the configuration if you need better performance.
+
+Use `gtfs.importRealtime(config)` in your code to run an import of a GTFS file specified in a config.json file.
+
+    const gtfs = require('gtfs');
+    const mongoose = require('mongoose');
+    const config = require('config.json');
+
+    mongoose.Promise = global.Promise;
+    mongoose.connect(config.mongoUrl, {useMongoClient: true});
+
+    gtfs.importRealtime(config);
+
+### Running the realtime import on command line
+To start the import via command line simply add the --realtimeOnly option to the `gtfs-import` script call. Note that the import script will not attempt to load both the standard GTFS and GTFS-realtime data simultaneously.
+
+    $ gtfs-import --realtimeOnly 
+
 
 ## Query Methods
 
