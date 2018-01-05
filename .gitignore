@@ -1,5 +1,5 @@
 node_modules
-downloads
+gtfs-downloads
 config*
 !config-sample.json
 test/fixture/tmp/*.txt
