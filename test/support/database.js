@@ -12,7 +12,7 @@ exports.connect = async config => {
   should.exists(db);
 
   // Also use mongoose to connect
-  await mongoose.connect(config.mongoUrl, {useMongoClient: true});
+  await mongoose.connect(config.mongoUrl);
   return db;
 };
 
