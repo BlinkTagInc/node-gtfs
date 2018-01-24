@@ -1,9 +1,12 @@
 const path = require('path');
 const fs = require('fs');
+const {promisify} = require('util');
 
 const extract = require('extract-zip');
 const parse = require('csv-parse');
 const should = require('should');
+
+const extractAsync = promisify(extract);
 
 const config = require('../config.json');
 const gtfs = require('../../');
@@ -47,46 +50,37 @@ describe('lib/import.js', function () {
     const countData = {};
     const tmpDir = path.join(__dirname, '../fixture/tmp/');
 
-    before(() => {
-      return new Promise((resolve, reject) => {
-        extract(agenciesFixturesLocal[0].path, {dir: tmpDir}, err => {
+    before(async () => {
+      await extractAsync(agenciesFixturesLocal[0].path, {dir: tmpDir});
+
+      await Promise.all(filenames.map(file => {
+        const filePath = path.join(tmpDir, `${file.fileNameBase}.txt`);
+
+        // GTFS has optional files
+        if (!fs.existsSync(filePath)) {
+          countData[file.collection] = 0;
+          return false;
+        }
+
+        const parser = parse({columns: true}, (err, data) => {
           if (err) {
-            return reject(err);
-          }
-          resolve();
-        });
-      })
-      .then(() => {
-        return Promise.all(filenames.map(file => {
-          const filePath = path.join(tmpDir, `${file.fileNameBase}.txt`);
-
-          // GTFS has optional files
-          if (!fs.existsSync(filePath)) {
-            countData[file.collection] = 0;
-            return false;
-          }
-
-          const parser = parse({columns: true}, (err, data) => {
-            if (err) {
-              throw new Error(err);
-            }
-
-            countData[file.collection] = data.length;
-          });
-
-          return fs.createReadStream(filePath)
-          .pipe(parser)
-          .on('error', err => {
-            countData[file.collection] = 0;
             throw new Error(err);
-          });
-        }));
-      })
-      .then(async () => {
-        db = await database.connect(config);
-        await database.teardown();
-        await gtfs.import(config);
-      });
+          }
+
+          countData[file.collection] = data.length;
+        });
+
+        return fs.createReadStream(filePath)
+        .pipe(parser)
+        .on('error', err => {
+          countData[file.collection] = 0;
+          throw new Error(err);
+        });
+      }));
+
+      db = await database.connect(config);
+      await database.teardown();
+      await gtfs.import(config);
     });
 
     after(async () => {
