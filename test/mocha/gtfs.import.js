@@ -62,7 +62,11 @@ describe('lib/import.js', function () {
           return false;
         }
 
-        const parser = parse({columns: true}, (err, data) => {
+        const parser = parse({
+          columns: true,
+          relax: true,
+          trim: true
+        }, (err, data) => {
           if (err) {
             throw new Error(err);
           }
