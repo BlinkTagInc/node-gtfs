@@ -1,11 +1,10 @@
 const path = require('path');
 
+const mongoose = require('mongoose');
 const should = require('should');
 
 const config = require('../config.json');
 const gtfs = require('../../');
-
-const database = require('../support/database');
 
 // Setup fixtures
 const agenciesFixtures = [{
@@ -17,21 +16,21 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getStopsAsGeoJSON(): ', () => {
   before(async () => {
-    await database.connect(config);
+    await mongoose.connect(config.mongoUrl);
   });
 
   after(async () => {
-    await database.teardown();
-    await database.close();
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.connection.close();
   });
 
   beforeEach(async () => {
-    await database.teardown();
+    await mongoose.connection.db.dropDatabase();
     await gtfs.import(config);
   });
 
   it('should return geojson with an empty features array if no stops exist for given agency', async () => {
-    await database.teardown();
+    await mongoose.connection.db.dropDatabase();
 
     const agencyKey = 'non_existing_agency';
     const geojson = await gtfs.getStopsAsGeoJSON({

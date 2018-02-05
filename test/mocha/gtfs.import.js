@@ -2,14 +2,17 @@ const path = require('path');
 const fs = require('fs');
 const {promisify} = require('util');
 
+const _ = require('lodash');
 const extract = require('extract-zip');
 const parse = require('csv-parse');
+const mongoose = require('mongoose');
 const should = require('should');
 
 const extractAsync = promisify(extract);
 
 const config = require('../config.json');
 const gtfs = require('../../');
+const models = require('../../models/models');
 
 const agenciesFixturesUrl = [{
   agency_key: 'caltrain',
@@ -21,19 +24,26 @@ const agenciesFixturesLocal = [{
   path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
 }];
 
-const database = require('../support/database');
-
-const filenames = require('../../lib/filenames');
-
 describe('lib/import.js', function () {
+  before(async () => {
+    await mongoose.connect(config.mongoUrl);
+  });
+
+  after(async () => {
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.connection.close();
+  });
+
   this.timeout(10000);
   describe('Download and import from different GTFS sources', () => {
     it('should be able to download and import from HTTP', async () => {
+      await mongoose.connection.db.dropDatabase();
       config.agencies = agenciesFixturesUrl;
       await gtfs.import(config);
     });
 
     it('should be able to download and import from local filesystem', async () => {
+      await mongoose.connection.db.dropDatabase();
       config.agencies = agenciesFixturesLocal;
       await gtfs.import(config);
     });
@@ -42,23 +52,18 @@ describe('lib/import.js', function () {
   describe('Verify data imported into database', () => {
     config.agencies = agenciesFixturesLocal;
 
-    const onError = err => {
-      throw new Error('Test failed', err);
-    };
-
-    let db;
     const countData = {};
     const tmpDir = path.join(__dirname, '../fixture/tmp/');
 
     before(async () => {
       await extractAsync(agenciesFixturesLocal[0].path, {dir: tmpDir});
 
-      await Promise.all(filenames.map(file => {
-        const filePath = path.join(tmpDir, `${file.fileNameBase}.txt`);
+      await Promise.all(models.map(model => {
+        const filePath = path.join(tmpDir, `${model.filenameBase}.txt`);
 
         // GTFS has optional files
         if (!fs.existsSync(filePath)) {
-          countData[file.collection] = 0;
+          countData[model.filenameBase] = 0;
           return false;
         }
 
@@ -71,121 +76,29 @@ describe('lib/import.js', function () {
             throw new Error(err);
           }
 
-          countData[file.collection] = data.length;
+          countData[model.filenameBase] = data.length;
         });
 
         return fs.createReadStream(filePath)
         .pipe(parser)
         .on('error', err => {
-          countData[file.collection] = 0;
+          countData[model.collection] = 0;
           throw new Error(err);
         });
       }));
 
-      db = await database.connect(config);
-      await database.teardown();
+      await mongoose.connection.db.dropDatabase();
       await gtfs.import(config);
     });
 
-    after(async () => {
-      await database.teardown();
-      await database.close();
-    });
-
-    it('should import the same number of agencies', done => {
-      db.collection('agencies').count((err, res) => {
-        should.not.exist(err);
-        res.should.equal(countData.agencies);
-        done();
+    for (const model of models) {
+      it(`should import the same number of ${model.filenameBase}`, done => {
+        model.model.collection.count((err, res) => {
+          should.not.exist(err);
+          res.should.equal(countData[model.filenameBase]);
+          done();
+        });
       });
-    });
-
-    it('should import the same number of calendars', done => {
-      db.collection('calendars').count((err, res) => {
-        should.not.exist(err);
-        res.should.equal(countData.calendars);
-        done();
-      });
-    });
-
-    it('should import the same number of calendar_dates', done => {
-      db.collection('calendardates').count((err, res) => {
-        should.not.exist(err);
-        res.should.equal(countData.calendardates);
-        done();
-      });
-    });
-
-    it('should import the same number of fare_attributes', done => {
-      db.collection('fareattributes').count((err, res) => {
-        should.not.exist(err);
-        res.should.equal(countData.fareattributes);
-        done();
-      });
-    });
-
-    it('should import the same number of fare_rules', done => {
-      db.collection('farerules').count((err, res) => {
-        should.not.exist(err);
-        res.should.equal(countData.farerules);
-        done();
-      });
-    });
-
-    it('should import the same number of feed_info', done => {
-      db.collection('feedinfos').count((err, res) => {
-        should.not.exist(err);
-        res.should.equal(countData.feedinfos);
-        done();
-      });
-    });
-
-    it('should import the same number of frequencies', done => {
-      db.collection('frequencies').count((err, res) => {
-        should.not.exist(err);
-        res.should.equal(countData.frequencies);
-        done();
-      });
-    });
-
-    it('should import the same number of routes', done => {
-      db.collection('routes').count((err, res) => {
-        should.not.exist(err);
-        res.should.equal(countData.routes);
-        done();
-      });
-    });
-
-    it('should import the same number of shapes', done => {
-      db.collection('shapes').count((err, res) => {
-        should.not.exist(err);
-        res.should.equal(countData.shapes);
-        done();
-      });
-    });
-
-    it('should import the same number of stops', done => {
-      db.collection('stops').count((err, res) => {
-        should.not.exist(err);
-        res.should.equal(countData.stops);
-        done();
-      });
-    });
-
-    it('should import the same number of transfers', done => {
-      db.collection('transfers').count((err, res) => {
-        should.not.exist(err);
-        res.should.equal(countData.transfers);
-        done();
-      });
-    });
-
-    it('should import the same number of trips', done => {
-      db.collection('trips').count((err, res) => {
-        should.not.exist(err);
-        res.should.equal(countData.trips);
-        done();
-      });
-    });
+    }
   });
 });

@@ -1,11 +1,10 @@
 const path = require('path');
 
+const mongoose = require('mongoose');
 const should = require('should');
 
 const config = require('../config.json');
 const gtfs = require('../../');
-
-const database = require('../support/database');
 
 // Setup fixtures
 const agenciesFixtures = [{
@@ -19,21 +18,18 @@ const agencyKey = agenciesFixtures[0].agency_key;
 
 describe('gtfs.getShapes():', () => {
   before(async () => {
-    await database.connect(config);
-  });
-
-  after(async () => {
-    await database.teardown();
-    await database.close();
-  });
-
-  beforeEach(async () => {
-    await database.teardown();
+    await mongoose.connect(config.mongoUrl);
+    await mongoose.connection.db.dropDatabase();
     await gtfs.import(config);
   });
 
+  after(async () => {
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.connection.close();
+  });
+
   it('should return an empty array if no shapes exist for given agency', async () => {
-    await database.teardown();
+    await mongoose.connection.db.dropDatabase();
 
     const agencyKey = 'non_existing_agency';
     const shapes = await gtfs.getShapes({
@@ -42,6 +38,8 @@ describe('gtfs.getShapes():', () => {
 
     should.exist(shapes);
     shapes.should.have.length(0);
+
+    await gtfs.import(config);
   });
 
   it('should return array of shapes for given agency', async () => {

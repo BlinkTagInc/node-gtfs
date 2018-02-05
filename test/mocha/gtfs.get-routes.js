@@ -1,11 +1,10 @@
 const path = require('path');
 
+const mongoose = require('mongoose');
 const should = require('should');
 
 const config = require('../config.json');
 const gtfs = require('../../');
-
-const database = require('../support/database');
 
 // Setup fixtures
 const agenciesFixtures = [{
@@ -19,26 +18,25 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getRoutes():', () => {
   before(async () => {
-    await database.connect(config);
-  });
-
-  after(async () => {
-    await database.teardown();
-    await database.close();
-  });
-
-  beforeEach(async () => {
-    await database.teardown();
+    await mongoose.connect(config.mongoUrl);
+    await mongoose.connection.db.dropDatabase();
     await gtfs.import(config);
   });
 
+  after(async () => {
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.connection.close();
+  });
+
   it('should return empty array if no routes for given agency exist', async () => {
-    await database.teardown();
+    await mongoose.connection.db.dropDatabase();
     const routes = await gtfs.getRoutes({
       agency_key: agencyKey
     });
     should.exist(routes);
     routes.should.have.length(0);
+
+    await gtfs.import(config);
   });
 
   it('should return expected routes for given agency', async () => {

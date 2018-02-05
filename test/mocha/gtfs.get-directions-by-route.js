@@ -1,11 +1,10 @@
 const path = require('path');
 
+const mongoose = require('mongoose');
 const should = require('should');
 
 const config = require('../config.json');
 const gtfs = require('../../');
-
-const database = require('../support/database');
 
 // Setup fixtures
 const agenciesFixtures = [{
@@ -19,21 +18,18 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getDirectionsByRoute():', () => {
   before(async () => {
-    await database.connect(config);
-  });
-
-  after(async () => {
-    await database.teardown();
-    await database.close();
-  });
-
-  beforeEach(async () => {
-    await database.teardown();
+    await mongoose.connect(config.mongoUrl);
+    await mongoose.connection.db.dropDatabase();
     await gtfs.import(config);
   });
 
+  after(async () => {
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.connection.close();
+  });
+
   it('should return empty array if no route', async () => {
-    await database.teardown();
+    await mongoose.connection.db.dropDatabase();
 
     const routeId = 'not_real';
     const directions = await gtfs.getDirectionsByRoute({
@@ -43,6 +39,8 @@ describe('gtfs.getDirectionsByRoute():', () => {
 
     should.exist(directions);
     directions.should.have.length(0);
+
+    await gtfs.import(config);
   });
 
   it('should return expected directions', async () => {

@@ -9,6 +9,43 @@
 
 `node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/), unzips it and stores it to a MongoDB database. In addition, this library provides some methods to query for agencies, routes, stops, times, fares and calendars. It also offers spatial queries to find nearby stops, routes and agencies. In addition, it can convert stops and shapes to geoJSON.
 
+This library has two parts: the [GTFS import script](#gtfs-import-script) and the [query methods](#query-methods).
+
+## Example Application
+
+The [GTFS-to-HTML](https://github.com/blinktaginc/gtfs-to-html) app uses `node-gtfs` for downloading, importing and querying GTFS data. It provides a good example of how to use this library.
+
+The [GTFS-to-geojson](https://github.com/blinktaginc/gtfs-to-geojson) app creates geoJSON files for transit routes for use in mapping. It uses `node-gtfs` for downloading, importing and querying GTFS data. It provides a good example of how to use this library.
+
+## Installation
+
+Install `node-gtfs` directly from [npm](https://npmjs.org):
+
+    npm install gtfs -g
+
+Note: If you are writing a project that uses `node-gtfs` then you'll want to include mongoose as a dependency with the same version that is specified in `node-gtfs` package.json. Otherwise, two versions will get installed and you'll won't be able to query data that was imported.
+
+## Command-line example
+
+    gtfs-import [--configPath /path/to/your/custom-config.json] [--skipDelete]
+
+## Code example
+
+    const gtfs = require('gtfs');
+    const mongoose = require('mongoose');
+    const config = require('./config.json');
+
+    mongoose.connect(config.mongoUrl);
+
+    gtfs.import(config)
+    .then(() => {
+      console.log('Import Successful');
+      return mongoose.connection.close();
+    })
+    .catch(err => {
+      console.error(err);
+    });
+
 ---
 
 ## Breaking changes in version 1.0.0
@@ -51,39 +88,6 @@ Or, you use async/await:
     }
 
 ---
-
-This library has two parts: the [GTFS import script](#gtfs-import-script) and the [query methods](#query-methods).
-
-## Example Application
-
-The [GTFS-to-HTML](https://github.com/blinktaginc/gtfs-to-html) app uses `node-gtfs` for downloading, importing and querying GTFS data. It provides a good example of how to use this library.
-
-The [GTFS-to-geojson](https://github.com/blinktaginc/gtfs-to-geojson) app creates geoJSON files for transit routes for use in mapping. It uses `node-gtfs` for downloading, importing and querying GTFS data. It provides a good example of how to use this library.
-
-## Installation
-
-Install `node-gtfs` directly from [npm](https://npmjs.org):
-
-    npm install gtfs -g
-
-Note: If you are writing a project that uses `node-gtfs` then you'll want to include mongoose as a dependency with the same version that is specified in `node-gtfs` package.json. Otherwise, two versions will get installed and you'll won't be able to query data that was imported.
-
-## Command-line example
-
-    gtfs-import [--configPath /path/to/your/custom-config.json] [--skipDelete]
-
-## Code example
-
-    const gtfs = require('gtfs');
-    const config = require('./config.json');
-
-    gtfs.import(config)
-    .then(() => {
-      console.log('Import Successful');
-    })
-    .catch(err => {
-      console.error(err);
-    });
 
 ## Configuration
 
@@ -267,12 +271,12 @@ Use `gtfs.import()` in your code to run an import of a GTFS file specified in a 
     const mongoose = require('mongoose');
     const config = require('config.json');
 
-    mongoose.Promise = global.Promise;
     mongoose.connect(config.mongoUrl);
 
     gtfs.import(config)
     .then(() => {
       console.log('Import Successful');
+      return mongoose.connection.close();
     })
     .catch(err => {
       console.error(err);
@@ -295,12 +299,12 @@ Configuration can be a JSON object in your code
       ]
     };
 
-    mongoose.Promise = global.Promise;
     mongoose.connect(config.mongoUrl);
 
     gtfs.import(config)
     .then(() => {
       console.log('Import Successful');
+      return mongoose.connection.close();
     })
     .catch(err => {
       console.error(err);
@@ -362,7 +366,6 @@ Include this library.
 Connect to mongo via mongoose.
 
     const mongoose = require('mongoose');
-    mongoose.Promise = global.Promise;
     mongoose.connect('YOUR-MONGODB-URI');
 
 If you are running locally, your MongoDB uri might be something like:

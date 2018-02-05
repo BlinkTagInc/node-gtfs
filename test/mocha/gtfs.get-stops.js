@@ -1,11 +1,10 @@
 const path = require('path');
 
+const mongoose = require('mongoose');
 const should = require('should');
 
 const config = require('../config.json');
 const gtfs = require('../../');
-
-const database = require('../support/database');
 
 // Setup fixtures
 const agenciesFixtures = [{
@@ -17,21 +16,18 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getStops():', () => {
   before(async () => {
-    await database.connect(config);
-  });
-
-  after(async () => {
-    await database.teardown();
-    await database.close();
-  });
-
-  beforeEach(async () => {
-    await database.teardown();
+    await mongoose.connect(config.mongoUrl);
+    await mongoose.connection.db.dropDatabase();
     await gtfs.import(config);
   });
 
+  after(async () => {
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.connection.close();
+  });
+
   it('should return an empty array if no stops exist for given agency', async () => {
-    await database.teardown();
+    await mongoose.connection.db.dropDatabase();
 
     const agencyKey = 'non_existing_agency';
     const stops = await gtfs.getStops({
@@ -40,6 +36,8 @@ describe('gtfs.getStops():', () => {
 
     should.exist(stops);
     stops.should.have.length(0);
+
+    await gtfs.import(config);
   });
 
   it('should return array of stops for given agency', async () => {
@@ -98,7 +96,7 @@ describe('gtfs.getStops():', () => {
   });
 
   it('should return an empty array if no stops exists for given agency, route and direction', async () => {
-    await database.teardown();
+    await mongoose.connection.db.dropDatabase();
 
     const agencyKey = 'non_existing_agency';
     const routeId = 'non_existing_route_id';
@@ -111,6 +109,8 @@ describe('gtfs.getStops():', () => {
 
     should.exist(stops);
     stops.should.have.length(0);
+
+    await gtfs.import(config);
   });
 
   it('should return array of stops if it exists for given agency, route and direction', async () => {
@@ -190,7 +190,7 @@ describe('gtfs.getStops():', () => {
   });
 
   it('should return an empty array if no stops exist', async () => {
-    await database.teardown();
+    await mongoose.connection.db.dropDatabase();
 
     const lon = -121.9867495;
     const lat = 37.38976166855;
@@ -206,6 +206,8 @@ describe('gtfs.getStops():', () => {
 
     should.exist(stops);
     stops.should.have.length(0);
+
+    await gtfs.import(config);
   });
 
   it('should return expected stops within given distance if they exist', async () => {

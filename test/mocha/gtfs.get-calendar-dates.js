@@ -1,11 +1,10 @@
 const path = require('path');
 
+const mongoose = require('mongoose');
 const should = require('should');
 
 const config = require('../config.json');
 const gtfs = require('../../');
-
-const database = require('../support/database');
 
 // Setup fixtures
 const agenciesFixtures = [{
@@ -17,17 +16,14 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getCalendarDates():', () => {
   before(async () => {
-    await database.connect(config);
+    await mongoose.connect(config.mongoUrl);
+    await mongoose.connection.db.dropDatabase();
+    await gtfs.import(config);
   });
 
   after(async () => {
-    await database.teardown();
-    await database.close();
-  });
-
-  beforeEach(async () => {
-    await database.teardown();
-    await gtfs.import(config);
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.connection.close();
   });
 
   it('should return empty array if no calendar dates exist', async () => {

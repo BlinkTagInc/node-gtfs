@@ -1,11 +1,10 @@
 const path = require('path');
 
+const mongoose = require('mongoose');
 const should = require('should');
 
 const config = require('../config.json');
 const gtfs = require('../../');
-
-const database = require('../support/database');
 
 // Setup fixtures
 const agenciesFixtures = [{
@@ -17,21 +16,18 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getShapesAsGeoJSON():', () => {
   before(async () => {
-    await database.connect(config);
-  });
-
-  after(async () => {
-    await database.teardown();
-    await database.close();
-  });
-
-  beforeEach(async () => {
-    await database.teardown();
+    await mongoose.connect(config.mongoUrl);
+    await mongoose.connection.db.dropDatabase();
     await gtfs.import(config);
   });
 
+  after(async () => {
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.connection.close();
+  });
+
   it('should return geojson with an empty features array if no shapes exist for given agency', async () => {
-    await database.teardown();
+    await mongoose.connection.db.dropDatabase();
 
     const agencyKey = 'non_existing_agency';
     const geojson = await gtfs.getShapesAsGeoJSON({
@@ -41,6 +37,8 @@ describe('gtfs.getShapesAsGeoJSON():', () => {
     should.exist(geojson);
     geojson.type.should.equal('FeatureCollection');
     geojson.features.should.have.length(0);
+
+    await gtfs.import(config);
   });
 
   it('should return geojson with shapes if they exist for given agency', async () => {

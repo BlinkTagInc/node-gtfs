@@ -1,11 +1,10 @@
 const path = require('path');
 
+const mongoose = require('mongoose');
 const should = require('should');
 
 const config = require('../config.json');
 const gtfs = require('../../');
-
-const database = require('../support/database');
 
 // Setup fixtures
 const agenciesFixtures = [{
@@ -19,21 +18,18 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getCalendars():', () => {
   before(async () => {
-    await database.connect(config);
-  });
-
-  after(async () => {
-    await database.teardown();
-    await database.close();
-  });
-
-  beforeEach(async () => {
-    await database.teardown();
+    await mongoose.connect(config.mongoUrl);
+    await mongoose.connection.db.dropDatabase();
     await gtfs.import(config);
   });
 
+  after(async () => {
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.connection.close();
+  });
+
   it('should return empty array if no calendars', async () => {
-    await database.teardown();
+    await mongoose.connection.db.dropDatabase();
 
     const calendars = await gtfs.getCalendars({
       agency_key: agencyKey
@@ -41,6 +37,8 @@ describe('gtfs.getCalendars():', () => {
 
     should.exists(calendars);
     calendars.should.have.length(0);
+
+    await gtfs.import(config);
   });
 
   it('should return expected calendars', async () => {
@@ -78,7 +76,7 @@ describe('gtfs.getCalendars():', () => {
   });
 
   it('should return empty array if no calendars', async () => {
-    await database.teardown();
+    await mongoose.connection.db.dropDatabase();
 
     const serviceIds = ['CT-16APR-Caltrain-Weekday-01-No'];
 
@@ -88,6 +86,8 @@ describe('gtfs.getCalendars():', () => {
 
     should.exists(calendars);
     calendars.should.have.length(0);
+
+    await gtfs.import(config);
   });
 
   it('should return expected calendars limited by service_id', async () => {

@@ -44,9 +44,7 @@
     "fs-extra": "^5.0.0",
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
-    "mongodb": "2.2.34",
-    "mongoose": "5.0.2",
-    "node-fetch": "^1.7.3",
+    "mongoose": "5.0.3",
     "proj4": "^2.4.4",
     "untildify": "^3.0.2",
     "yargs": "^11.0.0"

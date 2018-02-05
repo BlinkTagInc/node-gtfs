@@ -1,5 +1,6 @@
 const path = require('path');
 
+const mongoose = require('mongoose');
 const should = require('should');
 const tk = require('timekeeper');
 
@@ -7,8 +8,6 @@ const timeReference = new Date();
 
 const config = require('../config.json');
 const gtfs = require('../../');
-
-const database = require('../support/database');
 
 // Setup fixtures
 const agenciesFixtures = [{
@@ -20,27 +19,26 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getAgencies():', () => {
   before(async () => {
-    await database.connect(config);
+    await mongoose.connect(config.mongoUrl);
     tk.freeze(timeReference);
-  });
-
-  after(async () => {
-    await database.teardown();
-    await database.close();
-    tk.reset();
-  });
-
-  beforeEach(async () => {
-    await database.teardown();
+    await mongoose.connection.db.dropDatabase();
     await gtfs.import(config);
   });
 
+  after(async () => {
+    await mongoose.connection.db.dropDatabase();
+    await mongoose.connection.close();
+    tk.reset();
+  });
+
   it('should return empty array if no agencies exist', async () => {
-    await database.teardown();
+    await mongoose.connection.db.dropDatabase();
 
     const agencies = await gtfs.getAgencies();
     should.exists(agencies);
     agencies.should.have.length(0);
+
+    await gtfs.import(config);
   });
 
   it('should return expected agencies with no query', async () => {
