@@ -20,10 +20,6 @@ const Timetable = mongoose.model('Timetable', new mongoose.Schema({
     min: 0,
     max: 1
   },
-  service_id: {
-    type: String,
-    index: true
-  },
   start_date: Number,
   end_date: Number,
   monday: {
