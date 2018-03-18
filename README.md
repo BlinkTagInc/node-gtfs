@@ -7,7 +7,7 @@
 
 [![NPM](https://nodei.co/npm/gtfs.png?downloads=true)](https://nodei.co/npm/gtfs/)
 
-`node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/), unzips it and stores it to a MongoDB database. In addition, this library provides some methods to query for agencies, routes, stops, times, fares and calendars. It also offers spatial queries to find nearby stops, routes and agencies. In addition, it can convert stops and shapes to geoJSON.
+`node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/) into a MongoDB database and provides some methods to query for agencies, routes, stops, times, fares, calendars and other GTFS data. It also offers spatial queries to find nearby stops, routes and agencies and can convert stops and shapes to geoJSON format.
 
 This library has two parts: the [GTFS import script](#gtfs-import-script) and the [query methods](#query-methods).
 
@@ -19,11 +19,13 @@ The [GTFS-to-geojson](https://github.com/blinktaginc/gtfs-to-geojson) app create
 
 ## Installation
 
-Install `node-gtfs` directly from [npm](https://npmjs.org):
+If you would like to use this library as a command-line utility, you can install it globally directly from [npm](https://npmjs.org):
 
-    npm install gtfs -g
+    npm install gtfs mongoose -g
 
-Note: If you are writing a project that uses `node-gtfs` then you'll want to include mongoose as a dependency with the same version that is specified in `node-gtfs` package.json. Otherwise, two versions will get installed and you'll won't be able to query data that was imported.
+If you are using this as a node module as part of an application, you can include it in your project's `package.json` file.
+
+Note: [Mongoose](http://mongoosejs.com/) is a peer dependency of `node-gtfs`, so when installing globally be sure to install mongoose as well. If you are writing a application that uses `node-gtfs` as a dependency, then you'll need to include mongoose as a dependency in your project's `package.json`.
 
 ## Command-line example
 
