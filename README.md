@@ -894,8 +894,7 @@ Queries transfers and returns a promise. The result of the promise is an array o
 
 ### gtfs.getStopAttributes(query, projection, options)
 
-Queries stop_attributes and returns a promise. The result of the promise is an array of stop_attributes. These are from the non-standard `stop_attributes.txt`
-file.
+Queries stop_attributes and returns a promise. The result of the promise is an array of stop_attributes. These are from the non-standard `stop_attributes.txt` file. See [documentation and examples of this file](https://github.com/BlinkTagInc/gtfs-to-html#build-stop_attributestxt).
 
     // Get stop attributes for a few stops
     const stopIds = [
@@ -914,7 +913,7 @@ file.
 
 ### gtfs.getTimetables(query, projection, options)
 
-Queries timetables and returns a promise. The result of the promise is an array of timetables. These are from the non-standard `timetables.txt` file.
+Queries timetables and returns a promise. The result of the promise is an array of timetables. These are from the non-standard `timetables.txt` file. See [documentation and examples of this file](https://github.com/BlinkTagInc/gtfs-to-html#build-timetablestxt).
 
     // Get all timetables for an agency
     gtfs.getTimetables({
@@ -935,7 +934,7 @@ Queries timetables and returns a promise. The result of the promise is an array 
 
 ### gtfs.getTimetableStopOrders(query, projection, options)
 
-Queries timetable_stop_orders and returns a promise. The result of the promise is an array of timetable_stop_orders. These are from the non-standard `timetable_stop_order.txt` file.
+Queries timetable_stop_orders and returns a promise. The result of the promise is an array of timetable_stop_orders. These are from the non-standard `timetable_stop_order.txt` file. See [documentation and examples of this file](https://github.com/BlinkTagInc/gtfs-to-html#build-timetable_stop_ordertxt).
 
     // Get timetable_stop_orders for a specific timetable
     gtfs.getTimetableStopOrders({
@@ -948,7 +947,7 @@ Queries timetable_stop_orders and returns a promise. The result of the promise i
 
 ### gtfs.getTimetablePages(query, projection, options)
 
-Queries timetable_pages and returns a promise. The result of the promise is an array of timetable_pages. These are from the non-standard `timetable_pages.txt` file.
+Queries timetable_pages and returns a promise. The result of the promise is an array of timetable_pages. These are from the non-standard `timetable_pages.txt` file. See [documentation and examples of this file](https://github.com/BlinkTagInc/gtfs-to-html#build-timetable_pagestxt).
 
     // Get all timetable_pages for an agency
     gtfs.getTimetablePages({
