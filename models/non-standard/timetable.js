@@ -68,7 +68,12 @@ const Timetable = mongoose.model('Timetable', new mongoose.Schema({
     type: Number,
     index: true
   },
-  direction_name: String
-}));
+  direction_name: String,
+  exclude_exceptions: {
+    type: Number,
+    min: 0,
+    max: 1
+  }
+}, {}));
 
 module.exports = Timetable;
