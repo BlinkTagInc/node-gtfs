@@ -333,7 +333,7 @@ For example, to get a list of all agencies within 5 miles of a specific point:
       // Be sure to handle errors here
     });
 
-Most methods accept three arguments: `query`, `projection` and `options`. `projection` and `options` are optional and are passed to the [mongoose `find` query](http://mongoosejs.com/docs/api.html#model_Model.find).
+Most methods accept three arguments: `query`, `projection` and `options`. `projection` and `options` are optional and are passed to the [mongoose `find` query](http://mongoosejs.com/docs/api.html#find_find).
 
 #### Projection
 By default, `projection` is set to exclude mongo `_id`. [`projection`](http://mongoosejs.com/docs/api.html#query_Query-select) allows specifying which fields you would like returned. For instance:
