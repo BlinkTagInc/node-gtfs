@@ -488,7 +488,7 @@ Queries routes and returns a promise. The result of the promise is an array of r
     }, {
       _id: 0
     }, {
-      stop_name: 1
+      sort: {stop_name: 1}
     })
     .then(routes => {
 
