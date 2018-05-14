@@ -317,6 +317,10 @@ Configuration can be a JSON object in your code
 
 This library includes many methods you can use in your project to query GTFS data. These methods return promises.
 
+Most methods accept three arguments: `query`, `projection` and `options`. `projection` and `options` are optional and are passed to the [mongoose `find` query](http://mongoosejs.com/docs/api.html#find_find).
+
+#### Query
+
 For example, to get a list of all agencies within 5 miles of a specific point:
 
     gtfs.getAgencies({
@@ -332,8 +336,6 @@ For example, to get a list of all agencies within 5 miles of a specific point:
     .catch(err => {
       // Be sure to handle errors here
     });
-
-Most methods accept three arguments: `query`, `projection` and `options`. `projection` and `options` are optional and are passed to the [mongoose `find` query](http://mongoosejs.com/docs/api.html#find_find).
 
 #### Projection
 By default, `projection` is set to exclude mongo `_id`. [`projection`](http://mongoosejs.com/docs/api.html#query_Query-select) allows specifying which fields you would like returned. For instance:
