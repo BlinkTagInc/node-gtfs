@@ -317,6 +317,8 @@ Configuration can be a JSON object in your code
 
 This library includes many methods you can use in your project to query GTFS data. These methods return promises.
 
+#### Query
+
 For example, to get a list of all agencies within 5 miles of a specific point:
 
     gtfs.getAgencies({
