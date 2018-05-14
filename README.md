@@ -317,7 +317,7 @@ Configuration can be a JSON object in your code
 
 This library includes many methods you can use in your project to query GTFS data. These methods return promises.
 
-Most methods accept three arguments: `query`, `projection` and `options`. `projection` and `options` are optional and are passed to the [mongoose `find` query](http://mongoosejs.com/docs/api.html#model_Model.find).
+Most methods accept three arguments: `query`, `projection` and `options`. `projection` and `options` are optional and are passed to the [mongoose `find` query](http://mongoosejs.com/docs/api.html#find_find).
 
 #### Query
 
@@ -490,7 +490,7 @@ Queries routes and returns a promise. The result of the promise is an array of r
     }, {
       _id: 0
     }, {
-      stop_name: 1
+      sort: {stop_name: 1}
     })
     .then(routes => {
 
