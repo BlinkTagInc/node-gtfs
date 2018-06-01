@@ -69,7 +69,7 @@ const Timetable = mongoose.model('Timetable', new mongoose.Schema({
     index: true
   },
   direction_name: String,
-  exclude_exceptions: {
+  include_exceptions: {
     type: Number,
     min: 0,
     max: 1
