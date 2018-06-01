@@ -1,3 +1,5 @@
+/* eslint-env mocha */
+
 const path = require('path');
 
 const mongoose = require('mongoose');
@@ -7,7 +9,7 @@ const tk = require('timekeeper');
 const timeReference = new Date();
 
 const config = require('../config.json');
-const gtfs = require('../../');
+const gtfs = require('../..');
 
 // Setup fixtures
 const agenciesFixtures = [{

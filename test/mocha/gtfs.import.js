@@ -1,8 +1,9 @@
+/* eslint-env mocha */
+
 const path = require('path');
 const fs = require('fs');
 const {promisify} = require('util');
 
-const _ = require('lodash');
 const extract = require('extract-zip');
 const parse = require('csv-parse');
 const mongoose = require('mongoose');
@@ -11,7 +12,7 @@ const should = require('should');
 const extractAsync = promisify(extract);
 
 const config = require('../config.json');
-const gtfs = require('../../');
+const gtfs = require('../..');
 const models = require('../../models/models');
 
 const agenciesFixturesUrl = [{
@@ -80,11 +81,11 @@ describe('lib/import.js', function () {
         });
 
         return fs.createReadStream(filePath)
-        .pipe(parser)
-        .on('error', err => {
-          countData[model.collection] = 0;
-          throw new Error(err);
-        });
+          .pipe(parser)
+          .on('error', err => {
+            countData[model.collection] = 0;
+            throw new Error(err);
+          });
       }));
 
       await mongoose.connection.db.dropDatabase();

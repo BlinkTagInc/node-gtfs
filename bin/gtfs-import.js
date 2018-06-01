@@ -5,24 +5,23 @@ const path = require('path');
 const fs = require('fs-extra');
 const mongoose = require('mongoose');
 const untildify = require('untildify');
-const argv = require('yargs')
-    .usage('Usage: $0 --config ./config.json')
-    .help()
-    .option('c', {
-      alias: 'configPath',
-      describe: 'Path to config file',
-      default: './config.json',
-      type: 'string'
-    })
-    .option('s', {
-      alias: 'skipDelete',
-      describe: 'Don\'t delete existing data for `agency_key` on import',
-      type: 'boolean',
-      default: false
-    })
-    .argv;
+const {argv} = require('yargs')
+  .usage('Usage: $0 --config ./config.json')
+  .help()
+  .option('c', {
+    alias: 'configPath',
+    describe: 'Path to config file',
+    default: './config.json',
+    type: 'string'
+  })
+  .option('s', {
+    alias: 'skipDelete',
+    describe: 'Don\'t delete existing data for `agency_key` on import',
+    type: 'boolean',
+    default: false
+  });
 
-const gtfs = require('../');
+const gtfs = require('..');
 
 const handleError = err => {
   console.error(err || 'Unknown Error');
@@ -56,4 +55,4 @@ const setupImport = async () => {
 };
 
 setupImport()
-.catch(handleError);
+  .catch(handleError);
