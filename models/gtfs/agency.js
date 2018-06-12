@@ -22,6 +22,7 @@ const Agency = mongoose.model('Agency', new mongoose.Schema({
   agency_lang: String,
   agency_phone: String,
   agency_fare_url: String,
+  agency_email: String,
   agency_bounds: {
     sw: {
       type: Array,
