@@ -73,6 +73,11 @@ const Timetable = mongoose.model('Timetable', new mongoose.Schema({
     type: Number,
     min: 0,
     max: 1
+  },
+  show_continues_as: {
+    type: Number,
+    min: 0,
+    max: 1
   }
 }, {}));
 
