@@ -40,6 +40,7 @@
     "Andrea Gilardoni"
   ],
   "dependencies": {
+    "colors": "^1.3.0",
     "csv-parse": "^2.5.0",
     "extract-zip": "^1.6.7",
     "fs-extra": "^6.0.1",

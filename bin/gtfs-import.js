@@ -21,10 +21,11 @@ const {argv} = require('yargs')
     default: false
   });
 
+const logUtils = require('../lib/log-utils');
 const gtfs = require('..');
 
 const handleError = err => {
-  console.error(err || 'Unknown Error');
+  logUtils.error(err || 'Unknown Error');
   process.exit(1);
 };
 
