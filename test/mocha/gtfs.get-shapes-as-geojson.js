@@ -82,6 +82,6 @@ describe('gtfs.getShapesAsGeoJSON():', () => {
 
     should.exist(geojson);
     geojson.type.should.equal('FeatureCollection');
-    geojson.features.length.should.be.above(1);
+    geojson.features.length.should.be.above(0);
   });
 });
