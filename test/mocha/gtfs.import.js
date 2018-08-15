@@ -27,7 +27,7 @@ const agenciesFixturesLocal = [{
 
 describe('lib/import.js', function () {
   before(async () => {
-    await mongoose.connect(config.mongoUrl);
+    await mongoose.connect(config.mongoUrl, {useNewUrlParser: true});
   });
 
   after(async () => {
@@ -94,7 +94,7 @@ describe('lib/import.js', function () {
 
     for (const model of models) {
       it(`should import the same number of ${model.filenameBase}`, done => {
-        model.model.collection.count((err, res) => {
+        model.model.collection.estimatedDocumentCount({}, (err, res) => {
           should.not.exist(err);
           res.should.equal(countData[model.filenameBase]);
           done();

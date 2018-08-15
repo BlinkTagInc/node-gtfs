@@ -18,7 +18,7 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getShapesAsGeoJSON():', () => {
   before(async () => {
-    await mongoose.connect(config.mongoUrl);
+    await mongoose.connect(config.mongoUrl, {useNewUrlParser: true});
     await mongoose.connection.db.dropDatabase();
     await gtfs.import(config);
   });

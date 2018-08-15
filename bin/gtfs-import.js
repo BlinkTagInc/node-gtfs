@@ -49,7 +49,7 @@ const setupImport = async () => {
     handleError(err);
   }
 
-  await mongoose.connect(config.mongoUrl);
+  await mongoose.connect(config.mongoUrl, {useNewUrlParser: true});
   await gtfs.import(config);
   await mongoose.connection.close();
   process.exit();
