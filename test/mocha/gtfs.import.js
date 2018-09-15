@@ -27,6 +27,7 @@ const agenciesFixturesLocal = [{
 
 describe('lib/import.js', function () {
   before(async () => {
+    mongoose.set('useCreateIndex', true);
     await mongoose.connect(config.mongoUrl, {useNewUrlParser: true});
   });
 

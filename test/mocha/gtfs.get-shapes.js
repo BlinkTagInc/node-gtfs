@@ -20,6 +20,7 @@ const agencyKey = agenciesFixtures[0].agency_key;
 
 describe('gtfs.getShapes():', () => {
   before(async () => {
+    mongoose.set('useCreateIndex', true);
     await mongoose.connect(config.mongoUrl, {useNewUrlParser: true});
     await mongoose.connection.db.dropDatabase();
     await gtfs.import(config);

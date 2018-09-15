@@ -52,7 +52,7 @@
     "yargs": "^12.0.1"
   },
   "peerDependencies": {
-    "mongoose": "^5.2.8"
+    "mongoose": "^5.2.14"
   },
   "devDependencies": {
     "mocha": "^5.2.0",

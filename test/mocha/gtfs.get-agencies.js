@@ -21,6 +21,7 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getAgencies():', () => {
   before(async () => {
+    mongoose.set('useCreateIndex', true);
     await mongoose.connect(config.mongoUrl, {useNewUrlParser: true});
     tk.freeze(timeReference);
     await mongoose.connection.db.dropDatabase();

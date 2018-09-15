@@ -49,6 +49,7 @@ const setupImport = async () => {
     handleError(err);
   }
 
+  mongoose.set('useCreateIndex', true);
   await mongoose.connect(config.mongoUrl, {useNewUrlParser: true});
   await gtfs.import(config);
   await mongoose.connection.close();
