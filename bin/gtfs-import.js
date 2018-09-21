@@ -44,9 +44,9 @@ const setupImport = async () => {
   let config;
   try {
     config = await getConfig();
-  } catch (err) {
+  } catch (error) {
     console.error(new Error(`Cannot find configuration file at \`${argv.configPath}\`. Use config-sample.json as a starting point, pass --configPath option`));
-    handleError(err);
+    handleError(error);
   }
 
   mongoose.set('useCreateIndex', true);
