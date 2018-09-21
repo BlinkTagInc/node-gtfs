@@ -17,7 +17,7 @@ const models = require('../../models/models');
 
 const agenciesFixturesUrl = [{
   agency_key: 'caltrain',
-  url: 'http://transitfeeds.com/p/caltrain/122/latest/download'
+  url: 'http://transitfeeds.com/p/caltrain/122/20160406/download'
 }];
 
 const agenciesFixturesLocal = [{
