@@ -16,14 +16,14 @@ const stopTimeSchema = new mongoose.Schema({
     required: true
   },
   arrival_timestamp: {
-    type: Number,
+    type: Number
   },
   departure_time: {
     type: String,
     required: true
   },
   departure_timestamp: {
-    type: Number,
+    type: Number
   },
   stop_id: {
     type: String,

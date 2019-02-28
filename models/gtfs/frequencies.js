@@ -16,14 +16,14 @@ const Frequencies = mongoose.model('Frequencies', new mongoose.Schema({
     required: true
   },
   start_timestamp: {
-    type: Number,
+    type: Number
   },
   end_time: {
     type: String,
     required: true
   },
   end_timestamp: {
-    type: Number,
+    type: Number
   },
   headway_secs: {
     type: Number,
