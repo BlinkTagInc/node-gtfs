@@ -74,7 +74,7 @@ const Timetable = mongoose.model('Timetable', new mongoose.Schema({
     min: 0,
     max: 1
   },
-  show_continues_as: {
+  show_trip_continuation: {
     type: Number,
     min: 0,
     max: 1
