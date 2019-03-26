@@ -86,6 +86,22 @@ API along with your API token.
 }
 ```
 
+* Specify a download URL with custom headers:
+```
+{
+  "agencies": [
+    {
+      "agency_key": "county-connection",
+      "url": "http://countyconnection.com/GTFS/google_transit.zip",
+      "headers: {
+        "Content-Type": "application/json",
+        "Authorization": "bearer 1234567890"
+      },
+    }
+  ]
+}
+```
+
 * Specify a path to a zipped GTFS file:
 ```
 {
