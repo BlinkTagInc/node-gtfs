@@ -27,7 +27,8 @@ const stopTimeSchema = new mongoose.Schema({
   },
   stop_id: {
     type: String,
-    required: true
+    required: true,
+    index: true
   },
   stop_sequence: {
     type: Number,
