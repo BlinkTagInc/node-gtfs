@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.5] - 2019-04-09
+### Changed
+- Prevent timeout on all queries
+
+## [1.8.4] - 2019-03-31
+### Added
+- Index on stop_id
+### Changed
+- Strip byte-order-markers if present when importing
+
+## [1.8.3] - 2019-03-26
+### Added
+- Support for GET headers
+
+## [1.8.2] - 2019-03-11
+### Changed
+- Renamed config variable to `show_trip_continuation`
+
 ## [1.8.1] - 2019-02-28
 ### Added
 - Changelog
