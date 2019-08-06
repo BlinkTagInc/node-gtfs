@@ -188,6 +188,32 @@ If you don't want the import script to print any output to the console, you can 
 }
 ```
 
+If you want to route logs to a custom function, you can pass a function that takes a single `text` argument as `logFunction`. This con't be defined in `config.json` but instead passed in a config object to `gtfs.import()`.  For example:
+
+    const gtfs = require('gtfs');
+    const mongoose = require('mongoose');
+
+    const config = {
+      mongoUrl: 'mongodb://localhost:27017/gtfs',
+      agencies: [
+        {
+          agency_key: 'county-connection',
+          url: 'http://countyconnection.com/GTFS/google_transit.zip',
+          exclude: [
+            'shapes'
+          ]
+        }
+      ],
+      logFunction: function(text) {
+        // Do something with the logs here, like save it or send it somewhere
+        console.log(text);
+      }
+    };
+
+    mongoose.connect(config.mongoUrl, {useNewUrlParser: true});
+
+    gtfs.import(config);
+
 ### Deleting existing data
 
 If you don't want the import script to delete all existing data from the database with the same `agency_key`, you can set `skipDelete` to `true`. Defaults to `false`.
