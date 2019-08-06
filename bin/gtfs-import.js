@@ -25,7 +25,8 @@ const logUtils = require('../lib/log-utils');
 const gtfs = require('..');
 
 const handleError = err => {
-  logUtils.error(err || 'Unknown Error');
+  const text = err || 'Unknown Error';
+  process.stdout.write(`\n${logUtils.formatError(text)}\n`);
   process.exit(1);
 };
 
