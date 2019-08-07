@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const CalendarDate = mongoose.model('CalendarDate', new mongoose.Schema({
+  created_at: {
+    type: Date,
+    default: Date.now,
+    required: true
+  },
   agency_key: {
     type: String,
     required: true,

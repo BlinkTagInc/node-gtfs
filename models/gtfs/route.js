@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const Route = mongoose.model('Route', new mongoose.Schema({
+  created_at: {
+    type: Date,
+    default: Date.now,
+    required: true
+  },
   agency_key: {
     type: String,
     required: true,

@@ -60,6 +60,7 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 | option | type | description |
 | ------ | ---- | ----------- |
 | `agencies` | array | An array of GTFS files to be imported. |
+| `dataExpireAfterSeconds` | integer | The number of seconds after which the data will be deleted from mongodb using a TTL index. Optional, if not specified then data will not be automatically deleted. |
 | `mongoUrl` | string | The URL of the MongoDB database to import to. |
 | `verbose` | boolean | Whether or not to print output to the console. |
 | `skipDelete` | boolean | Whether or not to skip deleting existing data from the database. |
