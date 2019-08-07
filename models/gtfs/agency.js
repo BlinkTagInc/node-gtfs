@@ -36,8 +36,7 @@ const Agency = mongoose.model('Agency', new mongoose.Schema({
   agency_center: {
     type: [Number],
     index: '2dsphere'
-  },
-  date_last_updated: Number
+  }
 }));
 
 module.exports = Agency;

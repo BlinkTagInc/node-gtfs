@@ -72,8 +72,6 @@ describe('gtfs.getAgencies():', () => {
     agency.agency_center.should.have.length(2);
     agency.agency_center[0].should.eql(-121.98961605581664);
     agency.agency_center[1].should.eql(37.38996202963917);
-
-    agency.date_last_updated.should.eql(timeReference.getTime());
   });
 
   it('should return empty array if agency_key does not exist', async () => {
@@ -121,8 +119,6 @@ describe('gtfs.getAgencies():', () => {
     agency.agency_center.should.have.length(2);
     agency.agency_center[0].should.eql(-121.98961605581664);
     agency.agency_center[1].should.eql(37.38996202963917);
-
-    agency.date_last_updated.should.eql(timeReference.getTime());
   });
 
   it('should return only specific keys for expected agency for agency_key and agency_id', async () => {
