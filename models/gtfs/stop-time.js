@@ -12,15 +12,13 @@ const stopTimeSchema = new mongoose.Schema({
     index: true
   },
   arrival_time: {
-    type: String,
-    required: true
+    type: String
   },
   arrival_timestamp: {
     type: Number
   },
   departure_time: {
-    type: String,
-    required: true
+    type: String
   },
   departure_timestamp: {
     type: Number

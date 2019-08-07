@@ -12,14 +12,8 @@ const Route = mongoose.model('Route', new mongoose.Schema({
     index: true
   },
   agency_id: String,
-  route_short_name: {
-    type: String,
-    required: true
-  },
-  route_long_name: {
-    type: String,
-    required: true
-  },
+  route_short_name: String,
+  route_long_name: String,
   route_desc: String,
   route_type: {
     type: Number,
