@@ -20,7 +20,7 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getFrequencies():', () => {
   before(async () => {
-    await mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true });
+    await mongoose.connect(config.mongoUrl, {useNewUrlParser: true, useCreateIndex: true});
     await mongoose.connection.db.dropDatabase();
     await gtfs.import(config);
   });

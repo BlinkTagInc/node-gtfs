@@ -44,6 +44,7 @@
     "Devin Packer"
   ],
   "dependencies": {
+    "bluebird": "^3.5.5",
     "chalk": "^2.4.2",
     "csv-parse": "^4.4.4",
     "extract-zip": "^1.6.7",
@@ -78,7 +79,7 @@
   },
   "main": "index",
   "scripts": {
-    "test": "NODE_ENV=test mocha ./test/mocha/**/*.js --timeout 5000",
+    "test": "xo && NODE_ENV=test mocha ./test/mocha/**/*.js --timeout 5000",
     "lint": "xo"
   },
   "license": "MIT",

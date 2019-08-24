@@ -18,7 +18,7 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getStopsAsGeoJSON(): ', () => {
   before(async () => {
-    await mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true });
+    await mongoose.connect(config.mongoUrl, {useNewUrlParser: true, useCreateIndex: true});
   });
 
   after(async () => {

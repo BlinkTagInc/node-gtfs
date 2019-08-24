@@ -1,4 +1,5 @@
 /* eslint-env mocha */
+/* eslint-disable max-nested-callbacks */
 
 const path = require('path');
 const fs = require('fs');
@@ -27,7 +28,7 @@ const agenciesFixturesLocal = [{
 
 describe('lib/import.js', function () {
   before(async () => {
-    await mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true });
+    await mongoose.connect(config.mongoUrl, {useNewUrlParser: true, useCreateIndex: true});
   });
 
   after(async () => {
