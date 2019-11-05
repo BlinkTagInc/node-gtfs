@@ -50,7 +50,7 @@ const setupImport = async () => {
     handleError(error);
   }
 
-  await mongoose.connect(config.mongoUrl, {useNewUrlParser: true, useCreateIndex: true});
+  await mongoose.connect(config.mongoUrl, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
   await gtfs.import(config);
   await mongoose.connection.close();
   process.exit();
