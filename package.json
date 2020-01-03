@@ -1,7 +1,7 @@
 {
   "name": "gtfs",
   "description": "Import GTFS transit data into MongoDB and query routes, stops, times, fares and more",
-  "version": "1.9.2",
+  "version": "1.9.3",
   "keywords": [
     "transit",
     "gtfs",
@@ -44,22 +44,22 @@
     "Devin Packer"
   ],
   "dependencies": {
-    "bluebird": "^3.7.1",
-    "chalk": "^2.4.2",
-    "csv-parse": "^4.6.5",
+    "bluebird": "^3.7.2",
+    "chalk": "^3.0.0",
+    "csv-parse": "^4.8.3",
     "extract-zip": "^1.6.7",
     "fs-extra": "^8.1.0",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "node-fetch": "^2.6.0",
-    "proj4": "^2.5.0",
+    "proj4": "^2.6.0",
     "strip-bom-stream": "^4.0.0",
     "tmp-promise": "^2.0.2",
     "untildify": "^4.0.0",
-    "yargs": "^14.2.0"
+    "yargs": "^15.1.0"
   },
   "peerDependencies": {
-    "mongoose": "^5.7.7"
+    "mongoose": "^5.8.4"
   },
   "devDependencies": {
     "mocha": "^6.2.2",
@@ -84,7 +84,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">= 12.13.0"
+    "node": ">= 12.14.0"
   },
   "xo": {
     "esnext": true,
