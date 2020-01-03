@@ -3,7 +3,7 @@
 [![NPM version](https://img.shields.io/npm/v/gtfs.svg?style=flat)](https://www.npmjs.com/package/gtfs)
 [![David](https://img.shields.io/david/blinktaginc/node-gtfs.svg)](https://david-dm.org/blinktaginc/node-gtfs)
 [![npm](https://img.shields.io/npm/dm/gtfs.svg?style=flat)](https://www.npmjs.com/package/gtfs)
-[![CircleCI](https://img.shields.io/circleci/project/github/BlinkTagInc/node-gtfs.svg)](https://circleci.com/gh/BlinkTagInc/node-gtfs/tree/master)
+[![CircleCI](https://img.shields.io/github/workflow/status/BlinkTagInc/node-gtfs/Node%20CI.svg)](https://github.com/BlinkTagInc/node-gtfs/actions?query=workflow%3A%22Node+CI%22)
 [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
 
 [![NPM](https://nodei.co/npm/gtfs.png?downloads=true)](https://nodei.co/npm/gtfs/)
