@@ -55,13 +55,13 @@ describe('lib/import.js', function () {
     config.agencies = agenciesFixturesLocal;
 
     const countData = {};
-    const tmpDir = path.join(__dirname, '../fixture/tmp/');
+    const temporaryDir = path.join(__dirname, '../fixture/tmp/');
 
     before(async () => {
-      await extractAsync(agenciesFixturesLocal[0].path, {dir: tmpDir});
+      await extractAsync(agenciesFixturesLocal[0].path, {dir: temporaryDir});
 
       await Promise.all(models.map(model => {
-        const filePath = path.join(tmpDir, `${model.filenameBase}.txt`);
+        const filePath = path.join(temporaryDir, `${model.filenameBase}.txt`);
 
         // GTFS has optional files
         if (!fs.existsSync(filePath)) {
@@ -95,9 +95,9 @@ describe('lib/import.js', function () {
 
     for (const model of models) {
       it(`should import the same number of ${model.filenameBase}`, done => {
-        model.model.collection.estimatedDocumentCount({}, (err, res) => {
+        model.model.collection.estimatedDocumentCount({}, (err, result) => {
           should.not.exist(err);
-          res.should.equal(countData[model.filenameBase]);
+          result.should.equal(countData[model.filenameBase]);
           done();
         });
       });

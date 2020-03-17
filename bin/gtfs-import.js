@@ -16,7 +16,7 @@ const {argv} = require('yargs')
   })
   .option('s', {
     alias: 'skipDelete',
-    describe: 'Don\'t delete existing data for `agency_key` on import',
+    describe: 'Don’t delete existing data for `agency_key` on import',
     type: 'boolean',
     default: false
   });

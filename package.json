@@ -46,7 +46,7 @@
   "dependencies": {
     "bluebird": "^3.7.2",
     "chalk": "^3.0.0",
-    "csv-parse": "^4.8.3",
+    "csv-parse": "^4.8.8",
     "extract-zip": "^1.6.7",
     "fs-extra": "^8.1.0",
     "lodash": "^4.17.15",
@@ -56,16 +56,16 @@
     "strip-bom-stream": "^4.0.0",
     "tmp-promise": "^2.0.2",
     "untildify": "^4.0.0",
-    "yargs": "^15.1.0"
+    "yargs": "^15.3.1"
   },
   "peerDependencies": {
-    "mongoose": "^5.8.4"
+    "mongoose": "^5.9.5"
   },
   "devDependencies": {
-    "mocha": "^6.2.2",
+    "mocha": "^7.1.0",
     "should": "^13.2.3",
     "timekeeper": "^2.2.0",
-    "xo": "^0.25.3"
+    "xo": "^0.28.0"
   },
   "repository": {
     "type": "git",
