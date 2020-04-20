@@ -1,10 +1,6 @@
 #!/usr/bin/env node
 
-const path = require('path');
-
-const fs = require('fs-extra');
 const mongoose = require('mongoose');
-const untildify = require('untildify');
 const {argv} = require('yargs')
   .usage('Usage: $0 --config ./config.json')
   .help()
@@ -21,6 +17,7 @@ const {argv} = require('yargs')
     default: false
   });
 
+const fileUtils = require('../lib/file-utils');
 const logUtils = require('../lib/log-utils');
 const gtfs = require('..');
 
@@ -30,25 +27,8 @@ const handleError = err => {
   process.exit(1);
 };
 
-const getConfig = async () => {
-  const data = await fs.readFile(path.resolve(untildify(argv.configPath)), 'utf8');
-  const config = JSON.parse(data);
-
-  if (argv.skipDelete) {
-    config.skipDelete = argv.skipDelete;
-  }
-
-  return config;
-};
-
 const setupImport = async () => {
-  let config;
-  try {
-    config = await getConfig();
-  } catch (error) {
-    console.error(new Error(`Cannot find configuration file at \`${argv.configPath}\`. Use config-sample.json as a starting point, pass --configPath option`));
-    handleError(error);
-  }
+  const config = await fileUtils.getConfig(argv);
 
   await mongoose.connect(config.mongoUrl, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
   await gtfs.import(config);
