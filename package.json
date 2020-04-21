@@ -49,10 +49,12 @@
     "csv-parse": "^4.8.8",
     "extract-zip": "^1.6.7",
     "fs-extra": "^8.1.0",
+    "csv-stringify": "^5.4.0",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "node-fetch": "^2.6.0",
     "proj4": "^2.6.0",
+    "sanitize-filename": "^1.6.3",
     "strip-bom-stream": "^4.0.0",
     "tmp-promise": "^2.0.2",
     "untildify": "^4.0.0",
@@ -75,7 +77,8 @@
     "url": "https://github.com/blinktaginc/node-gtfs/issues"
   },
   "bin": {
-    "gtfs-import": "bin/gtfs-import.js"
+    "gtfs-import": "bin/gtfs-import.js",
+    "gtfs-export": "bin/gtfs-export.js"
   },
   "main": "index",
   "scripts": {

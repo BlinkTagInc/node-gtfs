@@ -10,11 +10,13 @@
 
 `node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/) into a MongoDB database and provides some methods to query for agencies, routes, stops, times, fares, calendars and other GTFS data. It also offers spatial queries to find nearby stops, routes and agencies and can convert stops and shapes to geoJSON format.
 
-This library has two parts: the [GTFS import script](#gtfs-import-script) and the [query methods](#query-methods).
+Additionally, this librarty can export data from mongoDB back into GTFS (csv) format.
+
+This library has three parts: the [GTFS import script](#gtfs-import-script), the [query methods](#query-methods) and the [GTFS export script](#gtfs-export-script)
 
 ## Example Application
 
-The [GTFS-to-HTML](https://github.com/blinktaginc/gtfs-to-html) app uses `node-gtfs` for downloading, importing and querying GTFS data. It provides a good example of how to use this library.
+The [GTFS-to-HTML](https://github.com/blinktaginc/gtfs-to-html) app uses `node-gtfs` for downloading, importing and querying GTFS data. It provides a good example of how to use this library and is used by over a dozen transit agencies to generate the timetables on their websites.
 
 The [GTFS-to-geojson](https://github.com/blinktaginc/gtfs-to-geojson) app creates geoJSON files for transit routes for use in mapping. It uses `node-gtfs` for downloading, importing and querying GTFS data. It provides a good example of how to use this library.
 
@@ -31,6 +33,8 @@ Note: [Mongoose](http://mongoosejs.com/) is a peer dependency of `node-gtfs`, so
 ## Command-line example
 
     gtfs-import [--configPath /path/to/your/custom-config.json] [--skipDelete]
+
+    gtfs-export [--configPath /path/to/your/custom-config.json]
 
 ## Code example
 
@@ -309,6 +313,72 @@ Configuration can be a JSON object in your code
     gtfs.import(config)
     .then(() => {
       console.log('Import Successful');
+      return mongoose.connection.close();
+    })
+    .catch(err => {
+      console.error(err);
+    });
+
+## `gtfs-export` Script
+
+The `gtfs-export` script reads from a JSON configuration file and exports data in GTFS format from a MongoDB database. [Read more on setting up your configuration file](#configuration).
+
+This could be used to export a GTFS file from mongodb after changes have been made to the data in the database manually.
+
+### Make sure MongoDB is running
+
+If you want to run this locally, make sure MongoDB in installed and running.
+
+    mongod
+
+### Make sure to import GTFS data into mongoDB first
+
+Nothing will be exported if there is no data to export. See the [GTFS import script](#gtfs-import-script).
+
+### Run the `gtfs-export` script from Command-line
+
+    gtfs-export
+
+By default, it will look for a `config.json` file in the project root. To specify a different path for the configuration file:
+
+    gtfs-export --configPath /path/to/your/custom-config.json
+
+### Command Line options
+
+#### Specify path to config JSON file
+You can specify the path to a config file to be used by the export script.
+
+    gtfs-export --configPath /path/to/your/custom-config.json
+
+#### Show help
+Show all command line options
+
+    gtfs-export --help
+
+### Use GTFS export script in code
+
+Use `gtfs.export()` in your code to run an export of a GTFS file specified in a config.json file.
+
+    const gtfs = require('gtfs');
+    const mongoose = require('mongoose');
+    const config = {
+      mongoUrl: 'mongodb://localhost:27017/gtfs',
+      agencies: [
+        {
+          agency_key: 'county-connection',
+          url: 'http://countyconnection.com/GTFS/google_transit.zip',
+          exclude: [
+            'shapes'
+          ]
+        }
+      ]
+    };
+
+    mongoose.connect(config.mongoUrl, {useNewUrlParser: true});
+
+    gtfs.export(config)
+    .then(() => {
+      console.log('Export Successful');
       return mongoose.connection.close();
     })
     .catch(err => {
