@@ -3,14 +3,11 @@
 
 const path = require('path');
 const fs = require('fs');
-const {promisify} = require('util');
 
 const extract = require('extract-zip');
 const parse = require('csv-parse');
 const mongoose = require('mongoose');
 const should = require('should');
-
-const extractAsync = promisify(extract);
 
 const config = require('../config.json');
 const gtfs = require('../..');
@@ -58,7 +55,7 @@ describe('lib/import.js', function () {
     const temporaryDir = path.join(__dirname, '../fixture/tmp/');
 
     before(async () => {
-      await extractAsync(agenciesFixturesLocal[0].path, {dir: temporaryDir});
+      await extract(agenciesFixturesLocal[0].path, {dir: temporaryDir});
 
       await Promise.all(models.map(model => {
         const filePath = path.join(temporaryDir, `${model.filenameBase}.txt`);
