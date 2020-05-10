@@ -20,7 +20,7 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getCalendars():', () => {
   before(async () => {
-    await mongoose.connect(config.mongoUrl, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
+    await mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
     await mongoose.connection.db.dropDatabase();
     await gtfs.import(config);
   });
@@ -50,8 +50,8 @@ describe('gtfs.getCalendars():', () => {
 
     const calendars = await gtfs.getCalendars({
       agency_key: agencyKey,
-      start_date: {$lt: endDate},
-      end_date: {$gte: startDate},
+      start_date: { $lt: endDate },
+      end_date: { $gte: startDate },
       tuesday
     });
 
@@ -83,7 +83,7 @@ describe('gtfs.getCalendars():', () => {
     const serviceIds = ['CT-16APR-Caltrain-Weekday-01-No'];
 
     const calendars = await gtfs.getCalendars({
-      service_id: {$in: serviceIds}
+      service_id: { $in: serviceIds }
     });
 
     should.exists(calendars);
@@ -96,7 +96,7 @@ describe('gtfs.getCalendars():', () => {
     const serviceIds = ['CT-16APR-Caltrain-Weekday-01'];
 
     const calendars = await gtfs.getCalendars({
-      service_id: {$in: serviceIds}
+      service_id: { $in: serviceIds }
     });
 
     should.exist(calendars);
@@ -122,7 +122,7 @@ describe('gtfs.getCalendars():', () => {
     const routeIds = ['TaSj-16APR'];
 
     const calendars = await gtfs.getCalendars({
-      route_id: {$in: routeIds}
+      route_id: { $in: routeIds }
     });
 
     should.exist(calendars);

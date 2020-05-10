@@ -18,7 +18,7 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getStopsAsGeoJSON(): ', () => {
   before(async () => {
-    await mongoose.connect(config.mongoUrl, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
+    await mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
   });
 
   after(async () => {
@@ -65,7 +65,7 @@ describe('gtfs.getStopsAsGeoJSON(): ', () => {
 
     const geojson = await gtfs.getStopsAsGeoJSON({
       agency_key: agencyKey,
-      stop_id: {$in: stopIds}
+      stop_id: { $in: stopIds }
     });
 
     should.exist(geojson);

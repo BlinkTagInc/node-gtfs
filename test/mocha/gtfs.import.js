@@ -25,7 +25,7 @@ const agenciesFixturesLocal = [{
 
 describe('lib/import.js', function () {
   before(async () => {
-    await mongoose.connect(config.mongoUrl, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
+    await mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
   });
 
   after(async () => {
@@ -55,7 +55,7 @@ describe('lib/import.js', function () {
     const temporaryDir = path.join(__dirname, '../fixture/tmp/');
 
     before(async () => {
-      await extract(agenciesFixturesLocal[0].path, {dir: temporaryDir});
+      await extract(agenciesFixturesLocal[0].path, { dir: temporaryDir });
 
       await Promise.all(models.map(model => {
         const filePath = path.join(temporaryDir, `${model.filenameBase}.txt`);

@@ -98,6 +98,10 @@
         {
           "properties": "never"
         }
+      ],
+      "object-curly-spacing": [
+        "error",
+        "always"
       ]
     }
   }

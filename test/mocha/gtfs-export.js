@@ -25,7 +25,7 @@ config.agencies = agenciesFixtures;
 
 describe('lib/export.js', function () {
   before(async () => {
-    await mongoose.connect(config.mongoUrl, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
+    await mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
     await mongoose.connection.db.dropDatabase();
     await gtfs.import(config);
   });
@@ -50,7 +50,7 @@ describe('lib/export.js', function () {
     const temporaryDir = path.join(__dirname, '../fixture/tmp/');
 
     before(async () => {
-      await extract(agenciesFixtures[0].path, {dir: temporaryDir});
+      await extract(agenciesFixtures[0].path, { dir: temporaryDir });
 
       await Promise.all(models.map(model => {
         const filePath = path.join(temporaryDir, `${model.filenameBase}.txt`);

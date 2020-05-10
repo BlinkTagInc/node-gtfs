@@ -20,7 +20,7 @@ const agencyKey = agenciesFixtures[0].agency_key;
 
 describe('gtfs.getShapes():', () => {
   before(async () => {
-    await mongoose.connect(config.mongoUrl, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
+    await mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
     await mongoose.connection.db.dropDatabase();
     await gtfs.import(config);
   });
@@ -112,7 +112,7 @@ describe('gtfs.getShapes():', () => {
     ];
     const shapes = await gtfs.getShapes({
       agency_key: agencyKey,
-      shape_id: {$in: shapeIds}
+      shape_id: { $in: shapeIds }
     });
 
     should.exist(shapes);

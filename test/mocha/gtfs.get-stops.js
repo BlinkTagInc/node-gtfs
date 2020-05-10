@@ -18,7 +18,7 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getStops():', () => {
   before(async () => {
-    await mongoose.connect(config.mongoUrl, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
+    await mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
     await mongoose.connection.db.dropDatabase();
     await gtfs.import(config);
   });
@@ -66,7 +66,7 @@ describe('gtfs.getStops():', () => {
 
     const stops = await gtfs.getStops({
       agency_key: agencyKey,
-      stop_id: {$in: stopIds}
+      stop_id: { $in: stopIds }
     });
 
     should.exist(stops);
@@ -86,7 +86,7 @@ describe('gtfs.getStops():', () => {
 
     const stops = await gtfs.getStops({
       agency_key: agencyKey,
-      stop_code: {$in: stopCodes}
+      stop_code: { $in: stopCodes }
     });
 
     should.exist(stops);

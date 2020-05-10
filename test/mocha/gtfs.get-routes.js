@@ -20,7 +20,7 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getRoutes():', () => {
   before(async () => {
-    await mongoose.connect(config.mongoUrl, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
+    await mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
     await mongoose.connection.db.dropDatabase();
     await gtfs.import(config);
   });
@@ -195,7 +195,7 @@ describe('gtfs.getRoutes():', () => {
   it('should return expected route with a specified route_id', async () => {
     const routeId = 'TaSj-16APR';
 
-    const routes = await gtfs.getRoutes({route_id: routeId});
+    const routes = await gtfs.getRoutes({ route_id: routeId });
 
     should.exist(routes);
     routes.should.have.length(1);

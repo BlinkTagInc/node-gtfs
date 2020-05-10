@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const mongoose = require('mongoose');
-const {argv} = require('yargs')
+const { argv } = require('yargs')
   .usage('Usage: $0 --config ./config.json')
   .help()
   .option('c', {
@@ -30,7 +30,7 @@ const handleError = err => {
 const setupImport = async () => {
   const config = await fileUtils.getConfig(argv);
 
-  await mongoose.connect(config.mongoUrl, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
+  await mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
   await gtfs.import(config);
   await mongoose.connection.close();
   process.exit();

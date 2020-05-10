@@ -18,7 +18,7 @@ config.agencies = agenciesFixtures;
 
 describe('gtfs.getCalendarDates():', () => {
   before(async () => {
-    await mongoose.connect(config.mongoUrl, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
+    await mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
     await mongoose.connection.db.dropDatabase();
     await gtfs.import(config);
   });
@@ -96,7 +96,7 @@ describe('gtfs.getCalendarDates():', () => {
       service_id: 1,
       date: 1
     }, {
-      sort: {date: 1},
+      sort: { date: 1 },
       lean: true
     });
 
