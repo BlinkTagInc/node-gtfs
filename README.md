@@ -63,15 +63,16 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 
 | option | type | description |
 | ------ | ---- | ----------- |
-| `agencies` | array | An array of GTFS files to be imported. |
-| `dataExpireAfterSeconds` | integer | The number of seconds after which the data will be deleted from mongodb using a TTL index. Optional, if not specified then data will not be automatically deleted. |
-| `mongoUrl` | string | The URL of the MongoDB database to import to. |
-| `verbose` | boolean | Whether or not to print output to the console. |
-| `skipDelete` | boolean | Whether or not to skip deleting existing data from the database. |
+| [`agencies`](#agencies) | array | An array of GTFS files to be imported. |
+| [`csvOptions`](#csvOptions) | object | Options passed to `csv-parse` for parsing GTFS CSV files. |
+| [`dataExpireAfterSeconds`](#dataExpireAfterSeconds) | integer | The number of seconds after which the data will be deleted from mongodb using a TTL index. Optional, if not specified then data will not be automatically deleted. |
+| [`mongoUrl`](#mongoUrl) | string | The URL of the MongoDB database to import to. |
+| [`verbose`](#verbose) | boolean | Whether or not to print output to the console. |
+| [`skipDelete`](#skipDelete) | boolean | Whether or not to skip deleting existing data from the database. |
 
-### Agencies
+### agencies
 
-Specify the GTFS files to be imported in an `agencies` array. GTFS files can be imported via a `url` or a local `path`.
+{Array} Specify the GTFS files to be imported in an `agencies` array. GTFS files can be imported via a `url` or a local `path`.
 
 Each file needs an `agency_key`, a short name you create that is specific to that GTFS file. For GTFS files that contain more than one agency, you only need to list each GTFS file once in the `agencies` array, not once per agency that it contains.
 
@@ -161,9 +162,33 @@ API along with your API token.
 }
 ```
 
-### MongoDB URI
+### csvOptions
 
-Add the MongoDB URI to `config.json` with the key `mongoUrl`. Running locally, you could use something like `mongodb://localhost:27017/gtfs`.
+{Object} Add options to be passed to [`csv-parse`](https://csv.js.org/parse/) wiith the key `csvOptions`. This is an optional paramenter.
+
+For instance, if you wanted to skip importing invalid lines in the GTFS file:
+
+```
+
+    "csvOptions": {
+      "skip_lines_with_error": true
+    }
+```
+
+See [full list of options](https://csv.js.org/parse/options/).
+
+### dataExpireAfterSeconds
+
+{Integer} The number of seconds after which the data will be deleted from mongodb using a [TTL index](https://docs.mongodb.com/manual/core/index-ttl/). Optional, if not specified then data will not be automatically deleted.
+
+```
+    "dataExpireAfterSeconds": 3600
+```
+
+### mongoUrl
+
+{String} The MongoDB URI use. When running locally, you may want to use `mongodb://localhost:27017/gtfs`.
+
 ```
 {
   "mongoUrl": "mongodb://localhost:27017/gtfs",
@@ -176,9 +201,9 @@ Add the MongoDB URI to `config.json` with the key `mongoUrl`. Running locally, y
 }
 ```
 
-### Logging
+### verbose
 
-If you don't want the import script to print any output to the console, you can set `verbose` to `false`. Defaults to `true`.
+{Boolean} If you don't want the import script to print any output to the console, you can set `verbose` to `false`. Defaults to `true`.
 
 ```
 {
@@ -193,7 +218,7 @@ If you don't want the import script to print any output to the console, you can 
 }
 ```
 
-If you want to route logs to a custom function, you can pass a function that takes a single `text` argument as `logFunction`. This con't be defined in `config.json` but instead passed in a config object to `gtfs.import()`.  For example:
+If you want to route logs to a custom function, you can pass a function that takes a single `text` argument as `logFunction`. This can't be defined in `config.json` but instead passed in a config object to `gtfs.import()`.  For example:
 
     const gtfs = require('gtfs');
     const mongoose = require('mongoose');
@@ -219,7 +244,7 @@ If you want to route logs to a custom function, you can pass a function that tak
 
     gtfs.import(config);
 
-### Deleting existing data
+### skipDelete
 
 If you don't want the import script to delete all existing data from the database with the same `agency_key`, you can set `skipDelete` to `true`. Defaults to `false`.
 
