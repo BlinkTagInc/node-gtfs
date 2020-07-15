@@ -42,7 +42,7 @@ Note: [Mongoose](http://mongoosejs.com/) is a peer dependency of `node-gtfs`, so
     const mongoose = require('mongoose');
     const config = require('./config.json');
 
-    mongoose.connect(config.mongoUrl, {useNewUrlParser: true});
+    mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
 
     gtfs.import(config)
     .then(() => {
@@ -240,7 +240,7 @@ If you want to route logs to a custom function, you can pass a function that tak
       }
     };
 
-    mongoose.connect(config.mongoUrl, {useNewUrlParser: true});
+    mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
 
     gtfs.import(config);
 
@@ -305,7 +305,7 @@ Use `gtfs.import()` in your code to run an import of a GTFS file specified in a 
     const mongoose = require('mongoose');
     const config = require('config.json');
 
-    mongoose.connect(config.mongoUrl, {useNewUrlParser: true});
+    mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
 
     gtfs.import(config)
     .then(() => {
@@ -333,7 +333,7 @@ Configuration can be a JSON object in your code
       ]
     };
 
-    mongoose.connect(config.mongoUrl, {useNewUrlParser: true});
+    mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true );
 
     gtfs.import(config)
     .then(() => {
@@ -399,7 +399,7 @@ Use `gtfs.export()` in your code to run an export of a GTFS file specified in a 
       ]
     };
 
-    mongoose.connect(config.mongoUrl, {useNewUrlParser: true});
+    mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
 
     gtfs.export(config)
     .then(() => {
