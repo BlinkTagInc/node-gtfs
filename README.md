@@ -16,9 +16,11 @@ This library has three parts: the [GTFS import script](#gtfs-import-script), the
 
 ## Example Application
 
-The [GTFS-to-HTML](https://github.com/blinktaginc/gtfs-to-html) app uses `node-gtfs` for downloading, importing and querying GTFS data. It provides a good example of how to use this library and is used by over a dozen transit agencies to generate the timetables on their websites.
+The [GTFS-to-HTML](https://gtfstohtml.com) app uses `node-gtfs` for downloading, importing and querying GTFS data. It provides a good example of how to use this library and is used by over a dozen transit agencies to generate the timetables on their websites.
 
 The [GTFS-to-geojson](https://github.com/blinktaginc/gtfs-to-geojson) app creates geoJSON files for transit routes for use in mapping. It uses `node-gtfs` for downloading, importing and querying GTFS data. It provides a good example of how to use this library.
+
+The [GTFS-to-chart](https://github.com/blinktaginc/gtfs-to-chart) app generates a stringline chart in D3 for all trips for a specific route using data from an agency's GTFS. It uses `node-gtfs` for downloading, importing and querying GTFS data.
 
 ## Installation
 
