@@ -62,6 +62,18 @@ const Timetable = mongoose.model('Timetable', new mongoose.Schema({
     min: 0,
     max: 1
   },
+  start_time: {
+    type: String
+  },
+  start_timestamp: {
+    type: Number
+  },
+  end_time: {
+    type: String
+  },
+  end_timestamp: {
+    type: Number
+  },
   timetable_label: String,
   service_notes: String,
   orientation: String,
