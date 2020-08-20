@@ -1,99 +1,73 @@
 /* eslint-env mocha */
 
 const path = require('path');
-
-const mongoose = require('mongoose');
 const should = require('should');
 
-const config = require('../config.json');
+const { openDb, closeDb } = require('../../lib/db');
 const gtfs = require('../..');
 
-// Setup fixtures
-const agenciesFixtures = [{
-  agency_key: 'caltrain',
-  path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
-}];
-
-config.agencies = agenciesFixtures;
+const config = {
+  agencies: [{
+    agency_key: 'caltrain',
+    path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
+  }],
+  verbose: false
+};
 
 describe('gtfs.getStoptimes():', () => {
   before(async () => {
-    await mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
-    await mongoose.connection.db.dropDatabase();
+    await openDb(config);
     await gtfs.import(config);
   });
 
   after(async () => {
-    await mongoose.connection.db.dropDatabase();
-    await mongoose.connection.close();
+    await closeDb();
   });
 
   it('should return an empty array if no stoptimes exist for given agency', async () => {
-    await mongoose.connection.db.dropDatabase();
+    const stopId = 'fake-stop-id';
 
-    const agencyKey = 'non_existing_agency';
-    const stopId = '70011';
-    const stoptimes = await gtfs.getStoptimes({
-      agency_key: agencyKey,
+    const results = await gtfs.getStoptimes({
       stop_id: stopId
     });
-
-    should.exist(stoptimes);
-    stoptimes.should.have.length(0);
-
-    await gtfs.import(config);
+    should.exists(results);
+    results.should.have.length(0);
   });
 
-  it('should return array of stoptimss for given agency, stop_id and stop_id', async () => {
-    const agencyKey = 'caltrain';
+  it('should return array of stoptimes for given stop_id', async () => {
     const stopId = '70011';
 
-    const stoptimes = await gtfs.getStoptimes({
-      agency_key: agencyKey,
+    const results = await gtfs.getStoptimes({
       stop_id: stopId
     });
+    should.exist(results);
+    results.should.have.length(80);
 
-    should.exist(stoptimes);
-    stoptimes.should.have.length(80);
-
-    for (const stoptime of stoptimes) {
-      stoptime.should.not.have.any.keys('_id');
+    for (const result of results) {
+      result.stop_id.should.equal(stopId);
     }
   });
 
-  it('should return array of stoptimes for given agency, stop_id and trip_ids', async () => {
-    const agencyKey = 'caltrain';
-    const stopId = '70011';
+  it('should return array of stoptimes for given trip_id ordered by stop_sequence', async () => {
     const tripId = '421a';
 
-    const stoptimes = await gtfs.getStoptimes({
-      agency_key: agencyKey,
-      stop_id: stopId,
+    const results = await gtfs.getStoptimes({
       trip_id: tripId
-    });
+    }, [], [
+      ['stop_sequence', 'ASC']
+    ]);
 
-    should.exist(stoptimes);
-    stoptimes.should.have.length(1);
+    should.exist(results);
+    results.should.have.length(24);
 
-    for (const stoptime of stoptimes) {
-      stoptime.should.not.have.any.keys('_id');
-    }
-  });
+    let lastStopSequence;
+    for (const result of results) {
+      result.trip_id.should.equal(tripId);
+      if (lastStopSequence !== undefined) {
+        result.stop_sequence.should.be.greaterThan(lastStopSequence);
+      }
 
-  it('should return array of stoptimes for given agency and trip_ids', async () => {
-    const agencyKey = 'caltrain';
-    const tripId = '421a';
-
-    const stoptimes = await gtfs.getStoptimes({
-      agency_key: agencyKey,
-      trip_id: tripId
-    });
-
-    should.exist(stoptimes);
-    stoptimes.should.have.length(24);
-
-    for (const stoptime of stoptimes) {
-      stoptime.should.not.have.any.keys('_id');
+      lastStopSequence = result.stop_sequence;
     }
   });
 });

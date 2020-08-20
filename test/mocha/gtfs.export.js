@@ -3,54 +3,45 @@
 
 const path = require('path');
 const fs = require('fs-extra');
-
 const extract = require('extract-zip');
 const parse = require('csv-parse');
-const mongoose = require('mongoose');
 const should = require('should');
 
-const config = require('../config.json');
+const { openDb, closeDb } = require('../../lib/db');
 const gtfs = require('../..');
 const models = require('../../models/models');
 
-// Setup fixtures
-const agenciesFixtures = [{
-  agency_key: 'caltrain',
-  path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
-}];
-
-const agencyKey = agenciesFixtures[0].agency_key;
-
-config.agencies = agenciesFixtures;
+const config = {
+  agencies: [{
+    agency_key: 'caltrain',
+    path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
+  }],
+  verbose: false
+};
 
 describe('lib/export.js', function () {
   before(async () => {
-    await mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
-    await mongoose.connection.db.dropDatabase();
+    await openDb(config);
     await gtfs.import(config);
   });
 
   after(async () => {
-    await mongoose.connection.db.dropDatabase();
-    await mongoose.connection.close();
+    await closeDb();
   });
 
   this.timeout(10000);
   describe('Export GTFS', () => {
     it('should be able to export GTFS', async () => {
-      config.agencies = agenciesFixtures;
       await gtfs.export(config);
     });
   });
 
   describe('Verify data exported', () => {
-    config.agencies = agenciesFixtures;
-
     const countData = {};
     const temporaryDir = path.join(__dirname, '../fixture/tmp/');
 
     before(async () => {
-      await extract(agenciesFixtures[0].path, { dir: temporaryDir });
+      await extract(config.agencies[0].path, { dir: temporaryDir });
 
       await Promise.all(models.map(model => {
         const filePath = path.join(temporaryDir, `${model.filenameBase}.txt`);
@@ -81,17 +72,16 @@ describe('lib/export.js', function () {
           });
       }));
 
-      await mongoose.connection.db.dropDatabase();
       await gtfs.import(config);
     });
 
     after(async () => {
-      await fs.remove(path.join(process.cwd(), 'gtfs-export', agencyKey));
+      await fs.remove(path.join(process.cwd(), 'gtfs-export', config.agencies[0].agency_key));
     });
 
     for (const model of models) {
       it(`should import the same number of ${model.filenameBase}`, done => {
-        const filePath = path.join(process.cwd(), 'gtfs-export', agencyKey, `${model.filenameBase}.txt`);
+        const filePath = path.join(process.cwd(), 'gtfs-export', config.agencies[0].agency_key, `${model.filenameBase}.txt`);
 
         // GTFS has optional files
         if (!fs.existsSync(filePath)) {

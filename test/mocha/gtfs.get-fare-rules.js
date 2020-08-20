@@ -1,69 +1,60 @@
 /* eslint-env mocha */
 
 const path = require('path');
-
-const mongoose = require('mongoose');
 const should = require('should');
 
-const config = require('../config.json');
+const { openDb, closeDb } = require('../../lib/db');
 const gtfs = require('../..');
 
-// Setup fixtures
-const agenciesFixtures = [{
-  agency_key: 'caltrain',
-  path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
-}];
-
-const agencyKey = agenciesFixtures[0].agency_key;
-
-config.agencies = agenciesFixtures;
+const config = {
+  agencies: [{
+    agency_key: 'caltrain',
+    path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
+  }],
+  verbose: false
+};
 
 describe('gtfs.getFareRules():', () => {
   before(async () => {
-    await mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
-    await mongoose.connection.db.dropDatabase();
+    await openDb(config);
     await gtfs.import(config);
   });
 
   after(async () => {
-    await mongoose.connection.db.dropDatabase();
-    await mongoose.connection.close();
+    await closeDb();
   });
 
   it('should return empty array if no fare_rules', async () => {
-    await mongoose.connection.db.dropDatabase();
-
     const routeId = 'not_real';
 
-    const fareRules = await gtfs.getFareRules({
-      agency_key: agencyKey,
+    const results = await gtfs.getFareRules({
       route_id: routeId
     });
-
-    should.exists(fareRules);
-    fareRules.should.have.length(0);
-
-    await gtfs.import(config);
+    should.exists(results);
+    results.should.have.length(0);
   });
 
   it('should return expected fare_rules', async () => {
     const routeId = 'Bu-16APR';
 
-    const fareRules = await gtfs.getFareRules({
-      agency_key: agencyKey,
+    const results = await gtfs.getFareRules({
       route_id: routeId
-    });
+    }, [
+      'fare_id',
+      'route_id',
+      'origin_id',
+      'destination_id'
+    ]);
 
-    should.exist(fareRules);
-    fareRules.length.should.equal(36);
+    const expectedResult = {
+      fare_id: 'OW_2_20160228',
+      route_id: 'Bu-16APR',
+      origin_id: '6',
+      destination_id: '5'
+    };
 
-    const fareRule = fareRules[0];
-
-    fareRule.should.not.have.any.keys('_id');
-    fareRule.agency_key.should.equal(agenciesFixtures[0].agency_key);
-    should.exist(fareRule.fare_id);
-    fareRule.route_id.should.equal(routeId);
-    should.exist(fareRule.origin_id);
-    should.exist(fareRule.destination_id);
+    should.exist(results);
+    results.length.should.equal(36);
+    results.should.containEql(expectedResult);
   });
 });

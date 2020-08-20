@@ -1,77 +1,46 @@
-const Agency = require('../models/gtfs/agency');
-const CalendarDate = require('../models/gtfs/calendar-date');
-const Calendar = require('../models/gtfs/calendar');
-const FareAttribute = require('../models/gtfs/fare-attribute');
-const FareRule = require('../models/gtfs/fare-rule');
-const FeedInfo = require('../models/gtfs/feed-info');
-const Frequencies = require('../models/gtfs/frequencies');
-const Route = require('../models/gtfs/route');
-const Shape = require('../models/gtfs/shape');
-const StopTime = require('../models/gtfs/stop-time');
-const Stop = require('../models/gtfs/stop');
-const Transfer = require('../models/gtfs/transfer');
-const Trip = require('../models/gtfs/trip');
+const agency = require('../models/gtfs/agency');
+const attributions = require('../models/gtfs/attributions');
+const calendarDates = require('../models/gtfs/calendar-dates');
+const calendar = require('../models/gtfs/calendar');
+const fareAttributes = require('../models/gtfs/fare-attributes');
+const fareRules = require('../models/gtfs/fare-rules');
+const feedInfo = require('../models/gtfs/feed-info');
+const frequencies = require('../models/gtfs/frequencies');
+const levels = require('../models/gtfs/levels');
+const pathways = require('../models/gtfs/pathways');
+const routes = require('../models/gtfs/routes');
+const shapes = require('../models/gtfs/shapes');
+const stopTimes = require('../models/gtfs/stop-times');
+const stops = require('../models/gtfs/stops');
+const transfers = require('../models/gtfs/transfers');
+const translations = require('../models/gtfs/translations');
+const trips = require('../models/gtfs/trips');
 
-const StopAttributes = require('../models/non-standard/stop-attributes');
-const Timetable = require('../models/non-standard/timetable');
-const TimetablePage = require('../models/non-standard/timetable-page');
-const TimetableStopOrder = require('../models/non-standard/timetable-stop-order');
+const stopAttributes = require('../models/non-standard/stop-attributes');
+const timetables = require('../models/non-standard/timetables');
+const timetablePages = require('../models/non-standard/timetable-pages');
+const timetableStopOrder = require('../models/non-standard/timetable-stop-order');
 
 module.exports = [
-  {
-    filenameBase: 'agency',
-    model: Agency
-  }, {
-    filenameBase: 'calendar_dates',
-    model: CalendarDate
-  }, {
-    filenameBase: 'calendar',
-    model: Calendar
-  }, {
-    filenameBase: 'fare_attributes',
-    model: FareAttribute
-  }, {
-    filenameBase: 'fare_rules',
-    model: FareRule
-  }, {
-    filenameBase: 'feed_info',
-    model: FeedInfo
-  }, {
-    filenameBase: 'frequencies',
-    model: Frequencies
-  }, {
-    filenameBase: 'routes',
-    model: Route
-  }, {
-    filenameBase: 'shapes',
-    model: Shape
-  }, {
-    filenameBase: 'stop_times',
-    model: StopTime
-  }, {
-    filenameBase: 'stops',
-    model: Stop
-  }, {
-    filenameBase: 'transfers',
-    model: Transfer
-  }, {
-    filenameBase: 'trips',
-    model: Trip
-  }, {
-    filenameBase: 'stop_attributes',
-    model: StopAttributes,
-    nonstandard: true
-  }, {
-    filenameBase: 'timetables',
-    model: Timetable,
-    nonstandard: true
-  }, {
-    filenameBase: 'timetable_pages',
-    model: TimetablePage,
-    nonstandard: true
-  }, {
-    filenameBase: 'timetable_stop_order',
-    model: TimetableStopOrder,
-    nonstandard: true
-  }
+  agency,
+  attributions,
+  calendarDates,
+  calendar,
+  fareAttributes,
+  fareRules,
+  feedInfo,
+  frequencies,
+  levels,
+  pathways,
+  routes,
+  shapes,
+  stopTimes,
+  stops,
+  transfers,
+  translations,
+  trips,
+  stopAttributes,
+  timetables,
+  timetablePages,
+  timetableStopOrder
 ];

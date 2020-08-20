@@ -1,216 +1,140 @@
 /* eslint-env mocha */
 
 const path = require('path');
-
-const mongoose = require('mongoose');
 const should = require('should');
 
-const config = require('../config.json');
+const { openDb, closeDb } = require('../../lib/db');
 const gtfs = require('../..');
 
-// Setup fixtures
-const agenciesFixtures = [{
-  agency_key: 'caltrain',
-  path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
-}];
-
-const agencyKey = agenciesFixtures[0].agency_key;
-
-config.agencies = agenciesFixtures;
+const config = {
+  agencies: [{
+    agency_key: 'caltrain',
+    path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
+  }],
+  verbose: false
+};
 
 describe('gtfs.getRoutes():', () => {
   before(async () => {
-    await mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
-    await mongoose.connection.db.dropDatabase();
+    await openDb(config);
     await gtfs.import(config);
   });
 
   after(async () => {
-    await mongoose.connection.db.dropDatabase();
-    await mongoose.connection.close();
+    await closeDb();
   });
 
   it('should return empty array if no routes for given agency exist', async () => {
-    await mongoose.connection.db.dropDatabase();
-    const routes = await gtfs.getRoutes({
-      agency_key: agencyKey
-    });
-    should.exist(routes);
-    routes.should.have.length(0);
+    const routeId = 'fake-route-id';
 
-    await gtfs.import(config);
+    const results = await gtfs.getRoutes({
+      route_id: routeId
+    });
+    should.exists(results);
+    results.should.have.length(0);
   });
 
-  it('should return expected routes for given agency', async () => {
-    const routes = await gtfs.getRoutes({
-      agency_key: agencyKey
-    });
+  it('should return expected routes', async () => {
+    const results = await gtfs.getRoutes(
+      {},
+      [],
+      [['route_long_name', 'ASC']]
+    );
 
-    should.exist(routes);
-
-    const expectedRoutes = {
-      'Bu-16APR': {
+    const expectedResults = [
+      {
         route_id: 'Bu-16APR',
+        agency_id: null,
         route_short_name: '',
         route_long_name: 'Baby Bullet',
+        route_desc: null,
         route_type: 2,
+        route_url: null,
         route_color: 'E31837',
-        agency_key: 'caltrain'
+        route_text_color: null,
+        route_sort_order: null
       },
-      'Li-16APR': {
+      {
         route_id: 'Li-16APR',
+        agency_id: null,
         route_short_name: '',
         route_long_name: 'Limited',
+        route_desc: null,
         route_type: 2,
+        route_url: null,
         route_color: 'FEF0B5',
-        agency_key: 'caltrain'
+        route_text_color: null,
+        route_sort_order: null
       },
-      'Lo-16APR': {
+      {
         route_id: 'Lo-16APR',
+        agency_id: null,
         route_short_name: '',
         route_long_name: 'Local',
+        route_desc: null,
         route_type: 2,
+        route_url: null,
         route_color: 'FFFFFF',
-        agency_key: 'caltrain'
+        route_text_color: null,
+        route_sort_order: null
       },
-      'TaSj-16APR': {
+      {
         route_id: 'TaSj-16APR',
+        agency_id: null,
         route_short_name: '',
         route_long_name: 'Tamien / San Jose Diridon Caltrain Shuttle',
+        route_desc: null,
         route_type: 3,
+        route_url: null,
         route_color: '41AD49',
-        agency_key: 'caltrain'
+        route_text_color: null,
+        route_sort_order: null
       }
-    };
+    ];
 
-    routes.should.have.length(4);
-
-    routes.forEach(route => {
-      const expectedRoute = expectedRoutes[route.route_id];
-
-      should.exist(expectedRoute);
-      expectedRoute.should.match(route);
-    });
+    should.exist(results);
+    results.should.have.length(4);
+    expectedResults.should.match(results);
   });
 
-  it('should return an empty array if no routes within given distance exist', async () => {
-    const lon = -130.9867495;
-    const lat = 45.38976166855;
-    const radius = 2;
+  it('should return expected routes for a specific stop_id', async () => {
+    const results = await gtfs.getRoutes(
+      { stop_id: '70321' },
+      [],
+      [['route_long_name', 'ASC']]
+    );
 
-    const routes = await gtfs.getRoutes({
-      within: {
-        lat,
-        lon,
-        radius
-      }
-    });
-
-    should.exist(routes);
-    routes.should.have.length(0);
-  });
-
-  it('should return expected routes within given distance if they exist', async () => {
-    const lon = -121.9867495;
-    const lat = 37.38976166855;
-    const radius = 2;
-    const expectedRoutes = {
-      'Li-16APR': {
+    const expectedResults = [
+      {
         route_id: 'Li-16APR',
+        agency_id: null,
         route_short_name: '',
         route_long_name: 'Limited',
+        route_desc: null,
         route_type: 2,
+        route_url: null,
         route_color: 'FEF0B5',
-        agency_key: 'caltrain'
-      },
-      'Lo-16APR': {
-        route_id: 'Lo-16APR',
-        route_short_name: '',
-        route_long_name: 'Local',
-        route_type: 2,
-        route_color: 'FFFFFF',
-        agency_key: 'caltrain'
+        route_text_color: null,
+        route_sort_order: null
       }
-    };
+    ];
 
-    const routes = await gtfs.getRoutes({
-      within: {
-        lat,
-        lon,
-        radius
-      }
-    });
-
-    should.exist(routes);
-    routes.should.have.length(2);
-
-    routes.forEach(route => {
-      const expectedRoute = expectedRoutes[route.route_id];
-
-      should.exist(expectedRoute);
-      expectedRoute.should.match(route);
-    });
+    should.exist(results);
+    results.should.have.length(1);
+    expectedResults.should.match(results);
   });
 
-  it('should return expected routes within given distance (without specifying radius)', async () => {
-    const lon = -122.39797353744507;
-    const lat = 37.7210684234136;
-    const expectedRoutes = {
-      'Li-16APR': {
-        route_id: 'Li-16APR',
-        route_short_name: '',
-        route_long_name: 'Limited',
-        route_type: 2,
-        route_color: 'FEF0B5',
-        agency_key: 'caltrain'
-      },
-      'Lo-16APR': {
-        route_id: 'Lo-16APR',
-        route_short_name: '',
-        route_long_name: 'Local',
-        route_type: 2,
-        route_color: 'FFFFFF',
-        agency_key: 'caltrain'
-      }
-    };
+  it('should return no routes for a invalid stop_id', async () => {
+    const results = await gtfs.getRoutes(
+      { stop_id: 'not-valid' },
+      [],
+      [['route_long_name', 'ASC']]
+    );
 
-    const routes = await gtfs.getRoutes({
-      within: {
-        lat,
-        lon
-      }
-    });
+    const expectedResults = [];
 
-    should.exist(routes);
-    routes.should.have.length(2);
-
-    routes.forEach(route => {
-      const expectedRoute = expectedRoutes[route.route_id];
-
-      should.exist(expectedRoute);
-      expectedRoute.should.match(route);
-    });
-  });
-
-  it('should return expected route with a specified route_id', async () => {
-    const routeId = 'TaSj-16APR';
-
-    const routes = await gtfs.getRoutes({ route_id: routeId });
-
-    should.exist(routes);
-    routes.should.have.length(1);
-
-    const route = routes[0];
-
-    const expectedRoute = {
-      route_id: 'TaSj-16APR',
-      route_short_name: '',
-      route_long_name: 'Tamien / San Jose Diridon Caltrain Shuttle',
-      route_type: 3,
-      route_color: '41AD49',
-      agency_key: 'caltrain'
-    };
-
-    expectedRoute.should.match(route);
+    should.exist(results);
+    results.should.have.length(0);
+    expectedResults.should.match(results);
   });
 });

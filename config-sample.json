@@ -1,8 +1,4 @@
 {
-  "mongoUrl": "mongodb://localhost:27017/gtfs",
-  "csvOptions": {
-    "skip_lines_with_error": true
-  },
   "agencies": [
     {
       "agency_key": "county-connection",
@@ -11,5 +7,9 @@
         "shapes"
       ]
     }
-  ]
+  ],
+  "csvOptions": {
+    "skip_lines_with_error": true
+  },
+  "sqlitePath": "/dev/sqlite/gtfs"
 }

@@ -1,0 +1,74 @@
+module.exports = {
+  filenameBase: 'stops',
+  schema: [
+    {
+      name: 'stop_id',
+      type: 'varchar(255)',
+      primary: true
+    },
+    {
+      name: 'stop_code',
+      type: 'varchar(255)'
+    },
+    {
+      name: 'stop_name',
+      type: 'varchar(255)',
+      required: true
+    },
+    {
+      name: 'stop_desc',
+      type: 'varchar(255)'
+    },
+    {
+      name: 'stop_lat',
+      type: 'real',
+      required: true,
+      min: -90,
+      max: 90
+    },
+    {
+      name: 'stop_lon',
+      type: 'real',
+      required: true,
+      min: -180,
+      max: 180
+    },
+    {
+      name: 'zone_id',
+      type: 'varchar(255)'
+    },
+    {
+      name: 'stop_url',
+      type: 'varchar(255)'
+    },
+    {
+      name: 'location_type',
+      type: 'integer',
+      min: 0,
+      max: 1
+    },
+    {
+      name: 'parent_station',
+      type: 'varchar(255)',
+      index: true
+    },
+    {
+      name: 'stop_timezone',
+      type: 'varchar(255)'
+    },
+    {
+      name: 'wheelchair_boarding',
+      type: 'integer',
+      min: 0,
+      max: 2
+    },
+    {
+      name: 'level_id',
+      type: 'varchar(255)'
+    },
+    {
+      name: 'platform_code',
+      type: 'varchar(255)'
+    }
+  ]
+};

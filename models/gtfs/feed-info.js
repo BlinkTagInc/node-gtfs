@@ -1,37 +1,49 @@
-const mongoose = require('mongoose');
-
-const FeedInfo = mongoose.model('FeedInfo', new mongoose.Schema({
-  created_at: {
-    type: Date,
-    default: Date.now,
-    required: true
-  },
-  agency_key: {
-    type: String,
-    required: true,
-    index: true
-  },
-  feed_publisher_name: {
-    type: String,
-    required: true
-  },
-  feed_publisher_url: {
-    type: String,
-    required: true
-  },
-  feed_lang: {
-    type: String,
-    required: true
-  },
-  feed_start_date: {
-    type: Number,
-    min: 10000000
-  },
-  feed_end_date: {
-    type: Number,
-    min: 10000000
-  },
-  feed_version: String
-}));
-
-module.exports = FeedInfo;
+module.exports = {
+  filenameBase: 'feed_info',
+  schema: [
+    {
+      name: 'id',
+      type: 'integer',
+      primary: true
+    },
+    {
+      name: 'feed_publisher_name',
+      type: 'varchar(255)',
+      required: true
+    },
+    {
+      name: 'feed_publisher_url',
+      type: 'varchar(255)',
+      required: true
+    },
+    {
+      name: 'feed_lang',
+      type: 'varchar(255)',
+      required: true
+    },
+    {
+      name: 'default_lang',
+      type: 'varchar(255)'
+    },
+    {
+      name: 'feed_start_date',
+      type: 'integer'
+    },
+    {
+      name: 'feed_end_date',
+      type: 'integer'
+    },
+    {
+      name: 'feed_version',
+      type: 'varchar(255)'
+    },
+    {
+      name: 'feed_contact_email',
+      type: 'varchar(255)'
+    },
+    {
+      name: 'feed_contact_url',
+      type: 'varchar(255)'
+    }
+  ]
+};

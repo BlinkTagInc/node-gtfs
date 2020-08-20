@@ -1,47 +1,45 @@
-const mongoose = require('mongoose');
-
-const Agency = mongoose.model('Agency', new mongoose.Schema({
-  created_at: {
-    type: Date,
-    default: Date.now,
-    required: true
-  },
-  agency_key: {
-    type: String,
-    required: true,
-    index: true
-  },
-  agency_id: String,
-  agency_name: {
-    type: String,
-    required: true
-  },
-  agency_url: {
-    type: String,
-    required: true
-  },
-  agency_timezone: {
-    type: String,
-    required: true
-  },
-  agency_lang: String,
-  agency_phone: String,
-  agency_fare_url: String,
-  agency_email: String,
-  agency_bounds: {
-    sw: {
-      type: Array,
-      index: '2dsphere'
+module.exports = {
+  filenameBase: 'agency',
+  schema: [
+    {
+      name: 'id',
+      type: 'integer',
+      primary: true
     },
-    ne: {
-      type: Array,
-      index: '2dsphere'
+    {
+      name: 'agency_id',
+      type: 'varchar(255)'
+    },
+    {
+      name: 'agency_name',
+      type: 'varchar(255)',
+      required: true
+    },
+    {
+      name: 'agency_url',
+      type: 'varchar(255)',
+      required: true
+    },
+    {
+      name: 'agency_timezone',
+      type: 'varchar(255)',
+      required: true
+    },
+    {
+      name: 'agency_lang',
+      type: 'varchar(255)'
+    },
+    {
+      name: 'agency_phone',
+      type: 'varchar(64)'
+    },
+    {
+      name: 'agency_fare_url',
+      type: 'varchar(1020)'
+    },
+    {
+      name: 'agency_email',
+      type: 'varchar(255)'
     }
-  },
-  agency_center: {
-    type: [Number],
-    index: '2dsphere'
-  }
-}));
-
-module.exports = Agency;
+  ]
+};

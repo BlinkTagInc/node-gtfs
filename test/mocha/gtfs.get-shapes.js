@@ -1,125 +1,228 @@
 /* eslint-env mocha */
 
 const path = require('path');
-
-const mongoose = require('mongoose');
 const should = require('should');
 
-const config = require('../config.json');
+const { openDb, closeDb } = require('../../lib/db');
 const gtfs = require('../..');
 
-// Setup fixtures
-const agenciesFixtures = [{
-  agency_key: 'caltrain',
-  path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
-}];
-
-config.agencies = agenciesFixtures;
-
-const agencyKey = agenciesFixtures[0].agency_key;
+const config = {
+  agencies: [{
+    agency_key: 'caltrain',
+    path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
+  }],
+  verbose: false
+};
 
 describe('gtfs.getShapes():', () => {
   before(async () => {
-    await mongoose.connect(config.mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
-    await mongoose.connection.db.dropDatabase();
+    await openDb(config);
     await gtfs.import(config);
   });
 
   after(async () => {
-    await mongoose.connection.db.dropDatabase();
-    await mongoose.connection.close();
+    await closeDb();
   });
 
-  it('should return an empty array if no shapes exist for given agency', async () => {
-    await mongoose.connection.db.dropDatabase();
+  it('should return an empty array if no shapes exist', async () => {
+    const shapeId = 'fake-shape-id';
 
-    const agencyKey = 'non_existing_agency';
-    const shapes = await gtfs.getShapes({
-      agency_key: agencyKey
+    const results = await gtfs.getShapes({
+      shape_id: shapeId
     });
-
-    should.exist(shapes);
-    shapes.should.have.length(0);
-
-    await gtfs.import(config);
+    should.exists(results);
+    results.should.have.length(0);
   });
 
-  it('should return array of shapes for given agency', async () => {
-    const shapes = await gtfs.getShapes({
-      agency_key: agencyKey
-    });
-
-    should.exist(shapes);
-    shapes.should.have.length(8);
-
-    for (const shape of shapes) {
-      shape.should.not.have.any.keys('_id');
-    }
-  });
-
-  it('should return array of shapes for given agency by route', async () => {
+  it('should return an empty array if no matching trips exist', async () => {
     const routeId = 'TaSj-16APR';
-    const shapes = await gtfs.getShapes({
-      agency_key: agencyKey,
-      route_id: routeId
-    });
+    const serviceId = 'fake-service-id';
 
-    should.exist(shapes);
-    shapes.should.have.length(2);
-
-    for (const shape of shapes) {
-      shape.should.not.have.any.keys('_id');
-    }
-  });
-
-  it('should return array of shapes for given agency by route and direction', async () => {
-    const routeId = 'TaSj-16APR';
-    const directionId = 0;
-    const shapes = await gtfs.getShapes({
-      agency_key: agencyKey,
+    const results = await gtfs.getShapes({
       route_id: routeId,
-      direction_id: directionId
-    });
-
-    should.exist(shapes);
-    shapes.should.have.length(1);
-
-    const shape = shapes[0];
-    shape.should.have.length(114);
-    shape[0].shape_id.should.equal('cal_tam_sj');
-    shape.should.not.have.any.keys('_id');
-  });
-
-  it('should return array of shapes for given agency and service_id', async () => {
-    const serviceId = 'CT-16APR-Caltrain-Saturday-02';
-    const shapes = await gtfs.getShapes({
-      agency_key: agencyKey,
       service_id: serviceId
     });
-
-    should.exist(shapes);
-    shapes.should.have.length(3);
-
-    for (const shape of shapes) {
-      shape.should.not.have.any.keys('_id');
-    }
+    should.exists(results);
+    results.should.have.length(0);
   });
 
-  it('should return array of shapes for given agency and shape_ids', async () => {
-    const shapeIds = [
-      'cal_sj_sf',
-      'cal_gil_sf'
-    ];
-    const shapes = await gtfs.getShapes({
-      agency_key: agencyKey,
-      shape_id: { $in: shapeIds }
-    });
+  it('should return array of shapes', async () => {
+    const results = await gtfs.getShapes(
+      {},
+      [
+        'shape_id',
+        'shape_pt_lat',
+        'shape_pt_lon',
+        'shape_pt_sequence',
+        'shape_dist_traveled'
+      ]
+    );
 
-    should.exist(shapes);
-    shapes.should.have.length(2);
+    const expectedResult = {
+      shape_id: 'cal_tam_sf',
+      shape_pt_lat: 37.60768711349564,
+      shape_pt_lon: -122.39467978477478,
+      shape_pt_sequence: 244,
+      shape_dist_traveled: null
+    };
 
-    for (const shape of shapes) {
-      shape.should.not.have.any.keys('_id');
-    }
+    should.exist(results);
+    results.length.should.equal(3008);
+    results.should.containEql(expectedResult);
+  });
+
+  it('should return array of shapes by route', async () => {
+    const routeId = 'TaSj-16APR';
+    const results = await gtfs.getShapes(
+      {
+        route_id: routeId
+      },
+      [
+        'shape_id',
+        'shape_pt_lat',
+        'shape_pt_lon',
+        'shape_pt_sequence',
+        'shape_dist_traveled'
+      ]
+    );
+
+    const expectedResult = {
+      shape_id: 'cal_tam_sj',
+      shape_pt_lat: 37.323558,
+      shape_pt_lon: -121.8919,
+      shape_pt_sequence: 10051,
+      shape_dist_traveled: null
+    };
+
+    should.exist(results);
+    results.length.should.equal(331);
+    results.should.containEql(expectedResult);
+  });
+
+  it('should return array of shapes for multiple routes', async () => {
+    const results = await gtfs.getShapes(
+      {
+        route_id: [
+          'Lo-16APR',
+          'Li-16APR'
+        ]
+      },
+      [
+        'shape_id',
+        'shape_pt_lat',
+        'shape_pt_lon',
+        'shape_pt_sequence',
+        'shape_dist_traveled'
+      ]
+    );
+
+    const expectedResult = {
+      shape_id: 'cal_sj_sf',
+      shape_pt_lat: 37.694407548683614,
+      shape_pt_lon: -122.40173935890198,
+      shape_pt_sequence: 306,
+      shape_dist_traveled: null
+    };
+
+    should.exist(results);
+    results.length.should.equal(2677);
+    results.should.containEql(expectedResult);
+  });
+
+  it('should return empty array of for invalid route', async () => {
+    const results = await gtfs.getShapes(
+      {
+        route_id: 'not-valid'
+      }
+    );
+
+    should.exist(results);
+    results.length.should.equal(0);
+  });
+
+  it('should return array of shapes by route and direction', async () => {
+    const routeId = 'TaSj-16APR';
+    const directionId = 0;
+    const results = await gtfs.getShapes(
+      {
+        route_id: routeId,
+        direction_id: directionId
+      },
+      [
+        'shape_id',
+        'shape_pt_lat',
+        'shape_pt_lon',
+        'shape_pt_sequence',
+        'shape_dist_traveled'
+      ]
+    );
+
+    const expectedResult = {
+      shape_id: 'cal_tam_sj',
+      shape_pt_lat: 37.323558,
+      shape_pt_lon: -121.8919,
+      shape_pt_sequence: 10051,
+      shape_dist_traveled: null
+    };
+
+    should.exist(results);
+    results.length.should.equal(114);
+    results.should.containEql(expectedResult);
+  });
+
+  it('should return array of shapes for specific trip_id', async () => {
+    const tripId = '329';
+    const results = await gtfs.getShapes(
+      {
+        trip_id: tripId
+      },
+      [
+        'shape_id',
+        'shape_pt_lat',
+        'shape_pt_lon',
+        'shape_pt_sequence',
+        'shape_dist_traveled'
+      ]
+    );
+
+    const expectedResult = {
+      shape_id: 'cal_tam_sf',
+      shape_pt_lat: 37.337664044379544,
+      shape_pt_lon: -121.90810561180115,
+      shape_pt_sequence: 25,
+      shape_dist_traveled: null
+    };
+
+    should.exist(results);
+    results.length.should.equal(401);
+    results.should.containEql(expectedResult);
+  });
+
+  it('should return array of shapes for specific service_id', async () => {
+    const serviceId = 'CT-16APR-Caltrain-Sunday-02';
+    const results = await gtfs.getShapes(
+      {
+        service_id: serviceId
+      },
+      [
+        'shape_id',
+        'shape_pt_lat',
+        'shape_pt_lon',
+        'shape_pt_sequence',
+        'shape_dist_traveled'
+      ]
+    );
+
+    const expectedResult = {
+      shape_id: 'cal_sj_tam',
+      shape_pt_lat: 37.294079,
+      shape_pt_lon: -121.874108,
+      shape_pt_sequence: 10154,
+      shape_dist_traveled: null
+    };
+
+    should.exist(results);
+    results.length.should.equal(713);
+    results.should.containEql(expectedResult);
   });
 });
