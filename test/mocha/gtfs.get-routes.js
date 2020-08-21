@@ -52,7 +52,9 @@ describe('gtfs.getRoutes():', () => {
         route_url: null,
         route_color: 'E31837',
         route_text_color: null,
-        route_sort_order: null
+        route_sort_order: null,
+        continuous_pickup: null,
+        continuous_drop_off: null
       },
       {
         route_id: 'Li-16APR',
@@ -64,7 +66,9 @@ describe('gtfs.getRoutes():', () => {
         route_url: null,
         route_color: 'FEF0B5',
         route_text_color: null,
-        route_sort_order: null
+        route_sort_order: null,
+        continuous_pickup: null,
+        continuous_drop_off: null
       },
       {
         route_id: 'Lo-16APR',
@@ -76,7 +80,9 @@ describe('gtfs.getRoutes():', () => {
         route_url: null,
         route_color: 'FFFFFF',
         route_text_color: null,
-        route_sort_order: null
+        route_sort_order: null,
+        continuous_pickup: null,
+        continuous_drop_off: null
       },
       {
         route_id: 'TaSj-16APR',
@@ -88,7 +94,9 @@ describe('gtfs.getRoutes():', () => {
         route_url: null,
         route_color: '41AD49',
         route_text_color: null,
-        route_sort_order: null
+        route_sort_order: null,
+        continuous_pickup: null,
+        continuous_drop_off: null
       }
     ];
 
@@ -115,7 +123,9 @@ describe('gtfs.getRoutes():', () => {
         route_url: null,
         route_color: 'FEF0B5',
         route_text_color: null,
-        route_sort_order: null
+        route_sort_order: null,
+        continuous_pickup: null,
+        continuous_drop_off: null
       }
     ];
 

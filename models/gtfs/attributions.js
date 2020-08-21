@@ -11,6 +11,10 @@ module.exports = {
       type: 'varchar(255)'
     },
     {
+      name: 'agency_id',
+      type: 'varchar(255)'
+    },
+    {
       name: 'route_id',
       type: 'varchar(255)'
     },
@@ -43,7 +47,7 @@ module.exports = {
     },
     {
       name: 'attribution_url',
-      type: 'varchar(255)'
+      type: 'varchar(1020)'
     },
     {
       name: 'attribution_email',

@@ -16,20 +16,22 @@ module.exports = {
       required: true
     },
     {
+      name: 'tts_stop_name',
+      type: 'varchar(255)'
+    },
+    {
       name: 'stop_desc',
       type: 'varchar(255)'
     },
     {
       name: 'stop_lat',
       type: 'real',
-      required: true,
       min: -90,
       max: 90
     },
     {
       name: 'stop_lon',
       type: 'real',
-      required: true,
       min: -180,
       max: 180
     },
@@ -39,13 +41,13 @@ module.exports = {
     },
     {
       name: 'stop_url',
-      type: 'varchar(255)'
+      type: 'varchar(1020)'
     },
     {
       name: 'location_type',
       type: 'integer',
       min: 0,
-      max: 1
+      max: 4
     },
     {
       name: 'parent_station',

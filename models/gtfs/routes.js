@@ -31,7 +31,7 @@ module.exports = {
     },
     {
       name: 'route_url',
-      type: 'varchar(255)'
+      type: 'varchar(1020)'
     },
     {
       name: 'route_color',
@@ -45,6 +45,18 @@ module.exports = {
       name: 'route_sort_order',
       type: 'integer',
       min: 0
+    },
+    {
+      name: 'continuous_pickup',
+      type: 'integer',
+      min: 0,
+      max: 3
+    },
+    {
+      name: 'continuous_drop_off',
+      type: 'integer',
+      min: 0,
+      max: 3
     }
   ]
 };

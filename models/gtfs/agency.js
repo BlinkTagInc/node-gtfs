@@ -17,7 +17,7 @@ module.exports = {
     },
     {
       name: 'agency_url',
-      type: 'varchar(255)',
+      type: 'varchar(1020)',
       required: true
     },
     {

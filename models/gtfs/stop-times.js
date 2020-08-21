@@ -59,6 +59,18 @@ module.exports = {
       max: 3
     },
     {
+      name: 'continuous_pickup',
+      type: 'integer',
+      min: 0,
+      max: 3
+    },
+    {
+      name: 'continuous_drop_off',
+      type: 'integer',
+      min: 0,
+      max: 3
+    },
+    {
       name: 'shape_dist_traveled',
       type: 'real',
       min: 0
@@ -67,7 +79,7 @@ module.exports = {
       name: 'timepoint',
       type: 'integer',
       min: 0,
-      max: 3
+      max: 1
     }
   ]
 };
