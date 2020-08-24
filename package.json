@@ -46,6 +46,7 @@
     "Darius MARTIN"
   ],
   "dependencies": {
+    "@turf/helpers": "^6.1.4",
     "bluebird": "^3.7.2",
     "chalk": "^4.1.0",
     "csv-parse": "^4.12.0",

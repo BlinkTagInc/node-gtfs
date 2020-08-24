@@ -55,7 +55,7 @@ describe('gtfs.getShapesAsGeoJSON():', () => {
 
     should.exist(geojson);
     geojson.type.should.equal('FeatureCollection');
-    geojson.features.length.should.equal(3);
+    geojson.features.length.should.equal(2);
     should.exist(geojson.features[0].geometry.coordinates);
     geojson.features[0].geometry.coordinates[0].length.should.equal(2);
     geojson.features[0].properties.route_color.should.startWith('#');
