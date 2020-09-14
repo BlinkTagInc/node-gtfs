@@ -586,6 +586,18 @@ Queries calendar_dates and returns a promise. The result of the promise is an ar
       service_id: 'CT-16APR-Caltrain-Sunday-02'
     });
 
+### gtfs.getFareAttributes(query, fields, sortBy)
+
+Queries fare_attributes and returns a promise. The result of the promise is an array of fare_attributes.
+
+    // Get all `fare_attributes` for an agency
+    gtfs.getFareAttributes();
+
+    // Get `fare_attributes` for a specific `fare_id`
+    gtfs.getFareAttributes({
+      fare_id: '123'
+    });
+
 ### gtfs.getFareRules(query, fields, sortBy)
 
 Queries fare_rules and returns a promise. The result of the promise is an array of fare_rules.
