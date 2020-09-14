@@ -497,6 +497,12 @@ Queries trips and returns a promise. The result of the promise is an array of tr
       direction_id: 0
     });
 
+    // Get trips for direction '' or null
+    gtfs.getTrips({
+      route_id: 'Lo-16APR',
+      direction_id: null
+    });
+
     // Get trips for a specific route and direction limited by a service_id
     gtfs.getTrips({
       route_id: 'Lo-16APR',
