@@ -16,6 +16,7 @@ const transfers = require('../models/gtfs/transfers');
 const translations = require('../models/gtfs/translations');
 const trips = require('../models/gtfs/trips');
 
+const directions = require('../models/non-standard/directions');
 const stopAttributes = require('../models/non-standard/stop-attributes');
 const timetables = require('../models/non-standard/timetables');
 const timetablePages = require('../models/non-standard/timetable-pages');
@@ -39,6 +40,7 @@ module.exports = [
   transfers,
   translations,
   trips,
+  directions,
   stopAttributes,
   timetables,
   timetablePages,

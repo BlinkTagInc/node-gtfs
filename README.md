@@ -662,6 +662,24 @@ Queries translations and returns a promise. The result of the promise is an arra
     // Get translations
     gtfs.getTranslations();
 
+### gtfs.getDirections(query, fields, sortBy)
+
+Queries directions and returns a promise. The result of the promise is an array of directions. These are from the non-standard `directions.txt` file. See [documentation and examples of this file](https://trilliumtransit.com/gtfs/reference/#directions).
+
+    // Get all directions
+    gtfs.getDirections();
+
+    // Get directions for a specific route
+    gtfs.getDirections({
+      route_id: '1234'
+    });
+
+    // Get directions for a specific route and directioin
+    gtfs.getDirections({
+      route_id: '1234',
+      direction_id: 1
+    });
+
 ### gtfs.getStopAttributes(query, fields, sortBy)
 
 Queries stop_attributes and returns a promise. The result of the promise is an array of stop_attributes. These are from the non-standard `stop_attributes.txt` file. See [documentation and examples of this file](https://gtfstohtml.com/docs/stop-attributes).
