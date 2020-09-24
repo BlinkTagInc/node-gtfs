@@ -330,13 +330,16 @@ For example, to get a list of all routes with just `route_id`, `route_short_name
       ]
     );
 
-To get a list of all trips with for a specific route:
+To get a list of all trip_ids for a specific route:
 
     const db = await gtfs.openDb(config);
     const trips = await gtfs.getTrips(
       {
         route_id: '123'
-      }
+      },
+      [
+        'trip_id'
+      ]
     );
 
 To get a few stops by specific stop_ids:
