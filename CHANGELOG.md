@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.6 - 2020-10-13
+### Changed
+- Dependency updates
+### Added
+- Better error formatting
+- GTFS import validation and better errors
+
+## [2.0.5 - 2020-09-24
+### Fixed
+- Fix for selecting a single field.
+
 ## [2.0.4 - 2020-09-20
 ### Added
 - Support for non-standard directions.txt file.
