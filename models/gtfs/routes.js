@@ -26,8 +26,9 @@ module.exports = {
       name: 'route_type',
       type: 'integer',
       required: true,
-      min: 0,
-      max: 7
+      min: 0
+      // Support extended GTFS route types with no max value
+      // https://developers.google.com/transit/gtfs/reference/extended-route-types
     },
     {
       name: 'route_url',
