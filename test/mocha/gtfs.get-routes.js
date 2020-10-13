@@ -45,7 +45,7 @@ describe('gtfs.getRoutes():', () => {
       {
         route_id: 'Bu-16APR',
         agency_id: null,
-        route_short_name: '',
+        route_short_name: null,
         route_long_name: 'Baby Bullet',
         route_desc: null,
         route_type: 2,
@@ -59,7 +59,7 @@ describe('gtfs.getRoutes():', () => {
       {
         route_id: 'Li-16APR',
         agency_id: null,
-        route_short_name: '',
+        route_short_name: null,
         route_long_name: 'Limited',
         route_desc: null,
         route_type: 2,
@@ -73,7 +73,7 @@ describe('gtfs.getRoutes():', () => {
       {
         route_id: 'Lo-16APR',
         agency_id: null,
-        route_short_name: '',
+        route_short_name: null,
         route_long_name: 'Local',
         route_desc: null,
         route_type: 2,
@@ -87,7 +87,7 @@ describe('gtfs.getRoutes():', () => {
       {
         route_id: 'TaSj-16APR',
         agency_id: null,
-        route_short_name: '',
+        route_short_name: null,
         route_long_name: 'Tamien / San Jose Diridon Caltrain Shuttle',
         route_desc: null,
         route_type: 3,
@@ -116,7 +116,7 @@ describe('gtfs.getRoutes():', () => {
       {
         route_id: 'Li-16APR',
         agency_id: null,
-        route_short_name: '',
+        route_short_name: null,
         route_long_name: 'Limited',
         route_desc: null,
         route_type: 2,

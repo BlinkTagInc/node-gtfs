@@ -39,20 +39,20 @@ describe('gtfs.getStops():', () => {
 
     const expectedResult = {
       stop_id: 'ctbu',
-      stop_code: '',
+      stop_code: null,
       stop_name: 'Burlingame Caltrain',
       tts_stop_name: null,
       stop_desc: null,
       stop_lat: 37.579719,
       stop_lon: -122.345266,
-      zone_id: '',
+      zone_id: null,
       stop_url: 'http://www.caltrain.com/stations/burlingamestation.html',
       location_type: 1,
-      parent_station: '',
+      parent_station: null,
       stop_timezone: null,
       wheelchair_boarding: 1,
       level_id: null,
-      platform_code: ''
+      platform_code: null
     };
 
     should.exist(results);
