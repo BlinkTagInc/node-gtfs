@@ -1,7 +1,7 @@
 {
   "name": "gtfs",
   "description": "Import GTFS transit data into SQLite and query routes, stops, times, fares and more",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "keywords": [
     "transit",
     "gtfs",
