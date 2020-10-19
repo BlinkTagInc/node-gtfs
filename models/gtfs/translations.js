@@ -23,7 +23,7 @@ module.exports = {
     },
     {
       name: 'translation',
-      type: 'varchar(1020)',
+      type: 'varchar(2047)',
       required: true
     },
     {
@@ -36,7 +36,7 @@ module.exports = {
     },
     {
       name: 'field_value',
-      type: 'varchar(1020)'
+      type: 'varchar(2047)'
     }
   ]
 };

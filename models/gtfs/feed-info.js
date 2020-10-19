@@ -13,7 +13,7 @@ module.exports = {
     },
     {
       name: 'feed_publisher_url',
-      type: 'varchar(1020)',
+      type: 'varchar(2047)',
       required: true
     },
     {
@@ -43,7 +43,7 @@ module.exports = {
     },
     {
       name: 'feed_contact_url',
-      type: 'varchar(1020)'
+      type: 'varchar(2047)'
     }
   ]
 };

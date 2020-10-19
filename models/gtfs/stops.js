@@ -41,7 +41,7 @@ module.exports = {
     },
     {
       name: 'stop_url',
-      type: 'varchar(1020)'
+      type: 'varchar(2047)'
     },
     {
       name: 'location_type',

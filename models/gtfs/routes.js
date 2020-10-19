@@ -32,7 +32,7 @@ module.exports = {
     },
     {
       name: 'route_url',
-      type: 'varchar(1020)'
+      type: 'varchar(2047)'
     },
     {
       name: 'route_color',

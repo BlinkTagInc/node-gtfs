@@ -47,7 +47,7 @@ module.exports = {
     },
     {
       name: 'attribution_url',
-      type: 'varchar(1020)'
+      type: 'varchar(2047)'
     },
     {
       name: 'attribution_email',

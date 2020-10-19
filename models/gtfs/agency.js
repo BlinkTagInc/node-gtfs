@@ -17,7 +17,7 @@ module.exports = {
     },
     {
       name: 'agency_url',
-      type: 'varchar(1020)',
+      type: 'varchar(2047)',
       required: true
     },
     {
@@ -35,7 +35,7 @@ module.exports = {
     },
     {
       name: 'agency_fare_url',
-      type: 'varchar(1020)'
+      type: 'varchar(2047)'
     },
     {
       name: 'agency_email',
