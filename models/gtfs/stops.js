@@ -12,8 +12,7 @@ module.exports = {
     },
     {
       name: 'stop_name',
-      type: 'varchar(255)',
-      required: true
+      type: 'varchar(255)'
     },
     {
       name: 'tts_stop_name',
