@@ -731,6 +731,30 @@ Queries timetable_pages and returns a promise. The result of the promise is an a
       timetable_page_id: '2'
     });
 
+### gtfs.getTimetableNotes(query, fields, sortBy)
+
+Queries timetable_notes and returns a promise. The result of the promise is an array of timetable_notes. These are from the non-standard `timetable_notes.txt` file. See [documentation and examples of this file](https://gtfstohtml.com/docs/timetable-notes).
+
+    // Get all timetable_notes for an agency
+    gtfs.getTimetableNotes();
+
+    // Get a specific timetable_note
+    gtfs.getTimetableNotes({
+      note_id: '1'
+    });
+
+### gtfs.getTimetableNotesReferences(query, fields, sortBy)
+
+Queries timetable_notes_references and returns a promise. The result of the promise is an array of timetable_notes_references. These are from the non-standard `timetable_notes_references.txt` file. See [documentation and examples of this file](https://gtfstohtml.com/docs/timetable-notes-references).
+
+    // Get all timetable_notes_references for an agency
+    gtfs.getTimetableNotesReferences();
+
+    // Get all timetable_notes_references for a specific timetable
+    gtfs.getTimetableNotesReferences({
+      timetable_id: '4'
+    });
+
 ## Contributing
 
 Pull requests are welcome, as is feedback and [reporting issues](https://github.com/blinktaginc/node-gtfs/issues).

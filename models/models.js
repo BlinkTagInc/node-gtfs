@@ -21,6 +21,8 @@ const stopAttributes = require('../models/non-standard/stop-attributes');
 const timetables = require('../models/non-standard/timetables');
 const timetablePages = require('../models/non-standard/timetable-pages');
 const timetableStopOrder = require('../models/non-standard/timetable-stop-order');
+const timetableNotes = require('../models/non-standard/timetable-notes');
+const timetableNotesReferences = require('../models/non-standard/timetable-notes-references');
 
 module.exports = [
   agency,
@@ -44,5 +46,7 @@ module.exports = [
   stopAttributes,
   timetables,
   timetablePages,
-  timetableStopOrder
+  timetableStopOrder,
+  timetableNotes,
+  timetableNotesReferences
 ];
