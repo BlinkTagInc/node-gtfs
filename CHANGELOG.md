@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1 - 2020-11-27
+### Fixed
+- Don't log missing non-standard GTFS files
+- Support for multiple agencies in one config file
+- Dependency updates
+
 ## [2.1.0 - 2020-11-10
 ### Added
 - Support for timetable_notes.txt and timetable_notes_references.txt
