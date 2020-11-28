@@ -1,5 +1,6 @@
 module.exports = {
   filenameBase: 'stop_attributes',
+  nonstandard: true,
   schema: [
     {
       name: 'id',

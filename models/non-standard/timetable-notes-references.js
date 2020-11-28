@@ -1,5 +1,6 @@
 module.exports = {
   filenameBase: 'timetable_notes_references',
+  nonstandard: true,
   schema: [
     {
       name: 'note_id',

@@ -1,5 +1,6 @@
 module.exports = {
   filenameBase: 'timetables',
+  nonstandard: true,
   schema: [
     {
       name: 'id',

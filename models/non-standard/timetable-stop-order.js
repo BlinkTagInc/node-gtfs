@@ -1,5 +1,6 @@
 module.exports = {
   filenameBase: 'timetable_stop_order',
+  nonstandard: true,
   schema: [
     {
       name: 'id',

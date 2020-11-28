@@ -1,5 +1,6 @@
 module.exports = {
   filenameBase: 'directions',
+  nonstandard: true,
   schema: [
     {
       name: 'id',
