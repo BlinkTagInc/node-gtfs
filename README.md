@@ -140,9 +140,26 @@ API along with your API token.
 }
 ```
 
+* Specify multiple agencies to be imported into the same database
+
+```
+{
+  "agencies": [
+    {
+      "agency_key": "myAgency",
+      "path": "/path/to/the/gtfs.zip"
+    },
+    {
+      "agency_key": "otherAgency",
+      "path": "/path/to/the/othergtfs.zip"
+    }
+  ]
+}
+```
+
 ### csvOptions
 
-{Object} Add options to be passed to [`csv-parse`](https://csv.js.org/parse/) wiith the key `csvOptions`. This is an optional paramenter.
+{Object} Add options to be passed to [`csv-parse`](https://csv.js.org/parse/) with the key `csvOptions`. This is an optional parameter.
 
 For instance, if you wanted to skip importing invalid lines in the GTFS file:
 
