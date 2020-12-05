@@ -3,11 +3,11 @@
 
 const path = require('path');
 const fs = require('fs-extra');
-const extract = require('extract-zip');
 const parse = require('csv-parse');
 const should = require('should');
 
 const { openDb, closeDb } = require('../../lib/db');
+const { unzip } = require('../../lib/file-utils');
 const gtfs = require('../..');
 const models = require('../../models/models');
 
@@ -41,7 +41,7 @@ describe('lib/export.js', function () {
     const temporaryDir = path.join(__dirname, '../fixture/tmp/');
 
     before(async () => {
-      await extract(config.agencies[0].path, { dir: temporaryDir });
+      await unzip(config.agencies[0].path, temporaryDir);
 
       await Promise.all(models.map(model => {
         const filePath = path.join(temporaryDir, `${model.filenameBase}.txt`);
