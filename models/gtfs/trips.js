@@ -40,7 +40,8 @@ module.exports = {
     },
     {
       name: 'shape_id',
-      type: 'varchar(255)'
+      type: 'varchar(255)',
+      index: true
     },
     {
       name: 'wheelchair_accessible',
