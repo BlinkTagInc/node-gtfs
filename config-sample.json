@@ -1,8 +1,8 @@
 {
   "agencies": [
     {
-      "agency_key": "county-connection",
-      "url": "http://countyconnection.com/GTFS/google_transit.zip",
+      "agency_key": "bart",
+      "url": "http://www.bart.gov/dev/schedules/google_transit.zip",
       "exclude": [
         "shapes"
       ]
