@@ -43,7 +43,8 @@
     "herrBeesch",
     "Oskari Groenroos <oskari@groenroos.fi>",
     "Devin Packer",
-    "Darius MARTIN"
+    "Darius MARTIN",
+    "Mike Brocks"
   ],
   "dependencies": {
     "@turf/helpers": "^6.1.4",
