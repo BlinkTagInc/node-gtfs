@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.4 - 2020-12-21
+### Updated
+- Updated github actions to test PRs and node 14.x
+- Better default sqlitePath
+- Detect TTY and use \n if not
+- Better error message when sqlitePath is invalid
+- Dependency updates
+
 ## [2.2.3 - 2020-12-12
 ### Updated
 - Better default GTFS in config-sample.json
