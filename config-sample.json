@@ -11,5 +11,5 @@
   "csvOptions": {
     "skip_lines_with_error": true
   },
-  "sqlitePath": "/dev/sqlite/gtfs"
+  "sqlitePath": "/tmp/gtfs"
 }
