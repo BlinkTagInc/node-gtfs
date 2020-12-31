@@ -27,7 +27,7 @@ describe('gtfs.getDb():', () => {
   it('should allow raw db queries: calendar_dates', async () => {
     const serviceIds = ['CT-16APR-Caltrain-Weekday-01'];
     const db = gtfs.getDb();
-    const results = await db.all(`SELECT * FROM calendar_dates WHERE exception_type = 1 AND service_id NOT IN (${serviceIds.map(() => '?').join(', ')})`, serviceIds);
+    const results = await db.all(`SELECT * FROM calendar_dates WHERE exception_type = 1 AND service_id NOT IN (${serviceIds.map(serviceId => `'${serviceId}'`).join(', ')})`);
 
     should.exists(results);
     results.should.have.length(4);
