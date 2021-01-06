@@ -24,6 +24,12 @@ const timetableStopOrder = require('../models/non-standard/timetable-stop-order'
 const timetableNotes = require('../models/non-standard/timetable-notes');
 const timetableNotesReferences = require('../models/non-standard/timetable-notes-references');
 
+const boardAlight = require('../models/gtfs-ride/board-alight');
+const rideFeedInfo = require('../models/gtfs-ride/ride-feed-info');
+const riderTrip = require('../models/gtfs-ride/rider-trip');
+const ridership = require('../models/gtfs-ride/ridership');
+const tripCapacity = require('../models/gtfs-ride/trip-capacity');
+
 module.exports = [
   agency,
   attributions,
@@ -48,5 +54,10 @@ module.exports = [
   timetablePages,
   timetableStopOrder,
   timetableNotes,
-  timetableNotesReferences
+  timetableNotesReferences,
+  boardAlight,
+  rideFeedInfo,
+  riderTrip,
+  ridership,
+  tripCapacity
 ];
