@@ -100,6 +100,6 @@ module.exports = {
       type: 'integer',
       min: 0,
       max: 1
-    },
+    }
   ]
 };

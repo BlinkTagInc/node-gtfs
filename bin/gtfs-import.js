@@ -14,10 +14,10 @@ const fileUtils = require('../lib/file-utils');
 const logUtils = require('../lib/log-utils');
 const gtfs = require('..');
 
-const handleError = err => {
-  const text = err || 'Unknown Error';
+const handleError = error => {
+  const text = error || 'Unknown Error';
   process.stdout.write(`\n${logUtils.formatError(text)}\n`);
-  console.error(err);
+  console.error(error);
   process.exit(1);
 };
 

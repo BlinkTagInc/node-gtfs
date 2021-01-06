@@ -83,9 +83,9 @@ describe('lib/import.js', function () {
           columns: true,
           relax: true,
           trim: true
-        }, (err, data) => {
-          if (err) {
-            throw new Error(err);
+        }, (error, data) => {
+          if (error) {
+            throw new Error(error);
           }
 
           countData[model.filenameBase] = data.length;
@@ -93,9 +93,9 @@ describe('lib/import.js', function () {
 
         return fs.createReadStream(filePath)
           .pipe(parser)
-          .on('error', err => {
+          .on('error', error => {
             countData[model.collection] = 0;
-            throw new Error(err);
+            throw new Error(error);
           });
       }));
 

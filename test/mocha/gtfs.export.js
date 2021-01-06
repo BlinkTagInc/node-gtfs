@@ -56,9 +56,9 @@ describe('lib/export.js', function () {
           columns: true,
           relax: true,
           trim: true
-        }, (err, data) => {
-          if (err) {
-            throw new Error(err);
+        }, (error, data) => {
+          if (error) {
+            throw new Error(error);
           }
 
           countData[model.filenameBase] = data.length;
@@ -66,9 +66,9 @@ describe('lib/export.js', function () {
 
         return fs.createReadStream(filePath)
           .pipe(parser)
-          .on('error', err => {
+          .on('error', error => {
             countData[model.collection] = 0;
-            throw new Error(err);
+            throw new Error(error);
           });
       }));
 
@@ -94,12 +94,12 @@ describe('lib/export.js', function () {
           columns: true,
           relax: true,
           trim: true
-        }, (err, data) => {
-          if (err) {
-            throw new Error(err);
+        }, (error, data) => {
+          if (error) {
+            throw new Error(error);
           }
 
-          should.not.exist(err);
+          should.not.exist(error);
 
           data.length.should.equal(countData[model.filenameBase]);
           done();
@@ -107,8 +107,8 @@ describe('lib/export.js', function () {
 
         return fs.createReadStream(filePath)
           .pipe(parser)
-          .on('error', err => {
-            should.not.exist(err);
+          .on('error', error => {
+            should.not.exist(error);
           });
       });
     }
