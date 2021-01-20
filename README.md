@@ -61,6 +61,7 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 | ------ | ---- | ----------- |
 | [`agencies`](#agencies) | array | An array of GTFS files to be imported. |
 | [`csvOptions`](#csvOptions) | object | Options passed to `csv-parse` for parsing GTFS CSV files. Optional. |
+| [`exportPath`](#exportPath) | string | A path to a directory to put exported GTFS files. Optional, defaults to `gtfs-export/<agency_key>` |
 | [`sqlitePath`](#sqlitePath) | string | A path to an SQLite database. Optional, defaults to using an in-memory database. |
 | [`verbose`](#verbose) | boolean | Whether or not to print output to the console. Optional, defaults to true. |
 
@@ -169,6 +170,16 @@ For instance, if you wanted to skip importing invalid lines in the GTFS file:
     "csvOptions": {
       "skip_lines_with_error": true
     }
+```
+
+### exportPath
+
+{Striing} A path to a directory to put exported GTFS files. If the directory does not exist, it will be created. Used when running `gtfs-export` script or `gtfs.export()`. Optional, defaults to `gtfs-export/<agency_key>`
+
+For instance, if you wanted to skip importing invalid lines in the GTFS file:
+
+```json
+    "exportPath": "~/path/where/gtfs/should/go"
 ```
 
 See [full list of options](https://csv.js.org/parse/options/).

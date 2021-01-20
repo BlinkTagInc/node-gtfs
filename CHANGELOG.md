@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dependency updates
 ### Added
 - GTFS-ride models and methods
+- Support for exportPath config option
 
 ## [2.2.4 - 2020-12-21
 ### Updated
