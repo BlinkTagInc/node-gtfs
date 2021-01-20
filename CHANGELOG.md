@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.5 - 2021-01-06
+### Fixed
+- Update getDB test to handle unlimited serviceIds
+### Updated
+- Readme updates
+- Reorganize table creation
+- Dependency updates
+### Added
+- GTFS-ride models and methods
+
 ## [2.2.4 - 2020-12-21
 ### Updated
 - Updated github actions to test PRs and node 14.x

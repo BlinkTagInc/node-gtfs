@@ -1,7 +1,7 @@
 {
   "name": "gtfs",
+  "version": "2.2.5",
   "description": "Import GTFS transit data into SQLite and query routes, stops, times, fares and more",
-  "version": "2.2.4",
   "keywords": [
     "transit",
     "gtfs",
@@ -9,6 +9,14 @@
     "geojson",
     "sqlite"
   ],
+  "bugs": {
+    "url": "https://github.com/blinktaginc/node-gtfs/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/blinktaginc/node-gtfs.git"
+  },
+  "license": "MIT",
   "author": "Brendan Nee <brendan@blinktag.com>",
   "contributors": [
     "Alessio Bogon",
@@ -46,54 +54,17 @@
     "Darius MARTIN",
     "Mike Brocks"
   ],
-  "dependencies": {
-    "@turf/helpers": "^6.1.4",
-    "bluebird": "^3.7.2",
-    "chalk": "^4.1.0",
-    "csv-parse": "^4.14.2",
-    "csv-stringify": "^5.5.3",
-    "fs-extra": "^9.0.1",
-    "lodash": "^4.17.20",
-    "node-fetch": "^2.6.1",
-    "pretty-error": "^2.1.2",
-    "sanitize-filename": "^1.6.3",
-    "sqlite": "^4.0.18",
-    "sqlite3": "^5.0.0",
-    "sqlstring": "^2.3.2",
-    "strip-bom-stream": "^4.0.0",
-    "tmp-promise": "^3.0.2",
-    "untildify": "^4.0.0",
-    "unzipper": "^0.10.11",
-    "yargs": "^16.2.0"
-  },
-  "devDependencies": {
-    "mocha": "^8.2.1",
-    "should": "^13.2.3",
-    "xo": "^0.36.1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/blinktaginc/node-gtfs.git"
-  },
-  "bugs": {
-    "url": "https://github.com/blinktaginc/node-gtfs/issues"
-  },
-  "bin": {
-    "gtfs-import": "bin/gtfs-import.js",
-    "gtfs-export": "bin/gtfs-export.js"
-  },
   "main": "index",
-  "scripts": {
-    "test": "xo && NODE_ENV=test mocha ./test/mocha/**/*.js --timeout 5000",
-    "lint": "xo"
+  "bin": {
+    "gtfs-export": "bin/gtfs-export.js",
+    "gtfs-import": "bin/gtfs-import.js"
   },
-  "license": "MIT",
-  "engines": {
-    "node": ">= 12.14.0"
+  "scripts": {
+    "lint": "xo",
+    "test": "xo && NODE_ENV=test mocha ./test/mocha/**/*.js --timeout 5000"
   },
   "xo": {
     "esnext": true,
-    "space": true,
     "rules": {
       "camelcase": [
         "error",
@@ -105,6 +76,35 @@
         "error",
         "always"
       ]
-    }
+    },
+    "space": true
+  },
+  "dependencies": {
+    "@turf/helpers": "^6.3.0",
+    "bluebird": "^3.7.2",
+    "chalk": "^4.1.0",
+    "csv-parse": "^4.15.0",
+    "csv-stringify": "^5.6.1",
+    "fs-extra": "^9.1.0",
+    "lodash": "^4.17.20",
+    "node-fetch": "^2.6.1",
+    "pretty-error": "^3.0.3",
+    "sanitize-filename": "^1.6.3",
+    "sqlite": "^4.0.19",
+    "sqlite3": "^5.0.1",
+    "sqlstring": "^2.3.2",
+    "strip-bom-stream": "^4.0.0",
+    "tmp-promise": "^3.0.2",
+    "untildify": "^4.0.0",
+    "unzipper": "^0.10.11",
+    "yargs": "^16.2.0"
+  },
+  "devDependencies": {
+    "mocha": "^8.2.1",
+    "should": "^13.2.3",
+    "xo": "^0.37.1"
+  },
+  "engines": {
+    "node": ">= 12.14.0"
   }
 }
