@@ -92,7 +92,7 @@
     "sanitize-filename": "^1.6.3",
     "sqlite": "^4.0.19",
     "sqlite3": "^5.0.1",
-    "sqlstring": "^2.3.2",
+    "sqlstring-sqlite": "^0.1.1",
     "strip-bom-stream": "^4.0.0",
     "tmp-promise": "^3.0.2",
     "untildify": "^4.0.0",
