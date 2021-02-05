@@ -90,10 +90,6 @@ or
 `gtfsUrl`
 
 Specify a URL to a zipped GTFS file.
-
-    gtfs-import --gtfsPath /path/to/your/gtfs.zip
-
-or 
     
     gtfs-import --gtfsUrl http://www.bart.gov/dev/schedules/google_transit.zip
 
