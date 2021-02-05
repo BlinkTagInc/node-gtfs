@@ -30,9 +30,23 @@ If you would like to use this library as a command-line utility, you can install
 
 If you are using this as a node module as part of an application, you can include it in your project's `package.json` file.
 
-## Command-line example
+## Command-line examples
 
-    gtfs-import [--configPath /path/to/your/custom-config.json]
+    gtfs-import --gtfsUrl http://www.bart.gov/dev/schedules/google_transit.zip
+
+or 
+    
+    gtfs-import --gtfsPath /path/to/your/gtfs.zip
+
+or 
+    
+    gtfs-import --gtfsPath /path/to/your/unzipped/gtfs
+
+or
+
+    gtfs-import --configPath /path/to/your/custom-config.json
+
+    gtfs-export --configPath /path/to/your/custom-config.json
 
 ## Code example
 
@@ -49,9 +63,41 @@ gtfs.import(config)
 });
 ```
 
----
+## Command Line Usage
 
-## Configuration
+The `gtfs-import` command-line utility will import GTFS into SQLite3.
+
+The `gtfs-export` command-line utility will create GTFS from data previously imported into SQLite3.
+
+### gtfs-import Command-line options
+
+`configPath`
+
+Allows specifying a path to a configuration json file. By default, `node-gtfs` will look for a `config.json` file in the directory it is being run from. Using a config.json file allows you specify more options than CLI arguments alone - see below.
+
+    gtfs-import --configPath /path/to/your/custom-config.json
+
+`gtfsPath`
+
+Specify a local path to GTFS, either zipped or unzipped.
+
+    gtfs-import --gtfsPath /path/to/your/gtfs.zip
+
+or 
+    
+    gtfs-import --gtfsPath /path/to/your/unzipped/gtfs
+
+`gtfsUrl`
+
+Specify a URL to a zipped GTFS file.
+
+    gtfs-import --gtfsPath /path/to/your/gtfs.zip
+
+or 
+    
+    gtfs-import --gtfsUrl http://www.bart.gov/dev/schedules/google_transit.zip
+
+## Configuration Files
 
 Copy `config-sample.json` to `config.json` and then add your projects configuration to `config.json`.
 

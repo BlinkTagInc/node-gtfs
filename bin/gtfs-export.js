@@ -6,11 +6,14 @@ const { argv } = require('yargs')
   .option('c', {
     alias: 'configPath',
     describe: 'Path to config file',
-    default: './config.json',
+    type: 'string'
+  })
+  .option('sqlitePath', {
+    describe: 'Path to SQLite database',
     type: 'string'
   });
 
-const fileUtils = require('../lib/file-utils');
+const { getConfig } = require('../lib/file-utils');
 const logUtils = require('../lib/log-utils');
 const gtfs = require('..');
 
@@ -20,7 +23,7 @@ const handleError = (error = 'Unknown Error') => {
 };
 
 const setupExport = async () => {
-  const config = await fileUtils.getConfig(argv);
+  const config = await getConfig(argv);
   await gtfs.export(config);
   process.exit();
 };
