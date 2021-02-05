@@ -1,7 +1,6 @@
 {
   "agencies": [
     {
-      "agency_key": "bart",
       "url": "http://www.bart.gov/dev/schedules/google_transit.zip",
       "exclude": [
         "shapes"

@@ -7,17 +7,10 @@ const parse = require('csv-parse');
 const should = require('should');
 
 const { openDb, closeDb } = require('../../lib/db');
-const { unzip } = require('../../lib/file-utils');
+const { unzip, generateFolderName } = require('../../lib/file-utils');
+const config = require('../test-config.js');
 const gtfs = require('../..');
 const models = require('../../models/models');
-
-const config = {
-  agencies: [{
-    agency_key: 'caltrain',
-    path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
-  }],
-  verbose: false
-};
 
 describe('lib/export.js', function () {
   before(async () => {
@@ -76,18 +69,20 @@ describe('lib/export.js', function () {
     });
 
     after(async () => {
-      await fs.remove(path.join(process.cwd(), 'gtfs-export', config.agencies[0].agency_key));
+      const agencies = await gtfs.getAgencies({}, ['agency_name']);
+      await fs.remove(path.join(process.cwd(), 'gtfs-export', generateFolderName(agencies[0].agency_name)));
     });
 
     for (const model of models) {
-      it(`should import the same number of ${model.filenameBase}`, done => {
-        const filePath = path.join(process.cwd(), 'gtfs-export', config.agencies[0].agency_key, `${model.filenameBase}.txt`);
+      it(`should import the same number of ${model.filenameBase}`, async () => {
+        const agencies = await gtfs.getAgencies({}, ['agency_name']);
+        const filePath = path.join(process.cwd(), 'gtfs-export', generateFolderName(agencies[0].agency_name), `${model.filenameBase}.txt`);
 
         // GTFS has optional files
         if (!fs.existsSync(filePath)) {
           const result = 0;
           result.should.equal(countData[model.filenameBase]);
-          return done();
+          return;
         }
 
         const parser = parse({
@@ -102,7 +97,6 @@ describe('lib/export.js', function () {
           should.not.exist(error);
 
           data.length.should.equal(countData[model.filenameBase]);
-          done();
         });
 
         return fs.createReadStream(filePath)

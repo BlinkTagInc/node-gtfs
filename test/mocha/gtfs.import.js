@@ -8,26 +8,17 @@ const should = require('should');
 
 const { openDb, closeDb } = require('../../lib/db');
 const { unzip } = require('../../lib/file-utils');
+const config = require('../test-config.js');
 const gtfs = require('../..');
 const models = require('../../models/models');
-
-const config = {
-  agencies: [{
-    agency_key: 'caltrain',
-    path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
-  }],
-  verbose: false
-};
 
 let db;
 
 const agenciesFixturesRemote = [{
-  agency_key: 'caltrain',
   url: 'http://transitfeeds.com/p/caltrain/122/20160406/download'
 }];
 
 const agenciesFixturesLocal = [{
-  agency_key: 'caltrain',
   path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
 }];
 

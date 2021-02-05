@@ -1,18 +1,10 @@
 /* eslint-env mocha */
 
-const path = require('path');
 const should = require('should');
 
 const { openDb, closeDb } = require('../../lib/db');
+const config = require('../test-config.js');
 const gtfs = require('../..');
-
-const config = {
-  agencies: [{
-    agency_key: 'caltrain',
-    path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
-  }],
-  verbose: false
-};
 
 describe('gtfs.getStops():', () => {
   before(async () => {

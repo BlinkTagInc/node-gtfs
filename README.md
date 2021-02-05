@@ -61,7 +61,7 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 | ------ | ---- | ----------- |
 | [`agencies`](#agencies) | array | An array of GTFS files to be imported. |
 | [`csvOptions`](#csvOptions) | object | Options passed to `csv-parse` for parsing GTFS CSV files. Optional. |
-| [`exportPath`](#exportPath) | string | A path to a directory to put exported GTFS files. Optional, defaults to `gtfs-export/<agency_key>` |
+| [`exportPath`](#exportPath) | string | A path to a directory to put exported GTFS files. Optional, defaults to `gtfs-export/<agency_name>`. |
 | [`sqlitePath`](#sqlitePath) | string | A path to an SQLite database. Optional, defaults to using an in-memory database. |
 | [`verbose`](#verbose) | boolean | Whether or not to print output to the console. Optional, defaults to true. |
 
@@ -69,7 +69,7 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 
 {Array} Specify the GTFS files to be imported in an `agencies` array. GTFS files can be imported via a `url` or a local `path`.
 
-Each file needs an `agency_key`, a short name you create that is specific to that GTFS file. For GTFS files that contain more than one agency, you only need to list each GTFS file once in the `agencies` array, not once per agency that it contains.
+For GTFS files that contain more than one agency, you only need to list each GTFS file once in the `agencies` array, not once per agency that it contains.
 
 To find an agency's GTFS file, visit [transitfeeds.com](http://transitfeeds.com). You can use the
 URL from the agency's website or you can use a URL generated from the transitfeeds.com
@@ -80,7 +80,6 @@ API along with your API token.
 {
   "agencies": [
     {
-      "agency_key": "county-connection",
       "url": "http://countyconnection.com/GTFS/google_transit.zip"
     }
   ]
@@ -92,7 +91,6 @@ API along with your API token.
 {
   "agencies": [
     {
-      "agency_key": "county-connection",
       "url": "http://countyconnection.com/GTFS/google_transit.zip",
       "headers": {
         "Content-Type": "application/json",
@@ -108,7 +106,6 @@ API along with your API token.
 {
   "agencies": [
     {
-      "agency_key": "myAgency",
       "path": "/path/to/the/gtfs.zip"
     }
   ]
@@ -119,7 +116,6 @@ API along with your API token.
 {
   "agencies": [
     {
-      "agency_key": "myAgency",
       "path": "/path/to/the/unzipped/gtfs/"
     }
   ]
@@ -132,7 +128,6 @@ API along with your API token.
 {
   "agencies": [
     {
-      "agency_key": "myAgency",
       "path": "/path/to/the/unzipped/gtfs/",
       "exclude": [
         "shapes",
@@ -149,11 +144,9 @@ API along with your API token.
 {
   "agencies": [
     {
-      "agency_key": "myAgency",
       "path": "/path/to/the/gtfs.zip"
     },
     {
-      "agency_key": "otherAgency",
       "path": "/path/to/the/othergtfs.zip"
     }
   ]
@@ -172,17 +165,11 @@ For instance, if you wanted to skip importing invalid lines in the GTFS file:
     }
 ```
 
+See [full list of options](https://csv.js.org/parse/options/).
+
 ### exportPath
 
-{Striing} A path to a directory to put exported GTFS files. If the directory does not exist, it will be created. Used when running `gtfs-export` script or `gtfs.export()`. Optional, defaults to `gtfs-export/<agency_key>`
-
-For instance, if you wanted to skip importing invalid lines in the GTFS file:
-
-```json
-    "exportPath": "~/path/where/gtfs/should/go"
-```
-
-See [full list of options](https://csv.js.org/parse/options/).
+{String} A path to a directory to put exported GTFS files. If the directory does not exist, it will be created. Used when running `gtfs-export` script or `gtfs.export()`. Optional, defaults to `gtfs-export/<agency_name>` where `<agency_name>` is a sanitized, [snake-cased](https://en.wikipedia.org/wiki/Snake_case) version of the first `agency_name` in `agency.txt`.
 
 ### sqlitePath
 
@@ -200,7 +187,6 @@ See [full list of options](https://csv.js.org/parse/options/).
 {
   "agencies": [
     {
-      "agency_key": "localAgency",
       "path": "/path/to/the/unzipped/gtfs/"
     }
   ],
@@ -216,7 +202,6 @@ const gtfs = require('gtfs');
 const config = {
   agencies: [
     {
-      agency_key: 'county-connection',
       url: 'http://countyconnection.com/GTFS/google_transit.zip',
       exclude: [
         'shapes'
@@ -269,7 +254,6 @@ const config = {
   sqlitePath: '/dev/sqlite/gtfs',
   agencies: [
     {
-      agency_key: 'county-connection',
       url: 'http://countyconnection.com/GTFS/google_transit.zip',
       exclude: [
         'shapes'
@@ -327,7 +311,6 @@ const config = {
   sqlitePath: '/dev/sqlite/gtfs',
   agencies: [
     {
-      agency_key: 'county-connection',
       url: 'http://countyconnection.com/GTFS/google_transit.zip',
       exclude: [
         'shapes'
