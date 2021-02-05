@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const { argv } = require('yargs')
-  .usage('Usage: $0 --config ./config.json')
+  .usage('Usage: $0 --configPath ./config.json')
   .help()
   .option('c', {
     alias: 'configPath',

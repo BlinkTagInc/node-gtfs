@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const { argv } = require('yargs')
-  .usage('Usage: $0 --config ./config.json')
+  .usage('Usage: $0 --configPath ./config.json')
   .help()
   .option('c', {
     alias: 'configPath',
@@ -10,6 +10,10 @@ const { argv } = require('yargs')
   })
   .option('sqlitePath', {
     describe: 'Path to SQLite database',
+    type: 'string'
+  })
+  .option('exportPath', {
+    describe: 'Path where GTFS export should go',
     type: 'string'
   });
 

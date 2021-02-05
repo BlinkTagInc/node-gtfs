@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.4.0 - 2021-02-04
 ### Added
-- Support for `gtfsPath`, `gtfsUrl` and `sqlitePath` parameters for `gtfs-import` and `gtfs-export` scripts.
+- Support for `gtfsPath`, `gtfsUrl`, `exportPath` and `sqlitePath` parameters for `gtfs-import` and `gtfs-export` scripts.
 ### Changed
 - Removed need for `agency_key` in config.json - use sanitized version of first `agency_name` in agencies.txt
 ### Updated
