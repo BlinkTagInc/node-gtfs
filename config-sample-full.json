@@ -1,0 +1,22 @@
+{
+  "agencies": [
+    {
+      "url": "http://www.bart.gov/dev/schedules/google_transit.zip",
+      "exclude": [
+        "shapes"
+      ]
+    },
+    {
+      "path": "/path/to/gtfs.zip",
+      "exclude": [
+        "stop_times",
+        "shapes"
+      ]
+    }
+  ],
+  "csvOptions": {
+    "skip_lines_with_error": true
+  },
+  "sqlitePath": "/tmp/gtfs",
+  "exportPath": "~/path/to/export/gtfs"
+}
