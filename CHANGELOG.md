@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0 - 2021-02-04
+### Added
+- Support for `gtfsPath`, `gtfsUrl` and `sqlitePath` parameters for `gtfs-import` and `gtfs-export` scripts.
+### Changed
+- Removed need for `agency_key` in config.json - use sanitized version of first `agency_name` in agencies.txt
+### Updated
+- Dependency updates
+
 ## [2.3.0 - 2021-01-20
 ### Fixed
 - Update getDB test to handle unlimited serviceIds
@@ -198,7 +206,6 @@ As of version 1.0.0, all `node-gtfs` methods have changed to accept a query obje
 
     // Query in `node-gtfs` version 1.0.0
     gtfs.getRoutes({
-      agency_key: 'caltrain',
       stop_id: '123'
     })
     .then(routes => {
