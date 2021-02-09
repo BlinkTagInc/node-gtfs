@@ -21,7 +21,6 @@ module.exports = {
     {
       name: 'transfer_type',
       type: 'integer',
-      required: true,
       min: 0,
       max: 3
     },
