@@ -61,7 +61,7 @@
   },
   "scripts": {
     "lint": "xo",
-    "test": "xo && NODE_ENV=test mocha ./test/mocha/**/*.js --timeout 5000"
+    "test": "xo && NODE_ENV=test mocha ./test/mocha/**/*.js --timeout 2000"
   },
   "xo": {
     "esnext": true,
