@@ -87,8 +87,8 @@ describe('gtfs.getCalendars():', () => {
     should.exist(results);
     results.length.should.equal(2);
 
-    results.forEach(result => {
+    for (const result of results) {
       expectedResults.should.matchAny(result);
-    });
+    }
   });
 });

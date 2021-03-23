@@ -67,9 +67,9 @@ describe('gtfs.getCalendarDates():', () => {
       }
     ];
 
-    results.forEach(result => {
+    for (const result of results) {
       expectedResults.should.matchAny(result);
-    });
+    }
   });
 
   it('should return only specific keys for expected calendar dates, sorted by date', async () => {

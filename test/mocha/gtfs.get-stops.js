@@ -122,9 +122,9 @@ describe('gtfs.getStops():', () => {
 
     should.exist(results);
     results.length.should.equal(24);
-    results.forEach((stop, idx) => {
+    for (const [idx, stop] of results.entries()) {
       expectedStopIds[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
-    });
+    }
   });
 
   it('should return array of stops if it exists for a specific route_id and direction_id', async () => {
@@ -157,9 +157,9 @@ describe('gtfs.getStops():', () => {
 
     should.exist(results);
     results.length.should.equal(12);
-    results.forEach((stop, idx) => {
+    for (const [idx, stop] of results.entries()) {
       expectedStopIds[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
-    });
+    }
   });
 
   it('should return array of stops for a specific trip_id', async () => {
@@ -202,8 +202,8 @@ describe('gtfs.getStops():', () => {
 
     should.exist(results);
     results.length.should.equal(24);
-    results.forEach((stop, idx) => {
+    for (const [idx, stop] of results.entries()) {
       expectedStopIds[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
-    });
+    }
   });
 });

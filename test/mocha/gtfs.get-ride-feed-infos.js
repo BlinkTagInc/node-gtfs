@@ -6,7 +6,7 @@ const { openDb, closeDb } = require('../../lib/db');
 const config = require('../test-config.js');
 const gtfs = require('../..');
 
-describe('gtfs.getTimetablePages():', () => {
+describe('gtfs.getRideFeedInfos():', () => {
   before(async () => {
     await openDb(config);
     await gtfs.import(config);
@@ -16,12 +16,8 @@ describe('gtfs.getTimetablePages():', () => {
     await closeDb();
   });
 
-  it('should return empty array if no timetable pages (GTFS-to-HTML timetables)', async () => {
-    const timetablePageId = 'fake-timetable-page-id';
-
-    const results = await gtfs.getTimetablePages({
-      timetable_page_id: timetablePageId
-    });
+  it('should return empty array if no ride-feed-infos (GTFS-ride)', async () => {
+    const results = await gtfs.getRideFeedInfos({});
     should.exists(results);
     results.should.have.length(0);
   });

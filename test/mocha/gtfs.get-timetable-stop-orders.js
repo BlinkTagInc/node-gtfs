@@ -16,7 +16,7 @@ describe('gtfs.getTimetableStopOrders():', () => {
     await closeDb();
   });
 
-  it('should return empty array if no timetable stop orders', async () => {
+  it('should return empty array if no timetable stop orders (GTFS-to-HTML timetables)', async () => {
     const timetableId = 'fake-timetable-id';
 
     const results = await gtfs.getTimetableStopOrders({

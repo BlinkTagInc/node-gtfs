@@ -16,7 +16,7 @@ describe('gtfs.getTimetables():', () => {
     await closeDb();
   });
 
-  it('should return empty array if no timetables', async () => {
+  it('should return empty array if no timetables (GTFS-to-HTML timetables)', async () => {
     const timetableId = 'fake-timetable-id';
 
     const results = await gtfs.getTimetables({
