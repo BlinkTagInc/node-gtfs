@@ -4,19 +4,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.4.2 - 2021-02-19
+## [2.4.4] - 2021-05-07
+### Updated
+- Dependency updates
+
+## [2.4.3] - 2021-03-23
+### Added
+- Tests for GTFS-ride methods and models
+### Updated
+- Dependency updates
+
+## [2.4.2] - 2021-02-19
 ### Fixed
 - Exclude timestamp fields from export
 ### Updated
 - Dependency updates
 
-## [2.4.1 - 2021-02-09
+## [2.4.1] - 2021-02-09
 ### Fixed
 - Updated transfers.txt model
 ### Updated
 - Dependency updates
 
-## [2.4.0 - 2021-02-04
+## [2.4.0] - 2021-02-04
 ### Added
 - Support for `gtfsPath`, `gtfsUrl`, `exportPath` and `sqlitePath` parameters for `gtfs-import` and `gtfs-export` scripts.
 ### Changed
@@ -24,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Updated
 - Dependency updates
 
-## [2.3.0 - 2021-01-20
+## [2.3.0] - 2021-01-20
 ### Fixed
 - Update getDB test to handle unlimited serviceIds
 ### Updated
@@ -37,7 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for exportPath config option
 - Use pluralize library
 
-## [2.2.4 - 2020-12-21
+## [2.2.4] - 2020-12-21
 ### Updated
 - Updated github actions to test PRs and node 14.x
 - Better default sqlitePath
@@ -45,81 +55,81 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Better error message when sqlitePath is invalid
 - Dependency updates
 
-## [2.2.3 - 2020-12-12
+## [2.2.3] - 2020-12-12
 ### Updated
 - Better default GTFS in config-sample.json
 - Skip creating tables for excluded files
 
-## [2.2.2 - 2020-12-10
+## [2.2.2] - 2020-12-10
 ### Updated
 - Dependency updates (fixes https://github.com/advisories/GHSA-qqgx-2p2h-9c37)
 
-## [2.2.1 - 2020-12-06
+## [2.2.1] - 2020-12-06
 ### Updated
 - Improved shapes query
 
-## [2.2.0 - 2020-12-05
+## [2.2.0] - 2020-12-05
 ### Updated
 - Use unzipper library to handle poorly formed zip files
 - Dependency updates
 
-## [2.1.1 - 2020-11-27
+## [2.1.1] - 2020-11-27
 ### Fixed
 - Don't log missing non-standard GTFS files
 - Support for multiple agencies in one config file
 - Dependency updates
 
-## [2.1.0 - 2020-11-10
+## [2.1.0] - 2020-11-10
 ### Added
 - Support for timetable_notes.txt and timetable_notes_references.txt
 
-## [2.0.9 - 2020-11-10
+## [2.0.9] - 2020-11-10
 ### Changed
 - Expand model character limit
 - Don't require stop_name in stops.txt
 - Dependency updates
 
-## [2.0.8 - 2020-10-14
+## [2.0.8] - 2020-10-14
 ### Changed
 - Improved validation on import
 
-## [2.0.7 - 2020-10-13
+## [2.0.7] - 2020-10-13
 ### Added
 - Support for extended GTFS route types
 
-## [2.0.6 - 2020-10-13
+## [2.0.6] - 2020-10-13
 ### Changed
 - Dependency updates
 ### Added
 - Better error formatting
 - GTFS import validation and better errors
 
-## [2.0.5 - 2020-09-24
+## [2.0.5] - 2020-09-24
 ### Fixed
 - Fix for selecting a single field.
 
-## [2.0.4 - 2020-09-20
+## [2.0.4] - 2020-09-20
 ### Added
 - Support for non-standard directions.txt file.
 - Added getFareAttributes to README
 
-## [2.0.3 - 2020-09-14
+## [2.0.3] - 2020-09-14
 ### Fixed
 - Fix for querying for null
 
-## [2.0.2 - 2020-09-06
+## [2.0.2] - 2020-09-06
 ### Changed
 - Dependency updates
 ### Fixed
 - Fix geojson property formatting
 
-## [2.0.1 - 2020-08-23
+## [2.0.1] - 2020-08-23
 ### Added
 - Updated model fields to latest GTFS spec
 - Test for gtfs.getDb()
 - Improved geoJSON generation
 
-## [2.0.0 - 2020-08-20
+## [2.0.0] - 2020-08-20
 ### Changed
 - Switched to SQLite
 - Breaking changes for all queries

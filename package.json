@@ -1,6 +1,6 @@
 {
   "name": "gtfs",
-  "version": "2.4.3",
+  "version": "2.4.4",
   "description": "Import GTFS transit data into SQLite and query routes, stops, times, fares and more",
   "keywords": [
     "transit",
@@ -82,28 +82,28 @@
   "dependencies": {
     "@turf/helpers": "^6.3.0",
     "bluebird": "^3.7.2",
-    "chalk": "^4.1.0",
-    "csv-parse": "^4.15.3",
+    "chalk": "^4.1.1",
+    "csv-parse": "^4.15.4",
     "csv-stringify": "^5.6.2",
-    "fs-extra": "^9.1.0",
+    "fs-extra": "^10.0.0",
     "lodash": "^4.17.21",
     "node-fetch": "^2.6.1",
     "pluralize": "^8.0.0",
     "pretty-error": "^3.0.3",
     "sanitize-filename": "^1.6.3",
-    "sqlite": "^4.0.19",
+    "sqlite": "^4.0.21",
     "sqlite3": "^5.0.2",
     "sqlstring-sqlite": "^0.1.1",
     "strip-bom-stream": "^4.0.0",
     "tmp-promise": "^3.0.2",
     "untildify": "^4.0.0",
     "unzipper": "^0.10.11",
-    "yargs": "^16.2.0"
+    "yargs": "^17.0.1"
   },
   "devDependencies": {
-    "mocha": "^8.3.2",
+    "mocha": "^8.4.0",
     "should": "^13.2.3",
-    "xo": "^0.38.2"
+    "xo": "^0.39.1"
   },
   "engines": {
     "node": ">= 12.14.0"
