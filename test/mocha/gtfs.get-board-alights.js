@@ -16,7 +16,7 @@ describe('gtfs.getBoardAlights():', () => {
     await closeDb();
   });
 
-  it('should return empty array if no board alights', async () => {
+  it('should return empty array if no board alights (GTFS-ride)', async () => {
     const tripId = 'fake-trip-id';
 
     const results = await gtfs.getBoardAlights({
