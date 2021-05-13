@@ -1,6 +1,6 @@
 {
   "name": "gtfs",
-  "version": "3.0.0-alpha.0",
+  "version": "3.0.0-alpha.1",
   "description": "Import GTFS transit data into SQLite and query routes, stops, times, fares and more",
   "keywords": [
     "transit",
@@ -90,10 +90,10 @@
   },
   "dependencies": {
     "@turf/helpers": "^6.3.0",
+    "better-copy": "^1.0.4",
     "chalk": "^4.1.1",
     "csv-parse": "^4.15.4",
     "csv-stringify": "^5.6.2",
-    "fs-extra": "^10.0.0",
     "lodash-es": "^4.17.21",
     "node-fetch": "^2.6.1",
     "pluralize": "^8.0.0",

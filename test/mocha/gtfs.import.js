@@ -1,9 +1,9 @@
 /* eslint-env mocha */
 /* eslint-disable max-nested-callbacks */
 
+import { createReadStream, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import fs from 'fs-extra';
 import parse from 'csv-parse';
 import should from 'should';
 
@@ -68,7 +68,7 @@ describe('lib/import.js', function () {
         const filePath = path.join(temporaryDir, `${model.filenameBase}.txt`);
 
         // GTFS has optional files
-        if (!fs.existsSync(filePath)) {
+        if (!existsSync(filePath)) {
           countData[model.filenameBase] = 0;
           return false;
         }
@@ -85,7 +85,7 @@ describe('lib/import.js', function () {
           countData[model.filenameBase] = data.length;
         });
 
-        return fs.createReadStream(filePath)
+        return createReadStream(filePath)
           .pipe(parser)
           .on('error', error => {
             countData[model.collection] = 0;

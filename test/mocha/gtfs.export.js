@@ -3,7 +3,8 @@
 
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import fs from 'fs-extra';
+import { createReadStream, existsSync } from 'node:fs';
+import { rm } from 'node:fs/promises';
 import parse from 'csv-parse';
 import should from 'should';
 
@@ -41,7 +42,7 @@ describe('lib/export.js', function () {
         const filePath = path.join(temporaryDir, `${model.filenameBase}.txt`);
 
         // GTFS has optional files
-        if (!fs.existsSync(filePath)) {
+        if (!existsSync(filePath)) {
           countData[model.filenameBase] = 0;
           return false;
         }
@@ -58,7 +59,7 @@ describe('lib/export.js', function () {
           countData[model.filenameBase] = data.length;
         });
 
-        return fs.createReadStream(filePath)
+        return createReadStream(filePath)
           .pipe(parser)
           .on('error', error => {
             countData[model.collection] = 0;
@@ -71,7 +72,7 @@ describe('lib/export.js', function () {
 
     after(async () => {
       const agencies = await getAgencies({}, ['agency_name']);
-      await fs.remove(path.join(process.cwd(), 'gtfs-export', generateFolderName(agencies[0].agency_name)));
+      await rm(path.join(process.cwd(), 'gtfs-export', generateFolderName(agencies[0].agency_name)), { recursive: true, force: true });
     });
 
     for (const model of models) {
@@ -80,7 +81,7 @@ describe('lib/export.js', function () {
         const filePath = path.join(process.cwd(), 'gtfs-export', generateFolderName(agencies[0].agency_name), `${model.filenameBase}.txt`);
 
         // GTFS has optional files
-        if (!fs.existsSync(filePath)) {
+        if (!existsSync(filePath)) {
           const result = 0;
           result.should.equal(countData[model.filenameBase]);
           return;
@@ -100,7 +101,7 @@ describe('lib/export.js', function () {
           data.length.should.equal(countData[model.filenameBase]);
         });
 
-        return fs.createReadStream(filePath)
+        return createReadStream(filePath)
           .pipe(parser)
           .on('error', error => {
             should.not.exist(error);
