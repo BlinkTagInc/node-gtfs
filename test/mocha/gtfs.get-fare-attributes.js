@@ -1,15 +1,15 @@
 /* eslint-env mocha */
 
-const should = require('should');
+import should from 'should';
 
-const { openDb, closeDb } = require('../../lib/db');
-const config = require('../test-config.js');
-const gtfs = require('../..');
+import { openDb, closeDb } from '../../lib/db.js';
+import config from '../test-config.js';
+import { importGtfs, getFareAttributes } from '../../index.js';
 
 describe('gtfs.getFareAttributes():', () => {
   before(async () => {
     await openDb(config);
-    await gtfs.import(config);
+    await importGtfs(config);
   });
 
   after(async () => {
@@ -19,7 +19,7 @@ describe('gtfs.getFareAttributes():', () => {
   it('should return empty array if no fare_attributes', async () => {
     const fareId = 'not_real';
 
-    const results = await gtfs.getFareAttributes({
+    const results = await getFareAttributes({
       fare_id: fareId
     });
 
@@ -30,7 +30,7 @@ describe('gtfs.getFareAttributes():', () => {
   it('should return expected fare_attributes', async () => {
     const fareId = 'OW_1_20160228';
 
-    const results = await gtfs.getFareAttributes({
+    const results = await getFareAttributes({
       fare_id: fareId
     });
 

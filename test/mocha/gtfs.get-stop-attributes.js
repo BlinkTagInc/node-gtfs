@@ -1,15 +1,15 @@
 /* eslint-env mocha */
 
-const should = require('should');
+import should from 'should';
 
-const { openDb, closeDb } = require('../../lib/db');
-const config = require('../test-config.js');
-const gtfs = require('../..');
+import { openDb, closeDb } from '../../lib/db.js';
+import config from '../test-config.js';
+import { importGtfs, getStopAttributes } from '../../index.js';
 
 describe('gtfs.getStopAttributes():', () => {
   before(async () => {
     await openDb(config);
-    await gtfs.import(config);
+    await importGtfs(config);
   });
 
   after(async () => {
@@ -19,7 +19,7 @@ describe('gtfs.getStopAttributes():', () => {
   it('should return empty array if no stop attributes', async () => {
     const stopId = 'fake-stop-id';
 
-    const results = await gtfs.getStopAttributes({
+    const results = await getStopAttributes({
       stop_id: stopId
     });
     should.exists(results);

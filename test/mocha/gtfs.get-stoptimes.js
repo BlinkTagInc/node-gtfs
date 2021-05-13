@@ -1,15 +1,15 @@
 /* eslint-env mocha */
 
-const should = require('should');
+import should from 'should';
 
-const { openDb, closeDb } = require('../../lib/db');
-const config = require('../test-config.js');
-const gtfs = require('../..');
+import { openDb, closeDb } from '../../lib/db.js';
+import config from '../test-config.js';
+import { importGtfs, getStoptimes } from '../../index.js';
 
 describe('gtfs.getStoptimes():', () => {
   before(async () => {
     await openDb(config);
-    await gtfs.import(config);
+    await importGtfs(config);
   });
 
   after(async () => {
@@ -19,7 +19,7 @@ describe('gtfs.getStoptimes():', () => {
   it('should return an empty array if no stoptimes exist for given agency', async () => {
     const stopId = 'fake-stop-id';
 
-    const results = await gtfs.getStoptimes({
+    const results = await getStoptimes({
       stop_id: stopId
     });
     should.exists(results);
@@ -29,7 +29,7 @@ describe('gtfs.getStoptimes():', () => {
   it('should return array of stoptimes for given stop_id', async () => {
     const stopId = '70011';
 
-    const results = await gtfs.getStoptimes({
+    const results = await getStoptimes({
       stop_id: stopId
     });
     should.exist(results);
@@ -43,7 +43,7 @@ describe('gtfs.getStoptimes():', () => {
   it('should return array of stoptimes for given trip_id ordered by stop_sequence', async () => {
     const tripId = '421a';
 
-    const results = await gtfs.getStoptimes({
+    const results = await getStoptimes({
       trip_id: tripId
     }, [], [
       ['stop_sequence', 'ASC']

@@ -1,6 +1,14 @@
 #!/usr/bin/env node
 
-const { argv } = require('yargs')
+import yargs from 'yargs';
+/* eslint-disable-next-line node/file-extension-in-import */
+import { hideBin } from 'yargs/helpers';
+
+import { getConfig } from '../lib/file-utils.js';
+import { formatError } from '../lib/log-utils.js';
+import { importGtfs } from '../lib/gtfs.js';
+
+const { argv } = yargs(hideBin(process.argv))
   .usage('Usage: $0 --configPath ./config.json')
   .help()
   .option('c', {
@@ -21,20 +29,16 @@ const { argv } = require('yargs')
     type: 'string'
   });
 
-const { getConfig } = require('../lib/file-utils');
-const logUtils = require('../lib/log-utils');
-const gtfs = require('..');
-
 const handleError = error => {
   const text = error || 'Unknown Error';
-  process.stdout.write(`\n${logUtils.formatError(text)}\n`);
+  process.stdout.write(`\n${formatError(text)}\n`);
   console.error(error);
   process.exit(1);
 };
 
 const setupImport = async () => {
   const config = await getConfig(argv);
-  await gtfs.import(config);
+  await importGtfs(config);
   process.exit();
 };
 

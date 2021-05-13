@@ -1,4 +1,4 @@
-module.exports = {
+const model = {
   filenameBase: 'board_alight',
   nonstandard: true,
   extension: 'gtfs-ride',
@@ -125,3 +125,5 @@ module.exports = {
     }
   ]
 };
+
+export default model;

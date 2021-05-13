@@ -1,15 +1,15 @@
 /* eslint-env mocha */
 
-const should = require('should');
+import should from 'should';
 
-const { openDb, closeDb } = require('../../lib/db');
-const config = require('../test-config.js');
-const gtfs = require('../..');
+import { openDb, closeDb } from '../../lib/db.js';
+import config from '../test-config.js';
+import { importGtfs, getStopsAsGeoJSON } from '../../index.js';
 
 describe('gtfs.getStopsAsGeoJSON(): ', () => {
   before(async () => {
     await openDb(config);
-    await gtfs.import(config);
+    await importGtfs(config);
   });
 
   after(async () => {
@@ -18,7 +18,7 @@ describe('gtfs.getStopsAsGeoJSON(): ', () => {
 
   it('should return geojson with an empty features array if no stops exist', async () => {
     const stopId = 'fake-stop-id';
-    const geojson = await gtfs.getStopsAsGeoJSON({
+    const geojson = await getStopsAsGeoJSON({
       stop_id: stopId
     });
 
@@ -28,7 +28,7 @@ describe('gtfs.getStopsAsGeoJSON(): ', () => {
   });
 
   it('should return geojson with stops if they exist', async () => {
-    const geojson = await gtfs.getStopsAsGeoJSON();
+    const geojson = await getStopsAsGeoJSON();
 
     should.exist(geojson);
     geojson.type.should.equal('FeatureCollection');
@@ -40,7 +40,7 @@ describe('gtfs.getStopsAsGeoJSON(): ', () => {
   it('should return geojson with stops if they exist for a specific stopId', async () => {
     const stopId = '70031';
 
-    const geojson = await gtfs.getStopsAsGeoJSON({
+    const geojson = await getStopsAsGeoJSON({
       stop_id: stopId
     });
 

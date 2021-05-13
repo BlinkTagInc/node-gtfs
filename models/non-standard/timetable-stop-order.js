@@ -1,4 +1,4 @@
-module.exports = {
+const model = {
   filenameBase: 'timetable_stop_order',
   nonstandard: true,
   schema: [
@@ -24,3 +24,5 @@ module.exports = {
     }
   ]
 };
+
+export default model;

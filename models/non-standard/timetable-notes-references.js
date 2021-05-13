@@ -1,4 +1,4 @@
-module.exports = {
+const model = {
   filenameBase: 'timetable_notes_references',
   nonstandard: true,
   schema: [
@@ -41,3 +41,5 @@ module.exports = {
     }
   ]
 };
+
+export default model;

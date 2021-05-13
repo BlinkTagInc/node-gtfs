@@ -1,4 +1,4 @@
-module.exports = {
+const model = {
   filenameBase: 'levels',
   schema: [
     {
@@ -17,3 +17,5 @@ module.exports = {
     }
   ]
 };
+
+export default model;

@@ -1,36 +1,36 @@
-const agency = require('../models/gtfs/agency');
-const attributions = require('../models/gtfs/attributions');
-const calendarDates = require('../models/gtfs/calendar-dates');
-const calendar = require('../models/gtfs/calendar');
-const fareAttributes = require('../models/gtfs/fare-attributes');
-const fareRules = require('../models/gtfs/fare-rules');
-const feedInfo = require('../models/gtfs/feed-info');
-const frequencies = require('../models/gtfs/frequencies');
-const levels = require('../models/gtfs/levels');
-const pathways = require('../models/gtfs/pathways');
-const routes = require('../models/gtfs/routes');
-const shapes = require('../models/gtfs/shapes');
-const stopTimes = require('../models/gtfs/stop-times');
-const stops = require('../models/gtfs/stops');
-const transfers = require('../models/gtfs/transfers');
-const translations = require('../models/gtfs/translations');
-const trips = require('../models/gtfs/trips');
+import agency from '../models/gtfs/agency.js';
+import attributions from '../models/gtfs/attributions.js';
+import calendarDates from '../models/gtfs/calendar-dates.js';
+import calendar from '../models/gtfs/calendar.js';
+import fareAttributes from '../models/gtfs/fare-attributes.js';
+import fareRules from '../models/gtfs/fare-rules.js';
+import feedInfo from '../models/gtfs/feed-info.js';
+import frequencies from '../models/gtfs/frequencies.js';
+import levels from '../models/gtfs/levels.js';
+import pathways from '../models/gtfs/pathways.js';
+import routes from '../models/gtfs/routes.js';
+import shapes from '../models/gtfs/shapes.js';
+import stopTimes from '../models/gtfs/stop-times.js';
+import stops from '../models/gtfs/stops.js';
+import transfers from '../models/gtfs/transfers.js';
+import translations from '../models/gtfs/translations.js';
+import trips from '../models/gtfs/trips.js';
 
-const directions = require('../models/non-standard/directions');
-const stopAttributes = require('../models/non-standard/stop-attributes');
-const timetables = require('../models/non-standard/timetables');
-const timetablePages = require('../models/non-standard/timetable-pages');
-const timetableStopOrder = require('../models/non-standard/timetable-stop-order');
-const timetableNotes = require('../models/non-standard/timetable-notes');
-const timetableNotesReferences = require('../models/non-standard/timetable-notes-references');
+import directions from '../models/non-standard/directions.js';
+import stopAttributes from '../models/non-standard/stop-attributes.js';
+import timetables from '../models/non-standard/timetables.js';
+import timetablePages from '../models/non-standard/timetable-pages.js';
+import timetableStopOrder from '../models/non-standard/timetable-stop-order.js';
+import timetableNotes from '../models/non-standard/timetable-notes.js';
+import timetableNotesReferences from '../models/non-standard/timetable-notes-references.js';
 
-const boardAlight = require('../models/gtfs-ride/board-alight');
-const rideFeedInfo = require('./gtfs-ride/ride-feed-info');
-const riderTrip = require('../models/gtfs-ride/rider-trip');
-const ridership = require('../models/gtfs-ride/ridership');
-const tripCapacity = require('../models/gtfs-ride/trip-capacity');
+import boardAlight from '../models/gtfs-ride/board-alight.js';
+import riderTrip from '../models/gtfs-ride/rider-trip.js';
+import ridership from '../models/gtfs-ride/ridership.js';
+import tripCapacity from '../models/gtfs-ride/trip-capacity.js';
+import rideFeedInfo from './gtfs-ride/ride-feed-info.js';
 
-module.exports = [
+const models = [
   agency,
   attributions,
   calendarDates,
@@ -61,3 +61,5 @@ module.exports = [
   ridership,
   tripCapacity
 ];
+
+export default models;

@@ -1,15 +1,15 @@
 /* eslint-env mocha */
 
-const should = require('should');
+import should from 'should';
 
-const { openDb, closeDb } = require('../../lib/db');
-const config = require('../test-config.js');
-const gtfs = require('../..');
+import { openDb, closeDb } from '../../lib/db.js';
+import config from '../test-config.js';
+import { importGtfs, getShapesAsGeoJSON } from '../../index.js';
 
 describe('gtfs.getShapesAsGeoJSON():', () => {
   before(async () => {
     await openDb(config);
-    await gtfs.import(config);
+    await importGtfs(config);
   });
 
   after(async () => {
@@ -18,7 +18,7 @@ describe('gtfs.getShapesAsGeoJSON():', () => {
 
   it('should return geojson with an empty features array if no shapes exist', async () => {
     const shapeId = 'fake-shape-id';
-    const geojson = await gtfs.getShapesAsGeoJSON({
+    const geojson = await getShapesAsGeoJSON({
       shape_id: shapeId
     });
 
@@ -28,7 +28,7 @@ describe('gtfs.getShapesAsGeoJSON():', () => {
   });
 
   it('should return geojson with shapes if they exist', async () => {
-    const geojson = await gtfs.getShapesAsGeoJSON();
+    const geojson = await getShapesAsGeoJSON();
 
     should.exist(geojson);
     geojson.type.should.equal('FeatureCollection');
@@ -41,7 +41,7 @@ describe('gtfs.getShapesAsGeoJSON():', () => {
   it('should return geojson with shapes for a specific routeId', async () => {
     const routeId = 'Lo-16APR';
 
-    const geojson = await gtfs.getShapesAsGeoJSON({
+    const geojson = await getShapesAsGeoJSON({
       route_id: routeId
     });
 
@@ -57,7 +57,7 @@ describe('gtfs.getShapesAsGeoJSON():', () => {
     const routeId = 'Lo-16APR';
     const directionId = 0;
 
-    const geojson = await gtfs.getShapesAsGeoJSON({
+    const geojson = await getShapesAsGeoJSON({
       route_id: routeId,
       direction_id: directionId
     });

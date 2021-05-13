@@ -1,15 +1,15 @@
 /* eslint-env mocha */
 
-const should = require('should');
+import should from 'should';
 
-const { openDb, closeDb } = require('../../lib/db');
-const config = require('../test-config.js');
-const gtfs = require('../..');
+import { openDb, closeDb } from '../../lib/db.js';
+import config from '../test-config.js';
+import { importGtfs, getCalendarDates } from '../../index.js';
 
 describe('gtfs.getCalendarDates():', () => {
   before(async () => {
     await openDb(config);
-    await gtfs.import(config);
+    await importGtfs(config);
   });
 
   after(async () => {
@@ -19,7 +19,7 @@ describe('gtfs.getCalendarDates():', () => {
   it('should return empty array if no calendar dates exist', async () => {
     const serviceId = 'fake-service-id';
 
-    const results = await gtfs.getCalendarDates({
+    const results = await getCalendarDates({
       service_id: serviceId
     });
     should.exists(results);
@@ -29,7 +29,7 @@ describe('gtfs.getCalendarDates():', () => {
   it('should return expected calendar dates', async () => {
     const serviceId = 'CT-16APR-Caltrain-Weekday-01';
 
-    const results = await gtfs.getCalendarDates({
+    const results = await getCalendarDates({
       service_id: serviceId
     });
 
@@ -75,7 +75,7 @@ describe('gtfs.getCalendarDates():', () => {
   it('should return only specific keys for expected calendar dates, sorted by date', async () => {
     const serviceId = 'CT-16APR-Caltrain-Weekday-01';
 
-    const results = await gtfs.getCalendarDates({
+    const results = await getCalendarDates({
       service_id: serviceId
     }, [
       'service_id',

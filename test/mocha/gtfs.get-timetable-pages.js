@@ -1,15 +1,15 @@
 /* eslint-env mocha */
 
-const should = require('should');
+import should from 'should';
 
-const { openDb, closeDb } = require('../../lib/db');
-const config = require('../test-config.js');
-const gtfs = require('../..');
+import { openDb, closeDb } from '../../lib/db.js';
+import config from '../test-config.js';
+import { importGtfs, getTimetablePages } from '../../index.js';
 
 describe('gtfs.getTimetablePages():', () => {
   before(async () => {
     await openDb(config);
-    await gtfs.import(config);
+    await importGtfs(config);
   });
 
   after(async () => {
@@ -19,7 +19,7 @@ describe('gtfs.getTimetablePages():', () => {
   it('should return empty array if no timetable pages (GTFS-to-HTML timetables)', async () => {
     const timetablePageId = 'fake-timetable-page-id';
 
-    const results = await gtfs.getTimetablePages({
+    const results = await getTimetablePages({
       timetable_page_id: timetablePageId
     });
     should.exists(results);

@@ -1,21 +1,22 @@
 /* eslint-env mocha */
 /* eslint-disable max-nested-callbacks */
 
-const path = require('path');
-const fs = require('fs-extra');
-const parse = require('csv-parse');
-const should = require('should');
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fs from 'fs-extra';
+import parse from 'csv-parse';
+import should from 'should';
 
-const { openDb, closeDb } = require('../../lib/db');
-const { unzip, generateFolderName } = require('../../lib/file-utils');
-const config = require('../test-config.js');
-const gtfs = require('../..');
-const models = require('../../models/models');
+import { openDb, closeDb } from '../../lib/db.js';
+import { unzip, generateFolderName } from '../../lib/file-utils.js';
+import config from '../test-config.js';
+import { importGtfs, exportGtfs, getAgencies } from '../../index.js';
+import models from '../../models/models.js';
 
 describe('lib/export.js', function () {
   before(async () => {
     await openDb(config);
-    await gtfs.import(config);
+    await importGtfs(config);
   });
 
   after(async () => {
@@ -25,13 +26,13 @@ describe('lib/export.js', function () {
   this.timeout(10000);
   describe('Export GTFS', () => {
     it('should be able to export GTFS', async () => {
-      await gtfs.export(config);
+      await exportGtfs(config);
     });
   });
 
   describe('Verify data exported', () => {
     const countData = {};
-    const temporaryDir = path.join(__dirname, '../fixture/tmp/');
+    const temporaryDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '../fixture/tmp/');
 
     before(async () => {
       await unzip(config.agencies[0].path, temporaryDir);
@@ -65,17 +66,17 @@ describe('lib/export.js', function () {
           });
       }));
 
-      await gtfs.import(config);
+      await importGtfs(config);
     });
 
     after(async () => {
-      const agencies = await gtfs.getAgencies({}, ['agency_name']);
+      const agencies = await getAgencies({}, ['agency_name']);
       await fs.remove(path.join(process.cwd(), 'gtfs-export', generateFolderName(agencies[0].agency_name)));
     });
 
     for (const model of models) {
       it(`should import the same number of ${model.filenameBase}`, async () => {
-        const agencies = await gtfs.getAgencies({}, ['agency_name']);
+        const agencies = await getAgencies({}, ['agency_name']);
         const filePath = path.join(process.cwd(), 'gtfs-export', generateFolderName(agencies[0].agency_name), `${model.filenameBase}.txt`);
 
         // GTFS has optional files

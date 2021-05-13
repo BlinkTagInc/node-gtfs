@@ -1,15 +1,15 @@
 /* eslint-env mocha */
 
-const should = require('should');
+import should from 'should';
 
-const { openDb, closeDb } = require('../../lib/db');
-const config = require('../test-config.js');
-const gtfs = require('../..');
+import { openDb, closeDb } from '../../lib/db.js';
+import config from '../test-config.js';
+import { importGtfs, getTransfers } from '../../index.js';
 
 describe('gtfs.getTransfers():', () => {
   before(async () => {
     await openDb(config);
-    await gtfs.import(config);
+    await importGtfs(config);
   });
 
   after(async () => {
@@ -19,7 +19,7 @@ describe('gtfs.getTransfers():', () => {
   it('should return empty array if no transfers', async () => {
     const fromStopId = 'fake-stop-id';
 
-    const results = await gtfs.getTransfers({
+    const results = await getTransfers({
       from_stop_id: fromStopId
     });
     should.exists(results);

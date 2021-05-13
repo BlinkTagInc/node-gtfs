@@ -1,4 +1,4 @@
-module.exports = {
+const model = {
   filenameBase: 'translations',
   schema: [
     {
@@ -40,3 +40,5 @@ module.exports = {
     }
   ]
 };
+
+export default model;

@@ -1,4 +1,4 @@
-module.exports = {
+const model = {
   filenameBase: 'stop_attributes',
   nonstandard: true,
   schema: [
@@ -19,3 +19,5 @@ module.exports = {
     }
   ]
 };
+
+export default model;

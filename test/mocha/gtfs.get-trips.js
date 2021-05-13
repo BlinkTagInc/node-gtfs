@@ -1,15 +1,15 @@
 /* eslint-env mocha */
 
-const should = require('should');
+import should from 'should';
 
-const { openDb, closeDb } = require('../../lib/db');
-const config = require('../test-config.js');
-const gtfs = require('../..');
+import { openDb, closeDb } from '../../lib/db.js';
+import config from '../test-config.js';
+import { importGtfs, getTrips } from '../../index.js';
 
 describe('gtfs.getTrips():', () => {
   before(async () => {
     await openDb(config);
-    await gtfs.import(config);
+    await importGtfs(config);
   });
 
   after(async () => {
@@ -19,7 +19,7 @@ describe('gtfs.getTrips():', () => {
   it('should return empty array if no trips exist', async () => {
     const tripId = 'fake-trip-id';
 
-    const results = await gtfs.getTrips({
+    const results = await getTrips({
       trip_id: tripId
     });
     should.exists(results);
@@ -29,7 +29,7 @@ describe('gtfs.getTrips():', () => {
   it('should return expected trips', async () => {
     const routeId = 'Bu-16APR';
 
-    const results = await gtfs.getTrips({
+    const results = await getTrips({
       route_id: routeId
     });
 

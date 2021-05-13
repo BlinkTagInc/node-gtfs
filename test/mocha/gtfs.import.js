@@ -1,16 +1,17 @@
 /* eslint-env mocha */
 /* eslint-disable max-nested-callbacks */
 
-const path = require('path');
-const fs = require('fs');
-const parse = require('csv-parse');
-const should = require('should');
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fs from 'fs-extra';
+import parse from 'csv-parse';
+import should from 'should';
 
-const { openDb, closeDb } = require('../../lib/db');
-const { unzip } = require('../../lib/file-utils');
-const config = require('../test-config.js');
-const gtfs = require('../..');
-const models = require('../../models/models');
+import { openDb, closeDb } from '../../lib/db.js';
+import { unzip } from '../../lib/file-utils.js';
+import config from '../test-config.js';
+import { importGtfs, getRoutes } from '../../index.js';
+import models from '../../models/models.js';
 
 let db;
 
@@ -19,7 +20,7 @@ const agenciesFixturesRemote = [{
 }];
 
 const agenciesFixturesLocal = [{
-  path: path.join(__dirname, '../fixture/caltrain_20160406.zip')
+  path: path.join(path.dirname(fileURLToPath(import.meta.url)), '../fixture/caltrain_20160406.zip')
 }];
 
 describe('lib/import.js', function () {
@@ -34,29 +35,31 @@ describe('lib/import.js', function () {
   this.timeout(10000);
   describe('Download and import from different GTFS sources', () => {
     it('should be able to download and import from HTTP', async () => {
-      config.agencies = agenciesFixturesRemote;
-      await gtfs.import(config);
+      await importGtfs({
+        ...config,
+        agencies: agenciesFixturesRemote
+      });
 
-      const routes = await gtfs.getRoutes();
+      const routes = await getRoutes();
       should.exist(routes);
       routes.length.should.equal(4);
     });
 
     it('should be able to download and import from local filesystem', async () => {
-      config.agencies = agenciesFixturesLocal;
-      await gtfs.import(config);
+      await importGtfs({
+        ...config,
+        agencies: agenciesFixturesLocal
+      });
 
-      const routes = await gtfs.getRoutes();
+      const routes = await getRoutes();
       should.exist(routes);
       routes.length.should.equal(4);
     });
   });
 
   describe('Verify data imported into database', () => {
-    config.agencies = agenciesFixturesLocal;
-
     const countData = {};
-    const temporaryDir = path.join(__dirname, '../fixture/tmp/');
+    const temporaryDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '../fixture/tmp/');
 
     before(async () => {
       await unzip(agenciesFixturesLocal[0].path, temporaryDir);
@@ -90,7 +93,10 @@ describe('lib/import.js', function () {
           });
       }));
 
-      await gtfs.import(config);
+      await importGtfs({
+        ...config,
+        agencies: agenciesFixturesLocal
+      });
     });
 
     for (const model of models) {

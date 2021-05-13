@@ -1,4 +1,4 @@
-module.exports = {
+const model = {
   filenameBase: 'directions',
   nonstandard: true,
   schema: [
@@ -27,3 +27,5 @@ module.exports = {
     }
   ]
 };
+
+export default model;

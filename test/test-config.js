@@ -1,8 +1,11 @@
-const path = require('path');
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-module.exports = {
+const config = {
   agencies: [{
-    path: path.join(__dirname, 'fixture/caltrain_20160406.zip')
+    path: path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixture/caltrain_20160406.zip')
   }],
   verbose: false
 };
+
+export default config;

@@ -1,4 +1,4 @@
-module.exports = {
+const model = {
   filenameBase: 'feed_info',
   schema: [
     {
@@ -47,3 +47,5 @@ module.exports = {
     }
   ]
 };
+
+export default model;

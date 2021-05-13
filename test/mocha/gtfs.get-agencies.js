@@ -1,14 +1,14 @@
 /* eslint-env mocha */
-const should = require('should');
+import should from 'should';
 
-const { openDb, closeDb } = require('../../lib/db');
-const config = require('../test-config.js');
-const gtfs = require('../..');
+import { openDb, closeDb } from '../../lib/db.js';
+import config from '../test-config.js';
+import { importGtfs, getAgencies } from '../../index.js';
 
 describe('gtfs.getAgencies():', () => {
   before(async () => {
     await openDb(config);
-    await gtfs.import(config);
+    await importGtfs(config);
   });
 
   after(async () => {
@@ -17,7 +17,7 @@ describe('gtfs.getAgencies():', () => {
 
   it('should return empty array if no agencies exist', async () => {
     const agencyId = 'fake-agency-id';
-    const results = await gtfs.getAgencies({
+    const results = await getAgencies({
       agency_id: agencyId
     });
     should.exists(results);
@@ -25,7 +25,7 @@ describe('gtfs.getAgencies():', () => {
   });
 
   it('should return expected agencies with no query', async () => {
-    const results = await gtfs.getAgencies();
+    const results = await getAgencies();
 
     const expectedResult = {
       id: 1,
@@ -48,7 +48,7 @@ describe('gtfs.getAgencies():', () => {
     const agencyId = 'CT';
     const agencyLand = 'en';
 
-    const results = await gtfs.getAgencies({
+    const results = await getAgencies({
       agency_id: agencyId,
       agency_lang: agencyLand
     });
@@ -73,7 +73,7 @@ describe('gtfs.getAgencies():', () => {
   it('should return only specific keys for expected agency for agency_id', async () => {
     const agencyId = 'CT';
 
-    const results = await gtfs.getAgencies({
+    const results = await getAgencies({
       agency_id: agencyId
     }, [
       'agency_url',

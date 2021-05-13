@@ -1,15 +1,15 @@
 /* eslint-env mocha */
 
-const should = require('should');
+import should from 'should';
 
-const { openDb, closeDb } = require('../../lib/db');
-const config = require('../test-config.js');
-const gtfs = require('../..');
+import { openDb, closeDb } from '../../lib/db.js';
+import config from '../test-config.js';
+import { importGtfs, getFareRules } from '../../index.js';
 
 describe('gtfs.getFareRules():', () => {
   before(async () => {
     await openDb(config);
-    await gtfs.import(config);
+    await importGtfs(config);
   });
 
   after(async () => {
@@ -19,7 +19,7 @@ describe('gtfs.getFareRules():', () => {
   it('should return empty array if no fare_rules', async () => {
     const routeId = 'not_real';
 
-    const results = await gtfs.getFareRules({
+    const results = await getFareRules({
       route_id: routeId
     });
     should.exists(results);
@@ -29,7 +29,7 @@ describe('gtfs.getFareRules():', () => {
   it('should return expected fare_rules', async () => {
     const routeId = 'Bu-16APR';
 
-    const results = await gtfs.getFareRules({
+    const results = await getFareRules({
       route_id: routeId
     }, [
       'fare_id',

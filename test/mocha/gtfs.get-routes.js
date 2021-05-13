@@ -1,15 +1,15 @@
 /* eslint-env mocha */
 
-const should = require('should');
+import should from 'should';
 
-const { openDb, closeDb } = require('../../lib/db');
-const config = require('../test-config.js');
-const gtfs = require('../..');
+import { openDb, closeDb } from '../../lib/db.js';
+import config from '../test-config.js';
+import { importGtfs, getRoutes } from '../../index.js';
 
 describe('gtfs.getRoutes():', () => {
   before(async () => {
     await openDb(config);
-    await gtfs.import(config);
+    await importGtfs(config);
   });
 
   after(async () => {
@@ -19,7 +19,7 @@ describe('gtfs.getRoutes():', () => {
   it('should return empty array if no routes for given agency exist', async () => {
     const routeId = 'fake-route-id';
 
-    const results = await gtfs.getRoutes({
+    const results = await getRoutes({
       route_id: routeId
     });
     should.exists(results);
@@ -27,7 +27,7 @@ describe('gtfs.getRoutes():', () => {
   });
 
   it('should return expected routes', async () => {
-    const results = await gtfs.getRoutes(
+    const results = await getRoutes(
       {},
       [],
       [['route_long_name', 'ASC']]
@@ -98,7 +98,7 @@ describe('gtfs.getRoutes():', () => {
   });
 
   it('should return expected routes for a specific stop_id', async () => {
-    const results = await gtfs.getRoutes(
+    const results = await getRoutes(
       { stop_id: '70321' },
       [],
       [['route_long_name', 'ASC']]
@@ -127,7 +127,7 @@ describe('gtfs.getRoutes():', () => {
   });
 
   it('should return no routes for a invalid stop_id', async () => {
-    const results = await gtfs.getRoutes(
+    const results = await getRoutes(
       { stop_id: 'not-valid' },
       [],
       [['route_long_name', 'ASC']]

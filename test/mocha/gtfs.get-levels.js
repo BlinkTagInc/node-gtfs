@@ -1,15 +1,15 @@
 /* eslint-env mocha */
 
-const should = require('should');
+import should from 'should';
 
-const { openDb, closeDb } = require('../../lib/db');
-const config = require('../test-config.js');
-const gtfs = require('../..');
+import { openDb, closeDb } from '../../lib/db.js';
+import config from '../test-config.js';
+import { importGtfs, getLevels } from '../../index.js';
 
 describe('gtfs.getLevels():', () => {
   before(async () => {
     await openDb(config);
-    await gtfs.import(config);
+    await importGtfs(config);
   });
 
   after(async () => {
@@ -19,7 +19,7 @@ describe('gtfs.getLevels():', () => {
   it('should return empty array if no levels', async () => {
     const levelId = 'not_real';
 
-    const results = await gtfs.getLevels({
+    const results = await getLevels({
       level_id: levelId
     });
     should.exists(results);

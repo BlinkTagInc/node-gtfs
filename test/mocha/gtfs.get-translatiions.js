@@ -1,15 +1,15 @@
 /* eslint-env mocha */
 
-const should = require('should');
+import should from 'should';
 
-const { openDb, closeDb } = require('../../lib/db');
-const config = require('../test-config.js');
-const gtfs = require('../..');
+import { openDb, closeDb } from '../../lib/db.js';
+import config from '../test-config.js';
+import { importGtfs, getTranslations } from '../../index.js';
 
 describe('gtfs.getTranslations():', () => {
   before(async () => {
     await openDb(config);
-    await gtfs.import(config);
+    await importGtfs(config);
   });
 
   after(async () => {
@@ -19,7 +19,7 @@ describe('gtfs.getTranslations():', () => {
   it('should return empty array if no translations', async () => {
     const fieldName = 'fake-field-name';
 
-    const results = await gtfs.getTranslations({
+    const results = await getTranslations({
       field_name: fieldName
     });
     should.exists(results);

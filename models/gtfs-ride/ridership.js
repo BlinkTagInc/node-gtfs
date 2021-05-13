@@ -1,4 +1,4 @@
-module.exports = {
+const model = {
   filenameBase: 'ridership',
   nonstandard: true,
   extension: 'gtfs-ride',
@@ -117,3 +117,5 @@ module.exports = {
     }
   ]
 };
+
+export default model;

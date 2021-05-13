@@ -1,4 +1,4 @@
-module.exports = {
+const model = {
   filenameBase: 'pathways',
   schema: [
     {
@@ -62,3 +62,5 @@ module.exports = {
     }
   ]
 };
+
+export default model;

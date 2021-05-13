@@ -1,4 +1,4 @@
-module.exports = {
+const model = {
   filenameBase: 'timetables',
   nonstandard: true,
   schema: [
@@ -134,3 +134,5 @@ module.exports = {
     }
   ]
 };
+
+export default model;

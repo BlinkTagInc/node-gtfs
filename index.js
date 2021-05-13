@@ -1,1 +1,1 @@
-module.exports = require('./lib/gtfs');
+export * from './lib/gtfs.js';

@@ -1,4 +1,4 @@
-module.exports = {
+const model = {
   filenameBase: 'shapes',
   schema: [
     {
@@ -39,3 +39,5 @@ module.exports = {
     }
   ]
 };
+
+export default model;
