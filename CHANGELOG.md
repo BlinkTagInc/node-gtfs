@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.1] - 2021-05-15
+### Fixed
+- Better error messages for missing config
+- Better error messages for invalid paths in config
+### Changed
+- Updated minimum node.js verstion to 14.17.0
+- Added github action tests for node 16
+- Dropped github action tests for node 12
+### Added
+- Tests for invalid path in config
+### Updated
+- Use copy-dir library
+- Depedency updates
+
 ## [3.0.0] - 2021-05-13
 ### Breaking Changes
 - Converted to ES Module
