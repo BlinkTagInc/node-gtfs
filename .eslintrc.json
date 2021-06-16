@@ -1,0 +1,33 @@
+{
+	"env": {
+		"node": true,
+		"es2021": true
+	},
+	"extends": [
+		"xo"
+	],
+	"parserOptions": {
+		"ecmaVersion": 12,
+		"sourceType": "module"
+	},
+	"rules": {
+		"camelcase": [
+      "error",
+      {
+        "properties": "never"
+      }
+    ],
+		"comma-dangle": ["error", "never"],
+    "indent": ["error", 2],
+    "object-curly-spacing": [
+      "error",
+      "always"
+    ],
+    "no-unused-vars": [
+      "error",
+      {
+        "varsIgnorePattern": "^[A-Z]"
+      }
+    ]
+	}
+}

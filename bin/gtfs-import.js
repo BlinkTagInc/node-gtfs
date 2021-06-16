@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import yargs from 'yargs';
-/* eslint-disable-next-line node/file-extension-in-import */
 import { hideBin } from 'yargs/helpers';
 
 import { getConfig } from '../lib/file-utils.js';

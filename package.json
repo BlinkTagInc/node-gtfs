@@ -61,32 +61,8 @@
     "gtfs-import": "bin/gtfs-import.js"
   },
   "scripts": {
-    "lint": "xo",
-    "test": "xo && NODE_ENV=test mocha ./test/mocha/**/*.js --timeout 2000"
-  },
-  "xo": {
-    "esnext": true,
-    "rules": {
-      "camelcase": [
-        "error",
-        {
-          "properties": "never"
-        }
-      ],
-      "object-curly-spacing": [
-        "error",
-        "always"
-      ],
-      "unicorn/numeric-separators-style": [
-        "error",
-        {
-          "number": {
-            "minimumDigits": 9
-          }
-        }
-      ]
-    },
-    "space": true
+    "lint": "eslint **/*.js",
+    "test": "eslint **/*.js && NODE_ENV=test mocha ./test/mocha/**/*.js --timeout 2000"
   },
   "dependencies": {
     "@turf/helpers": "^6.3.0",
@@ -112,7 +88,8 @@
   "devDependencies": {
     "mocha": "^8.4.0",
     "should": "^13.2.3",
-    "xo": "^0.40.1"
+    "eslint": "^7.28.0",
+    "eslint-config-xo": "^0.37.0"
   },
   "engines": {
     "node": ">= 14.17.0"
