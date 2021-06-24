@@ -4,8 +4,7 @@ const model = {
   schema: [
     {
       name: 'note_id',
-      type: 'varchar(255)',
-      primary: true
+      type: 'varchar(255)'
     },
     {
       name: 'timetable_id',
