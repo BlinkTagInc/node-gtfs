@@ -22,6 +22,8 @@ The [GTFS-to-geojson](https://github.com/blinktaginc/gtfs-to-geojson) app create
 
 The [GTFS-to-chart](https://github.com/blinktaginc/gtfs-to-chart) app generates a stringline chart in D3 for all trips for a specific route using data from an agency's GTFS. It uses `node-gtfs` for downloading, importing and querying GTFS data.
 
+The [GTFS-Text-to-Speech](https://github.com/blinktaginc/node-gtfs-tts) app tests GTFS stop name pronunciation for text-to-speech. It uses `node-gtfs` for loading stop names from GTFS data.
+
 ## Installation
 
 If you would like to use this library as a command-line utility, you can install it globally directly from [npm](https://npmjs.org):
