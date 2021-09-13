@@ -1,6 +1,6 @@
 {
   "name": "gtfs",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Import GTFS transit data into SQLite and query routes, stops, times, fares and more",
   "keywords": [
     "transit",
@@ -68,28 +68,28 @@
     "@turf/helpers": "^6.5.0",
     "chalk": "^4.1.2",
     "copy-dir": "^1.3.0",
-    "csv-parse": "^4.16.0",
-    "csv-stringify": "^5.6.2",
+    "csv-parse": "^4.16.3",
+    "csv-stringify": "^5.6.5",
     "lodash-es": "^4.17.21",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.0.0",
     "pluralize": "^8.0.0",
     "pretty-error": "^3.0.4",
     "promise-map-series": "^0.3.0",
     "sanitize-filename": "^1.6.3",
     "sqlite": "^4.0.23",
-    "sqlite3": "^5.0.2",
+    "sqlite3": "github:mapbox/node-sqlite3#593c9d",
     "sqlstring-sqlite": "^0.1.1",
-    "strip-bom-stream": "^4.0.0",
+    "strip-bom-stream": "^5.0.0",
     "tmp-promise": "^3.0.2",
     "untildify": "^4.0.0",
     "unzipper": "^0.10.11",
-    "yargs": "^17.0.1"
+    "yargs": "^17.1.1"
   },
   "devDependencies": {
-    "mocha": "^9.0.3",
-    "should": "^13.2.3",
     "eslint": "^7.32.0",
-    "eslint-config-xo": "^0.37.0"
+    "eslint-config-xo": "^0.38.0",
+    "mocha": "^9.1.1",
+    "should": "^13.2.3"
   },
   "engines": {
     "node": ">= 14.17.0"
