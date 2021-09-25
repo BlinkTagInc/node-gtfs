@@ -1,6 +1,6 @@
 {
   "name": "gtfs",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "Import GTFS transit data into SQLite and query routes, stops, times, fares and more",
   "keywords": [
     "transit",
@@ -83,12 +83,12 @@
     "tmp-promise": "^3.0.2",
     "untildify": "^4.0.0",
     "unzipper": "^0.10.11",
-    "yargs": "^17.1.1"
+    "yargs": "^17.2.1"
   },
   "devDependencies": {
     "eslint": "^7.32.0",
     "eslint-config-xo": "^0.38.0",
-    "mocha": "^9.1.1",
+    "mocha": "^9.1.2",
     "should": "^13.2.3"
   },
   "engines": {

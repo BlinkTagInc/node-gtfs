@@ -4,7 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.1.1] - 2021-08-02
+## [3.1.2] - 2021-09-25
+### Changed
+- Switch to recursive-copy library
+- Change pinned node-sqlite path
+### Updated
+- Dependency updates
+
+## [3.1.1] - 2021-09-013
 ### Updated
 - Dependency updates - pinned sqlite3 version to solve security issue: https://github.com/mapbox/node-sqlite3/issues/1483
 
