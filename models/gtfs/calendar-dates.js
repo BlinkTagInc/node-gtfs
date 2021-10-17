@@ -4,19 +4,19 @@ const model = {
     {
       name: 'id',
       type: 'integer',
-      primary: true
+      primary: true,
     },
     {
       name: 'service_id',
       type: 'varchar(255)',
       required: true,
-      index: true
+      index: true,
     },
     {
       name: 'date',
       type: 'integer',
       required: true,
-      index: true
+      index: true,
     },
     {
       name: 'exception_type',
@@ -24,13 +24,13 @@ const model = {
       required: true,
       min: 1,
       max: 2,
-      index: true
+      index: true,
     },
     {
       name: 'holiday_name',
-      type: 'varchar(255)'
-    }
-  ]
+      type: 'varchar(255)',
+    },
+  ],
 };
 
 export default model;

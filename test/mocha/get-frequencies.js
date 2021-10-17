@@ -20,7 +20,7 @@ describe('getFrequencies():', () => {
     const tripId = 'not_real';
 
     const results = await getFrequencies({
-      trip_id: tripId
+      trip_id: tripId,
     });
     should.exists(results);
     results.should.have.length(0);

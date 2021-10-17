@@ -19,7 +19,7 @@ describe('getStopsAsGeoJSON(): ', () => {
   it('should return geojson with an empty features array if no stops exist', async () => {
     const stopId = 'fake-stop-id';
     const geojson = await getStopsAsGeoJSON({
-      stop_id: stopId
+      stop_id: stopId,
     });
 
     should.exist(geojson);
@@ -41,7 +41,7 @@ describe('getStopsAsGeoJSON(): ', () => {
     const stopId = '70031';
 
     const geojson = await getStopsAsGeoJSON({
-      stop_id: stopId
+      stop_id: stopId,
     });
 
     should.exist(geojson);

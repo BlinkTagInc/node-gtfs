@@ -20,7 +20,7 @@ describe('getLevels():', () => {
     const levelId = 'not_real';
 
     const results = await getLevels({
-      level_id: levelId
+      level_id: levelId,
     });
     should.exists(results);
     results.should.have.length(0);

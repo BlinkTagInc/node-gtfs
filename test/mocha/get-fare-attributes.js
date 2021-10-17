@@ -20,7 +20,7 @@ describe('getFareAttributes():', () => {
     const fareId = 'not_real';
 
     const results = await getFareAttributes({
-      fare_id: fareId
+      fare_id: fareId,
     });
 
     should.exists(results);
@@ -31,7 +31,7 @@ describe('getFareAttributes():', () => {
     const fareId = 'OW_1_20160228';
 
     const results = await getFareAttributes({
-      fare_id: fareId
+      fare_id: fareId,
     });
 
     const expectedResult = {
@@ -41,7 +41,7 @@ describe('getFareAttributes():', () => {
       payment_method: 1,
       transfers: 0,
       agency_id: null,
-      transfer_duration: null
+      transfer_duration: null,
     };
 
     should.exist(results);

@@ -20,7 +20,7 @@ describe('getTranslations():', () => {
     const fieldName = 'fake-field-name';
 
     const results = await getTranslations({
-      field_name: fieldName
+      field_name: fieldName,
     });
     should.exists(results);
     results.should.have.length(0);

@@ -4,45 +4,45 @@ const model = {
     {
       name: 'id',
       type: 'integer',
-      primary: true
+      primary: true,
     },
     {
       name: 'trip_id',
       type: 'varchar(255)',
       required: true,
-      index: true
+      index: true,
     },
     {
       name: 'start_time',
       type: 'varchar(255)',
-      required: true
+      required: true,
     },
     {
       name: 'start_timestamp',
-      type: 'integer'
+      type: 'integer',
     },
     {
       name: 'end_time',
       type: 'varchar(255)',
-      required: true
+      required: true,
     },
     {
       name: 'end_timestamp',
-      type: 'integer'
+      type: 'integer',
     },
     {
       name: 'headway_secs',
       type: 'integer',
       required: true,
-      min: 0
+      min: 0,
     },
     {
       name: 'exact_times',
       type: 'integer',
       min: 0,
-      max: 1
-    }
-  ]
+      max: 1,
+    },
+  ],
 };
 
 export default model;

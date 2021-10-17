@@ -20,7 +20,7 @@ describe('getPathways():', () => {
     const pathwayId = 'not_real';
 
     const results = await getPathways({
-      pathway_id: pathwayId
+      pathway_id: pathwayId,
     });
     should.exists(results);
     results.should.have.length(0);

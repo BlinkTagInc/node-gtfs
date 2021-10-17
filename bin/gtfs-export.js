@@ -13,15 +13,15 @@ const { argv } = yargs(hideBin(process.argv))
   .option('c', {
     alias: 'configPath',
     describe: 'Path to config file',
-    type: 'string'
+    type: 'string',
   })
   .option('sqlitePath', {
     describe: 'Path to SQLite database',
-    type: 'string'
+    type: 'string',
   })
   .option('exportPath', {
     describe: 'Path where GTFS export should go',
-    type: 'string'
+    type: 'string',
   });
 
 const handleError = (error = 'Unknown Error') => {
@@ -35,5 +35,4 @@ const setupExport = async () => {
   process.exit();
 };
 
-setupExport()
-  .catch(handleError);
+setupExport().catch(handleError);

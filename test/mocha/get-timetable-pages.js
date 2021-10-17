@@ -20,7 +20,7 @@ describe('getTimetablePages():', () => {
     const timetablePageId = 'fake-timetable-page-id';
 
     const results = await getTimetablePages({
-      timetable_page_id: timetablePageId
+      timetable_page_id: timetablePageId,
     });
     should.exists(results);
     results.should.have.length(0);

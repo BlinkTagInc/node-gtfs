@@ -36,12 +36,12 @@ If you are using this as a node module as part of an application, you can includ
 
     gtfs-import --gtfsUrl http://www.bart.gov/dev/schedules/google_transit.zip
 
-or 
-    
+or
+
     gtfs-import --gtfsPath /path/to/your/gtfs.zip
 
-or 
-    
+or
+
     gtfs-import --gtfsPath /path/to/your/unzipped/gtfs
 
 or
@@ -55,15 +55,17 @@ or
 ```js
 import { importGtfs } from 'gtfs';
 import { readFile } from 'fs/promises';
-const config = JSON.parse(await readFile(new URL('./config.json', import.meta.url)));
+const config = JSON.parse(
+  await readFile(new URL('./config.json', import.meta.url))
+);
 
 importGtfs(config)
-.then(() => {
-  console.log('Import Successful');
-})
-.catch(err => {
-  console.error(err);
-});
+  .then(() => {
+    console.log('Import Successful');
+  })
+  .catch((err) => {
+    console.error(err);
+  });
 ```
 
 ## Command Line Usage
@@ -86,14 +88,14 @@ Specify a local path to GTFS, either zipped or unzipped.
 
     gtfs-import --gtfsPath /path/to/your/gtfs.zip
 
-or 
-    
+or
+
     gtfs-import --gtfsPath /path/to/your/unzipped/gtfs
 
 `gtfsUrl`
 
 Specify a URL to a zipped GTFS file.
-    
+
     gtfs-import --gtfsUrl http://www.bart.gov/dev/schedules/google_transit.zip
 
 ## Configuration Files
@@ -102,13 +104,13 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 
     cp config-sample.json config.json
 
-| option | type | description |
-| ------ | ---- | ----------- |
-| [`agencies`](#agencies) | array | An array of GTFS files to be imported. |
-| [`csvOptions`](#csvOptions) | object | Options passed to `csv-parse` for parsing GTFS CSV files. Optional. |
-| [`exportPath`](#exportPath) | string | A path to a directory to put exported GTFS files. Optional, defaults to `gtfs-export/<agency_name>`. |
-| [`sqlitePath`](#sqlitePath) | string | A path to an SQLite database. Optional, defaults to using an in-memory database. |
-| [`verbose`](#verbose) | boolean | Whether or not to print output to the console. Optional, defaults to true. |
+| option                      | type    | description                                                                                          |
+| --------------------------- | ------- | ---------------------------------------------------------------------------------------------------- |
+| [`agencies`](#agencies)     | array   | An array of GTFS files to be imported.                                                               |
+| [`csvOptions`](#csvOptions) | object  | Options passed to `csv-parse` for parsing GTFS CSV files. Optional.                                  |
+| [`exportPath`](#exportPath) | string  | A path to a directory to put exported GTFS files. Optional, defaults to `gtfs-export/<agency_name>`. |
+| [`sqlitePath`](#sqlitePath) | string  | A path to an SQLite database. Optional, defaults to using an in-memory database.                     |
+| [`verbose`](#verbose)       | boolean | Whether or not to print output to the console. Optional, defaults to true.                           |
 
 ### agencies
 
@@ -120,7 +122,8 @@ To find an agency's GTFS file, visit [transitfeeds.com](http://transitfeeds.com)
 URL from the agency's website or you can use a URL generated from the transitfeeds.com
 API along with your API token.
 
-* Specify a download URL:
+- Specify a download URL:
+
 ```json
 {
   "agencies": [
@@ -131,7 +134,8 @@ API along with your API token.
 }
 ```
 
-* Specify a download URL with custom headers:
+- Specify a download URL with custom headers:
+
 ```json
 {
   "agencies": [
@@ -140,13 +144,14 @@ API along with your API token.
       "headers": {
         "Content-Type": "application/json",
         "Authorization": "bearer 1234567890"
-      },
+      }
     }
   ]
 }
 ```
 
-* Specify a path to a zipped GTFS file:
+- Specify a path to a zipped GTFS file:
+
 ```json
 {
   "agencies": [
@@ -156,7 +161,9 @@ API along with your API token.
   ]
 }
 ```
-* Specify a path to an unzipped GTFS file:
+
+- Specify a path to an unzipped GTFS file:
+
 ```json
 {
   "agencies": [
@@ -167,23 +174,20 @@ API along with your API token.
 }
 ```
 
-* Exclude files - if you don't want all GTFS files to be imported, you can specify an array of files to exclude.
+- Exclude files - if you don't want all GTFS files to be imported, you can specify an array of files to exclude.
 
 ```json
 {
   "agencies": [
     {
       "path": "/path/to/the/unzipped/gtfs/",
-      "exclude": [
-        "shapes",
-        "stops"
-      ]
+      "exclude": ["shapes", "stops"]
     }
   ]
 }
 ```
 
-* Specify multiple agencies to be imported into the same database
+- Specify multiple agencies to be imported into the same database
 
 ```json
 {
@@ -239,7 +243,7 @@ See [full list of options](https://csv.js.org/parse/options/).
 }
 ```
 
-If you want to route logs to a custom function, you can pass a function that takes a single `text` argument as `logFunction`. This can't be defined in `config.json` but instead passed in a config object to `importGtfs()`.  For example:
+If you want to route logs to a custom function, you can pass a function that takes a single `text` argument as `logFunction`. This can't be defined in `config.json` but instead passed in a config object to `importGtfs()`. For example:
 
 ```js
 import { importGtfs } from 'gtfs';
@@ -248,15 +252,13 @@ const config = {
   agencies: [
     {
       url: 'http://countyconnection.com/GTFS/google_transit.zip',
-      exclude: [
-        'shapes'
-      ]
-    }
+      exclude: ['shapes'],
+    },
   ],
-  logFunction: function(text) {
+  logFunction: function (text) {
     // Do something with the logs here, like save it or send it somewhere
     console.log(text);
-  }
+  },
 };
 
 importGtfs(config);
@@ -282,15 +284,17 @@ Use `importGtfs()` in your code to run an import of a GTFS file specified in a c
 import { importGtfs } from 'gtfs';
 import { readFile } from 'fs/promises';
 
-const config = JSON.parse(await readFile(new URL('./config.json', import.meta.url)));
+const config = JSON.parse(
+  await readFile(new URL('./config.json', import.meta.url))
+);
 
 importGtfs(config)
-.then(() => {
-  console.log('Import Successful');
-})
-.catch(err => {
-  console.error(err);
-});
+  .then(() => {
+    console.log('Import Successful');
+  })
+  .catch((err) => {
+    console.error(err);
+  });
 ```
 
 Configuration can be a JSON object in your code
@@ -303,20 +307,18 @@ const config = {
   agencies: [
     {
       url: 'http://countyconnection.com/GTFS/google_transit.zip',
-      exclude: [
-        'shapes'
-      ]
-    }
-  ]
+      exclude: ['shapes'],
+    },
+  ],
 };
 
 importGtfs(config)
-.then(() => {
-  console.log('Import Successful');
-})
-.catch(err => {
-  console.error(err);
-});
+  .then(() => {
+    console.log('Import Successful');
+  })
+  .catch((err) => {
+    console.error(err);
+  });
 ```
 
 ## `gtfs-export` Script
@@ -340,11 +342,13 @@ By default, it will look for a `config.json` file in the project root. To specif
 ### Command Line options
 
 #### Specify path to config JSON file
+
 You can specify the path to a config file to be used by the export script.
 
     gtfs-export --configPath /path/to/your/custom-config.json
 
 #### Show help
+
 Show all command line options
 
     gtfs-export --help
@@ -361,20 +365,18 @@ const config = {
   agencies: [
     {
       url: 'http://countyconnection.com/GTFS/google_transit.zip',
-      exclude: [
-        'shapes'
-      ]
-    }
-  ]
+      exclude: ['shapes'],
+    },
+  ],
 };
 
 exportGtfs(config)
-.then(() => {
-  console.log('Export Successful');
-})
-.catch(err => {
-  console.error(err);
-});
+  .then(() => {
+    console.log('Export Successful');
+  })
+  .catch((err) => {
+    console.error(err);
+  });
 ```
 
 ## Query Methods
@@ -390,19 +392,15 @@ For example, to get a list of all routes with just `route_id`, `route_short_name
 ```js
 import { openDb, getRoutes } from 'gtfs';
 import { readFile } from 'fs/promises';
-const config = JSON.parse(await readFile(new URL('./config.json', import.meta.url)));
+const config = JSON.parse(
+  await readFile(new URL('./config.json', import.meta.url))
+);
 
 const db = await openDb(config);
 const routes = await getRoutes(
   {},
-  [
-    'route_id',
-    'route_short_name',
-    'route_color'
-  ],
-  [
-    ['route_short_name', 'ASC']
-  ]
+  ['route_id', 'route_short_name', 'route_color'],
+  [['route_short_name', 'ASC']]
 );
 ```
 
@@ -411,16 +409,16 @@ To get a list of all trip_ids for a specific route:
 ```js
 import { openDb, getTrips } from 'gtfs';
 import { readFile } from 'fs/promises';
-const config = JSON.parse(await readFile(new URL('./config.json', import.meta.url)));
+const config = JSON.parse(
+  await readFile(new URL('./config.json', import.meta.url))
+);
 
 const db = await openDb(config);
 const trips = await getTrips(
   {
-    route_id: '123'
+    route_id: '123',
   },
-  [
-    'trip_id'
-  ]
+  ['trip_id']
 );
 ```
 
@@ -469,7 +467,7 @@ getAgencies();
 
 // Get a specific agency
 getAgencies({
-  agency_id: 'caltrain'
+  agency_id: 'caltrain',
 });
 ```
 
@@ -485,7 +483,7 @@ getAttributions();
 
 // Get a specific attribution
 getAttributions({
-  attribution_id: '123'
+  attribution_id: '123',
 });
 ```
 
@@ -497,17 +495,11 @@ Queries routes and returns a promise. The result of the promise is an array of r
 import { getRoutes } from 'gtfs';
 
 // Get all routes, sorted by route_short_name
-getRoutes(
-  {},
-  [],
-  [
-    ['route_short_name', 'ASC']
-  ]
-);
+getRoutes({}, [], [['route_short_name', 'ASC']]);
 
 // Get a specific route
 getRoutes({
-  route_id: 'Lo-16APR'
+  route_id: 'Lo-16APR',
 });
 ```
 
@@ -519,12 +511,10 @@ import { getRoutes } from 'gtfs';
 // Get routes that serve a specific stop, sorted by `stop_name`.
 getRoutes(
   {
-    stop_id: '70011'
+    stop_id: '70011',
   },
   [],
-  [
-    ['stop_name', 'ASC']
-  ]
+  [['stop_name', 'ASC']]
 );
 ```
 
@@ -540,7 +530,7 @@ getStops();
 
 // Get a specific stop by stop_id
 getStops({
-  stop_id: '70011'
+  stop_id: '70011',
 });
 ```
 
@@ -551,7 +541,7 @@ import { getRoutes } from 'gtfs';
 
 // Get all stops for a specific route
 getStops({
-  route_id: 'Lo-16APR'
+  route_id: 'Lo-16APR',
 });
 ```
 
@@ -562,7 +552,7 @@ import { getRoutes } from 'gtfs';
 
 // Get all stops for a specific trip
 getStops({
-  trip_id: '37a'
+  trip_id: '37a',
 });
 ```
 
@@ -578,7 +568,7 @@ getStopsAsGeoJSON();
 
 // Get all stops for a specific route as geoJSON
 getStopsAsGeoJSON({
-  route_id: 'Lo-16APR'
+  route_id: 'Lo-16APR',
 });
 ```
 
@@ -594,24 +584,22 @@ getStoptimes();
 
 // Get all stoptimes for a specific stop
 getStoptimes({
-  stop_id: '70011'
+  stop_id: '70011',
 });
 
 // Get all stoptimes for a specific trip, sorted by stop_sequence
 getStoptimes(
   {
-    trip_id: '37a'
+    trip_id: '37a',
   },
   [],
-  [
-    ['stop_sequence', 'ASC']
-  ]
+  [['stop_sequence', 'ASC']]
 );
 
 // Get all stoptimes for a specific stop and service_id
 getStoptimes({
   stop_id: '70011',
-  service_id: 'CT-16APR-Caltrain-Weekday-01'
+  service_id: 'CT-16APR-Caltrain-Weekday-01',
 });
 ```
 
@@ -657,7 +645,7 @@ getShapes();
 ```
 
 `getShapes` allows passing a `route_id` in the query and it will query trips to find all shapes served by that `route_id`.
-  
+
 ```js
 import { getShapes } from 'gtfs';
 
@@ -674,7 +662,7 @@ import { getShapes } from 'gtfs';
 
 // Get all shapes for a specific trip_id
 getShapes({
-  trip_id: '37a'
+  trip_id: '37a',
 });
 ```
 
@@ -703,17 +691,17 @@ getShapesAsGeoJSON();
 
 // Get geoJSON of stops along a specific route
 getShapesAsGeoJSON({
-  route_id: 'Lo-16APR'
+  route_id: 'Lo-16APR',
 });
 
 // Get geoJSON of stops for a specific trip
 getShapesAsGeoJSON({
-  trip_id: '37a'
+  trip_id: '37a',
 });
 
 // Get geoJSON of stops for a specific `service_id`
 getShapesAsGeoJSON({
-  service_id: 'CT-16APR-Caltrain-Sunday-02'
+  service_id: 'CT-16APR-Caltrain-Sunday-02',
 });
 ```
 
@@ -729,7 +717,7 @@ getCalendars();
 
 // Get calendars for a specific `service_id`
 getCalendars({
-  service_id: 'CT-16APR-Caltrain-Sunday-02'
+  service_id: 'CT-16APR-Caltrain-Sunday-02',
 });
 ```
 
@@ -745,7 +733,7 @@ getCalendarDates();
 
 // Get calendar_dates for a specific `service_id`
 getCalendarDates({
-  service_id: 'CT-16APR-Caltrain-Sunday-02'
+  service_id: 'CT-16APR-Caltrain-Sunday-02',
 });
 ```
 
@@ -761,7 +749,7 @@ getFareAttributes();
 
 // Get `fare_attributes` for a specific `fare_id`
 getFareAttributes({
-  fare_id: '123'
+  fare_id: '123',
 });
 ```
 
@@ -777,7 +765,7 @@ getFareRules();
 
 // Get fare_rules for a specific route
 getFareRules({
-  route_id: 'Lo-16APR'
+  route_id: 'Lo-16APR',
 });
 ```
 
@@ -804,7 +792,7 @@ getFrequencies();
 
 // Get frequencies for a specific trip
 getFrequencies({
-  trip_id: '1234'
+  trip_id: '1234',
 });
 ```
 
@@ -842,7 +830,7 @@ getTransfers();
 
 // Get transfers for a specific stop
 getTransfers({
-  from_stop_id: '1234'
+  from_stop_id: '1234',
 });
 ```
 
@@ -869,13 +857,13 @@ getDirections();
 
 // Get directions for a specific route
 getDirections({
-  route_id: '1234'
+  route_id: '1234',
 });
 
 // Get directions for a specific route and direction
 getDirections({
   route_id: '1234',
-  direction_id: 1
+  direction_id: 1,
 });
 ```
 
@@ -891,7 +879,7 @@ getStopAttributes();
 
 // Get stop attributes for specific stop
 getStopAttributes({
-  stop_id: '1234'
+  stop_id: '1234',
 });
 ```
 
@@ -907,7 +895,7 @@ getTimetables();
 
 // Get a specific timetable
 getTimetables({
-  timetable_id: '1'
+  timetable_id: '1',
 });
 ```
 
@@ -923,7 +911,7 @@ getTimetableStopOrders();
 
 // Get timetable_stop_orders for a specific timetable
 getTimetableStopOrders({
-  timetable_id: '1'
+  timetable_id: '1',
 });
 ```
 
@@ -939,7 +927,7 @@ getTimetablePages();
 
 // Get a specific timetable_page
 getTimetablePages({
-  timetable_page_id: '2'
+  timetable_page_id: '2',
 });
 ```
 
@@ -955,7 +943,7 @@ getTimetableNotes();
 
 // Get a specific timetable_note
 getTimetableNotes({
-  note_id: '1'
+  note_id: '1',
 });
 ```
 
@@ -971,7 +959,7 @@ getTimetableNotesReferences();
 
 // Get all timetable_notes_references for a specific timetable
 getTimetableNotesReferences({
-  timetable_id: '4'
+  timetable_id: '4',
 });
 ```
 
@@ -988,7 +976,6 @@ To run tests:
 To run a specific test:
 
     NODE_ENV=test mocha ./test/mocha/gtfs.get-stoptimes.js
-
 
 ### Linting
 

@@ -8,32 +8,32 @@ const model = {
       type: 'integer',
       min: 0,
       max: 6,
-      required: true
+      required: true,
     },
     {
       name: 'ride_start_date',
       type: 'integer',
-      index: true
+      index: true,
     },
     {
       name: 'ride_end_date',
       type: 'integer',
-      index: true
+      index: true,
     },
     {
       name: 'gtfs_feed_date',
       type: 'integer',
-      index: true
+      index: true,
     },
     {
       name: 'default_currency_type',
-      type: 'varchar(255)'
+      type: 'varchar(255)',
     },
     {
       name: 'ride_feed_version',
-      type: 'varchar(255)'
-    }
-  ]
+      type: 'varchar(255)',
+    },
+  ],
 };
 
 export default model;

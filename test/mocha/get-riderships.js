@@ -20,7 +20,7 @@ describe('getRiderships():', () => {
     const routeId = 'fake-route-id';
 
     const results = await getRiderships({
-      route_id: routeId
+      route_id: routeId,
     });
     should.exists(results);
     results.should.have.length(0);

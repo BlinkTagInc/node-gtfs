@@ -20,7 +20,7 @@ describe('getDirections():', () => {
     const fareRouteId = 'not_real';
 
     const results = await getDirections({
-      route_id: fareRouteId
+      route_id: fareRouteId,
     });
     should.exists(results);
     results.should.have.length(0);

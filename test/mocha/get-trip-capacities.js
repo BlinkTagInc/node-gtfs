@@ -20,7 +20,7 @@ describe('getTripCapacities():', () => {
     const tripId = 'fake-trip-id';
 
     const results = await getTripCapacities({
-      trip_id: tripId
+      trip_id: tripId,
     });
     should.exists(results);
     results.should.have.length(0);

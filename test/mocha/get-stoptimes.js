@@ -20,7 +20,7 @@ describe('getStoptimes():', () => {
     const stopId = 'fake-stop-id';
 
     const results = await getStoptimes({
-      stop_id: stopId
+      stop_id: stopId,
     });
     should.exists(results);
     results.should.have.length(0);
@@ -30,7 +30,7 @@ describe('getStoptimes():', () => {
     const stopId = '70011';
 
     const results = await getStoptimes({
-      stop_id: stopId
+      stop_id: stopId,
     });
     should.exist(results);
     results.should.have.length(80);
@@ -43,11 +43,13 @@ describe('getStoptimes():', () => {
   it('should return array of stoptimes for given trip_id ordered by stop_sequence', async () => {
     const tripId = '421a';
 
-    const results = await getStoptimes({
-      trip_id: tripId
-    }, [], [
-      ['stop_sequence', 'ASC']
-    ]);
+    const results = await getStoptimes(
+      {
+        trip_id: tripId,
+      },
+      [],
+      [['stop_sequence', 'ASC']]
+    );
 
     should.exist(results);
     results.should.have.length(24);

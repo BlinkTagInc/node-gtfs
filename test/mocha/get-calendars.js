@@ -20,7 +20,7 @@ describe('getCalendars():', () => {
     const serviceId = 'fake-service-id';
 
     const results = await getCalendars({
-      service_id: serviceId
+      service_id: serviceId,
     });
     should.exists(results);
     results.should.have.length(0);
@@ -28,7 +28,7 @@ describe('getCalendars():', () => {
 
   it('should return expected calendars by day', async () => {
     const results = await getCalendars({
-      sunday: 1
+      sunday: 1,
     });
 
     const expectedResult = {
@@ -41,7 +41,7 @@ describe('getCalendars():', () => {
       saturday: 0,
       sunday: 1,
       start_date: 20140323,
-      end_date: 20190331
+      end_date: 20190331,
     };
 
     should.exist(results);
@@ -53,8 +53,8 @@ describe('getCalendars():', () => {
     const results = await getCalendars({
       service_id: [
         'CT-16APR-Caltrain-Saturday-02',
-        'CT-16APR-Caltrain-Sunday-02'
-      ]
+        'CT-16APR-Caltrain-Sunday-02',
+      ],
     });
 
     const expectedResults = [
@@ -68,7 +68,7 @@ describe('getCalendars():', () => {
         saturday: 1,
         sunday: 0,
         start_date: 20140329,
-        end_date: 20190331
+        end_date: 20190331,
       },
       {
         service_id: 'CT-16APR-Caltrain-Sunday-02',
@@ -80,8 +80,8 @@ describe('getCalendars():', () => {
         saturday: 0,
         sunday: 1,
         start_date: 20140323,
-        end_date: 20190331
-      }
+        end_date: 20190331,
+      },
     ];
 
     should.exist(results);

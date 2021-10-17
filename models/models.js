@@ -59,7 +59,7 @@ const models = [
   rideFeedInfo,
   riderTrip,
   ridership,
-  tripCapacity
+  tripCapacity,
 ];
 
 export default models;

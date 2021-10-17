@@ -20,7 +20,7 @@ describe('getTimetableStopOrders():', () => {
     const timetableId = 'fake-timetable-id';
 
     const results = await getTimetableStopOrders({
-      timetable_id: timetableId
+      timetable_id: timetableId,
     });
     should.exists(results);
     results.should.have.length(0);

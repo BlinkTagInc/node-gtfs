@@ -19,7 +19,7 @@ describe('getShapesAsGeoJSON():', () => {
   it('should return geojson with an empty features array if no shapes exist', async () => {
     const shapeId = 'fake-shape-id';
     const geojson = await getShapesAsGeoJSON({
-      shape_id: shapeId
+      shape_id: shapeId,
     });
 
     should.exist(geojson);
@@ -42,7 +42,7 @@ describe('getShapesAsGeoJSON():', () => {
     const routeId = 'Lo-16APR';
 
     const geojson = await getShapesAsGeoJSON({
-      route_id: routeId
+      route_id: routeId,
     });
 
     should.exist(geojson);
@@ -59,7 +59,7 @@ describe('getShapesAsGeoJSON():', () => {
 
     const geojson = await getShapesAsGeoJSON({
       route_id: routeId,
-      direction_id: directionId
+      direction_id: directionId,
     });
 
     should.exist(geojson);

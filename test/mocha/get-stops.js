@@ -20,7 +20,7 @@ describe('getStops():', () => {
     const stopId = 'fake-stop-id';
 
     const results = await getStops({
-      stop_id: stopId
+      stop_id: stopId,
     });
     should.exists(results);
     results.should.have.length(0);
@@ -44,7 +44,7 @@ describe('getStops():', () => {
       stop_timezone: null,
       wheelchair_boarding: 1,
       level_id: null,
-      platform_code: null
+      platform_code: null,
     };
 
     should.exist(results);
@@ -56,26 +56,28 @@ describe('getStops():', () => {
     const stopId = '70031';
 
     const results = await getStops({
-      stop_id: stopId
+      stop_id: stopId,
     });
 
-    const expectedResult = [{
-      stop_id: '70031',
-      stop_code: '70031',
-      stop_name: 'Bayshore Caltrain',
-      tts_stop_name: null,
-      stop_desc: null,
-      stop_lat: 37.709537,
-      stop_lon: -122.401586,
-      zone_id: '1',
-      stop_url: 'http://www.caltrain.com/stations/bayshorestation.html',
-      location_type: 0,
-      parent_station: 'ctba',
-      stop_timezone: null,
-      wheelchair_boarding: 1,
-      level_id: null,
-      platform_code: 'NB'
-    }];
+    const expectedResult = [
+      {
+        stop_id: '70031',
+        stop_code: '70031',
+        stop_name: 'Bayshore Caltrain',
+        tts_stop_name: null,
+        stop_desc: null,
+        stop_lat: 37.709537,
+        stop_lon: -122.401586,
+        zone_id: '1',
+        stop_url: 'http://www.caltrain.com/stations/bayshorestation.html',
+        location_type: 0,
+        parent_station: 'ctba',
+        stop_timezone: null,
+        wheelchair_boarding: 1,
+        level_id: null,
+        platform_code: 'NB',
+      },
+    ];
 
     should.exist(results);
     results.length.should.equal(1);
@@ -85,13 +87,13 @@ describe('getStops():', () => {
   it('should return array of stops if it exists for a specific route_id', async () => {
     const routeId = 'Bu-16APR';
 
-    const results = await getStops({
-      route_id: routeId
-    },
-    [],
-    [
-      ['stop_id', 'ASC']
-    ]);
+    const results = await getStops(
+      {
+        route_id: routeId,
+      },
+      [],
+      [['stop_id', 'ASC']]
+    );
 
     const expectedStopIds = [
       '70011',
@@ -117,13 +119,16 @@ describe('getStops():', () => {
       '70261',
       '70262',
       '70271',
-      '70272'
+      '70272',
     ];
 
     should.exist(results);
     results.length.should.equal(24);
     for (const [idx, stop] of results.entries()) {
-      expectedStopIds[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
+      expectedStopIds[idx].should.equal(
+        stop.stop_id,
+        'The order of stops are expected to be the same'
+      );
     }
   });
 
@@ -131,14 +136,14 @@ describe('getStops():', () => {
     const routeId = 'Bu-16APR';
     const directionId = 1;
 
-    const results = await getStops({
-      route_id: routeId,
-      direction_id: directionId
-    },
-    [],
-    [
-      ['stop_id', 'ASC']
-    ]);
+    const results = await getStops(
+      {
+        route_id: routeId,
+        direction_id: directionId,
+      },
+      [],
+      [['stop_id', 'ASC']]
+    );
 
     const expectedStopIds = [
       '70012',
@@ -152,26 +157,29 @@ describe('getStops():', () => {
       '70212',
       '70222',
       '70262',
-      '70272'
+      '70272',
     ];
 
     should.exist(results);
     results.length.should.equal(12);
     for (const [idx, stop] of results.entries()) {
-      expectedStopIds[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
+      expectedStopIds[idx].should.equal(
+        stop.stop_id,
+        'The order of stops are expected to be the same'
+      );
     }
   });
 
   it('should return array of stops for a specific trip_id', async () => {
     const tripId = '427a';
 
-    const results = await getStops({
-      trip_id: tripId
-    },
-    [],
-    [
-      ['stop_id', 'ASC']
-    ]);
+    const results = await getStops(
+      {
+        trip_id: tripId,
+      },
+      [],
+      [['stop_id', 'ASC']]
+    );
 
     const expectedStopIds = [
       '70011',
@@ -197,13 +205,16 @@ describe('getStops():', () => {
       '70221',
       '70231',
       '70241',
-      '70261'
+      '70261',
     ];
 
     should.exist(results);
     results.length.should.equal(24);
     for (const [idx, stop] of results.entries()) {
-      expectedStopIds[idx].should.equal(stop.stop_id, 'The order of stops are expected to be the same');
+      expectedStopIds[idx].should.equal(
+        stop.stop_id,
+        'The order of stops are expected to be the same'
+      );
     }
   });
 });

@@ -6,43 +6,43 @@ const model = {
     {
       name: 'agency_id',
       type: 'varchar(255)',
-      index: true
+      index: true,
     },
     {
       name: 'trip_id',
       type: 'varchar(255)',
-      index: true
+      index: true,
     },
     {
       name: 'service_date',
       type: 'integer',
-      index: true
+      index: true,
     },
     {
       name: 'vehicle_description',
-      type: 'varchar(255)'
+      type: 'varchar(255)',
     },
     {
       name: 'seated_capacity',
       type: 'integer',
-      min: 0
+      min: 0,
     },
     {
       name: 'standing_capacity',
       type: 'integer',
-      min: 0
+      min: 0,
     },
     {
       name: 'wheelchair_capacity',
       type: 'integer',
-      min: 0
+      min: 0,
     },
     {
       name: 'bike_capacity',
       type: 'integer',
-      min: 0
-    }
-  ]
+      min: 0,
+    },
+  ],
 };
 
 export default model;

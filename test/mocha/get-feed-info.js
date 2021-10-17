@@ -20,7 +20,7 @@ describe('getFeedInfo():', () => {
     const feedPublisherName = 'not_real';
 
     const results = await getFeedInfo({
-      feed_publisher_name: feedPublisherName
+      feed_publisher_name: feedPublisherName,
     });
     should.exists(results);
     results.should.have.length(0);

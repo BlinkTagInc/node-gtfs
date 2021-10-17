@@ -20,7 +20,7 @@ describe('getBoardAlights():', () => {
     const tripId = 'fake-trip-id';
 
     const results = await getBoardAlights({
-      trip_id: tripId
+      trip_id: tripId,
     });
     should.exists(results);
     results.should.have.length(0);

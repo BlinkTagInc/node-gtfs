@@ -13,22 +13,22 @@ const { argv } = yargs(hideBin(process.argv))
   .option('c', {
     alias: 'configPath',
     describe: 'Path to config file',
-    type: 'string'
+    type: 'string',
   })
   .option('gtfsPath', {
     describe: 'Path to gtfs (zipped or unzipped)',
-    type: 'string'
+    type: 'string',
   })
   .option('gtfsUrl', {
     describe: 'URL of gtfs file',
-    type: 'string'
+    type: 'string',
   })
   .option('sqlitePath', {
     describe: 'Path to SQLite database',
-    type: 'string'
+    type: 'string',
   });
 
-const handleError = error => {
+const handleError = (error) => {
   const text = error || 'Unknown Error';
   process.stdout.write(`\n${formatError(text)}\n`);
   console.error(error);
@@ -41,5 +41,4 @@ const setupImport = async () => {
   process.exit();
 };
 
-setupImport()
-  .catch(handleError);
+setupImport().catch(handleError);

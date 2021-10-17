@@ -20,7 +20,7 @@ describe('getTransfers():', () => {
     const fromStopId = 'fake-stop-id';
 
     const results = await getTransfers({
-      from_stop_id: fromStopId
+      from_stop_id: fromStopId,
     });
     should.exists(results);
     results.should.have.length(0);

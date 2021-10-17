@@ -6,102 +6,102 @@ const model = {
     {
       name: 'rider_id',
       type: 'varchar(255)',
-      primary: true
+      primary: true,
     },
     {
       name: 'agency_id',
       type: 'varchar(255)',
-      index: true
+      index: true,
     },
     {
       name: 'trip_id',
       type: 'varchar(255)',
-      index: true
+      index: true,
     },
     {
       name: 'boarding_stop_id',
       type: 'varchar(255)',
-      index: true
+      index: true,
     },
     {
       name: 'boarding_stop_sequence',
       type: 'integer',
       min: 0,
-      index: true
+      index: true,
     },
     {
       name: 'alighting_stop_id',
       type: 'varchar(255)',
-      index: true
+      index: true,
     },
     {
       name: 'alighting_stop_sequence',
       type: 'integer',
       min: 0,
-      index: true
+      index: true,
     },
     {
       name: 'service_date',
       type: 'integer',
-      index: true
+      index: true,
     },
     {
       name: 'boarding_time',
-      type: 'varchar(255)'
+      type: 'varchar(255)',
     },
     {
       name: 'boarding_timestamp',
       type: 'integer',
-      index: true
+      index: true,
     },
     {
       name: 'alighting_time',
-      type: 'varchar(255)'
+      type: 'varchar(255)',
     },
     {
       name: 'alighting_timestamp',
       type: 'integer',
-      index: true
+      index: true,
     },
     {
       name: 'rider_type',
       type: 'integer',
       min: 0,
-      max: 13
+      max: 13,
     },
     {
       name: 'rider_type_description',
-      type: 'varchar(255)'
+      type: 'varchar(255)',
     },
     {
       name: 'fare_paid',
-      type: 'real'
+      type: 'real',
     },
     {
       name: 'transaction_type',
       type: 'integer',
       min: 0,
-      max: 8
+      max: 8,
     },
     {
       name: 'fare_media',
       type: 'integer',
       min: 0,
-      max: 9
+      max: 9,
     },
     {
       name: 'accompanying_device',
       type: 'integer',
       min: 0,
-      max: 6
+      max: 6,
     },
     {
       name: 'transfer_status',
       type: 'integer',
       min: 0,
-      max: 1
-    }
-  ]
+      max: 1,
+    },
+  ],
 };
 
 export default model;

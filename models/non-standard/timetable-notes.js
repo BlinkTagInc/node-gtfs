@@ -5,17 +5,17 @@ const model = {
     {
       name: 'note_id',
       type: 'varchar(255)',
-      primary: true
+      primary: true,
     },
     {
       name: 'symbol',
-      type: 'varchar(255)'
+      type: 'varchar(255)',
     },
     {
       name: 'note',
-      type: 'varchar(2047)'
-    }
-  ]
+      type: 'varchar(2047)',
+    },
+  ],
 };
 
 export default model;
