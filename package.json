@@ -93,5 +93,15 @@
   },
   "engines": {
     "node": ">= 14.17.0"
+  },
+  "release-it": {
+    "github": {
+      "release": true
+    },
+    "plugins": {
+      "@release-it/keep-a-changelog": {
+        "filename": "CHANGELOG.md"
+      }
+    }
   }
 }
