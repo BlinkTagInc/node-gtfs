@@ -1,28 +1,32 @@
-# Node-GTFS
+<p align="center">
+  ➡️
+  <a href="#installation">Installation</a> |
+  <a href="#quick-start">Quick Start</a> |
+  <a href="#configuration">Configuration</a> |
+  <a href="#query-methods">Query Methods</a>
+  ⬅️
+  <br /><br />
+  <img src="docs/images/node-gtfs-logo.svg" alt="node-GTFS" />
+  <br /><br />
+  <a href="https://www.npmjs.com/package/gtfs" rel="nofollow"><img src="https://img.shields.io/npm/v/gtfs.svg?style=flat" style="max-width: 100%;"></a>
+  <a href="https://www.npmjs.com/package/gtfs" rel="nofollow"><img src="https://img.shields.io/npm/dm/gtfs.svg?style=flat" style="max-width: 100%;"></a>
+  <a href="https://github.com/BlinkTagInc/node-gtfs/actions?query=workflow%3A%22Node+CI%22"><img src="https://img.shields.io/github/workflow/status/BlinkTagInc/node-gtfs/Node%20CI.svg" alt="CircleCI" style="max-width: 100%;"></a>
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg">
+  <br /><br />
+  Import and Export GTFS transit data into SQLite. Query or change routes, stops, times, fares and more.
+  <br /><br />
+  <a href="https://nodei.co/npm/gtfs/" rel="nofollow"><img src="https://nodei.co/npm/gtfs.png?downloads=true" alt="NPM" style="max-width: 100%;"></a>
+</p>
 
-[![NPM version](https://img.shields.io/npm/v/gtfs.svg?style=flat)](https://www.npmjs.com/package/gtfs)
-[![David](https://img.shields.io/david/blinktaginc/node-gtfs.svg)](https://david-dm.org/blinktaginc/node-gtfs)
-[![npm](https://img.shields.io/npm/dm/gtfs.svg?style=flat)](https://www.npmjs.com/package/gtfs)
-[![CircleCI](https://img.shields.io/github/workflow/status/BlinkTagInc/node-gtfs/Node%20CI.svg)](https://github.com/BlinkTagInc/node-gtfs/actions?query=workflow%3A%22Node+CI%22)
-[![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
-
-[![NPM](https://nodei.co/npm/gtfs.png?downloads=true)](https://nodei.co/npm/gtfs/)
+<hr>
 
 `node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/) into a SQLite database and provides some methods to query for agencies, routes, stops, times, fares, calendars and other GTFS data. It also offers spatial queries to find nearby stops, routes and agencies and can convert stops and shapes to geoJSON format.
 
 Additionally, this library can export data from the SQLite database back into GTFS (csv) format.
 
+You can use it as a [command-line tool](#command-line-examples) or as a [node.js module](#code-example).
+
 This library has three parts: the [GTFS import script](#gtfs-import-script), the [query methods](#query-methods) and the [GTFS export script](#gtfs-export-script)
-
-## Example Application
-
-The [GTFS-to-HTML](https://gtfstohtml.com) app uses `node-gtfs` for downloading, importing and querying GTFS data. It provides a good example of how to use this library and is used by over a dozen transit agencies to generate the timetables on their websites.
-
-The [GTFS-to-geojson](https://github.com/blinktaginc/gtfs-to-geojson) app creates geoJSON files for transit routes for use in mapping. It uses `node-gtfs` for downloading, importing and querying GTFS data. It provides a good example of how to use this library.
-
-The [GTFS-to-chart](https://github.com/blinktaginc/gtfs-to-chart) app generates a stringline chart in D3 for all trips for a specific route using data from an agency's GTFS. It uses `node-gtfs` for downloading, importing and querying GTFS data.
-
-The [GTFS-Text-to-Speech](https://github.com/blinktaginc/node-gtfs-tts) app tests GTFS stop name pronunciation for text-to-speech. It uses `node-gtfs` for loading stop names from GTFS data.
 
 ## Installation
 
@@ -32,7 +36,9 @@ If you would like to use this library as a command-line utility, you can install
 
 If you are using this as a node module as part of an application, you can include it in your project's `package.json` file.
 
-## Command-line examples
+## Quick Start
+
+### Command-line examples
 
     gtfs-import --gtfsUrl http://www.bart.gov/dev/schedules/google_transit.zip
 
@@ -50,7 +56,7 @@ or
 
     gtfs-export --configPath /path/to/your/custom-config.json
 
-## Code example
+### Code example
 
 ```js
 import { importGtfs } from 'gtfs';
@@ -67,6 +73,27 @@ importGtfs(config)
     console.error(err);
   });
 ```
+
+### Example Applications
+
+<table>
+  <tr>
+    <td><img src="https://github.com/BlinkTagInc/gtfs-to-html/raw/master/www/static/img/gtfs-to-html-logo.svg" alt="GTFS-to-HTML" width="200"></td>
+    <td><a href="https://gtfstohtml.com">GTFS-to-HTML</a> uses `node-gtfs` for downloading, importing and querying GTFS data. It provides a good example of how to use this library and is used by over a dozen transit agencies to generate the timetables on their websites.</td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/BlinkTagInc/gtfs-to-geojson/raw/master/docs/images/gtfs-to-geojson-logo.svg" alt="GTFS-to-geojson" width="200"></td>
+    <td><a href="https://github.com/blinktaginc/gtfs-to-geojson">GTFS-to-geojson</a> creates geoJSON files for transit routes for use in mapping. It uses `node-gtfs` for downloading, importing and querying GTFS data. It provides a good example of how to use this library.</td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/BlinkTagInc/gtfs-to-chart/raw/master/docs/images/gtfs-to-chart-logo.svg" alt="GTFS-to-Chart" width="200"></td>
+    <td><a href="https://github.com/blinktaginc/gtfs-to-chart">GTFS-to-chart</a> generates a stringline chart in D3 for all trips for a specific route using data from an agency's GTFS. It uses `node-gtfs` for downloading, importing and querying GTFS data.</td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/BlinkTagInc/gtfs-tts/raw/main/docs/images/gtfs-tts-logo.svg" alt="GTFS-TTS" width="200"></td>
+    <td><a href="https://github.com/blinktaginc/gtfs-tts">GTFS-Text-to-Speech</a> app tests GTFS stop name pronunciation for text-to-speech. It uses `node-gtfs` for loading stop names from GTFS data.</td>
+  </tr>
+</table>
 
 ## Command Line Usage
 
@@ -98,7 +125,7 @@ Specify a URL to a zipped GTFS file.
 
     gtfs-import --gtfsUrl http://www.bart.gov/dev/schedules/google_transit.zip
 
-## Configuration Files
+## Configuration
 
 Copy `config-sample.json` to `config.json` and then add your projects configuration to `config.json`.
 
