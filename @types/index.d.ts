@@ -1,7 +1,11 @@
 import CsvParse = require("csv-parse");
 import * as Sqlite3 from "sqlite";
 
-export type SqlDatabase = ReturnType<typeof Sqlite3.open>;
+export {}; // disable implicit exporting of types
+
+type Unpromise<T> = T extends Promise<infer U> ? U : T;
+
+export type SqlDatabase = Unpromise<ReturnType<typeof Sqlite3.open>>;
 
 export type SqlValue = undefined | null | string | number | boolean | Date | SqlValue[];
 
