@@ -1,5 +1,6 @@
 import CsvParse = require("csv-parse");
 import * as Sqlite3 from "sqlite";
+import { FeatureCollection, Geometry } from "@turf/helpers";
 
 export {}; // disable implicit exporting of types
 
@@ -115,7 +116,7 @@ export function getStops(query?: SqlWhere, fields?: SqlSelect, sortBy?: SqlOrder
  * Queries stops and returns a promise for an geoJSON object of stops.
  * All valid queries for `getStops()` work for `getStopsAsGeoJSON()`.
  */
-export function getStopsAsGeoJSON(query?: SqlWhere): Promise<SqlResults>;
+export function getStopsAsGeoJSON(query?: SqlWhere): Promise<FeatureCollection<Geometry, { [name: string]: any; }>>;
 
 /**
  * Queries `stop_times` and returns a promise for an array of stop_times.
@@ -136,7 +137,7 @@ export function getShapes(query?: SqlWhere, fields?: SqlSelect, sortBy?: SqlOrde
  * Queries shapes and returns a promise for an geoJSON object of shapes.
  * All valid queries for `getShapes()` work for `getShapesAsGeoJSON()`.
  */
-export function getShapesAsGeoJSON(query?: SqlWhere): Promise<SqlResults>;
+export function getShapesAsGeoJSON(query?: SqlWhere): Promise<FeatureCollection<Geometry, { [name: string]: any; }>>;
 
 /**
  * Queries calendars and returns a promise for an array of calendars.
