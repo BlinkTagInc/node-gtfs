@@ -18,7 +18,30 @@ export type SqlOrderBy = Array<[string, "ASC" | "DESC"]>;
 
 export type SqlResults = Array<Record<string, any>>;
 
-export interface Config {
+export type Config = ExportConfig & ImportConfig;
+
+interface VerboseConfig {
+    /**
+     * Whether or not to print output to the console. Defaults to true.
+     */
+    verbose?: boolean;
+}
+
+export interface DbConfig {
+    /**
+     * A path to an SQLite database. Defaults to using an in-memory database.
+     */
+    sqlitePath?: string;
+}
+
+export interface ExportConfig extends DbConfig, VerboseConfig {
+    /**
+     * Path to a directory to store exported GTFS files. Defaults to `gtfs-export/<agency_name>`.
+     */
+    exportPath?: string;
+}
+
+export interface ImportConfig extends DbConfig, VerboseConfig {
     /**
      * An array of GTFS files to be imported.
      */
@@ -50,37 +73,22 @@ export interface Config {
      * Options passed to csv-parse for parsing GTFS CSV files.
      */
     csvOptions?: CsvParse.Options;
-
-    /**
-     * Path to a directory to store exported GTFS files. Defaults to `gtfs-export/<agency_name>`.
-     */
-    exportPath?: string;
-
-    /**
-     * A path to an SQLite database. Defaults to using an in-memory database.
-     */
-    sqlitePath?: string;
-
-    /**
-     * Whether or not to print output to the console. Defaults to true.
-     */
-    verbose?: boolean;
 }
 
 /**
  * Use exportGtfs() in your code to run an export of a GTFS file specified in a config.json file.
  */
-export function exportGtfs(config: Config): Promise<void>;
+export function exportGtfs(config: ExportConfig): Promise<void>;
 
 /**
  * Use importGtfs() in your code to run an import of a GTFS file specified in a config.json file.
  */
-export function importGtfs(config: Config): Promise<void>;
+export function importGtfs(config: ImportConfig): Promise<void>;
 
 /**
  * Open database before making any queries.
  */
-export function openDb(config: Config): Promise<SqlDatabase>;
+export function openDb(config: DbConfig): Promise<SqlDatabase>;
 
 /**
  * Closes open database.
