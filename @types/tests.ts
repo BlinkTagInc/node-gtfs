@@ -1,4 +1,4 @@
-import { Config, exportGtfs, getAgencies, getDb, importGtfs, openDb } from "gtfs";
+import { Config, exportGtfs, getAgencies, getDb, getShapesAsGeoJSON, importGtfs, openDb } from "gtfs";
 
 /**
  * This is type-checked (but not executed) by dtslint.
@@ -21,4 +21,6 @@ import { Config, exportGtfs, getAgencies, getDb, importGtfs, openDb } from "gtfs
 
     const results = await getAgencies();
     results[0]; // $ExpectType Record<string, any>
+
+    await getShapesAsGeoJSON(); // $ExpectType FeatureCollection<Geometry, { [name: string]: any; }>
 })();
