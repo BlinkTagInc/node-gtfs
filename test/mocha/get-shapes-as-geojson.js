@@ -2,9 +2,14 @@
 
 import should from 'should';
 
-import { openDb, closeDb } from '../../lib/db.js';
 import config from '../test-config.js';
-import { importGtfs, getShapesAsGeoJSON } from '../../index.js';
+import {
+  openDb,
+  getDb,
+  closeDb,
+  importGtfs,
+  getShapesAsGeoJSON,
+} from '../../index.js';
 
 describe('getShapesAsGeoJSON():', () => {
   before(async () => {
@@ -13,7 +18,8 @@ describe('getShapesAsGeoJSON():', () => {
   });
 
   after(async () => {
-    await closeDb();
+    const db = getDb(config);
+    await closeDb(db);
   });
 
   it('should return geojson with an empty features array if no shapes exist', async () => {

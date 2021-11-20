@@ -2,9 +2,14 @@
 
 import should from 'should';
 
-import { openDb, closeDb } from '../../lib/db.js';
 import config from '../test-config.js';
-import { importGtfs, getTimetableStopOrders } from '../../index.js';
+import {
+  openDb,
+  getDb,
+  closeDb,
+  importGtfs,
+  getTimetableStopOrders,
+} from '../../index.js';
 
 describe('getTimetableStopOrders():', () => {
   before(async () => {
@@ -13,7 +18,8 @@ describe('getTimetableStopOrders():', () => {
   });
 
   after(async () => {
-    await closeDb();
+    const db = getDb(config);
+    await closeDb(db);
   });
 
   it('should return empty array if no timetable stop orders (GTFS-to-HTML timetables)', async () => {

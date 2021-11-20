@@ -2,9 +2,8 @@
 
 import should from 'should';
 
-import { openDb, closeDb } from '../../lib/db.js';
 import config from '../test-config.js';
-import { importGtfs, getStops } from '../../index.js';
+import { openDb, getDb, closeDb, importGtfs, getStops } from '../../index.js';
 
 describe('getStops():', () => {
   before(async () => {
@@ -13,7 +12,8 @@ describe('getStops():', () => {
   });
 
   after(async () => {
-    await closeDb();
+    const db = getDb(config);
+    await closeDb(db);
   });
 
   it('should return an empty array if no stops exist', async () => {

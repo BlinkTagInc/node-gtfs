@@ -2,9 +2,8 @@
 
 import should from 'should';
 
-import { openDb, closeDb } from '../../lib/db.js';
 import config from '../test-config.js';
-import { importGtfs, getTrips } from '../../index.js';
+import { openDb, getDb, closeDb, importGtfs, getTrips } from '../../index.js';
 
 describe('getTrips():', () => {
   before(async () => {
@@ -13,7 +12,8 @@ describe('getTrips():', () => {
   });
 
   after(async () => {
-    await closeDb();
+    const db = getDb(config);
+    await closeDb(db);
   });
 
   it('should return empty array if no trips exist', async () => {

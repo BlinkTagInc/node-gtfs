@@ -2,9 +2,14 @@
 
 import should from 'should';
 
-import { openDb, closeDb } from '../../lib/db.js';
 import config from '../test-config.js';
-import { importGtfs, getRiderTrips } from '../../index.js';
+import {
+  openDb,
+  getDb,
+  closeDb,
+  importGtfs,
+  getRiderTrips,
+} from '../../index.js';
 
 describe('getRiderTrips():', () => {
   before(async () => {
@@ -13,7 +18,8 @@ describe('getRiderTrips():', () => {
   });
 
   after(async () => {
-    await closeDb();
+    const db = getDb(config);
+    await closeDb(db);
   });
 
   it('should return empty array if no rider trips (GTFS-ride)', async () => {
