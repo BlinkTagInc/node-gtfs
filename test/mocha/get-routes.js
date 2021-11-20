@@ -2,9 +2,8 @@
 
 import should from 'should';
 
-import { openDb, closeDb } from '../../lib/db.js';
 import config from '../test-config.js';
-import { importGtfs, getRoutes } from '../../index.js';
+import { openDb, getDb, closeDb, importGtfs, getRoutes } from '../../index.js';
 
 describe('getRoutes():', () => {
   before(async () => {
@@ -13,7 +12,8 @@ describe('getRoutes():', () => {
   });
 
   after(async () => {
-    await closeDb();
+    const db = getDb(config);
+    await closeDb(db);
   });
 
   it('should return empty array if no routes for given agency exist', async () => {

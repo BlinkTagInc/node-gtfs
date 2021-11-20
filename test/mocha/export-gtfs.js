@@ -8,10 +8,16 @@ import { rm } from 'node:fs/promises';
 import parse from 'csv-parse';
 import should from 'should';
 
-import { openDb, closeDb } from '../../lib/db.js';
 import { unzip, generateFolderName } from '../../lib/file-utils.js';
 import config from '../test-config.js';
-import { importGtfs, exportGtfs, getAgencies } from '../../index.js';
+import {
+  openDb,
+  getDb,
+  closeDb,
+  importGtfs,
+  exportGtfs,
+  getAgencies,
+} from '../../index.js';
 import models from '../../models/models.js';
 
 describe('exportGtfs():', function () {
@@ -21,7 +27,8 @@ describe('exportGtfs():', function () {
   });
 
   after(async () => {
-    await closeDb();
+    const db = getDb(config);
+    await closeDb(db);
   });
 
   this.timeout(10000);

@@ -2,9 +2,8 @@
 
 import should from 'should';
 
-import { openDb, closeDb } from '../../lib/db.js';
 import config from '../test-config.js';
-import { importGtfs, getShapes } from '../../index.js';
+import { openDb, getDb, closeDb, importGtfs, getShapes } from '../../index.js';
 
 describe('getShapes():', () => {
   before(async () => {
@@ -13,7 +12,8 @@ describe('getShapes():', () => {
   });
 
   after(async () => {
-    await closeDb();
+    const db = getDb(config);
+    await closeDb(db);
   });
 
   it('should return an empty array if no shapes exist', async () => {

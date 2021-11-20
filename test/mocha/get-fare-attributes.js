@@ -2,9 +2,14 @@
 
 import should from 'should';
 
-import { openDb, closeDb } from '../../lib/db.js';
 import config from '../test-config.js';
-import { importGtfs, getFareAttributes } from '../../index.js';
+import {
+  openDb,
+  getDb,
+  closeDb,
+  importGtfs,
+  getFareAttributes,
+} from '../../index.js';
 
 describe('getFareAttributes():', () => {
   before(async () => {
@@ -13,7 +18,8 @@ describe('getFareAttributes():', () => {
   });
 
   after(async () => {
-    await closeDb();
+    const db = getDb(config);
+    await closeDb(db);
   });
 
   it('should return empty array if no fare_attributes', async () => {

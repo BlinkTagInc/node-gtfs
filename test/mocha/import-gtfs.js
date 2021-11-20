@@ -7,10 +7,9 @@ import { fileURLToPath } from 'node:url';
 import parse from 'csv-parse';
 import should from 'should';
 
-import { openDb, closeDb } from '../../lib/db.js';
 import { unzip } from '../../lib/file-utils.js';
 import config from '../test-config.js';
-import { importGtfs, getRoutes } from '../../index.js';
+import { openDb, getDb, closeDb, importGtfs, getRoutes } from '../../index.js';
 import models from '../../models/models.js';
 
 let db;
@@ -36,7 +35,8 @@ describe('importGtfs():', function () {
   });
 
   after(async () => {
-    await closeDb();
+    const db = getDb(config);
+    await closeDb(db);
   });
 
   this.timeout(10000);
