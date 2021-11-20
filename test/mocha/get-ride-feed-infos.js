@@ -2,9 +2,14 @@
 
 import should from 'should';
 
-import { openDb, closeDb } from '../../lib/db.js';
 import config from '../test-config.js';
-import { importGtfs, getRideFeedInfos } from '../../index.js';
+import {
+  openDb,
+  getDb,
+  closeDb,
+  importGtfs,
+  getRideFeedInfos,
+} from '../../index.js';
 
 describe('getRideFeedInfos():', () => {
   before(async () => {
@@ -13,7 +18,8 @@ describe('getRideFeedInfos():', () => {
   });
 
   after(async () => {
-    await closeDb();
+    const db = getDb(config);
+    await closeDb(db);
   });
 
   it('should return empty array if no ride-feed-infos (GTFS-ride)', async () => {

@@ -2,9 +2,14 @@
 
 import should from 'should';
 
-import { openDb, closeDb } from '../../lib/db.js';
 import config from '../test-config.js';
-import { importGtfs, getTimetables } from '../../index.js';
+import {
+  openDb,
+  getDb,
+  closeDb,
+  importGtfs,
+  getTimetables,
+} from '../../index.js';
 
 describe('getTimetables():', () => {
   before(async () => {
@@ -13,7 +18,8 @@ describe('getTimetables():', () => {
   });
 
   after(async () => {
-    await closeDb();
+    const db = getDb(config);
+    await closeDb(db);
   });
 
   it('should return empty array if no timetables (GTFS-to-HTML timetables)', async () => {

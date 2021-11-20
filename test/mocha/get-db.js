@@ -1,10 +1,21 @@
 /* eslint-env mocha */
 
 import should from 'should';
+import fs from 'fs';
 
-import { openDb, closeDb } from '../../lib/db.js';
 import config from '../test-config.js';
-import { importGtfs, getDb } from '../../index.js';
+import { openDb, getDb, closeDb, importGtfs, getShapes } from '../../index.js';
+
+const db2Config = {
+  ...config,
+  agencies: [
+    {
+      ...config.agencies[0],
+      exclude: ['shapes'],
+    },
+  ],
+  sqlitePath: './tmpdb',
+};
 
 describe('getDb():', () => {
   before(async () => {
@@ -13,7 +24,13 @@ describe('getDb():', () => {
   });
 
   after(async () => {
-    await closeDb();
+    const db = getDb(config);
+    await closeDb(db);
+
+    // Close db2 and then delete it
+    const db2 = getDb(db2Config);
+    await closeDb(db2);
+    fs.unlinkSync(db2Config.sqlitePath);
   });
 
   it('should allow raw db queries: calendar_dates', async () => {
@@ -40,5 +57,47 @@ describe('getDb():', () => {
     );
     should.exists(results);
     results.should.have.length(62);
+  });
+
+  it('should allow multiple db connections', async () => {
+    const db2 = await openDb(db2Config);
+    await importGtfs(db2Config);
+
+    const db1 = getDb(config);
+
+    db1.config.filename.should.equal(':memory:');
+    db2.config.filename.should.equal('./tmpdb');
+
+    // Query db1 for shapes
+    const shapeId = 'cal_sf_tam';
+    const results1 = await getShapes({
+      shape_id: shapeId,
+    });
+
+    const expectedResult = {
+      id: 1424,
+      shape_id: 'cal_sf_tam',
+      shape_pt_lat: 37.45375587083584,
+      shape_pt_lon: -122.18063950538635,
+      shape_pt_sequence: 279,
+      shape_dist_traveled: null,
+    };
+
+    should.exist(results1);
+    results1.length.should.equal(401);
+    results1.should.containEql(expectedResult);
+
+    // Query db2 for shapes, none should exist
+    const results2 = await getShapes(
+      {
+        shape_id: shapeId,
+      },
+      [],
+      [],
+      { db: db2 }
+    );
+
+    should.exist(results2);
+    results2.length.should.equal(0);
   });
 });

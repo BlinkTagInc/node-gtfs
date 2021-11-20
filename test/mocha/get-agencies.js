@@ -1,9 +1,14 @@
 /* eslint-env mocha */
 import should from 'should';
 
-import { openDb, closeDb } from '../../lib/db.js';
 import config from '../test-config.js';
-import { importGtfs, getAgencies } from '../../index.js';
+import {
+  openDb,
+  getDb,
+  closeDb,
+  importGtfs,
+  getAgencies,
+} from '../../index.js';
 
 describe('getAgencies():', () => {
   before(async () => {
@@ -12,7 +17,8 @@ describe('getAgencies():', () => {
   });
 
   after(async () => {
-    await closeDb();
+    const db = getDb(config);
+    await closeDb(db);
   });
 
   it('should return empty array if no agencies exist', async () => {

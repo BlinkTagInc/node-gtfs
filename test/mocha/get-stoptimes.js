@@ -2,9 +2,14 @@
 
 import should from 'should';
 
-import { openDb, closeDb } from '../../lib/db.js';
 import config from '../test-config.js';
-import { importGtfs, getStoptimes } from '../../index.js';
+import {
+  openDb,
+  getDb,
+  closeDb,
+  importGtfs,
+  getStoptimes,
+} from '../../index.js';
 
 describe('getStoptimes():', () => {
   before(async () => {
@@ -13,7 +18,8 @@ describe('getStoptimes():', () => {
   });
 
   after(async () => {
-    await closeDb();
+    const db = getDb(config);
+    await closeDb(db);
   });
 
   it('should return an empty array if no stoptimes exist for given agency', async () => {
