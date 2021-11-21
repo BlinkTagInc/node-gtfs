@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createReadStream, existsSync } from 'node:fs';
 import { rm } from 'node:fs/promises';
-import parse from 'csv-parse';
+import { parse } from 'csv-parse';
 import should from 'should';
 
 import { unzip, generateFolderName } from '../../lib/file-utils.js';

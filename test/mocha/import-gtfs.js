@@ -4,7 +4,7 @@
 import { createReadStream, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import parse from 'csv-parse';
+import { parse } from 'csv-parse';
 import should from 'should';
 
 import { unzip } from '../../lib/file-utils.js';
