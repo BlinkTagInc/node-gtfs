@@ -52,7 +52,8 @@
     "Oskari Groenroos <oskari@groenroos.fi>",
     "Devin Packer",
     "Darius MARTIN",
-    "Mike Brocks"
+    "Mike Brocks",
+    "Matt Moran"
   ],
   "type": "module",
   "main": "index.js",
