@@ -60,7 +60,9 @@
     "gtfs-export": "bin/gtfs-export.js",
     "gtfs-import": "bin/gtfs-import.js"
   },
+  "types": "@types",
   "scripts": {
+    "dtslint": "dtslint @types",
     "lint": "eslint **/*.js",
     "lint-fix": "eslint **/*.js --fix",
     "test": "eslint **/*.js && NODE_ENV=test mocha ./test/mocha/**/*.js --timeout 2000"
@@ -87,6 +89,7 @@
     "yargs": "^17.2.1"
   },
   "devDependencies": {
+    "dtslint": "^4.2.0",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-xo": "^0.39.0",

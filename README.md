@@ -2,6 +2,7 @@
   ➡️
   <a href="#installation">Installation</a> |
   <a href="#quick-start">Quick Start</a> |
+  <a href="#typescript-support">TypeScript Support</a> |
   <a href="#configuration">Configuration</a> |
   <a href="#query-methods">Query Methods</a>
   ⬅️
@@ -124,6 +125,10 @@ or
 Specify a URL to a zipped GTFS file.
 
     gtfs-import --gtfsUrl http://www.bart.gov/dev/schedules/google_transit.zip
+
+## TypeScript Support
+
+Basic TypeScript typings are included with this library. Please [open an issue](https://github.com/blinktaginc/node-gtfs/issues) if you find any inconsistencies between the declared types and underlying code.
 
 ## Configuration
 
