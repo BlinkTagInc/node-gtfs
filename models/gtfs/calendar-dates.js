@@ -29,6 +29,7 @@ const model = {
     {
       name: 'holiday_name',
       type: 'varchar(255)',
+      nocase: true,
     },
   ],
 };

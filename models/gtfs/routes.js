@@ -13,14 +13,17 @@ const model = {
     {
       name: 'route_short_name',
       type: 'varchar(255)',
+      nocase: true,
     },
     {
       name: 'route_long_name',
       type: 'varchar(255)',
+      nocase: true,
     },
     {
       name: 'route_desc',
       type: 'varchar(255)',
+      nocase: true,
     },
     {
       name: 'route_type',
@@ -33,14 +36,17 @@ const model = {
     {
       name: 'route_url',
       type: 'varchar(2047)',
+      nocase: true,
     },
     {
       name: 'route_color',
       type: 'varchar(255)',
+      nocase: true,
     },
     {
       name: 'route_text_color',
       type: 'varchar(255)',
+      nocase: true,
     },
     {
       name: 'route_sort_order',

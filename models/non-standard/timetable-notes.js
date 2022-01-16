@@ -14,6 +14,7 @@ const model = {
     {
       name: 'note',
       type: 'varchar(2047)',
+      nocase: true,
     },
   ],
 };

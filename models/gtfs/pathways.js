@@ -55,10 +55,12 @@ const model = {
     {
       name: 'signposted_as',
       type: 'varchar(255)',
+      nocase: true,
     },
     {
       name: 'reversed_signposted_as',
       type: 'varchar(255)',
+      nocase: true,
     },
   ],
 };

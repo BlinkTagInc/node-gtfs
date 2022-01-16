@@ -14,6 +14,7 @@ const model = {
     {
       name: 'filename',
       type: 'varchar(255)',
+      nocase: true,
     },
   ],
 };

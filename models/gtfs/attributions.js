@@ -26,6 +26,7 @@ const model = {
       name: 'organization_name',
       type: 'varchar(255)',
       required: true,
+      nocase: true,
     },
     {
       name: 'is_producer',
@@ -48,14 +49,17 @@ const model = {
     {
       name: 'attribution_url',
       type: 'varchar(2047)',
+      nocase: true,
     },
     {
       name: 'attribution_email',
       type: 'varchar(255)',
+      nocase: true,
     },
     {
       name: 'attribution_phone',
       type: 'varchar(255)',
+      nocase: true,
     },
   ],
 };
