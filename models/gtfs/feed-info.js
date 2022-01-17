@@ -16,7 +16,6 @@ const model = {
       name: 'feed_publisher_url',
       type: 'varchar(2047)',
       required: true,
-      nocase: true,
     },
     {
       name: 'feed_lang',
@@ -48,7 +47,6 @@ const model = {
     {
       name: 'feed_contact_url',
       type: 'varchar(2047)',
-      nocase: true,
     },
   ],
 };

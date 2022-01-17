@@ -49,7 +49,6 @@ const model = {
     {
       name: 'attribution_url',
       type: 'varchar(2047)',
-      nocase: true,
     },
     {
       name: 'attribution_email',

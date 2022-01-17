@@ -44,7 +44,6 @@ const model = {
     {
       name: 'stop_url',
       type: 'varchar(2047)',
-      nocase: true,
     },
     {
       name: 'location_type',

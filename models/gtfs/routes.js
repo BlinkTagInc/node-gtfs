@@ -36,7 +36,6 @@ const model = {
     {
       name: 'route_url',
       type: 'varchar(2047)',
-      nocase: true,
     },
     {
       name: 'route_color',

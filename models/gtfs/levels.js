@@ -14,6 +14,7 @@ const model = {
     {
       name: 'level_name',
       type: 'varchar(255)',
+      nocase: true,
     },
   ],
 };

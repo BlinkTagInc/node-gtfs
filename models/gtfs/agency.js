@@ -20,7 +20,6 @@ const model = {
       name: 'agency_url',
       type: 'varchar(2047)',
       required: true,
-      nocase: true,
     },
     {
       name: 'agency_timezone',
@@ -40,7 +39,6 @@ const model = {
     {
       name: 'agency_fare_url',
       type: 'varchar(2047)',
-      nocase: true,
     },
     {
       name: 'agency_email',
