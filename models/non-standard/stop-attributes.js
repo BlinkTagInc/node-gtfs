@@ -16,6 +16,7 @@ const model = {
     {
       name: 'stop_city',
       type: 'varchar(255)',
+      nocase: true,
     },
   ],
 };

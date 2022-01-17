@@ -45,6 +45,7 @@ const model = {
     {
       name: 'stop_headsign',
       type: 'varchar(255)',
+      nocase: true,
     },
     {
       name: 'pickup_type',

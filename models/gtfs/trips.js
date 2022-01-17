@@ -21,10 +21,12 @@ const model = {
     {
       name: 'trip_headsign',
       type: 'varchar(255)',
+      nocase: true,
     },
     {
       name: 'trip_short_name',
       type: 'varchar(255)',
+      nocase: true,
     },
     {
       name: 'direction_id',

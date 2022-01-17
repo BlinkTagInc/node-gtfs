@@ -13,14 +13,17 @@ const model = {
     {
       name: 'stop_name',
       type: 'varchar(255)',
+      nocase: true,
     },
     {
       name: 'tts_stop_name',
       type: 'varchar(255)',
+      nocase: true,
     },
     {
       name: 'stop_desc',
       type: 'varchar(255)',
+      nocase: true,
     },
     {
       name: 'stop_lat',
@@ -41,6 +44,7 @@ const model = {
     {
       name: 'stop_url',
       type: 'varchar(2047)',
+      nocase: true,
     },
     {
       name: 'location_type',
