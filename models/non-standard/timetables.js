@@ -97,10 +97,12 @@ const model = {
     {
       name: 'timetable_label',
       type: 'varchar(255)',
+      nocase: true,
     },
     {
       name: 'service_notes',
       type: 'varchar(255)',
+      nocase: true,
     },
     {
       name: 'orientation',
