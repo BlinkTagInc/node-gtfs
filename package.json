@@ -60,7 +60,8 @@
   "main": "index.js",
   "bin": {
     "gtfs-export": "bin/gtfs-export.js",
-    "gtfs-import": "bin/gtfs-import.js"
+    "gtfs-import": "bin/gtfs-import.js",
+    "gtfsrt-update": "bin/gtfsrt-update.js"
   },
   "types": "@types",
   "scripts": {
