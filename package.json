@@ -75,6 +75,7 @@
     "chalk": "^5.0.0",
     "csv-parse": "^5.0.4",
     "csv-stringify": "^6.0.5",
+    "gtfs-realtime-bindings": "^0.0.6",
     "lodash-es": "^4.17.21",
     "node-fetch": "^3.2.0",
     "pluralize": "^8.0.0",

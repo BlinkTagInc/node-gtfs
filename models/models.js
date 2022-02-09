@@ -31,6 +31,9 @@ import ridership from '../models/gtfs-ride/ridership.js';
 import tripCapacity from '../models/gtfs-ride/trip-capacity.js';
 import rideFeedInfo from './gtfs-ride/ride-feed-info.js';
 
+import tripUpdates from './gtfs-rt/trip-updates.js';
+import stopTimesUpdates from './gtfs-rt/stop-times-updates.js';
+
 const models = [
   agency,
   attributions,
@@ -62,6 +65,8 @@ const models = [
   riderTrip,
   ridership,
   tripCapacity,
+  tripUpdates,
+  stopTimesUpdates,
 ];
 
 export default models;
