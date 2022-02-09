@@ -23,6 +23,7 @@ import timetablePages from '../models/non-standard/timetable-pages.js';
 import timetableStopOrder from '../models/non-standard/timetable-stop-order.js';
 import timetableNotes from '../models/non-standard/timetable-notes.js';
 import timetableNotesReferences from '../models/non-standard/timetable-notes-references.js';
+import tripsDatedVehicleJourney from '../models/non-standard/trips-dated-vehicle-journey.js'
 
 import boardAlight from '../models/gtfs-ride/board-alight.js';
 import riderTrip from '../models/gtfs-ride/rider-trip.js';
@@ -55,6 +56,7 @@ const models = [
   timetableStopOrder,
   timetableNotes,
   timetableNotesReferences,
+  tripsDatedVehicleJourney,
   boardAlight,
   rideFeedInfo,
   riderTrip,
