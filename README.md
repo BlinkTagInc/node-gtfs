@@ -245,7 +245,7 @@ API along with your API token.
         "https://opendata.somewhere.com/gtfs-rt/VehicleUpdates.pb",
         "https://opendata.somewhere.com/gtfs-rt/TripUpdates.pb"
       ],
-      "headers": {
+      "rtheaders": {
         "Authorization": "bearer 1234567890"
       }
     }
