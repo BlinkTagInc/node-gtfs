@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Documentation updates
 - Added default:, and source: keywords in the models to describe a default value and a source to transform from for GTFS-RT
+- Filtering all models belonging to gtfs-rt from import (but not export) in gtfs
 
 ### Added
 
