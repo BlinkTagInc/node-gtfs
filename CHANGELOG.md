@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unrealeased]
+
+### Updated
+
+- Documentation updates
+- Added default:, and source: keywords in the models to describe a default value and a source to transform from for GTFS-RT
+
+### Added
+
+- Added trips-dates-vehicle-journey.txt models
+- GTFS-RT Support for VehiclePositions, TripUpdates and ServiceAlerts
+- gtfsrt-update script - does selective refresh of only GTFS-RT data without deleting the database
+- updateGtfsRt() method - does selective refresh of only GTFS-RT data without deleting the database
+- getServiceAlerts(..), getStopTimesUpdates(..), getTripUpdates(..), and getVehicleLocations(..) added methods
+- config-sample-rtupdates.json - new example with rtupdates configured
+- Added models for all GTFS-RT data that have been implemented so far
+- Dependency on long and gtfs-realtime-bindings libraries added
+- rtupdates added for configuration section for a agency
+- rtupdate_headers added for headers when performing GTFS-RT data retreival
+
 ## [3.2.4] - 2022-01-21
 
 ### Updated
