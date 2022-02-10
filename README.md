@@ -1062,6 +1062,17 @@ getTimetableNotesReferences({
 });
 ```
 
+### getTripsDatedVehicleJourneys(query, fields, sortBy)
+
+Queries trips_dated_vehicle_journey and returns a promise. The result of the promise is an array of trips_dated_vehicle_journey. These are from the non-standard `trips-dated-vehicle-journey.txt` file. See [documentation and examples of this file](https://www.trafiklab.se/api/trafiklab-apis/gtfs-regional/extra-files/).
+
+```js
+import { getTripsDatedVehicleJourneys } from 'gtfs';
+
+// Get all timetable_stop_orders
+getTripsDatedVehicleJourneys();
+```
+
 ### getServiceAlerts(query, fields, sortBy)
 
 Queries service alerts and returns a promise. The result of the promise is an array of service alerts.
