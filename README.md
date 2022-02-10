@@ -21,13 +21,13 @@
 
 <hr>
 
-`node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/) into a SQLite database and provides some methods to query for agencies, routes, stops, times, fares, calendars and other GTFS data. It also offers spatial queries to find nearby stops, routes and agencies and can convert stops and shapes to geoJSON format.
+`node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/) into a SQLite database and provides some methods to query for agencies, routes, stops, times, fares, calendars and other GTFS data. It also offers spatial queries to find nearby stops, routes and agencies and can convert stops and shapes to geoJSON format. Additionally, this library can export data from the SQLite database back into GTFS (csv) format.
 
-Additionally, this library can export data from the SQLite database back into GTFS (csv) format.
+The library also supports importing GTFS-RT data into the database to make sure the database can be kept very fresh using SQLITE REPLACE which makes it very effective.
 
 You can use it as a [command-line tool](#command-line-examples) or as a [node.js module](#code-example).
 
-This library has three parts: the [GTFS import script](#gtfs-import-script), the [query methods](#query-methods) and the [GTFS export script](#gtfs-export-script)
+This library has four parts: the [GTFS import script](#gtfs-import-script), the [query methods](#query-methods), [GTFS export script](#gtfs-export-script) and [GTFS-RT update script](#gtfsrt-update-script)
 
 ## Installation
 
@@ -206,6 +206,21 @@ API along with your API token.
 }
 ```
 
+- Specify one or more urls to use for GTFS-RT updates:
+
+```json
+{
+  "agencies": [
+    {
+      "url": "http://countyconnection.com/GTFS/google_transit.zip",
+      "rtupdates": [
+        "https://opendata.somewhere.com/gtfs-rt/updates.pb"
+      ],
+    }
+  ]
+}
+```
+
 - Exclude files - if you don't want all GTFS files to be imported, you can specify an array of files to exclude.
 
 ```json
@@ -347,6 +362,39 @@ const config = {
 importGtfs(config)
   .then(() => {
     console.log('Import Successful');
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+```
+
+## `gtfsrt-update` Script
+
+The `gtfsrt-update` script reads from a JSON configuration file and imports the GTFS-RT data specified to a SQLite database. [Read more on setting up your configuration file](#configuration).
+
+### Run the `gtfsrt-update` script from command-line
+
+    gtfs-import
+
+By default, it will look for a `config.json` file in the project root. To specify a different path for the configuration file:
+
+    gtfs-import --configPath /path/to/your/custom-config.json
+
+### Use `updateGtfsRt` script in code
+
+Use `updateGtfsRt()` in your code to run an update of a GTFS-RT data specified in a config.json file.
+
+```js
+import { updateGtfsRt } from 'gtfs';
+import { readFile } from 'fs/promises';
+
+const config = JSON.parse(
+  await readFile(new URL('./config.json', import.meta.url))
+);
+
+updateGtfsRt(config)
+  .then(() => {
+    console.log('Update Successful');
   })
   .catch((err) => {
     console.error(err);
@@ -993,6 +1041,54 @@ getTimetableNotesReferences();
 getTimetableNotesReferences({
   timetable_id: '4',
 });
+```
+
+### getServiceAlerts(query, fields, sortBy)
+
+Queries service alerts and returns a promise. The result of the promise is an array of service alerts.
+These are only valid if you use GTFS-RT and have imported Service Alert data.
+
+```js
+import { getServiceAlerts } from 'gtfs';
+
+// Get service alerts
+getServiceAlerts();
+```
+
+### getTripUpdates(query, fields, sortBy)
+
+Queries trip alerts and returns a promise. The result of the promise is an array of trip updates.
+These are only valid if you use GTFS-RT and have imported Trip Update data.
+
+```js
+import { getTripUpdates } from 'gtfs';
+
+// Get all trip updates
+getTripUpdates();
+```
+
+### getStopTimesUpdates(query, fields, sortBy)
+
+Queries stop times updates and returns a promise. The result of the promise is an array of stop times updates.
+These are only valid if you use GTFS-RT and have imported Trip Update data.
+
+```js
+import { getStopTimesUpdates } from 'gtfs';
+
+// Get all stop times updates
+getStopTimesUpdates();
+```
+
+### getVehiclePositions(query, fields, sortBy)
+
+Queries vehicle positions and returns a promise. The result of the promise is an array of vehicle location data.
+These are only valid if you use GTFS-RT and have imported Vehicle Position data.
+
+```js
+import { getVehiclePositions } from 'gtfs';
+
+// Get all vehicle position data
+getVehiclePositions();
 ```
 
 ## Contributing
