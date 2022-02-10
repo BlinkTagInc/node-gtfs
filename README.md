@@ -1121,6 +1121,31 @@ import { getVehiclePositions } from 'gtfs';
 getVehiclePositions();
 ```
 
+### advancedQuery(table, query, fields, sortBy, join)
+
+Queries the database in a simple manner with support for table joins and custom tables. Returns a promise.
+The result of the promise is an array the selected data. Example shows joining stop_times with trips.
+Used for advanced scenarios. Not recomended unless you really, really, need to.
+
+```js
+import { advancedQuery } from 'gtfs';
+
+// Perform a custom query
+advancedQuery('stop_times', ['id','trip_id'], [], 'INNER JOIN trips ON stop_times.trip_id=trips.trip_id');
+```
+
+### rawQuery(query, params)
+
+Queries the database using a raw sql statement with params. Returns a promise.
+The result of the promise is an array the selected data.
+
+```js
+import { rawQuery } from 'gtfs';
+
+// Perform a raw query
+rawQuery('SELECT * FROM trips');
+```
+
 ## Contributing
 
 Pull requests are welcome, as is feedback and [reporting issues](https://github.com/blinktaginc/node-gtfs/issues).
