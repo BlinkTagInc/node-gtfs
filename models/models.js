@@ -33,6 +33,9 @@ import rideFeedInfo from './gtfs-ride/ride-feed-info.js';
 
 import tripUpdates from './gtfs-rt/trip-updates.js';
 import stopTimesUpdates from './gtfs-rt/stop-times-updates.js';
+import vehiclePositions from './gtfs-rt/vehicle-positions.js';
+import serviceAlerts from './gtfs-rt/service-alerts.js';
+import serviceAlertTargets from './gtfs-rt/service-alert-targets.js';
 
 const models = [
   agency,
@@ -67,6 +70,9 @@ const models = [
   tripCapacity,
   tripUpdates,
   stopTimesUpdates,
+  vehiclePositions,
+  serviceAlerts,
+  serviceAlertTargets,
 ];
 
 export default models;

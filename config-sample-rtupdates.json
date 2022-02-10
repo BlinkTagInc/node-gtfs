@@ -10,7 +10,6 @@
         "trip_updates": "https://opendata.samtrafiken.se/gtfs-rt/sl/TripUpdates.pb?key=yourkey",
         "vehicle_positions": "https://opendata.samtrafiken.se/gtfs-rt/sl/VehiclePositions.pb?key=yourkey",
         "service_alerts": "https://opendata.samtrafiken.se/gtfs-rt/sl/ServiceAlerts.pb?key=yourkey",
-        "occupancy_data": "https://opendata.samtrafiken.se/gtfs-rt/sl/OccupancyData.pb?key=yourkey",
         "update_headers": {
           "X-CustomHeader": "MyCustomHeader"
         }
