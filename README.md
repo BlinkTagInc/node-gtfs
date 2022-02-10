@@ -27,7 +27,7 @@ The library also supports importing GTFS-RT data into the database to make sure 
 
 You can use it as a [command-line tool](#command-line-examples) or as a [node.js module](#code-example).
 
-This library has four parts: the [GTFS import script](#gtfs-import-script), the [query methods](#query-methods), [GTFS export script](#gtfs-export-script) and [GTFS-RT update script](#gtfsrt-update-script)
+This library has four parts: the [GTFS import script](#gtfs-import-script), [GTFS export script](#gtfs-export-script) and [GTFS-RT update script](#gtfsrt-update-script) and the [query methods](#query-methods)
 
 ## Installation
 
@@ -206,7 +206,20 @@ API along with your API token.
 }
 ```
 
-- Specify one or more urls to use for GTFS-RT updates:
+- Exclude files - if you don't want all GTFS files to be imported, you can specify an array of files to exclude.
+
+```json
+{
+  "agencies": [
+    {
+      "path": "/path/to/the/unzipped/gtfs/",
+      "exclude": ["shapes", "stops"]
+    }
+  ]
+}
+```
+
+- Specify a url to use for GTFS-RT updates:
 
 ```json
 {
@@ -221,14 +234,20 @@ API along with your API token.
 }
 ```
 
-- Exclude files - if you don't want all GTFS files to be imported, you can specify an array of files to exclude.
+- Specify serveral urls to use for GTFS-RT updates and custom headers:
 
 ```json
 {
   "agencies": [
     {
-      "path": "/path/to/the/unzipped/gtfs/",
-      "exclude": ["shapes", "stops"]
+      "url": "http://countyconnection.com/GTFS/google_transit.zip",
+      "rtupdates": [
+        "https://opendata.somewhere.com/gtfs-rt/VehicleUpdates.pb",
+        "https://opendata.somewhere.com/gtfs-rt/TripUpdates.pb"
+      ],
+      "headers": {
+        "Authorization": "bearer 1234567890"
+      }
     }
   ]
 }

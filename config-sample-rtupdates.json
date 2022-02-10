@@ -8,10 +8,10 @@
         "https://opendata.samtrafiken.se/gtfs-rt/sl/VehiclePositions.pb?key=yourkey",
         "https://opendata.samtrafiken.se/gtfs-rt/sl/ServiceAlerts.pb?key=yourkey"
       ],
-      "update_headers": {
+      "rtheaders": {
         "X-CustomHeader": "MyCustomHeader"
       },
-      "agency_headers": {
+      "headers": {
         "X-CustomHeader": "MyCustomHeader"
       }
     },
