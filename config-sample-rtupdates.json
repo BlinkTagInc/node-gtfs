@@ -3,16 +3,16 @@
     {
       "url": "http://www.bart.gov/dev/schedules/google_transit.zip",
       "exclude": ["shapes"],
-      "agency_headers": {
+      "rtupdates": [
+        "https://opendata.samtrafiken.se/gtfs-rt/sl/TripUpdates.pb?key=yourkey",
+        "https://opendata.samtrafiken.se/gtfs-rt/sl/VehiclePositions.pb?key=yourkey",
+        "https://opendata.samtrafiken.se/gtfs-rt/sl/ServiceAlerts.pb?key=yourkey"
+      ],
+      "update_headers": {
         "X-CustomHeader": "MyCustomHeader"
       },
-      "rtupdates": {
-        "trip_updates": "https://opendata.samtrafiken.se/gtfs-rt/sl/TripUpdates.pb?key=yourkey",
-        "vehicle_positions": "https://opendata.samtrafiken.se/gtfs-rt/sl/VehiclePositions.pb?key=yourkey",
-        "service_alerts": "https://opendata.samtrafiken.se/gtfs-rt/sl/ServiceAlerts.pb?key=yourkey",
-        "update_headers": {
-          "X-CustomHeader": "MyCustomHeader"
-        }
+      "agency_headers": {
+        "X-CustomHeader": "MyCustomHeader"
       }
     },
     {
