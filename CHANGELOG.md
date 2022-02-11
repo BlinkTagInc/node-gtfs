@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dependency on long and gtfs-realtime-bindings libraries added
 - rtupdates added for configuration section for a agency
 - rtupdate_headers added for headers when performing GTFS-RT data retreival
-- advancedQuery and rawQuery to perform direct database querys
+- advancedQuery, runRawQuery and execRawQuery to perform direct database querys
 
 ## [3.2.4] - 2022-01-21
 

@@ -1121,7 +1121,7 @@ import { getVehiclePositions } from 'gtfs';
 getVehiclePositions();
 ```
 
-### advancedQuery(table, query, fields, sortBy, join)
+### advancedQuery(table, advancedQueryOptions)
 
 Queries the database in a simple manner with support for table joins and custom tables. Returns a promise.
 The result of the promise is an array the selected data. Example shows joining stop_times with trips.
@@ -1130,20 +1130,39 @@ Used for advanced scenarios. Not recomended unless you really, really, need to.
 ```js
 import { advancedQuery } from 'gtfs';
 
+const advancedQueryOptions = {
+  fields: ['id','trip_id'],
+  join: [{
+    type: 'INNER',
+    table: 'trips',
+    on: 'stop_times.trip_id=trips.trip_id'
+  }]
+}
 // Perform a custom query
-advancedQuery('stop_times', ['id','trip_id'], [], 'INNER JOIN trips ON stop_times.trip_id=trips.trip_id');
+advancedQuery('stop_times', advancedQueryOptions);
 ```
 
-### rawQuery(query, params)
+### runRawQuery(query)
 
-Queries the database using a raw sql statement with params. Returns a promise.
+Queries the database using a raw sql statement. Returns a promise.
 The result of the promise is an array the selected data.
 
 ```js
 import { rawQuery } from 'gtfs';
 
 // Perform a raw query
-rawQuery('SELECT * FROM trips');
+runRawQuery('SELECT * FROM trips');
+```
+
+### execRawQuery(query)
+
+Executes a statement. Returns a promise containing the result of the execute.
+
+```js
+import { rawQuery } from 'gtfs';
+
+// Purge trips table
+execRawQuery('DELETE FROM trips');
 ```
 
 ## Contributing
