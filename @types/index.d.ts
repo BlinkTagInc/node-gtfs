@@ -16,10 +16,35 @@ export type SqlSelect = string[];
 
 export type SqlOrderBy = Array<[string, "ASC" | "DESC"]>;
 
+export type JoinTables = Array<JoinOptions>;
+
 export type SqlResults = Array<Record<string, any>>;
+
+export type SqlQueryString = string;
+
+export type SqlTableName = string;
 
 export type Config = ExportConfig & ImportConfig;
 
+export type AdvancedQueryOptions = {
+    /**
+     * An advanced query 
+     */    
+    query?: SqlWhere;
+    fields?: SqlSelect;
+    orderBy?: SqlOrderBy
+    join?: Array<JoinOptions>,
+    options?: QueryOptions
+}
+
+export type JoinOptions = {
+    /**
+     * Options for joining, type 
+     */    
+    type?: "LEFT OUTER" | "INNER";
+    table: string;
+    on: string;
+}
 interface VerboseConfig {
     /**
      * Whether or not to print output to the console. Defaults to true.
@@ -58,6 +83,11 @@ export interface ImportConfig extends DbConfig, VerboseConfig {
         headers?: Record<string, string>;
 
         /**
+         * Specify custom headers for download URL.
+         */
+        rtheaders?: Record<string, string>;        
+
+        /**
          * Specify a path to a zipped GTFS file or an unzipped GTFS directory.
          * One of `url` or `path` must be provided.
          */
@@ -67,6 +97,11 @@ export interface ImportConfig extends DbConfig, VerboseConfig {
          * Specify a download URL. One of `url` or `path` must be provided.
          */
         url?: string;
+
+        /**
+         * Specify a download URL for RTFS-RT data
+         */
+        rtupdates?: string[];        
     }>;
 
     /**
@@ -90,6 +125,11 @@ export function exportGtfs(config: ExportConfig): Promise<void>;
 export function importGtfs(config: ImportConfig): Promise<void>;
 
 /**
+ * Use updateGtfsRt() in your code to run an update of a GTFS-RT data specified in a config.json file.
+ */
+export function updateGtfsRt(config: ImportConfig): Promise<void>;
+ 
+ /**
  * Open database before making any queries.
  */
 export function openDb(config: DbConfig): Promise<SqlDatabase>;
@@ -267,3 +307,38 @@ export function getRiderships(query?: SqlWhere, fields?: SqlSelect, sortBy?: Sql
  * Queries trip-capacities and returns a promise for an array of trip-capacities.
  */
 export function getTripCapacities(query?: SqlWhere, fields?: SqlSelect, sortBy?: SqlOrderBy, options?: QueryOptions): Promise<SqlResults>;
+
+/**
+ * Queries trip-capacities and returns a promise for an array of service-alerts.
+ */
+export function getServiceAlerts(query?: SqlWhere, fields?: SqlSelect, sortBy?: SqlOrderBy, options?: QueryOptions): Promise<SqlResults>;
+
+/**
+ * Queries trip-capacities and returns a promise for an array of trip-updates.
+ */
+export function getTripUpdates(query?: SqlWhere, fields?: SqlSelect, sortBy?: SqlOrderBy, options?: QueryOptions): Promise<SqlResults>;
+
+/**
+ * Queries trip-capacities and returns a promise for an array of vehicle-positions.
+ */
+export function getVehiclePositions(query?: SqlWhere, fields?: SqlSelect, sortBy?: SqlOrderBy, options?: QueryOptions): Promise<SqlResults>;
+
+/**
+ * Queries trip-capacities and returns a promise for an array of stop-times-updates.
+ */
+export function getStopTimesUpdates(query?: SqlWhere, fields?: SqlSelect, sortBy?: SqlOrderBy, options?: QueryOptions): Promise<SqlResults>;
+
+/**
+ * Runs an advanced query.
+ */
+export function advancedQuery(table?: SqlTableName, advancedQueryOptions?: AdvancedQueryOptions): Promise<SqlResults>;
+
+/**
+ * Runs an raw query retuning all rows.
+ */
+export function runRawQuery(sql?: SqlQueryString, options?: QueryOptions): Promise<SqlResults>;
+
+/**
+ * Executing an raw query.
+ */
+export function execRawQuery(sql?: SqlQueryString, options?: QueryOptions): Promise<any>;
