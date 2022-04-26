@@ -71,7 +71,6 @@
   },
   "dependencies": {
     "@turf/helpers": "^6.5.0",
-    "@vscode/sqlite3": "^5.0.8",
     "chalk": "^5.0.1",
     "csv-parse": "^5.0.4",
     "csv-stringify": "^6.0.5",
@@ -82,7 +81,8 @@
     "promise-map-series": "^0.3.0",
     "recursive-copy": "^2.0.14",
     "sanitize-filename": "^1.6.3",
-    "sqlite": "^4.0.25",
+    "sqlite": "^4.1.1",
+    "sqlite3": "^5.0.5",
     "sqlstring-sqlite": "^0.1.1",
     "strip-bom-stream": "^5.0.0",
     "tmp-promise": "^3.0.3",
@@ -91,8 +91,8 @@
     "yargs": "^17.4.1"
   },
   "devDependencies": {
-    "dtslint": "^4.2.1",
-    "eslint": "^8.13.0",
+    "dtslint": "^3.4.2",
+    "eslint": "^8.14.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-xo": "^0.40.0",
     "husky": "^7.0.4",
