@@ -209,4 +209,32 @@ describe('getShapes():', () => {
     results.length.should.equal(713);
     results.should.containEql(expectedResult);
   });
+
+  it('should return array of shapes for specific shape_id', async () => {
+    const shapeId = 'cal_sf_tam';
+    const results = await getShapes(
+      {
+        shape_id: shapeId,
+      },
+      [
+        'shape_id',
+        'shape_pt_lat',
+        'shape_pt_lon',
+        'shape_pt_sequence',
+        'shape_dist_traveled',
+      ]
+    );
+
+    const expectedResult = {
+      shape_id: 'cal_sf_tam',
+      shape_pt_lat: 37.682971245836484,
+      shape_pt_lon: -122.39507675170898,
+      shape_pt_sequence: 88,
+      shape_dist_traveled: null,
+    };
+
+    should.exist(results);
+    results.length.should.equal(401);
+    results.should.containEql(expectedResult);
+  });
 });

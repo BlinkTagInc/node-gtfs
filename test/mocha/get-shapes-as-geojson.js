@@ -75,4 +75,19 @@ describe('getShapesAsGeoJSON():', () => {
     geojson.features[0].geometry.coordinates[0].length.should.equal(2);
     geojson.features[0].properties.route_color.should.startWith('#');
   });
+
+  it('should return geojson with shapes for a specific shapeId', async () => {
+    const shapeId = 'cal_sf_tam';
+
+    const geojson = await getShapesAsGeoJSON({
+      shape_id: shapeId,
+    });
+
+    should.exist(geojson);
+    geojson.type.should.equal('FeatureCollection');
+    geojson.features.length.should.equal(3);
+    should.exist(geojson.features[0].geometry.coordinates);
+    geojson.features[0].geometry.coordinates[0].length.should.equal(2);
+    geojson.features[0].properties.route_color.should.startWith('#');
+  });
 });

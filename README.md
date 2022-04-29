@@ -569,7 +569,7 @@ getStops({
 `getStops` allows passing a `route_id` in the query and it will query trips and stoptimes to find all stops served by that `route_id`.
 
 ```js
-import { getRoutes } from 'gtfs';
+import { getStops } from 'gtfs';
 
 // Get all stops for a specific route
 getStops({
@@ -580,11 +580,22 @@ getStops({
 `getStops` allows passing a `trip_id` in the query and it will query stoptimes to find all stops on that `trip_id`.
 
 ```js
-import { getRoutes } from 'gtfs';
+import { getStops } from 'gtfs';
 
 // Get all stops for a specific trip
 getStops({
   trip_id: '37a',
+});
+```
+
+`getStops` allows passing a `shape_id` in the query and it will query trips and stoptimes to find all stops that use that `shape_id`.
+
+```js
+import { getStops } from 'gtfs';
+
+// Get all stops for a specific trip
+getStops({
+  shape_id: 'cal_sf_tam',
 });
 ```
 
@@ -718,22 +729,27 @@ Returns geoJSON of shapes.
 ```js
 import { getShapesAsGeoJSON } from 'gtfs';
 
-// Get geoJSON of all stops in an agency
+// Get geoJSON of all routes in an agency
 getShapesAsGeoJSON();
 
-// Get geoJSON of stops along a specific route
+// Get geoJSON of shapes for a specific route
 getShapesAsGeoJSON({
   route_id: 'Lo-16APR',
 });
 
-// Get geoJSON of stops for a specific trip
+// Get geoJSON of shapes for a specific trip
 getShapesAsGeoJSON({
   trip_id: '37a',
 });
 
-// Get geoJSON of stops for a specific `service_id`
+// Get geoJSON of shapes for a specific `service_id`
 getShapesAsGeoJSON({
   service_id: 'CT-16APR-Caltrain-Sunday-02',
+});
+
+// Get geoJSON of shapes for a specific `shape_id`
+getShapesAsGeoJSON({
+  shape_id: 'cal_sf_tam',
 });
 ```
 

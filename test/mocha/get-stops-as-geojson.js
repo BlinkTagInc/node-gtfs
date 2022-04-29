@@ -56,4 +56,18 @@ describe('getStopsAsGeoJSON(): ', () => {
     should.exist(geojson.features[0].geometry.coordinates);
     geojson.features[0].geometry.coordinates.length.should.equal(2);
   });
+
+  it('should return geojson with stops if they exist for a specific shapeId', async () => {
+    const shapeId = 'cal_sf_tam';
+
+    const geojson = await getStopsAsGeoJSON({
+      shape_id: shapeId,
+    });
+
+    should.exist(geojson);
+    geojson.type.should.equal('FeatureCollection');
+    geojson.features.length.should.equal(25);
+    should.exist(geojson.features[0].geometry.coordinates);
+    geojson.features[0].geometry.coordinates.length.should.equal(2);
+  });
 });

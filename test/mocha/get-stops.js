@@ -217,4 +217,53 @@ describe('getStops():', () => {
       );
     }
   });
+
+  it('should return array of stops if it exists for a specific shape_id', async () => {
+    const shapeId = 'cal_sf_tam';
+
+    const results = await getStops(
+      {
+        shape_id: shapeId,
+      },
+      [],
+      [['stop_id', 'ASC']]
+    );
+
+    const expectedStopIds = [
+      '70012',
+      '70021',
+      '70022',
+      '70032',
+      '70042',
+      '70052',
+      '70062',
+      '70082',
+      '70092',
+      '70102',
+      '70112',
+      '70122',
+      '70132',
+      '70142',
+      '70162',
+      '70172',
+      '70192',
+      '70202',
+      '70212',
+      '70222',
+      '70232',
+      '70242',
+      '70252',
+      '70262',
+      '70272',
+    ];
+
+    should.exist(results);
+    results.length.should.equal(25);
+    for (const [idx, stop] of results.entries()) {
+      expectedStopIds[idx].should.equal(
+        stop.stop_id,
+        'The order of stops are expected to be the same'
+      );
+    }
+  });
 });
