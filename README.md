@@ -96,13 +96,13 @@ importGtfs(config)
   </tr>
 </table>
 
-## Command Line Usage
+## Command-Line Usage
 
 The `gtfs-import` command-line utility will import GTFS into SQLite3.
 
 The `gtfs-export` command-line utility will create GTFS from data previously imported into SQLite3.
 
-### gtfs-import Command-line options
+### gtfs-import Command-Line options
 
 `configPath`
 
@@ -371,7 +371,7 @@ By default, it will look for a `config.json` file in the project root. To specif
 
     gtfs-export --configPath /path/to/your/custom-config.json
 
-### Command Line options
+### Command-Line options
 
 #### Specify path to config JSON file
 
@@ -381,7 +381,7 @@ You can specify the path to a config file to be used by the export script.
 
 #### Show help
 
-Show all command line options
+Show all command-line options
 
     gtfs-export --help
 
