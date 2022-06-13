@@ -1,0 +1,28 @@
+{
+  "agencies": [
+    {
+      "url": "http://www.bart.gov/dev/schedules/google_transit.zip",
+      "exclude": ["shapes"],
+      "realtimeUrls": [
+        "https://opendata.samtrafiken.se/gtfs-rt/sl/TripUpdates.pb?key=yourkey",
+        "https://opendata.samtrafiken.se/gtfs-rt/sl/VehiclePositions.pb?key=yourkey",
+        "https://opendata.samtrafiken.se/gtfs-rt/sl/ServiceAlerts.pb?key=yourkey"
+      ],
+      "realtimeHeaders": {
+        "X-CustomHeader": "MyCustomHeader"
+      },
+      "headers": {
+        "X-CustomHeader": "MyCustomHeader"
+      }
+    },
+    {
+      "path": "/path/to/gtfs.zip",
+      "exclude": ["stop_times", "shapes"]
+    }
+  ],
+  "csvOptions": {
+    "skip_lines_with_error": true
+  },
+  "sqlitePath": "/tmp/gtfs",
+  "exportPath": "~/path/to/export/gtfs"
+}

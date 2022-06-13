@@ -23,12 +23,19 @@ import timetablePages from '../models/non-standard/timetable-pages.js';
 import timetableStopOrder from '../models/non-standard/timetable-stop-order.js';
 import timetableNotes from '../models/non-standard/timetable-notes.js';
 import timetableNotesReferences from '../models/non-standard/timetable-notes-references.js';
+import tripsDatedVehicleJourney from '../models/non-standard/trips-dated-vehicle-journey.js';
 
 import boardAlight from '../models/gtfs-ride/board-alight.js';
 import riderTrip from '../models/gtfs-ride/rider-trip.js';
 import ridership from '../models/gtfs-ride/ridership.js';
 import tripCapacity from '../models/gtfs-ride/trip-capacity.js';
 import rideFeedInfo from './gtfs-ride/ride-feed-info.js';
+
+import tripUpdates from './gtfs-realtime/trip-updates.js';
+import stopTimesUpdates from './gtfs-realtime/stop-times-updates.js';
+import vehiclePositions from './gtfs-realtime/vehicle-positions.js';
+import serviceAlerts from './gtfs-realtime/service-alerts.js';
+import serviceAlertTargets from './gtfs-realtime/service-alert-targets.js';
 
 const models = [
   agency,
@@ -55,11 +62,17 @@ const models = [
   timetableStopOrder,
   timetableNotes,
   timetableNotesReferences,
+  tripsDatedVehicleJourney,
   boardAlight,
   rideFeedInfo,
   riderTrip,
   ridership,
   tripCapacity,
+  tripUpdates,
+  stopTimesUpdates,
+  vehiclePositions,
+  serviceAlerts,
+  serviceAlertTargets,
 ];
 
 export default models;

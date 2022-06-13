@@ -21,13 +21,13 @@
 
 <hr>
 
-`node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/) into a SQLite database and provides some methods to query for agencies, routes, stops, times, fares, calendars and other GTFS data. It also offers spatial queries to find nearby stops, routes and agencies and can convert stops and shapes to geoJSON format.
+`node-GTFS` loads transit data in [GTFS format](https://developers.google.com/transit/) into a SQLite database and provides some methods to query for agencies, routes, stops, times, fares, calendars and other GTFS data. It also offers spatial queries to find nearby stops, routes and agencies and can convert stops and shapes to geoJSON format. Additionally, this library can export data from the SQLite database back into GTFS (csv) format.
 
-Additionally, this library can export data from the SQLite database back into GTFS (csv) format.
+The library also supports importing GTFS-Realtime data into the same database. In order to keep the realtime database fresh, it uses `SQLITE REPLACE` which makes it very effective.
 
 You can use it as a [command-line tool](#command-line-examples) or as a [node.js module](#code-example).
 
-This library has three parts: the [GTFS import script](#gtfs-import-script), the [query methods](#query-methods) and the [GTFS export script](#gtfs-export-script)
+This library has four parts: the [GTFS import script](#gtfs-import-script), [GTFS export script](#gtfs-export-script) and [GTFS-Realtime update script](#gtfsrealtime-update-script) and the [query methods](#query-methods)
 
 ## Installation
 
@@ -219,6 +219,25 @@ API along with your API token.
 }
 ```
 
+- Specify urls for GTFS-Realtime updates. `realtimeUrls` allows an array of GTFS-Realtime URLs. For example, a URL for trip updates, a URL for vehicle updates and a URL for service alerts. In addition, a `realtimeHeaders` parameter allows adding additional HTTP headers to the request.
+
+```json
+{
+  "agencies": [
+    {
+      "url": "http://countyconnection.com/GTFS/google_transit.zip",
+      "realtimeUrls": [
+        "https://opendata.somewhere.com/gtfs-rt/VehicleUpdates.pb",
+        "https://opendata.somewhere.com/gtfs-rt/TripUpdates.pb"
+      ],
+      "realtimeHeaders": {
+        "Authorization": "bearer 1234567890"
+      }
+    }
+  ]
+}
+```
+
 - Specify multiple agencies to be imported into the same database
 
 ```json
@@ -353,6 +372,39 @@ importGtfs(config)
   });
 ```
 
+## `gtfsrealtime-update` Script
+
+The `gtfsrealtime-update` script requests GTFS-Realtime data and importings into a SQLite database. [GTFS-Realtime data](https://gtfs.org/realtime/reference/) can compliment GTFS Static data. [Read more about GTFS-Realtime configuration](#configuration).
+
+### Run the `gtfsrealtime-update` script from command-line
+
+    gtfsrealtime-update
+
+By default, it will look for a `config.json` file in the project root. To specify a different path for the configuration file:
+
+    gtfsrealtime-update --configPath /path/to/your/custom-config.json
+
+### Use `updateGtfsRealtime` script in code
+
+Use `updateGtfsRealtime()` in your code to run an update of a GTFS-Realtime data specified in a config.json file.
+
+```js
+import { updateGtfsRealtime } from 'gtfs';
+import { readFile } from 'fs/promises';
+
+const config = JSON.parse(
+  await readFile(new URL('./config.json', import.meta.url))
+);
+
+updateGtfsRealtime(config)
+  .then(() => {
+    console.log('Update Successful');
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+```
+
 ## `gtfs-export` Script
 
 The `gtfs-export` script reads from a JSON configuration file and exports data in GTFS format from a SQLite database. [Read more on setting up your configuration file](#configuration).
@@ -416,6 +468,8 @@ exportGtfs(config)
 This library includes many methods you can use in your project to query GTFS data. These methods return promises.
 
 Most methods accept three optional arguments: `query`, `fields` and `sortBy`.
+
+More advanced methods include `advancedQuery`, `runRawQuery` and `execRawQuery`.
 
 #### Query
 
@@ -1009,6 +1063,114 @@ getTimetableNotesReferences();
 getTimetableNotesReferences({
   timetable_id: '4',
 });
+```
+
+### getTripsDatedVehicleJourneys(query, fields, sortBy)
+
+Queries trips_dated_vehicle_journey and returns a promise. The result of the promise is an array of trips_dated_vehicle_journey. These are from the non-standard `trips-dated-vehicle-journey.txt` file. See [documentation and examples of this file](https://www.trafiklab.se/api/trafiklab-apis/gtfs-regional/extra-files/).
+
+```js
+import { getTripsDatedVehicleJourneys } from 'gtfs';
+
+// Get all timetable_stop_orders
+getTripsDatedVehicleJourneys();
+```
+
+### getServiceAlerts(query, fields, sortBy)
+
+Queries service alerts and returns a promise. The result of the promise is an array of service alerts.
+These are only valid if you use GTFS-Realtime and have imported Service Alert data.
+
+```js
+import { getServiceAlerts } from 'gtfs';
+
+// Get service alerts
+getServiceAlerts();
+```
+
+### getTripUpdates(query, fields, sortBy)
+
+Queries trip alerts and returns a promise. The result of the promise is an array of trip updates.
+These are only valid if you use GTFS-Realtime and have imported Trip Update data.
+
+```js
+import { getTripUpdates } from 'gtfs';
+
+// Get all trip updates
+getTripUpdates();
+```
+
+### getStopTimesUpdates(query, fields, sortBy)
+
+Queries stop times updates and returns a promise. The result of the promise is an array of stop times updates.
+These are only valid if you use GTFS-Realtime and have imported Trip Update data.
+
+```js
+import { getStopTimesUpdates } from 'gtfs';
+
+// Get all stop times updates
+getStopTimesUpdates();
+```
+
+### getVehiclePositions(query, fields, sortBy)
+
+Queries vehicle positions and returns a promise. The result of the promise is an array of vehicle location data.
+These are only valid if you use GTFS-Realtime and have imported Vehicle Position data.
+
+```js
+import { getVehiclePositions } from 'gtfs';
+
+// Get all vehicle position data
+getVehiclePositions();
+```
+
+### advancedQuery(table, advancedQueryOptions)
+
+Queries the database in a simple manner with support for table joins and custom tables. Returns a promise.
+The result of the promise is an array the selected data. Example shows joining stop_times with trips.
+Used for advanced scenarios.
+
+```js
+import { advancedQuery } from 'gtfs';
+
+const advancedQueryOptions = {
+  query: {
+    'stop_times.trip_id': tripId,
+  },
+  fields: ['stop_times.trip_id', 'arrival_time'],
+  join: [
+    {
+      type: 'INNER',
+      table: 'trips',
+      on: 'stop_times.trip_id=trips.trip_id',
+    },
+  ],
+};
+// Perform a custom query
+advancedQuery('stop_times', advancedQueryOptions);
+```
+
+### runRawQuery(query)
+
+Queries the database using a raw sql statement. Returns a promise.
+The result of the promise is an array the selected data.
+
+```js
+import { runRawQuery } from 'gtfs';
+
+// Perform a raw query
+runRawQuery('SELECT * FROM stop_times WHERE stop_sequence="1"');
+```
+
+### execRawQuery(query)
+
+Executes a statement. Returns a promise containing the result of the execute.
+
+```js
+import { execRawQuery } from 'gtfs';
+
+// Purge trips table
+execRawQuery('DELETE FROM trips');
 ```
 
 ## Contributing
