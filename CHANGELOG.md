@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Use yoctocolors instead of chalk
 
+### Fixed
+
+- Support untildify in sqlitePath config variable
+
 ## [3.4.0] - 2022-06-12
 
 ### Updated
