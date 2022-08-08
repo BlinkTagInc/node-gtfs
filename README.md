@@ -93,6 +93,10 @@ try {
     <td><img src="https://github.com/BlinkTagInc/gtfs-tts/raw/main/docs/images/gtfs-tts-logo.svg" alt="GTFS-TTS" width="200"></td>
     <td><a href="https://github.com/blinktaginc/gtfs-tts">GTFS-Text-to-Speech</a> app tests GTFS stop name pronunciation for text-to-speech. It uses `node-gtfs` for loading stop names from GTFS data.</td>
   </tr>
+  <tr>
+    <td><img src="https://github.com/BlinkTagInc/transit-arrivals-widget/raw/master/docs/images/transit-arrivals-widget-logo.svg" alt="Transit Arrivals Widget" width="200"></td>
+    <td><a href="https://github.com/BlinkTagInc/transit-arrivals-widget">Transit Arrivals Widget</a> creates a realtime transit arrivals tool from GTFS and GTFS-RT data.</td>
+  </tr>
 </table>
 
 ## Command-Line Usage
