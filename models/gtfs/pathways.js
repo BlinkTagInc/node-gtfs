@@ -5,6 +5,7 @@ const model = {
       name: 'pathway_id',
       type: 'varchar(255)',
       primary: true,
+      required: true,
     },
     {
       name: 'from_stop_id',
@@ -33,6 +34,7 @@ const model = {
     {
       name: 'length',
       type: 'real',
+      min: 0,
     },
     {
       name: 'traversal_time',

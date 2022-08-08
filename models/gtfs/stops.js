@@ -5,6 +5,7 @@ const model = {
       name: 'stop_id',
       type: 'varchar(255)',
       primary: true,
+      required: true,
     },
     {
       name: 'stop_code',

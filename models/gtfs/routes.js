@@ -5,6 +5,7 @@ const model = {
       name: 'route_id',
       type: 'varchar(255)',
       primary: true,
+      required: true,
     },
     {
       name: 'agency_id',
@@ -63,6 +64,10 @@ const model = {
       type: 'integer',
       min: 0,
       max: 3,
+    },
+    {
+      name: 'network_id',
+      type: 'varchar(255)',
     },
   ],
 };

@@ -5,6 +5,7 @@ const model = {
       name: 'level_id',
       type: 'varchar(255)',
       primary: true,
+      required: true,
     },
     {
       name: 'level_index',

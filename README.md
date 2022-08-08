@@ -557,6 +557,22 @@ getAgencies({
 });
 ```
 
+### getAreas(query, fields, sortBy)
+
+Queries areas and returns a promise. The result of the promise is an array of areas.
+
+```js
+import { getAreas } from 'gtfs';
+
+// Get all areas
+getAreas();
+
+// Get a specific area
+getAreas({
+  area_id: 'area1',
+});
+```
+
 ### getAttributions(query, fields, sortBy)
 
 Queries attributions and returns a promise. The result of the promise is an array of attributions.
@@ -855,6 +871,38 @@ getFareAttributes({
 });
 ```
 
+### getFareLegRules(query, fields, sortBy)
+
+Queries fare leg rules and returns a promise. The result of the promise is an array of fare leg rules.
+
+```js
+import { getFareLegRules } from 'gtfs';
+
+// Get all fare leg rules
+getFareLegRules();
+
+// Get fare leg rules for a specific fare product
+getFareLegRules({
+  fare_product_id: 'product1',
+});
+```
+
+### getFareProducts(query, fields, sortBy)
+
+Queries fare products and returns a promise. The result of the promise is an array of fare products.
+
+```js
+import { getFareProducts } from 'gtfs';
+
+// Get all fare products
+getFareProducts();
+
+// Get a specific fare product
+getFareProducts({
+  fare_product_id: 'product1',
+});
+```
+
 ### getFareRules(query, fields, sortBy)
 
 Queries fare_rules and returns a promise. The result of the promise is an array of fare_rules.
@@ -868,6 +916,22 @@ getFareRules();
 // Get fare_rules for a specific route
 getFareRules({
   route_id: 'Lo-16APR',
+});
+```
+
+### getFareTransferRules(query, fields, sortBy)
+
+Queries fare transfer rules and returns a promise. The result of the promise is an array of fare transfer rules.
+
+```js
+import { getFareTransferRules } from 'gtfs';
+
+// Get all fare transfer rules
+getFareTransferRules();
+
+// Get a all fare transfer rules for a specific fare product
+getFareTransferRules({
+  fare_product_id: 'product1',
 });
 ```
 
@@ -967,6 +1031,17 @@ getDirections({
   route_id: '1234',
   direction_id: 1,
 });
+```
+
+### getStopAreas(query, fields, sortBy)
+
+Queries stop areas and returns a promise. The result of the promise is an array of stop areas.
+
+```js
+import { getStopAreas } from 'gtfs';
+
+// Get all stop areas
+getStopAreas();
 ```
 
 ### getStopAttributes(query, fields, sortBy)

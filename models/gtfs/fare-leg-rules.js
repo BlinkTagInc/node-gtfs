@@ -1,31 +1,26 @@
 const model = {
-  filenameBase: 'fare_rules',
+  filenameBase: 'fare_leg_rules',
   schema: [
     {
-      name: 'id',
-      type: 'integer',
-      primary: true,
+      name: 'leg_group_id',
+      type: 'varchar(255)',
     },
     {
-      name: 'fare_id',
+      name: 'network_id',
+      type: 'varchar(255)',
+    },
+    {
+      name: 'from_area_id',
+      type: 'varchar(255)',
+    },
+    {
+      name: 'to_area_id',
+      type: 'varchar(255)',
+    },
+    {
+      name: 'fare_product_id',
       type: 'varchar(255)',
       required: true,
-    },
-    {
-      name: 'route_id',
-      type: 'varchar(255)',
-    },
-    {
-      name: 'origin_id',
-      type: 'varchar(255)',
-    },
-    {
-      name: 'destination_id',
-      type: 'varchar(255)',
-    },
-    {
-      name: 'contains_id',
-      type: 'varchar(255)',
     },
   ],
 };

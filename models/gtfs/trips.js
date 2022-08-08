@@ -2,11 +2,6 @@ const model = {
   filenameBase: 'trips',
   schema: [
     {
-      name: 'trip_id',
-      type: 'varchar(255)',
-      primary: true,
-    },
-    {
       name: 'route_id',
       type: 'varchar(255)',
       required: true,
@@ -17,6 +12,12 @@ const model = {
       type: 'varchar(255)',
       required: true,
       index: true,
+    },
+    {
+      name: 'trip_id',
+      type: 'varchar(255)',
+      primary: true,
+      required: true,
     },
     {
       name: 'trip_headsign',
