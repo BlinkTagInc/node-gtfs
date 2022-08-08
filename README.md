@@ -62,17 +62,16 @@ or
 ```js
 import { importGtfs } from 'gtfs';
 import { readFile } from 'fs/promises';
+
 const config = JSON.parse(
   await readFile(new URL('./config.json', import.meta.url))
 );
 
-importGtfs(config)
-  .then(() => {
-    console.log('Import Successful');
-  })
-  .catch((err) => {
-    console.error(err);
-  });
+try {
+  await importGtfs(config);
+} catch (error) {
+  console.error(error);
+}
 ```
 
 ### Example Applications
@@ -312,7 +311,7 @@ const config = {
   },
 };
 
-importGtfs(config);
+await importGtfs(config);
 ```
 
 ## `gtfs-import` Script
@@ -339,13 +338,7 @@ const config = JSON.parse(
   await readFile(new URL('./config.json', import.meta.url))
 );
 
-importGtfs(config)
-  .then(() => {
-    console.log('Import Successful');
-  })
-  .catch((err) => {
-    console.error(err);
-  });
+await importGtfs(config);
 ```
 
 Configuration can be a JSON object in your code
@@ -363,13 +356,7 @@ const config = {
   ],
 };
 
-importGtfs(config)
-  .then(() => {
-    console.log('Import Successful');
-  })
-  .catch((err) => {
-    console.error(err);
-  });
+await importGtfs(config);
 ```
 
 ## `gtfsrealtime-update` Script
@@ -396,13 +383,7 @@ const config = JSON.parse(
   await readFile(new URL('./config.json', import.meta.url))
 );
 
-updateGtfsRealtime(config)
-  .then(() => {
-    console.log('Update Successful');
-  })
-  .catch((err) => {
-    console.error(err);
-  });
+await updateGtfsRealtime(config);
 ```
 
 ## `gtfs-export` Script
@@ -454,13 +435,7 @@ const config = {
   ],
 };
 
-exportGtfs(config)
-  .then(() => {
-    console.log('Export Successful');
-  })
-  .catch((err) => {
-    console.error(err);
-  });
+await exportGtfs(config);
 ```
 
 ## Query Methods
@@ -549,10 +524,10 @@ Queries agencies and returns a promise. The result of the promise is an array of
 import { getAgencies } from 'gtfs';
 
 // Get all agencies
-getAgencies();
+const agencies = await getAgencies();
 
 // Get a specific agency
-getAgencies({
+const agencies = await getAgencies({
   agency_id: 'caltrain',
 });
 ```
@@ -565,10 +540,10 @@ Queries areas and returns a promise. The result of the promise is an array of ar
 import { getAreas } from 'gtfs';
 
 // Get all areas
-getAreas();
+const areas = await getAreas();
 
 // Get a specific area
-getAreas({
+const areas = await getAreas({
   area_id: 'area1',
 });
 ```
@@ -581,10 +556,10 @@ Queries attributions and returns a promise. The result of the promise is an arra
 import { getAttributions } from 'gtfs';
 
 // Get all attributions
-getAttributions();
+const attributions = await getAttributions();
 
 // Get a specific attribution
-getAttributions({
+const attributions = await getAttributions({
   attribution_id: '123',
 });
 ```
@@ -597,10 +572,10 @@ Queries routes and returns a promise. The result of the promise is an array of r
 import { getRoutes } from 'gtfs';
 
 // Get all routes, sorted by route_short_name
-getRoutes({}, [], [['route_short_name', 'ASC']]);
+const routes = await getRoutes({}, [], [['route_short_name', 'ASC']]);
 
 // Get a specific route
-getRoutes({
+const routes = await getRoutes({
   route_id: 'Lo-16APR',
 });
 ```
@@ -611,7 +586,7 @@ getRoutes({
 import { getRoutes } from 'gtfs';
 
 // Get routes that serve a specific stop, sorted by `stop_name`.
-getRoutes(
+const routes = await getRoutes(
   {
     stop_id: '70011',
   },
@@ -628,43 +603,34 @@ Queries stops and returns a promise. The result of the promise is an array of st
 import { getStops } from 'gtfs';
 
 // Get all stops
-getStops();
+const stops = await getStops();
 
 // Get a specific stop by stop_id
-getStops({
+const stops = await getStops({
   stop_id: '70011',
 });
-```
 
-`getStops` allows passing a `route_id` in the query and it will query trips and stoptimes to find all stops served by that `route_id`.
-
-```js
-import { getStops } from 'gtfs';
-
-// Get all stops for a specific route
-getStops({
+/*
+ * `getStops` allows passing a `route_id` in the query and it will
+ * query trips and stoptimes to find all stops served by that `route_id`.
+ */
+const stops = await getStops({
   route_id: 'Lo-16APR',
 });
-```
 
-`getStops` allows passing a `trip_id` in the query and it will query stoptimes to find all stops on that `trip_id`.
-
-```js
-import { getStops } from 'gtfs';
-
-// Get all stops for a specific trip
-getStops({
+/*
+ * `getStops` allows passing a `trip_id` in the query and it will query
+ * stoptimes to find all stops on that `trip_id`.
+ */
+const stops = await getStops({
   trip_id: '37a',
 });
-```
 
-`getStops` allows passing a `shape_id` in the query and it will query trips and stoptimes to find all stops that use that `shape_id`.
-
-```js
-import { getStops } from 'gtfs';
-
-// Get all stops for a specific trip
-getStops({
+/*
+ * `getStops` allows passing a `shape_id` in the query and it will query
+ * trips and stoptimes to find all stops that use that `shape_id`.
+ */
+const stops = await getStops({
   shape_id: 'cal_sf_tam',
 });
 ```
@@ -677,10 +643,10 @@ Queries stops and returns a promise. The result of the promise is an geoJSON obj
 import { getStopsAsGeoJSON } from 'gtfs';
 
 // Get all stops for an agency as geoJSON
-getStopsAsGeoJSON();
+const stopsGeojson = await getStopsAsGeoJSON();
 
 // Get all stops for a specific route as geoJSON
-getStopsAsGeoJSON({
+const stopsGeojson = await getStopsAsGeoJSON({
   route_id: 'Lo-16APR',
 });
 ```
@@ -693,15 +659,15 @@ Queries `stop_times` and returns a promise. The result of the promise is an arra
 import { getStoptimes } from 'gtfs';
 
 // Get all stoptimes
-getStoptimes();
+const stoptimes = await getStoptimes();
 
 // Get all stoptimes for a specific stop
-getStoptimes({
+const stoptimes = await getStoptimes({
   stop_id: '70011',
 });
 
 // Get all stoptimes for a specific trip, sorted by stop_sequence
-getStoptimes(
+const stoptimes = await getStoptimes(
   {
     trip_id: '37a',
   },
@@ -710,7 +676,7 @@ getStoptimes(
 );
 
 // Get all stoptimes for a specific stop and service_id
-getStoptimes({
+const stoptimes = await getStoptimes({
   stop_id: '70011',
   service_id: 'CT-16APR-Caltrain-Weekday-01',
 });
@@ -724,22 +690,22 @@ Queries trips and returns a promise. The result of the promise is an array of tr
 import { getTrips } from 'gtfs';
 
 // Get all trips
-getTrips();
+const trips = await getTrips();
 
 // Get trips for a specific route and direction
-getTrips({
+const trips = await getTrips({
   route_id: 'Lo-16APR',
   direction_id: 0
 });
 
 // Get trips for direction '' or null
-getTrips({
+const trips = await getTrips({
   route_id: 'Lo-16APR',
   direction_id: null
 });
 
 // Get trips for a specific route and direction limited by a service_id
-getTrips({
+const trips = await getTrips({
   route_id: 'Lo-16APR',
   direction_id: 0,
   service_id: '
@@ -754,7 +720,7 @@ Queries shapes and returns a promise. The result of the promise is an array of s
 import { getShapes } from 'gtfs';
 
 // Get all shapes for an agency
-getShapes();
+const shapes = await getShapes();
 ```
 
 `getShapes` allows passing a `route_id` in the query and it will query trips to find all shapes served by that `route_id`.
@@ -763,30 +729,24 @@ getShapes();
 import { getShapes } from 'gtfs';
 
 // Get all shapes for a specific route and direction
-getShapes({
+const shapes = await getShapes({
   route_id: 'Lo-16APR',
 });
-```
 
-`getShapes` allows passing a `trip_id` in the query and it will query trips to find all shapes served by that `trip_id`.
-
-```js
-import { getShapes } from 'gtfs';
-
-// Get all shapes for a specific trip_id
-getShapes({
+/*
+ * `getShapes` allows passing a `trip_id` in the query and it will query
+ * trips to find all shapes served by that `trip_id`.
+ */
+const shapes = await getShapes({
   trip_id: '37a',
 });
-```
 
-`getShapes` allows passing a `service_id` in the query and it will query trips to find all shapes served by that `service_id`.
-
-```js
-import { getShapes } from 'gtfs';
-
-// Get all shapes for a specific service_id
-.etShapes({
-  service_id: 'CT-16APR-Caltrain-Sunday-02'
+/*
+ * `getShapes` allows passing a `service_id` in the query and it will query
+ * trips to find all shapes served by that `service_id`.
+ */
+const shapes = await getShapes({
+  service_id: 'CT-16APR-Caltrain-Sunday-02',
 });
 ```
 
@@ -794,31 +754,29 @@ import { getShapes } from 'gtfs';
 
 Queries shapes and returns a promise. The result of the promise is an geoJSON object of shapes. All valid queries for `getShapes()` work for `getShapesAsGeoJSON()`.
 
-Returns geoJSON of shapes.
-
 ```js
 import { getShapesAsGeoJSON } from 'gtfs';
 
 // Get geoJSON of all routes in an agency
-getShapesAsGeoJSON();
+const shapesGeojson = await getShapesAsGeoJSON();
 
 // Get geoJSON of shapes for a specific route
-getShapesAsGeoJSON({
+const shapesGeojson = await getShapesAsGeoJSON({
   route_id: 'Lo-16APR',
 });
 
 // Get geoJSON of shapes for a specific trip
-getShapesAsGeoJSON({
+const shapesGeojson = await getShapesAsGeoJSON({
   trip_id: '37a',
 });
 
 // Get geoJSON of shapes for a specific `service_id`
-getShapesAsGeoJSON({
+const shapesGeojson = await getShapesAsGeoJSON({
   service_id: 'CT-16APR-Caltrain-Sunday-02',
 });
 
 // Get geoJSON of shapes for a specific `shape_id`
-getShapesAsGeoJSON({
+const shapesGeojson = await getShapesAsGeoJSON({
   shape_id: 'cal_sf_tam',
 });
 ```
@@ -831,10 +789,10 @@ Queries calendars and returns a promise. The result of the promise is an array o
 import { getCalendars } from 'gtfs';
 
 // Get all calendars for an agency
-getCalendars();
+const calendars = await getCalendars();
 
 // Get calendars for a specific `service_id`
-getCalendars({
+const calendars = await getCalendars({
   service_id: 'CT-16APR-Caltrain-Sunday-02',
 });
 ```
@@ -847,10 +805,10 @@ Queries calendar_dates and returns a promise. The result of the promise is an ar
 import { getCalendarDates } from 'gtfs';
 
 // Get all calendar_dates for an agency
-getCalendarDates();
+const calendarDates = await getCalendarDates();
 
 // Get calendar_dates for a specific `service_id`
-getCalendarDates({
+const calendarDates = await getCalendarDates({
   service_id: 'CT-16APR-Caltrain-Sunday-02',
 });
 ```
@@ -863,10 +821,10 @@ Queries fare_attributes and returns a promise. The result of the promise is an a
 import { getFareAttributes } from 'gtfs';
 
 // Get all `fare_attributes` for an agency
-getFareAttributes();
+const fareAttributes = await getFareAttributes();
 
 // Get `fare_attributes` for a specific `fare_id`
-getFareAttributes({
+const fareAttributes = await getFareAttributes({
   fare_id: '123',
 });
 ```
@@ -879,10 +837,10 @@ Queries fare leg rules and returns a promise. The result of the promise is an ar
 import { getFareLegRules } from 'gtfs';
 
 // Get all fare leg rules
-getFareLegRules();
+const fareLegRules = await getFareLegRules();
 
 // Get fare leg rules for a specific fare product
-getFareLegRules({
+const fareLegRules = await getFareLegRules({
   fare_product_id: 'product1',
 });
 ```
@@ -895,10 +853,10 @@ Queries fare products and returns a promise. The result of the promise is an arr
 import { getFareProducts } from 'gtfs';
 
 // Get all fare products
-getFareProducts();
+const fareProducts = await getFareProducts();
 
 // Get a specific fare product
-getFareProducts({
+const fareProducts = await getFareProducts({
   fare_product_id: 'product1',
 });
 ```
@@ -911,10 +869,10 @@ Queries fare_rules and returns a promise. The result of the promise is an array 
 import { getFareRules } from 'gtfs';
 
 // Get all `fare_rules` for an agency
-getFareRules();
+const fareRules = await getFareRules();
 
 // Get fare_rules for a specific route
-getFareRules({
+const fareRules = await getFareRules({
   route_id: 'Lo-16APR',
 });
 ```
@@ -927,10 +885,10 @@ Queries fare transfer rules and returns a promise. The result of the promise is 
 import { getFareTransferRules } from 'gtfs';
 
 // Get all fare transfer rules
-getFareTransferRules();
+const fareTransferRules = await getFareTransferRules();
 
 // Get a all fare transfer rules for a specific fare product
-getFareTransferRules({
+const fareTransferRules = await getFareTransferRules({
   fare_product_id: 'product1',
 });
 ```
@@ -943,7 +901,7 @@ Queries feed_info and returns a promise. The result of the promise is an array o
 import { getFeedInfo } from 'gtfs';
 
 // Get feed_info
-getFeedInfo();
+const feedInfo = await getFeedInfo();
 ```
 
 ### getFrequencies(query, fields, sortBy)
@@ -954,10 +912,10 @@ Queries frequencies and returns a promise. The result of the promise is an array
 import { getFrequencies } from 'gtfs';
 
 // Get all frequencies
-getFrequencies();
+const frequencies = await getFrequencies();
 
 // Get frequencies for a specific trip
-getFrequencies({
+const frequencies = await getFrequencies({
   trip_id: '1234',
 });
 ```
@@ -969,8 +927,8 @@ Queries levels and returns a promise. The result of the promise is an array of l
 ```js
 import { getLevels } from 'gtfs';
 
-// Get levels
-getLevels();
+// Get all levels
+const levels = await getLevels();
 ```
 
 ### getPathways(query, fields, sortBy)
@@ -980,8 +938,8 @@ Queries pathways and returns a promise. The result of the promise is an array of
 ```js
 import { getPathways } from 'gtfs';
 
-// Get pathways
-getPathways();
+// Get all pathways
+const pathways = await getPathways();
 ```
 
 ### getTransfers(query, fields, sortBy)
@@ -992,10 +950,10 @@ Queries transfers and returns a promise. The result of the promise is an array o
 import { getTransfers } from 'gtfs';
 
 // Get all transfers
-getTransfers();
+const transfers = await getTransfers();
 
 // Get transfers for a specific stop
-getTransfers({
+const transfers = await getTransfers({
   from_stop_id: '1234',
 });
 ```
@@ -1007,8 +965,8 @@ Queries translations and returns a promise. The result of the promise is an arra
 ```js
 import { getTranslations } from 'gtfs';
 
-// Get translations
-getTranslations();
+// Get all translations
+const translations = await getTranslations();
 ```
 
 ### getDirections(query, fields, sortBy)
@@ -1019,15 +977,15 @@ Queries directions and returns a promise. The result of the promise is an array 
 import { getDirections } from 'gtfs';
 
 // Get all directions
-getDirections();
+const directions = await getDirections();
 
 // Get directions for a specific route
-getDirections({
+const directions = await getDirections({
   route_id: '1234',
 });
 
 // Get directions for a specific route and direction
-getDirections({
+const directions = await getDirections({
   route_id: '1234',
   direction_id: 1,
 });
@@ -1041,7 +999,7 @@ Queries stop areas and returns a promise. The result of the promise is an array 
 import { getStopAreas } from 'gtfs';
 
 // Get all stop areas
-getStopAreas();
+const stopAreas = await getStopAreas();
 ```
 
 ### getStopAttributes(query, fields, sortBy)
@@ -1052,10 +1010,10 @@ Queries stop_attributes and returns a promise. The result of the promise is an a
 import { getStopAttributes } from 'gtfs';
 
 // Get all stop attributes
-getStopAttributes();
+const stopAttributes = await getStopAttributes();
 
 // Get stop attributes for specific stop
-getStopAttributes({
+const stopAttributes = await getStopAttributes({
   stop_id: '1234',
 });
 ```
@@ -1068,10 +1026,10 @@ Queries timetables and returns a promise. The result of the promise is an array 
 import { getTimetables } from 'gtfs';
 
 // Get all timetables for an agency
-getTimetables();
+const timetables = await getTimetables();
 
 // Get a specific timetable
-getTimetables({
+const timetables = await getTimetables({
   timetable_id: '1',
 });
 ```
@@ -1084,10 +1042,10 @@ Queries timetable_stop_orders and returns a promise. The result of the promise i
 import { getTimetableStopOrders } from 'gtfs';
 
 // Get all timetable_stop_orders
-getTimetableStopOrders();
+const timetableStopOrders = await getTimetableStopOrders();
 
 // Get timetable_stop_orders for a specific timetable
-getTimetableStopOrders({
+const timetableStopOrders = await getTimetableStopOrders({
   timetable_id: '1',
 });
 ```
@@ -1100,10 +1058,10 @@ Queries timetable_pages and returns a promise. The result of the promise is an a
 import { getTimetablePages } from 'gtfs';
 
 // Get all timetable_pages for an agency
-getTimetablePages();
+const timetablePages = await getTimetablePages();
 
 // Get a specific timetable_page
-getTimetablePages({
+const timetablePages = await getTimetablePages({
   timetable_page_id: '2',
 });
 ```
@@ -1116,10 +1074,10 @@ Queries timetable_notes and returns a promise. The result of the promise is an a
 import { getTimetableNotes } from 'gtfs';
 
 // Get all timetable_notes for an agency
-getTimetableNotes();
+const timetableNotes = await getTimetableNotes();
 
 // Get a specific timetable_note
-getTimetableNotes({
+const timetableNotes = await getTimetableNotes({
   note_id: '1',
 });
 ```
@@ -1132,10 +1090,10 @@ Queries timetable_notes_references and returns a promise. The result of the prom
 import { getTimetableNotesReferences } from 'gtfs';
 
 // Get all timetable_notes_references for an agency
-getTimetableNotesReferences();
+const timetableNotesReferences = await getTimetableNotesReferences();
 
 // Get all timetable_notes_references for a specific timetable
-getTimetableNotesReferences({
+const timetableNotesReferences = await getTimetableNotesReferences({
   timetable_id: '4',
 });
 ```
@@ -1148,7 +1106,7 @@ Queries trips_dated_vehicle_journey and returns a promise. The result of the pro
 import { getTripsDatedVehicleJourneys } from 'gtfs';
 
 // Get all timetable_stop_orders
-getTripsDatedVehicleJourneys();
+const tripsDatedVehicleJourneys = await getTripsDatedVehicleJourneys();
 ```
 
 ### getServiceAlerts(query, fields, sortBy)
@@ -1160,7 +1118,7 @@ These are only valid if you use GTFS-Realtime and have imported Service Alert da
 import { getServiceAlerts } from 'gtfs';
 
 // Get service alerts
-getServiceAlerts();
+const serviceAlerts = await getServiceAlerts();
 ```
 
 ### getTripUpdates(query, fields, sortBy)
@@ -1172,7 +1130,7 @@ These are only valid if you use GTFS-Realtime and have imported Trip Update data
 import { getTripUpdates } from 'gtfs';
 
 // Get all trip updates
-getTripUpdates();
+const tripUpdates = await getTripUpdates();
 ```
 
 ### getStopTimesUpdates(query, fields, sortBy)
@@ -1184,7 +1142,7 @@ These are only valid if you use GTFS-Realtime and have imported Trip Update data
 import { getStopTimesUpdates } from 'gtfs';
 
 // Get all stop times updates
-getStopTimesUpdates();
+const stopTimesUpdates = await getStopTimesUpdates();
 ```
 
 ### getVehiclePositions(query, fields, sortBy)
@@ -1196,7 +1154,7 @@ These are only valid if you use GTFS-Realtime and have imported Vehicle Position
 import { getVehiclePositions } from 'gtfs';
 
 // Get all vehicle position data
-getVehiclePositions();
+const vehiclePositions = await getVehiclePositions();
 ```
 
 ### advancedQuery(table, advancedQueryOptions)
@@ -1221,8 +1179,9 @@ const advancedQueryOptions = {
     },
   ],
 };
+
 // Perform a custom query
-advancedQuery('stop_times', advancedQueryOptions);
+const stoptimes = await advancedQuery('stop_times', advancedQueryOptions);
 ```
 
 ### runRawQuery(query)
@@ -1234,7 +1193,9 @@ The result of the promise is an array the selected data.
 import { runRawQuery } from 'gtfs';
 
 // Perform a raw query
-runRawQuery('SELECT * FROM stop_times WHERE stop_sequence="1"');
+const stoptimes = await runRawQuery(
+  'SELECT * FROM stop_times WHERE stop_sequence="1"'
+);
 ```
 
 ### execRawQuery(query)
@@ -1245,7 +1206,7 @@ Executes a statement. Returns a promise containing the result of the execute.
 import { execRawQuery } from 'gtfs';
 
 // Purge trips table
-execRawQuery('DELETE FROM trips');
+await execRawQuery('DELETE FROM trips');
 ```
 
 ## Contributing
