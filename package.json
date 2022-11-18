@@ -78,7 +78,7 @@
     "gtfs-realtime-bindings": "^0.0.6",
     "lodash-es": "^4.17.21",
     "long": "^5.2.1",
-    "node-fetch": "^3.2.10",
+    "node-fetch": "^3.3.0",
     "pluralize": "^8.0.0",
     "pretty-error": "^4.0.0",
     "promise-map-series": "^0.3.0",
