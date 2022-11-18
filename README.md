@@ -139,13 +139,14 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 
     cp config-sample.json config.json
 
-| option                      | type    | description                                                                                          |
-| --------------------------- | ------- | ---------------------------------------------------------------------------------------------------- |
-| [`agencies`](#agencies)     | array   | An array of GTFS files to be imported.                                                               |
-| [`csvOptions`](#csvOptions) | object  | Options passed to `csv-parse` for parsing GTFS CSV files. Optional.                                  |
-| [`exportPath`](#exportPath) | string  | A path to a directory to put exported GTFS files. Optional, defaults to `gtfs-export/<agency_name>`. |
-| [`sqlitePath`](#sqlitePath) | string  | A path to an SQLite database. Optional, defaults to using an in-memory database.                     |
-| [`verbose`](#verbose)       | boolean | Whether or not to print output to the console. Optional, defaults to true.                           |
+| option                                  | type    | description                                                                                                                            |
+| --------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| [`agencies`](#agencies)                 | array   | An array of GTFS files to be imported.                                                                                                 |
+| [`csvOptions`](#csvOptions)             | object  | Options passed to `csv-parse` for parsing GTFS CSV files. Optional.                                                                    |
+| [`exportPath`](#exportPath)             | string  | A path to a directory to put exported GTFS files. Optional, defaults to `gtfs-export/<agency_name>`.                                   |
+| [`ignoreDuplicates`](#ignoreduplicates) | boolean | Whether or not to ignore unique constraints on ids when importing GTFS, such as `trip_id`, `calendar_id`. Optional, defaults to false. |
+| [`sqlitePath`](#sqlitePath)             | string  | A path to an SQLite database. Optional, defaults to using an in-memory database.                                                       |
+| [`verbose`](#verbose)                   | boolean | Whether or not to print output to the console. Optional, defaults to true.                                                             |
 
 ### agencies
 
@@ -273,6 +274,32 @@ See [full list of options](https://csv.js.org/parse/options/).
 ### exportPath
 
 {String} A path to a directory to put exported GTFS files. If the directory does not exist, it will be created. Used when running `gtfs-export` script or `exportGtfs()`. Optional, defaults to `gtfs-export/<agency_name>` where `<agency_name>` is a sanitized, [snake-cased](https://en.wikipedia.org/wiki/Snake_case) version of the first `agency_name` in `agency.txt`.
+
+```json
+{
+  "agencies": [
+    {
+      "path": "/path/to/the/unzipped/gtfs/"
+    }
+  ],
+  "exportPath": "~/path/to/export/gtfs"
+}
+```
+
+### ignoreDuplicates
+
+{Boolean} If you don't want node-GTFS to throw an error when it encounters a duplicate id on GTFS import. If `true`, it will skip importing duplicate records where unique constraints are violated, such as`trip_id`, `stop_id`, `calendar_id`. Useful if importing GTFS from multiple sources into one SQlite database that share routes or stops. Defaults to `false`.
+
+```json
+{
+  "agencies": [
+    {
+      "path": "/path/to/the/unzipped/gtfs/"
+    }
+  ],
+  "ignoreDuplicates": false
+}
+```
 
 ### sqlitePath
 

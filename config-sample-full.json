@@ -12,6 +12,7 @@
   "csvOptions": {
     "skip_lines_with_error": true
   },
+  "ignoreDuplicates": false,
   "sqlitePath": "/tmp/gtfs",
   "exportPath": "~/path/to/export/gtfs"
 }
