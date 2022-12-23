@@ -55,7 +55,8 @@
     "Darius MARTIN",
     "Mike Brocks",
     "Matt Moran",
-    "Daniel Sörlöv"
+    "Daniel Sörlöv",
+    "Ali Zarghami <alizarghami@gmail.com>"
   ],
   "type": "module",
   "main": "index.js",

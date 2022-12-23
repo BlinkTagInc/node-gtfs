@@ -141,7 +141,7 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 
 | option                                  | type    | description                                                                                                                            |
 | --------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| [`agencies`](#agencies)                 | array   | An array of GTFS files to be imported.                                                                                                 |
+| [`agencies`](#agencies)                 | array   | An array of GTFS files to be imported, and which files to exclude.                                                                     |
 | [`csvOptions`](#csvOptions)             | object  | Options passed to `csv-parse` for parsing GTFS CSV files. Optional.                                                                    |
 | [`exportPath`](#exportPath)             | string  | A path to a directory to put exported GTFS files. Optional, defaults to `gtfs-export/<agency_name>`.                                   |
 | [`ignoreDuplicates`](#ignoreduplicates) | boolean | Whether or not to ignore unique constraints on ids when importing GTFS, such as `trip_id`, `calendar_id`. Optional, defaults to false. |
