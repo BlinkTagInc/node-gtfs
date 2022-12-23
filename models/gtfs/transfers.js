@@ -37,7 +37,8 @@ const model = {
       type: 'integer',
       min: 0,
       max: 5,
-      required: true,
+      required: false,
+      default: 0
     },
     {
       name: 'min_transfer_time',
