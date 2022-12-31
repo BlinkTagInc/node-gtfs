@@ -95,6 +95,7 @@
     "yoctocolors": "^1.0.0"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.3",
     "dtslint": "^4.2.1",
     "eslint": "^8.30.0",
     "eslint-config-prettier": "^8.5.0",

@@ -1,5 +1,7 @@
 import CsvParse = require('csv-parse');
 
+import Database = require('better-sqlite3');
+
 import { FeatureCollection, Geometry } from '@turf/helpers';
 
 export {}; // disable implicit exporting of types
@@ -19,7 +21,7 @@ export type SqlSelect = string[];
 
 export type SqlOrderBy = Array<[string, 'ASC' | 'DESC']>;
 
-export type JoinTables = Array<JoinOptions>;
+export type JoinTables = JoinOptions[];
 
 export type SqlResults = Array<Record<string, any>>;
 
@@ -29,25 +31,26 @@ export type SqlTableName = string;
 
 export type Config = ExportConfig & ImportConfig;
 
-export type AdvancedQueryOptions = {
+export interface AdvancedQueryOptions {
   /**
-   * An advanced query
+   * Queries the database with support for table joins and custom tables and returns an array of data.
    */
   query?: SqlWhere;
   fields?: SqlSelect;
   orderBy?: SqlOrderBy;
-  join?: Array<JoinOptions>;
+  join?: JoinOptions[];
   options?: QueryOptions;
-};
+}
 
-export type JoinOptions = {
+export interface JoinOptions {
   /**
    * Options for joining, type
    */
   type?: 'LEFT OUTER' | 'INNER';
   table: string;
   on: string;
-};
+}
+
 interface VerboseConfig {
   /**
    * Whether or not to print output to the console. Defaults to true.
@@ -57,7 +60,7 @@ interface VerboseConfig {
 
 export interface DbConfig {
   /**
-   * A path to an SQLite database. Defaults to using an in-memory database.
+   * A path to a SQLite database. Defaults to using an in-memory database.
    */
   sqlitePath?: string;
 }
@@ -71,7 +74,7 @@ export interface ExportConfig extends DbConfig, VerboseConfig {
 
 export interface ImportConfig extends DbConfig, VerboseConfig {
   /**
-   * An array of GTFS files to be imported.
+   * An array of agencies with GTFS files to be imported.
    */
   agencies: Array<{
     /**
@@ -114,11 +117,11 @@ export interface ImportConfig extends DbConfig, VerboseConfig {
 }
 
 export interface QueryOptions {
-  db?: SqlDatabase;
+  db?: Database.Database;
 }
 
 /**
- * Use exportGtfs() in your code to run an export of a GTFS file specified in a config.json file.
+ * Use exportGtfs() in your code to run an export of a GTFS from SQLite specified in a config.json file.
  */
 export function exportGtfs(config: ExportConfig): Promise<void>;
 
@@ -133,17 +136,17 @@ export function importGtfs(config: ImportConfig): Promise<void>;
 export function updateGtfsRealtime(config: ImportConfig): Promise<void>;
 
 /**
- * Open database before making any queries.
+ * Opens the database specified in the config object.
  */
-export function openDb(config: DbConfig): Promise<SqlDatabase>;
+export function openDb(config: DbConfig): Database.Database;
 
 /**
- * Closes open database.
+ * Closes the specified database.
  */
-export function closeDb(db?: SqlDatabase): Promise<void>;
+export function closeDb(db?: Database.Database): void;
 
 /**
- * Queries agencies and returns a promise for an array of agencies.
+ * Returns an array of agencies that match query parameters.
  */
 export function getAgencies(
   query?: SqlWhere,
@@ -153,7 +156,17 @@ export function getAgencies(
 ): SqlResults;
 
 /**
- * Queries attributions and returns a promise for an array of attributions.
+ * Returns an array of areas that match query parameters.
+ */
+export function getAreas(
+  query?: SqlWhere,
+  fields?: SqlSelect,
+  sortBy?: SqlOrderBy,
+  options?: QueryOptions
+): SqlResults;
+
+/**
+ * Returns an array of attributions that match query parameters.
  */
 export function getAttributions(
   query?: SqlWhere,
@@ -163,7 +176,7 @@ export function getAttributions(
 ): SqlResults;
 
 /**
- * Queries routes and returns a promise for an array of routes.
+ * Returns an array of routes that match query parameters.
  */
 export function getRoutes(
   query?: SqlWhere,
@@ -173,7 +186,7 @@ export function getRoutes(
 ): SqlResults;
 
 /**
- * Queries stops and returns a promise for an array of stops.
+ * Returns an array of stops that match query parameters.
  */
 export function getStops(
   query?: SqlWhere,
@@ -183,7 +196,7 @@ export function getStops(
 ): SqlResults;
 
 /**
- * Queries stops and returns a promise for an geoJSON object of stops.
+ * Returns geoJSON object of stops that match query parameters.
  * All valid queries for `getStops()` work for `getStopsAsGeoJSON()`.
  */
 export function getStopsAsGeoJSON(
@@ -192,7 +205,7 @@ export function getStopsAsGeoJSON(
 ): Promise<FeatureCollection<Geometry, { [name: string]: any }>>;
 
 /**
- * Queries `stop_times` and returns a promise for an array of stop_times.
+ * Returns an array of stop_times that match query parameters.
  */
 export function getStoptimes(
   query?: SqlWhere,
@@ -202,7 +215,7 @@ export function getStoptimes(
 ): SqlResults;
 
 /**
- * Queries trips and returns a promise for an array of trips.
+ * Returns an array of trips that match query parameters.
  */
 export function getTrips(
   query?: SqlWhere,
@@ -212,7 +225,7 @@ export function getTrips(
 ): SqlResults;
 
 /**
- * Queries shapes and returns a promise for an array of shapes.
+ * Returns an array of shapes that match query parameters.
  */
 export function getShapes(
   query?: SqlWhere,
@@ -222,16 +235,16 @@ export function getShapes(
 ): SqlResults;
 
 /**
- * Queries shapes and returns a promise for an geoJSON object of shapes.
+ * Returns a geoJSON object of shapes that match query parameters.
  * All valid queries for `getShapes()` work for `getShapesAsGeoJSON()`.
  */
 export function getShapesAsGeoJSON(
   query?: SqlWhere,
   options?: QueryOptions
-): Promise<FeatureCollection<Geometry, { [name: string]: any }>>;
+): FeatureCollection<Geometry, { [name: string]: any }>;
 
 /**
- * Queries calendars and returns a promise for an array of calendars.
+ * Returns an array of calendars that match query parameters.
  */
 export function getCalendars(
   query?: SqlWhere,
@@ -241,7 +254,7 @@ export function getCalendars(
 ): SqlResults;
 
 /**
- * Queries calendar_dates and returns a promise for an array of calendar_dates.
+ * Returns an array of calendar_dates that match query parameters.
  */
 export function getCalendarDates(
   query?: SqlWhere,
@@ -251,7 +264,7 @@ export function getCalendarDates(
 ): SqlResults;
 
 /**
- * Queries fare_attributes and returns a promise for an array of fare_attributes.
+ * Returns an array of fare_attributes that match query parameters.
  */
 export function getFareAttributes(
   query?: SqlWhere,
@@ -261,7 +274,27 @@ export function getFareAttributes(
 ): SqlResults;
 
 /**
- * Queries fare_rules and returns a promise for an array of fare_rules.
+ * Returns an array of fare_leg_rules that match query parameters.
+ */
+export function getFareLegRules(
+  query?: SqlWhere,
+  fields?: SqlSelect,
+  sortBy?: SqlOrderBy,
+  options?: QueryOptions
+): SqlResults;
+
+/**
+ * Returns an array of fare_products that match query parameters.
+ */
+export function getFareProducts(
+  query?: SqlWhere,
+  fields?: SqlSelect,
+  sortBy?: SqlOrderBy,
+  options?: QueryOptions
+): SqlResults;
+
+/**
+ * Returns an array of fare_rules that match query parameters.
  */
 export function getFareRules(
   query?: SqlWhere,
@@ -271,7 +304,17 @@ export function getFareRules(
 ): SqlResults;
 
 /**
- * Queries feed_info and returns a promise for an array of feed_infos.
+ * Returns an array of fare_transfer_rules that match query parameters.
+ */
+export function getFareTransferRules(
+  query?: SqlWhere,
+  fields?: SqlSelect,
+  sortBy?: SqlOrderBy,
+  options?: QueryOptions
+): SqlResults;
+
+/**
+ * Returns an array of feed_info that match query parameters.
  */
 export function getFeedInfo(
   query?: SqlWhere,
@@ -281,7 +324,7 @@ export function getFeedInfo(
 ): SqlResults;
 
 /**
- * Queries frequencies and returns a promise for an array of frequencies.
+ * Returns an array of frequencies that match query parameters.
  */
 export function getFrequencies(
   query?: SqlWhere,
@@ -291,7 +334,7 @@ export function getFrequencies(
 ): SqlResults;
 
 /**
- * Queries levels and returns a promise for an array of levels.
+ * Returns an array of levels that match query parameters.
  */
 export function getLevels(
   query?: SqlWhere,
@@ -301,7 +344,7 @@ export function getLevels(
 ): SqlResults;
 
 /**
- * Queries pathways and returns a promise for an array of pathways.
+ * Returns an array of pathways that match query parameters.
  */
 export function getPathways(
   query?: SqlWhere,
@@ -311,7 +354,7 @@ export function getPathways(
 ): SqlResults;
 
 /**
- * Queries transfers and returns a promise for an array of transfers.
+ * Returns an array of transfers that match query parameters.
  */
 export function getTransfers(
   query?: SqlWhere,
@@ -321,7 +364,7 @@ export function getTransfers(
 ): SqlResults;
 
 /**
- * Queries translations and returns a promise for an array of translations.
+ * Returns an array of translations that match query parameters.
  */
 export function getTranslations(
   query?: SqlWhere,
@@ -331,8 +374,18 @@ export function getTranslations(
 ): SqlResults;
 
 /**
- * Queries directions and returns a promise for an array of directions.
- * These are from the non-standard `directions.txt` file.
+ * Returns an array of stop_areas that match query parameters.
+ */
+export function getStopAreas(
+  query?: SqlWhere,
+  fields?: SqlSelect,
+  sortBy?: SqlOrderBy,
+  options?: QueryOptions
+): SqlResults;
+
+/**
+ * Returns an array of directions that match query parameters.
+ * This is for the non-standard `directions.txt` file.
  */
 export function getDirections(
   query?: SqlWhere,
@@ -342,8 +395,8 @@ export function getDirections(
 ): SqlResults;
 
 /**
- * Queries stop_attributes and returns a promise for an array of stop_attributes.
- * These are from the non-standard `stop_attributes.txt` file.
+ * Returns an array of stop_attributes that match query parameters.
+ * This is for the non-standard `stop_attributes.txt` file.
  */
 export function getStopAttributes(
   query?: SqlWhere,
@@ -353,8 +406,8 @@ export function getStopAttributes(
 ): SqlResults;
 
 /**
- * Queries timetables and returns a promise for an array of timetables.
- * These are from the non-standard `timetables.txt` file.
+ * Returns an array of timetables that match query parameters.
+ * This is for the non-standard `timetables.txt` file used in GTFS-to-HTML.
  */
 export function getTimetables(
   query?: SqlWhere,
@@ -364,8 +417,8 @@ export function getTimetables(
 ): SqlResults;
 
 /**
- * Queries timetable_stop_orders and returns a promise for an array of timetable_stop_orders.
- * These are from the non-standard `timetable_stop_order.txt` file.
+ * Returns an array of timetable_stop_orders that match query parameters.
+ * This is for the non-standard `timetable_stop_order.txt` file used in GTFS-to-HTML.
  */
 export function getTimetableStopOrders(
   query?: SqlWhere,
@@ -375,8 +428,8 @@ export function getTimetableStopOrders(
 ): SqlResults;
 
 /**
- * Queries timetable_pages and returns a promise for an array of timetable_pages.
- * These are from the non-standard `timetable_pages.txt` file.
+ * Returns an array of timetable_pages that match query parameters.
+ * This is for the non-standard `timetable_pages.txt` file used in GTFS-to-HTML.
  */
 export function getTimetablePages(
   query?: SqlWhere,
@@ -386,8 +439,8 @@ export function getTimetablePages(
 ): SqlResults;
 
 /**
- * Queries timetable_notes and returns a promise for an array of timetable_notes.
- * These are from the non-standard `timetable_notes.txt` file.
+ * Returns an array of timetable_notes that match query parameters.
+ * This is for the non-standard `timetable_notes.txt` file used in GTFS-to-HTML.
  */
 export function getTimetableNotes(
   query?: SqlWhere,
@@ -397,8 +450,8 @@ export function getTimetableNotes(
 ): SqlResults;
 
 /**
- * Queries timetable_notes_references and returns a promise for an array of timetable_notes references.
- * These are from the non-standard `timetable_notes_references.txt` file.
+ * Returns an array of timetable_notes_references that match query parameters.
+ * This is for the non-standard `timetable_notes_references.txt` file used in GTFS-to-HTML.
  */
 export function getTimetableNotesReferences(
   query?: SqlWhere,
@@ -408,9 +461,10 @@ export function getTimetableNotesReferences(
 ): SqlResults;
 
 /**
- * Queries board-alights and returns a promise for an array of board-alights.
+ * Returns an array of trips_dated_vehicle_journey that match query parameters.
+ * This is for the non-standard `trips_dated_vehicle_journey.txt` file.
  */
-export function getBoardAlights(
+export function getTripsDatedVehicleJourneys(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
@@ -418,47 +472,8 @@ export function getBoardAlights(
 ): SqlResults;
 
 /**
- * Queries ride-feed-info and returns a promise for an array of ride-feed-info.
- */
-export function getRideFeedInfos(
-  query?: SqlWhere,
-  fields?: SqlSelect,
-  sortBy?: SqlOrderBy,
-  options?: QueryOptions
-): SqlResults;
-
-/**
- * Queries rider trips and returns a promise for an array of rider trips.
- */
-export function getRiderTrips(
-  query?: SqlWhere,
-  fields?: SqlSelect,
-  sortBy?: SqlOrderBy,
-  options?: QueryOptions
-): SqlResults;
-
-/**
- * Queries riderships and returns a promise for an array of riderships.
- */
-export function getRiderships(
-  query?: SqlWhere,
-  fields?: SqlSelect,
-  sortBy?: SqlOrderBy,
-  options?: QueryOptions
-): SqlResults;
-
-/**
- * Queries trip-capacities and returns a promise for an array of trip-capacities.
- */
-export function getTripCapacities(
-  query?: SqlWhere,
-  fields?: SqlSelect,
-  sortBy?: SqlOrderBy,
-  options?: QueryOptions
-): SqlResults;
-
-/**
- * Queries trip-capacities and returns a promise for an array of service-alerts.
+ * Returns an array of GTFS Realtime service alerts that match query parameters.
+ * This only works if you configure GTFS Realtime import in node-gtfs.
  */
 export function getServiceAlerts(
   query?: SqlWhere,
@@ -468,7 +483,8 @@ export function getServiceAlerts(
 ): SqlResults;
 
 /**
- * Queries trip-capacities and returns a promise for an array of trip-updates.
+ * Returns an array of GTFS Realtime trip updates that match query parameters.
+ * This only works if you configure GTFS Realtime import in node-gtfs.
  */
 export function getTripUpdates(
   query?: SqlWhere,
@@ -478,9 +494,10 @@ export function getTripUpdates(
 ): SqlResults;
 
 /**
- * Queries trip-capacities and returns a promise for an array of vehicle-positions.
+ * Returns an array of GTFS Realtime stop time updates that match query parameters.
+ * This only works if you configure GTFS Realtime import in node-gtfs.
  */
-export function getVehiclePositions(
+export function getStopTimesUpdates(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
@@ -488,9 +505,10 @@ export function getVehiclePositions(
 ): SqlResults;
 
 /**
- * Queries trip-capacities and returns a promise for an array of stop-times-updates.
+ * Returns an array of GTFS Realtime vehicle positions that match query parameters.
+ * This only works if you configure GTFS Realtime import in node-gtfs.
  */
-export function getStopTimesUpdates(
+export function getVehiclePositions(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,

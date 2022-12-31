@@ -22,7 +22,7 @@ import {
 
   await exportGtfs(config); // $ExpectType void
 
-  openDb(config); // $ExpectType Database<Database, Statement>
+  openDb(config); // $ExpectType Database
 
   const results = getAgencies();
   results[0]; // $ExpectType Record<string, any>
