@@ -688,7 +688,7 @@ const stops = getStops({
 });
 ```
 
-### getStopsAsGeoJSON(query)
+### getStopsAsGeoJSON(query, options)
 
 Returns geoJSON object of stops that match query parameters. All valid queries for `getStops()` work for `getStopsAsGeoJSON()`.
 
@@ -800,7 +800,7 @@ const shapes = getShapes({
 });
 ```
 
-### getShapesAsGeoJSON(query)
+### getShapesAsGeoJSON(query, options)
 
 Returns a geoJSON object of shapes that match query parameters. All valid queries for `getShapes()` work for `getShapesAsGeoJSON()`.
 
@@ -1237,23 +1237,24 @@ import { openDb } from 'gtfs';
 const db = openDb(config);
 
 // Get a specific trip
-const statement = db.prepare('SELECT * FROM trips WHERE trip_id = ?');
-const trip = statement.get('123');
+const trip = db.prepare('SELECT * FROM trips WHERE trip_id = ?').get('123');
 
 // Get all stops
 const stops = db.prepare('SELECT * from stops').all();
 
 // Get all calendar_ids for specific date
-const statement = db.prepare(
-  'SELECT service_id from calendar WHERE start_date <= $date AND end_date >= $date'
-);
-const calendarIds = statement.all({ date: 20150101 });
+const calendarIds = db
+  .prepare(
+    'SELECT service_id from calendar WHERE start_date <= $date AND end_date >= $date'
+  )
+  .all({ date: 20150101 });
 
 // Find all stops for route_id=18 by joining tables
-const statement = db.prepare(
-  'SELECT DISTINCT stops.stop_id from stops INNER JOIN stop_times ON stops.stop_id = stop_times.stop_id INNER JOIN trips on trips.trip_id = stop_times.trip_id WHERE trips.route_id = ?'
-);
-const calendarIds = statement.all('18');
+const stopIds = db
+  .prepare(
+    'SELECT DISTINCT stops.stop_id from stops INNER JOIN stop_times ON stops.stop_id = stop_times.stop_id INNER JOIN trips on trips.trip_id = stop_times.trip_id WHERE trips.route_id = ?'
+  )
+  .all('18');
 
 // Execute raw SQL
 const sql = "DELETE FROM trips where trip_id = '329'";

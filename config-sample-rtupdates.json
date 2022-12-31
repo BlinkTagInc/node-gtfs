@@ -1,28 +1,16 @@
 {
   "agencies": [
     {
-      "url": "http://www.bart.gov/dev/schedules/google_transit.zip",
-      "exclude": ["shapes"],
+      "url": "https://marintransit.org/data/google_transit.zip",
       "realtimeUrls": [
-        "https://opendata.samtrafiken.se/gtfs-rt/sl/TripUpdates.pb?key=yourkey",
-        "https://opendata.samtrafiken.se/gtfs-rt/sl/VehiclePositions.pb?key=yourkey",
-        "https://opendata.samtrafiken.se/gtfs-rt/sl/ServiceAlerts.pb?key=yourkey"
-      ],
-      "realtimeHeaders": {
-        "X-CustomHeader": "MyCustomHeader"
-      },
-      "headers": {
-        "X-CustomHeader": "MyCustomHeader"
-      }
-    },
-    {
-      "path": "/path/to/gtfs.zip",
-      "exclude": ["stop_times", "shapes"]
+        "https://marintransit.net/gtfs-rt/alerts",
+        "https://marintransit.net/gtfs-rt/tripupdates",
+        "https://marintransit.net/gtfs-rt/vehiclepositions"
+      ]
     }
   ],
   "csvOptions": {
     "skip_lines_with_error": true
   },
-  "sqlitePath": "/tmp/gtfs",
-  "exportPath": "~/path/to/export/gtfs"
+  "sqlitePath": "/tmp/gtfs"
 }
