@@ -3,39 +3,33 @@
 import should from 'should';
 
 import config from '../test-config.js';
-import {
-  openDb,
-  getDb,
-  closeDb,
-  importGtfs,
-  getFareRules,
-} from '../../index.js';
+import { openDb, closeDb, importGtfs, getFareRules } from '../../index.js';
 
 describe('getFareRules():', () => {
   before(async () => {
-    await openDb(config);
+    openDb(config);
     await importGtfs(config);
   });
 
-  after(async () => {
-    const db = getDb(config);
-    await closeDb(db);
+  after(() => {
+    const db = openDb(config);
+    closeDb(db);
   });
 
-  it('should return empty array if no fare_rules', async () => {
+  it('should return empty array if no fare_rules', () => {
     const routeId = 'not_real';
 
-    const results = await getFareRules({
+    const results = getFareRules({
       route_id: routeId,
     });
     should.exists(results);
     results.should.have.length(0);
   });
 
-  it('should return expected fare_rules', async () => {
+  it('should return expected fare_rules', () => {
     const routeId = 'Bu-16APR';
 
-    const results = await getFareRules(
+    const results = getFareRules(
       {
         route_id: routeId,
       },

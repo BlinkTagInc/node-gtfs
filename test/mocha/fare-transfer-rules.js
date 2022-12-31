@@ -7,10 +7,10 @@ import {
   openDb,
   closeDb,
   importGtfs,
-  getTimetableStopOrders,
+  getFareTransferRules,
 } from '../../index.js';
 
-describe('getTimetableStopOrders():', () => {
+describe('getFareTransferRules():', () => {
   before(async () => {
     openDb(config);
     await importGtfs(config);
@@ -21,11 +21,10 @@ describe('getTimetableStopOrders():', () => {
     closeDb(db);
   });
 
-  it('should return empty array if no timetable stop orders (GTFS-to-HTML timetables)', () => {
-    const timetableId = 'fake-timetable-id';
-
-    const results = getTimetableStopOrders({
-      timetable_id: timetableId,
+  it('should return empty array if no fare_transfer_rules exist', () => {
+    const transferId = 'fake-transfer-id';
+    const results = getFareTransferRules({
+      transfer_id: transferId,
     });
     should.exists(results);
     results.should.have.length(0);

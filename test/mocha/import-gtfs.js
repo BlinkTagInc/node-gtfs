@@ -9,7 +9,7 @@ import should from 'should';
 
 import { unzip } from '../../lib/file-utils.js';
 import config from '../test-config.js';
-import { openDb, getDb, closeDb, importGtfs, getRoutes } from '../../index.js';
+import { openDb, closeDb, importGtfs, getRoutes } from '../../index.js';
 import models from '../../models/models.js';
 
 let db;
@@ -30,13 +30,13 @@ const agenciesFixturesLocal = [
 ];
 
 describe('importGtfs():', function () {
-  before(async () => {
-    db = await openDb(config);
+  before(() => {
+    db = openDb(config);
   });
 
-  after(async () => {
-    const db = getDb(config);
-    await closeDb(db);
+  after(() => {
+    const db = openDb(config);
+    closeDb(db);
   });
 
   this.timeout(10000);
@@ -47,7 +47,7 @@ describe('importGtfs():', function () {
         agencies: agenciesFixturesRemote,
       });
 
-      const routes = await getRoutes();
+      const routes = getRoutes();
       should.exist(routes);
       routes.length.should.equal(4);
     });
@@ -58,7 +58,7 @@ describe('importGtfs():', function () {
         agencies: agenciesFixturesLocal,
       });
 
-      const routes = await getRoutes();
+      const routes = getRoutes();
       should.exist(routes);
       routes.length.should.equal(4);
     });
@@ -127,9 +127,9 @@ describe('importGtfs():', function () {
 
     for (const model of models) {
       it(`should import the same number of ${model.filenameBase}`, async () => {
-        const result = await db.get(
-          `SELECT COUNT(*) FROM ${model.filenameBase};`
-        );
+        const result = await db
+          .prepare(`SELECT COUNT(*) FROM ${model.filenameBase};`)
+          .get();
         result['COUNT(*)'].should.equal(countData[model.filenameBase]);
       });
     }

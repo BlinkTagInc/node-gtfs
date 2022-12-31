@@ -3,26 +3,20 @@
 import should from 'should';
 
 import config from '../test-config.js';
-import {
-  openDb,
-  getDb,
-  closeDb,
-  importGtfs,
-  advancedQuery,
-} from '../../index.js';
+import { openDb, closeDb, importGtfs, advancedQuery } from '../../index.js';
 
 describe('advancedQuery():', () => {
   before(async () => {
-    await openDb(config);
+    openDb(config);
     await importGtfs(config);
   });
 
-  after(async () => {
-    const db = getDb(config);
-    await closeDb(db);
+  after(() => {
+    const db = openDb(config);
+    closeDb(db);
   });
 
-  it('should return empty array if no trips', async () => {
+  it('should return empty array if no trips', () => {
     const routeId = 'fake-route-id';
 
     const advancedQueryOptions = {
@@ -38,13 +32,13 @@ describe('advancedQuery():', () => {
         },
       ],
     };
-    const results = await advancedQuery('stop_times', advancedQueryOptions);
+    const results = advancedQuery('stop_times', advancedQueryOptions);
 
     should.exists(results);
     results.should.have.length(0);
   });
 
-  it('should return expected trips with joined trip', async () => {
+  it('should return expected trips with joined trip', () => {
     const tripId = '329';
 
     const advancedQueryOptions = {
@@ -60,7 +54,7 @@ describe('advancedQuery():', () => {
         },
       ],
     };
-    const results = await advancedQuery('stop_times', advancedQueryOptions);
+    const results = advancedQuery('stop_times', advancedQueryOptions);
 
     const expectedResults = [
       { trip_id: '329', arrival_time: '9:09:00' },

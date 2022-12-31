@@ -29,13 +29,35 @@ You can use it as a [command-line tool](#command-line-examples) or as a [node.js
 
 This library has four parts: the [GTFS import script](#gtfs-import-script), [GTFS export script](#gtfs-export-script) and [GTFS-Realtime update script](#gtfsrealtime-update-script) and the [query methods](#query-methods)
 
+## Breaking changes in Version 4
+
+Version 4 of node-gtfs switched to using the better-sqlite3 library. This allowed all query methods to become synchronous and speeds up import and export.
+
+- All query methods are now synchronous.
+
+```js
+// Version 3
+const routes = await getRoutes();
+
+// Version 4
+const routes = getRoutes();
+```
+
+- `runRawQuery` has been removed. Use [Raw SQLite Query](#raw-sqlite-query) instead.
+- `execRawQuery` has been removed. Use [Raw SQLite Query](#raw-sqlite-query) instead.
+- `getDb` has been removed. Use `openDb` instead.
+
 ## Installation
 
-If you would like to use this library as a command-line utility, you can install it globally directly from [npm](https://npmjs.org):
+To use this library as a command-line utility, install it globally [npm](https://npmjs.org):
 
     npm install gtfs -g
 
-If you are using this as a node module as part of an application, you can include it in your project's `package.json` file.
+This will add the `gtfs-import` and `gtfs-export` scripts to your path.
+
+If you are using this as a node module as part of an application, include it in your project's `package.json` file.
+
+    npm install gtfs
 
 ## Quick Start
 
@@ -471,11 +493,13 @@ await exportGtfs(config);
 
 ## Query Methods
 
-This library includes many methods you can use in your project to query GTFS data. These methods return promises.
+This library includes many methods you can use in your project to query GTFS data.
 
-Most methods accept three optional arguments: `query`, `fields` and `sortBy`.
+Most methods accept three optional arguments: `query`, `fields`, `sortBy` and `options`.
 
-More advanced methods include `advancedQuery`, `runRawQuery` and `execRawQuery`.
+For more advanced queries, you can use `advancedQuery` or any query method from [better-sqlite3](#raw-sqlite-query).
+
+You need to run `openDb(config)` before using any query methods.
 
 #### Query
 
@@ -488,11 +512,12 @@ const config = JSON.parse(
   await readFile(new URL('./config.json', import.meta.url))
 );
 
-const db = await openDb(config);
-const routes = await getRoutes(
-  {},
-  ['route_id', 'route_short_name', 'route_color'],
-  [['route_short_name', 'ASC']]
+const db = openDb(config);
+const routes = getRoutes(
+  {}, // No query filters
+  ['route_id', 'route_short_name', 'route_color'], // Only return these fields
+  [['route_short_name', 'ASC']], // Sort by this field and direction
+  { db: db } // Options for the query. Can specify which database to use if more than one are open
 );
 ```
 
@@ -505,8 +530,8 @@ const config = JSON.parse(
   await readFile(new URL('./config.json', import.meta.url))
 );
 
-const db = await openDb(config);
-const trips = await getTrips(
+const db = openDb(config);
+const trips = getTrips(
   {
     route_id: '123',
   },
@@ -521,8 +546,8 @@ import { openDb, getStops } from 'gtfs';
 import { readFile } from 'fs/promises';
 const config = JSON.parse(await readFile(new URL('./config.json', import.meta.url)));
 
-const db = await openDb(config);
-const stops = await getStops(
+const db = openDb(config);
+const stops = getStops(
   {
     stop_id: [
       '123',
@@ -544,80 +569,77 @@ import { openDb } from 'gtfs';
 Open database before making any queries
 
 ```js
-const db = await openDb(config);
+const db = openDb(config);
 ```
 
-### getAgencies(query, fields, sortBy)
+### getAgencies(query, fields, sortBy, options)
 
-Queries agencies and returns a promise. The result of the promise is an array of agencies.
+Returns an array of agencies that match query parameters. [Details on agency.txt](https://gtfs.org/schedule/reference/#agencytxt)
 
 ```js
 import { getAgencies } from 'gtfs';
 
 // Get all agencies
-const agencies = await getAgencies();
+const agencies = getAgencies();
 
 // Get a specific agency
-const agencies = await getAgencies({
+const agencies = getAgencies({
   agency_id: 'caltrain',
 });
 ```
 
-### getAreas(query, fields, sortBy)
+### getAreas(query, fields, sortBy, options)
 
-Queries areas and returns a promise. The result of the promise is an array of areas.
+Returns an array of areas that match query parameters. [Details on areas.txt](https://gtfs.org/schedule/reference/#areastxt)
 
 ```js
 import { getAreas } from 'gtfs';
 
 // Get all areas
-const areas = await getAreas();
+const areas = getAreas();
 
 // Get a specific area
-const areas = await getAreas({
+const areas = getAreas({
   area_id: 'area1',
 });
 ```
 
-### getAttributions(query, fields, sortBy)
+### getAttributions(query, fields, sortBy, options)
 
-Queries attributions and returns a promise. The result of the promise is an array of attributions.
+Returns an array of attributions that match query parameters. [Details on attributions.txt](https://gtfs.org/schedule/reference/#attributionstxt)
 
 ```js
 import { getAttributions } from 'gtfs';
 
 // Get all attributions
-const attributions = await getAttributions();
+const attributions = getAttributions();
 
 // Get a specific attribution
-const attributions = await getAttributions({
+const attributions = getAttributions({
   attribution_id: '123',
 });
 ```
 
-### getRoutes(query, fields, sortBy)
+### getRoutes(query, fields, sortBy, options)
 
-Queries routes and returns a promise. The result of the promise is an array of routes.
+Returns an array of routes that match query parameters. [Details on routes.txt](https://gtfs.org/schedule/reference/#routestxt)
 
 ```js
 import { getRoutes } from 'gtfs';
 
 // Get all routes, sorted by route_short_name
-const routes = await getRoutes({}, [], [['route_short_name', 'ASC']]);
+const routes = getRoutes({}, [], [['route_short_name', 'ASC']]);
 
 // Get a specific route
-const routes = await getRoutes({
+const routes = getRoutes({
   route_id: 'Lo-16APR',
 });
-```
 
-`getRoutes` allows passing a `stop_id` in the query and it will query stoptimes and trips to find all routes that serve that `stop_id`.
-
-```js
-import { getRoutes } from 'gtfs';
-
-// Get routes that serve a specific stop, sorted by `stop_name`.
-const routes = await getRoutes(
+/*
+ * `getRoutes` allows passing a `stop_id` as part of the query. This will
+ * query stoptimes and trips to find all routes that serve that `stop_id`.
+ */
+const routes = getRoutes(
   {
     stop_id: '70011',
   },
@@ -626,18 +648,18 @@ const routes = await getRoutes(
 );
 ```
 
-### getStops(query, fields, sortBy)
+### getStops(query, fields, sortBy, options)
 
-Queries stops and returns a promise. The result of the promise is an array of stops.
+Returns an array of stops that match query parameters. [Details on stops.txt](https://gtfs.org/schedule/reference/#stopstxt)
 
 ```js
 import { getStops } from 'gtfs';
 
 // Get all stops
-const stops = await getStops();
+const stops = getStops();
 
 // Get a specific stop by stop_id
-const stops = await getStops({
+const stops = getStops({
   stop_id: '70011',
 });
 
@@ -645,7 +667,7 @@ const stops = await getStops({
  * `getStops` allows passing a `route_id` in the query and it will
  * query trips and stoptimes to find all stops served by that `route_id`.
  */
-const stops = await getStops({
+const stops = getStops({
   route_id: 'Lo-16APR',
 });
 
@@ -653,7 +675,7 @@ const stops = await getStops({
  * `getStops` allows passing a `trip_id` in the query and it will query
  * stoptimes to find all stops on that `trip_id`.
  */
-const stops = await getStops({
+const stops = getStops({
   trip_id: '37a',
 });
 
@@ -661,44 +683,44 @@ const stops = await getStops({
  * `getStops` allows passing a `shape_id` in the query and it will query
  * trips and stoptimes to find all stops that use that `shape_id`.
  */
-const stops = await getStops({
+const stops = getStops({
   shape_id: 'cal_sf_tam',
 });
 ```
 
 ### getStopsAsGeoJSON(query)
 
-Queries stops and returns a promise. The result of the promise is an geoJSON object of stops. All valid queries for `getStops()` work for `getStopsAsGeoJSON()`.
+Returns geoJSON object of stops that match query parameters. All valid queries for `getStops()` work for `getStopsAsGeoJSON()`.
 
 ```js
 import { getStopsAsGeoJSON } from 'gtfs';
 
 // Get all stops for an agency as geoJSON
-const stopsGeojson = await getStopsAsGeoJSON();
+const stopsGeojson = getStopsAsGeoJSON();
 
 // Get all stops for a specific route as geoJSON
-const stopsGeojson = await getStopsAsGeoJSON({
+const stopsGeojson = getStopsAsGeoJSON({
   route_id: 'Lo-16APR',
 });
 ```
 
-### getStoptimes(query, fields, sortBy)
+### getStoptimes(query, fields, sortBy, options)
 
-Queries `stop_times` and returns a promise. The result of the promise is an array of `stop_times`.
+Returns an array of stop_times that match query parameters. [Details on stop_times.txt](https://gtfs.org/schedule/reference/#stop_timestxt)
 
 ```js
 import { getStoptimes } from 'gtfs';
 
 // Get all stoptimes
-const stoptimes = await getStoptimes();
+const stoptimes = getStoptimes();
 
 // Get all stoptimes for a specific stop
-const stoptimes = await getStoptimes({
+const stoptimes = getStoptimes({
   stop_id: '70011',
 });
 
 // Get all stoptimes for a specific trip, sorted by stop_sequence
-const stoptimes = await getStoptimes(
+const stoptimes = getStoptimes(
   {
     trip_id: '37a',
   },
@@ -707,60 +729,57 @@ const stoptimes = await getStoptimes(
 );
 
 // Get all stoptimes for a specific stop and service_id
-const stoptimes = await getStoptimes({
+const stoptimes = getStoptimes({
   stop_id: '70011',
   service_id: 'CT-16APR-Caltrain-Weekday-01',
 });
 ```
 
-### getTrips(query, fields, sortBy)
+### getTrips(query, fields, sortBy, options)
 
-Queries trips and returns a promise. The result of the promise is an array of trips.
+Returns an array of trips that match query parameters. [Details on trips.txt](https://gtfs.org/schedule/reference/#tripstxt)
 
 ```js
 import { getTrips } from 'gtfs';
 
 // Get all trips
-const trips = await getTrips();
+const trips = getTrips();
 
 // Get trips for a specific route and direction
-const trips = await getTrips({
+const trips = getTrips({
   route_id: 'Lo-16APR',
   direction_id: 0
 });
 
 // Get trips for direction '' or null
-const trips = await getTrips({
+const trips = getTrips({
   route_id: 'Lo-16APR',
   direction_id: null
 });
 
 // Get trips for a specific route and direction limited by a service_id
-const trips = await getTrips({
+const trips = getTrips({
   route_id: 'Lo-16APR',
   direction_id: 0,
   service_id: '
 });
 ```
 
-### getShapes(query, fields, sortBy)
+### getShapes(query, fields, sortBy, options)
 
-Queries shapes and returns a promise. The result of the promise is an array of shapes.
+Returns an array of shapes that match query parameters. [Details on shapes.txt](https://gtfs.org/schedule/reference/#shapestxt)
 
 ```js
 import { getShapes } from 'gtfs';
 
 // Get all shapes for an agency
-const shapes = await getShapes();
-```
+const shapes = getShapes();
 
-`getShapes` allows passing a `route_id` in the query and it will query trips to find all shapes served by that `route_id`.
-
-```js
-import { getShapes } from 'gtfs';
-
-// Get all shapes for a specific route and direction
-const shapes = await getShapes({
+/*
+ * `getShapes` allows passing a `route_id` in the query and it will query
+ * trips to find all shapes served by that `route_id`.
+ */
+const shapes = getShapes({
   route_id: 'Lo-16APR',
 });
 
@@ -768,7 +787,7 @@ const shapes = await getShapes({
  * `getShapes` allows passing a `trip_id` in the query and it will query
  * trips to find all shapes served by that `trip_id`.
  */
-const shapes = await getShapes({
+const shapes = getShapes({
   trip_id: '37a',
 });
 
@@ -776,427 +795,422 @@ const shapes = await getShapes({
  * `getShapes` allows passing a `service_id` in the query and it will query
  * trips to find all shapes served by that `service_id`.
  */
-const shapes = await getShapes({
+const shapes = getShapes({
   service_id: 'CT-16APR-Caltrain-Sunday-02',
 });
 ```
 
 ### getShapesAsGeoJSON(query)
 
-Queries shapes and returns a promise. The result of the promise is an geoJSON object of shapes. All valid queries for `getShapes()` work for `getShapesAsGeoJSON()`.
+Returns a geoJSON object of shapes that match query parameters. All valid queries for `getShapes()` work for `getShapesAsGeoJSON()`.
 
 ```js
 import { getShapesAsGeoJSON } from 'gtfs';
 
 // Get geoJSON of all routes in an agency
-const shapesGeojson = await getShapesAsGeoJSON();
+const shapesGeojson = getShapesAsGeoJSON();
 
 // Get geoJSON of shapes for a specific route
-const shapesGeojson = await getShapesAsGeoJSON({
+const shapesGeojson = getShapesAsGeoJSON({
   route_id: 'Lo-16APR',
 });
 
 // Get geoJSON of shapes for a specific trip
-const shapesGeojson = await getShapesAsGeoJSON({
+const shapesGeojson = getShapesAsGeoJSON({
   trip_id: '37a',
 });
 
 // Get geoJSON of shapes for a specific `service_id`
-const shapesGeojson = await getShapesAsGeoJSON({
+const shapesGeojson = getShapesAsGeoJSON({
   service_id: 'CT-16APR-Caltrain-Sunday-02',
 });
 
 // Get geoJSON of shapes for a specific `shape_id`
-const shapesGeojson = await getShapesAsGeoJSON({
+const shapesGeojson = getShapesAsGeoJSON({
   shape_id: 'cal_sf_tam',
 });
 ```
 
-### getCalendars(query, fields, sortBy)
+### getCalendars(query, fields, sortBy, options)
 
-Queries calendars and returns a promise. The result of the promise is an array of calendars.
+Returns an array of calendars that match query parameters. [Details on calendar.txt](https://gtfs.org/schedule/reference/#calendartxt)
 
 ```js
 import { getCalendars } from 'gtfs';
 
 // Get all calendars for an agency
-const calendars = await getCalendars();
+const calendars = getCalendars();
 
 // Get calendars for a specific `service_id`
-const calendars = await getCalendars({
+const calendars = getCalendars({
   service_id: 'CT-16APR-Caltrain-Sunday-02',
 });
 ```
 
-### getCalendarDates(query, fields, sortBy)
+### getCalendarDates(query, fields, sortBy, options)
 
-Queries calendar_dates and returns a promise. The result of the promise is an array of calendar_dates.
+Returns an array of calendar_dates that match query parameters. [Details on calendar_dates.txt](https://gtfs.org/schedule/reference/#calendar_datestxt)
 
 ```js
 import { getCalendarDates } from 'gtfs';
 
 // Get all calendar_dates for an agency
-const calendarDates = await getCalendarDates();
+const calendarDates = getCalendarDates();
 
 // Get calendar_dates for a specific `service_id`
-const calendarDates = await getCalendarDates({
+const calendarDates = getCalendarDates({
   service_id: 'CT-16APR-Caltrain-Sunday-02',
 });
 ```
 
-### getFareAttributes(query, fields, sortBy)
+### getFareAttributes(query, fields, sortBy, options)
 
-Queries fare_attributes and returns a promise. The result of the promise is an array of fare_attributes.
+Returns an array of fare_attributes that match query parameters. [Details on fare_attributes.txt](https://gtfs.org/schedule/reference/#fare_attributestxt)
 
 ```js
 import { getFareAttributes } from 'gtfs';
 
 // Get all `fare_attributes` for an agency
-const fareAttributes = await getFareAttributes();
+const fareAttributes = getFareAttributes();
 
 // Get `fare_attributes` for a specific `fare_id`
-const fareAttributes = await getFareAttributes({
+const fareAttributes = getFareAttributes({
   fare_id: '123',
 });
 ```
 
-### getFareLegRules(query, fields, sortBy)
+### getFareLegRules(query, fields, sortBy, options)
 
-Queries fare leg rules and returns a promise. The result of the promise is an array of fare leg rules.
+Returns an array of fare_leg_rules that match query parameters. [Details on fare_leg_rules.txt](https://gtfs.org/schedule/reference/#fare_leg_rulestxt)
 
 ```js
 import { getFareLegRules } from 'gtfs';
 
 // Get all fare leg rules
-const fareLegRules = await getFareLegRules();
+const fareLegRules = getFareLegRules();
 
 // Get fare leg rules for a specific fare product
-const fareLegRules = await getFareLegRules({
+const fareLegRules = getFareLegRules({
   fare_product_id: 'product1',
 });
 ```
 
-### getFareProducts(query, fields, sortBy)
+### getFareProducts(query, fields, sortBy, options)
 
-Queries fare products and returns a promise. The result of the promise is an array of fare products.
+Returns an array of fare_products that match query parameters. [Details on fare_products.txt](https://gtfs.org/schedule/reference/#fare_productstxt)
 
 ```js
 import { getFareProducts } from 'gtfs';
 
 // Get all fare products
-const fareProducts = await getFareProducts();
+const fareProducts = getFareProducts();
 
 // Get a specific fare product
-const fareProducts = await getFareProducts({
+const fareProducts = getFareProducts({
   fare_product_id: 'product1',
 });
 ```
 
-### getFareRules(query, fields, sortBy)
+### getFareRules(query, fields, sortBy, options)
 
-Queries fare_rules and returns a promise. The result of the promise is an array of fare_rules.
+Returns an array of fare_rules that match query parameters. [Details on fare_rules.txt](https://gtfs.org/schedule/reference/#fare_rulestxt)
 
 ```js
 import { getFareRules } from 'gtfs';
 
 // Get all `fare_rules` for an agency
-const fareRules = await getFareRules();
+const fareRules = getFareRules();
 
 // Get fare_rules for a specific route
-const fareRules = await getFareRules({
+const fareRules = getFareRules({
   route_id: 'Lo-16APR',
 });
 ```
 
-### getFareTransferRules(query, fields, sortBy)
+### getFareTransferRules(query, fields, sortBy, options)
 
-Queries fare transfer rules and returns a promise. The result of the promise is an array of fare transfer rules.
+Returns an array of fare_transfer_rules that match query parameters. [Details on fare_transfer_rules.txt](https://gtfs.org/schedule/reference/#fare_transfer_rulestxt)
 
 ```js
 import { getFareTransferRules } from 'gtfs';
 
 // Get all fare transfer rules
-const fareTransferRules = await getFareTransferRules();
+const fareTransferRules = getFareTransferRules();
 
 // Get a all fare transfer rules for a specific fare product
-const fareTransferRules = await getFareTransferRules({
+const fareTransferRules = getFareTransferRules({
   fare_product_id: 'product1',
 });
 ```
 
-### getFeedInfo(query, fields, sortBy)
+### getFeedInfo(query, fields, sortBy, options)
 
-Queries feed_info and returns a promise. The result of the promise is an array of feed_infos.
+Returns an array of feed_info that match query parameters. [Details on feed_info.txt](https://gtfs.org/schedule/reference/#feed_infotxt)
 
 ```js
 import { getFeedInfo } from 'gtfs';
 
 // Get feed_info
-const feedInfo = await getFeedInfo();
+const feedInfo = getFeedInfo();
 ```
 
-### getFrequencies(query, fields, sortBy)
+### getFrequencies(query, fields, sortBy, options)
 
-Queries frequencies and returns a promise. The result of the promise is an array of frequencies.
+Returns an array of frequencies that match query parameters. [Details on frequencies.txt](https://gtfs.org/schedule/reference/#frequenciestxt)
 
 ```js
 import { getFrequencies } from 'gtfs';
 
 // Get all frequencies
-const frequencies = await getFrequencies();
+const frequencies = getFrequencies();
 
 // Get frequencies for a specific trip
-const frequencies = await getFrequencies({
+const frequencies = getFrequencies({
   trip_id: '1234',
 });
 ```
 
-### getLevels(query, fields, sortBy)
+### getLevels(query, fields, sortBy, options)
 
-Queries levels and returns a promise. The result of the promise is an array of levels.
+Returns an array of levels that match query parameters. [Details on levels.txt](https://gtfs.org/schedule/reference/#levelstxt)
 
 ```js
 import { getLevels } from 'gtfs';
 
 // Get all levels
-const levels = await getLevels();
+const levels = getLevels();
 ```
 
-### getPathways(query, fields, sortBy)
+### getPathways(query, fields, sortBy, options)
 
-Queries pathways and returns a promise. The result of the promise is an array of pathways.
+Returns an array of pathways that match query parameters. [Details on pathways.txt](https://gtfs.org/schedule/reference/#pathwaystxt)
 
 ```js
 import { getPathways } from 'gtfs';
 
 // Get all pathways
-const pathways = await getPathways();
+const pathways = getPathways();
 ```
 
-### getTransfers(query, fields, sortBy)
+### getTransfers(query, fields, sortBy, options)
 
-Queries transfers and returns a promise. The result of the promise is an array of transfers.
+Returns an array of transfers that match query parameters. [Details on transfers.txt](https://gtfs.org/schedule/reference/#transferstxt)
 
 ```js
 import { getTransfers } from 'gtfs';
 
 // Get all transfers
-const transfers = await getTransfers();
+const transfers = getTransfers();
 
 // Get transfers for a specific stop
-const transfers = await getTransfers({
+const transfers = getTransfers({
   from_stop_id: '1234',
 });
 ```
 
-### getTranslations(query, fields, sortBy)
+### getTranslations(query, fields, sortBy, options)
 
-Queries translations and returns a promise. The result of the promise is an array of translations.
+Returns an array of translations that match query parameters. [Details on translations.txt](https://gtfs.org/schedule/reference/#translationstxt)
 
 ```js
 import { getTranslations } from 'gtfs';
 
 // Get all translations
-const translations = await getTranslations();
+const translations = getTranslations();
 ```
 
-### getDirections(query, fields, sortBy)
+### getStopAreas(query, fields, sortBy, options)
 
-Queries directions and returns a promise. The result of the promise is an array of directions. These are from the non-standard `directions.txt` file. See [documentation and examples of this file](https://trilliumtransit.com/gtfs/reference/#directions).
-
-```js
-import { getDirections } from 'gtfs';
-
-// Get all directions
-const directions = await getDirections();
-
-// Get directions for a specific route
-const directions = await getDirections({
-  route_id: '1234',
-});
-
-// Get directions for a specific route and direction
-const directions = await getDirections({
-  route_id: '1234',
-  direction_id: 1,
-});
-```
-
-### getStopAreas(query, fields, sortBy)
-
-Queries stop areas and returns a promise. The result of the promise is an array of stop areas.
+Returns an array of stop_areas that match query parameters. [Details on stop_areas.txt](https://gtfs.org/schedule/reference/#stop_areastxt)
 
 ```js
 import { getStopAreas } from 'gtfs';
 
 // Get all stop areas
-const stopAreas = await getStopAreas();
+const stopAreas = getStopAreas();
 ```
 
-### getStopAttributes(query, fields, sortBy)
+### getDirections(query, fields, sortBy, options)
 
-Queries stop_attributes and returns a promise. The result of the promise is an array of stop_attributes. These are from the non-standard `stop_attributes.txt` file. See [documentation and examples of this file](https://gtfstohtml.com/docs/stop-attributes).
+Returns an array of directions that match query parameters. This is for the non-standard `directions.txt` file. [Details on directions.txt](https://trilliumtransit.com/gtfs/reference/#directions)
+
+```js
+import { getDirections } from 'gtfs';
+
+// Get all directions
+const directions = getDirections();
+
+// Get directions for a specific route
+const directions = getDirections({
+  route_id: '1234',
+});
+
+// Get directions for a specific route and direction
+const directions = getDirections({
+  route_id: '1234',
+  direction_id: 1,
+});
+```
+
+### getStopAttributes(query, fields, sortBy, options)
+
+Returns an array of stop_attributes that match query parameters. This is for the non-standard `stop_attributes.txt` file. [Details on stop_attributes.txt](https://trilliumtransit.com/gtfs/reference/#stop_attributes)
 
 ```js
 import { getStopAttributes } from 'gtfs';
 
 // Get all stop attributes
-const stopAttributes = await getStopAttributes();
+const stopAttributes = getStopAttributes();
 
 // Get stop attributes for specific stop
-const stopAttributes = await getStopAttributes({
+const stopAttributes = getStopAttributes({
   stop_id: '1234',
 });
 ```
 
-### getTimetables(query, fields, sortBy)
+### getTimetables(query, fields, sortBy, options)
 
-Queries timetables and returns a promise. The result of the promise is an array of timetables. These are from the non-standard `timetables.txt` file. See [documentation and examples of this file](https://gtfstohtml.com/docs/timetables.
+Returns an array of timetables that match query parameters. This is for the non-standard `timetables.txt` file used in GTFS-to-HTML. [Details on timetables.txt](https://gtfstohtml.com/docs/timetables)
 
 ```js
 import { getTimetables } from 'gtfs';
 
 // Get all timetables for an agency
-const timetables = await getTimetables();
+const timetables = getTimetables();
 
 // Get a specific timetable
-const timetables = await getTimetables({
+const timetables = getTimetables({
   timetable_id: '1',
 });
 ```
 
-### getTimetableStopOrders(query, fields, sortBy)
+### getTimetableStopOrders(query, fields, sortBy, options)
 
-Queries timetable_stop_orders and returns a promise. The result of the promise is an array of timetable_stop_orders. These are from the non-standard `timetable_stop_order.txt` file. See [documentation and examples of this file](https://gtfstohtml.com/docs/timetable-stop-order).
+Returns an array of timetable_stop_orders that match query parameters. This is for the non-standard `timetable_stop_order.txt` file used in GTFS-to-HTML. [Details on timetable_stop_order.txt](https://gtfstohtml.com/docs/timetable-stop-order)
 
 ```js
 import { getTimetableStopOrders } from 'gtfs';
 
 // Get all timetable_stop_orders
-const timetableStopOrders = await getTimetableStopOrders();
+const timetableStopOrders = getTimetableStopOrders();
 
 // Get timetable_stop_orders for a specific timetable
-const timetableStopOrders = await getTimetableStopOrders({
+const timetableStopOrders = getTimetableStopOrders({
   timetable_id: '1',
 });
 ```
 
-### getTimetablePages(query, fields, sortBy)
+### getTimetablePages(query, fields, sortBy, options)
 
-Queries timetable_pages and returns a promise. The result of the promise is an array of timetable_pages. These are from the non-standard `timetable_pages.txt` file. See [documentation and examples of this file](https://gtfstohtml.com/docs/timetable-pages).
+Returns an array of timetable_pages that match query parameters. This is for the non-standard `timetable_pages.txt` file used in GTFS-to-HTML. [Details on timetable_pages.txt](https://gtfstohtml.com/docs/timetable-pages)
 
 ```js
 import { getTimetablePages } from 'gtfs';
 
 // Get all timetable_pages for an agency
-const timetablePages = await getTimetablePages();
+const timetablePages = getTimetablePages();
 
 // Get a specific timetable_page
-const timetablePages = await getTimetablePages({
+const timetablePages = getTimetablePages({
   timetable_page_id: '2',
 });
 ```
 
-### getTimetableNotes(query, fields, sortBy)
+### getTimetableNotes(query, fields, sortBy, options)
 
-Queries timetable_notes and returns a promise. The result of the promise is an array of timetable_notes. These are from the non-standard `timetable_notes.txt` file. See [documentation and examples of this file](https://gtfstohtml.com/docs/timetable-notes).
+Returns an array of timetable_notes that match query parameters. This is for the non-standard `timetable_notes.txt` file used in GTFS-to-HTML. [Details on timetable_notes.txt](https://gtfstohtml.com/docs/timetable-notes)
 
 ```js
 import { getTimetableNotes } from 'gtfs';
 
 // Get all timetable_notes for an agency
-const timetableNotes = await getTimetableNotes();
+const timetableNotes = getTimetableNotes();
 
 // Get a specific timetable_note
-const timetableNotes = await getTimetableNotes({
+const timetableNotes = getTimetableNotes({
   note_id: '1',
 });
 ```
 
-### getTimetableNotesReferences(query, fields, sortBy)
+### getTimetableNotesReferences(query, fields, sortBy, options)
 
-Queries timetable_notes_references and returns a promise. The result of the promise is an array of timetable_notes_references. These are from the non-standard `timetable_notes_references.txt` file. See [documentation and examples of this file](https://gtfstohtml.com/docs/timetable-notes-references).
+Returns an array of timetable_notes_references that match query parameters. This is for the non-standard `timetable_notes_references.txt` file used in GTFS-to-HTML. [Details on timetable_notes_references.txt](https://gtfstohtml.com/docs/timetable-notes-references)
 
 ```js
 import { getTimetableNotesReferences } from 'gtfs';
 
 // Get all timetable_notes_references for an agency
-const timetableNotesReferences = await getTimetableNotesReferences();
+const timetableNotesReferences = getTimetableNotesReferences();
 
 // Get all timetable_notes_references for a specific timetable
-const timetableNotesReferences = await getTimetableNotesReferences({
+const timetableNotesReferences = getTimetableNotesReferences({
   timetable_id: '4',
 });
 ```
 
-### getTripsDatedVehicleJourneys(query, fields, sortBy)
+### getTripsDatedVehicleJourneys(query, fields, sortBy, options)
 
-Queries trips_dated_vehicle_journey and returns a promise. The result of the promise is an array of trips_dated_vehicle_journey. These are from the non-standard `trips-dated-vehicle-journey.txt` file. See [documentation and examples of this file](https://www.trafiklab.se/api/trafiklab-apis/gtfs-regional/extra-files/).
+Returns an array of trips_dated_vehicle_journey that match query parameters. This is for the non-standard `trips_dated_vehicle_journey.txt` file. [Details on trips_dated_vehicle_journey.txt](https://www.trafiklab.se/api/trafiklab-apis/gtfs-regional/extra-files/)
 
 ```js
 import { getTripsDatedVehicleJourneys } from 'gtfs';
 
 // Get all timetable_stop_orders
-const tripsDatedVehicleJourneys = await getTripsDatedVehicleJourneys();
+const tripsDatedVehicleJourneys = getTripsDatedVehicleJourneys();
 ```
 
-### getServiceAlerts(query, fields, sortBy)
+### getServiceAlerts(query, fields, sortBy, options)
 
-Queries service alerts and returns a promise. The result of the promise is an array of service alerts.
-These are only valid if you use GTFS-Realtime and have imported Service Alert data.
+Returns an array of GTFS Realtime service alerts that match query parameters. This only works if you configure GTFS Realtime import in node-gtfs. [Details on Service Alerts](https://gtfs.org/realtime/feed-entities/service-alerts/)
 
 ```js
 import { getServiceAlerts } from 'gtfs';
 
 // Get service alerts
-const serviceAlerts = await getServiceAlerts();
+const serviceAlerts = getServiceAlerts();
 ```
 
-### getTripUpdates(query, fields, sortBy)
+### getTripUpdates(query, fields, sortBy, options)
 
-Queries trip alerts and returns a promise. The result of the promise is an array of trip updates.
-These are only valid if you use GTFS-Realtime and have imported Trip Update data.
+Returns an array of GTFS Realtime trip updates that match query parameters. This only works if you configure GTFS Realtime import in node-gtfs. [Details on Trip Updates](https://gtfs.org/realtime/feed-entities/trip-updates/)
 
 ```js
 import { getTripUpdates } from 'gtfs';
 
 // Get all trip updates
-const tripUpdates = await getTripUpdates();
+const tripUpdates = getTripUpdates();
 ```
 
-### getStopTimesUpdates(query, fields, sortBy)
+### getStopTimesUpdates(query, fields, sortBy, options)
 
-Queries stop times updates and returns a promise. The result of the promise is an array of stop times updates.
-These are only valid if you use GTFS-Realtime and have imported Trip Update data.
+Returns an array of GTFS Realtime stop time updates that match query parameters. This only works if you configure GTFS Realtime import in node-gtfs. [Details on Stop Time Updates](https://gtfs.org/realtime/feed-entities/trip-updates/#stoptimeupdate)
 
 ```js
 import { getStopTimesUpdates } from 'gtfs';
 
 // Get all stop times updates
-const stopTimesUpdates = await getStopTimesUpdates();
+const stopTimesUpdates = getStopTimesUpdates();
 ```
 
-### getVehiclePositions(query, fields, sortBy)
+### getVehiclePositions(query, fields, sortBy, options)
 
-Queries vehicle positions and returns a promise. The result of the promise is an array of vehicle location data.
-These are only valid if you use GTFS-Realtime and have imported Vehicle Position data.
+Returns an array of GTFS Realtime vehicle positions that match query parameters. This only works if you configure GTFS Realtime import in node-gtfs. [Details on Vehicle Positions](https://gtfs.org/realtime/feed-entities/vehicle-positions/)
 
 ```js
 import { getVehiclePositions } from 'gtfs';
 
 // Get all vehicle position data
-const vehiclePositions = await getVehiclePositions();
+const vehiclePositions = getVehiclePositions();
 ```
 
 ### advancedQuery(table, advancedQueryOptions)
 
-Queries the database in a simple manner with support for table joins and custom tables. Returns a promise.
-The result of the promise is an array the selected data. Example shows joining stop_times with trips.
-Used for advanced scenarios.
+Queries the database with support for table joins and custom tables and returns an array of data.
 
 ```js
 import { advancedQuery } from 'gtfs';
 
+// Example `advancedQuery` joining stop_times with trips.
 const advancedQueryOptions = {
   query: {
     'stop_times.trip_id': tripId,
@@ -1211,33 +1225,39 @@ const advancedQueryOptions = {
   ],
 };
 
-// Perform a custom query
-const stoptimes = await advancedQuery('stop_times', advancedQueryOptions);
+const stoptimes = advancedQuery('stop_times', advancedQueryOptions);
 ```
 
-### runRawQuery(query)
+### Raw SQLite Query
 
-Queries the database using a raw sql statement. Returns a promise.
-The result of the promise is an array the selected data.
+Use the `openDb` function to get the db object, and then use any query method from [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) to query GTFS data.
 
 ```js
-import { runRawQuery } from 'gtfs';
+import { openDb } from 'gtfs';
+const db = openDb(config);
 
-// Perform a raw query
-const stoptimes = await runRawQuery(
-  'SELECT * FROM stop_times WHERE stop_sequence="1"'
+// Get a specific trip
+const statement = db.prepare('SELECT * FROM trips WHERE trip_id = ?');
+const trip = statement.get('123');
+
+// Get all stops
+const stops = db.prepare('SELECT * from stops').all();
+
+// Get all calendar_ids for specific date
+const statement = db.prepare(
+  'SELECT service_id from calendar WHERE start_date <= $date AND end_date >= $date'
 );
-```
+const calendarIds = statement.all({ date: 20150101 });
 
-### execRawQuery(query)
+// Find all stops for route_id=18 by joining tables
+const statement = db.prepare(
+  'SELECT DISTINCT stops.stop_id from stops INNER JOIN stop_times ON stops.stop_id = stop_times.stop_id INNER JOIN trips on trips.trip_id = stop_times.trip_id WHERE trips.route_id = ?'
+);
+const calendarIds = statement.all('18');
 
-Executes a statement. Returns a promise containing the result of the execute.
-
-```js
-import { execRawQuery } from 'gtfs';
-
-// Purge trips table
-await execRawQuery('DELETE FROM trips');
+// Execute raw SQL
+const sql = "DELETE FROM trips where trip_id = '329'";
+db.exec(sql);
 ```
 
 ## Contributing

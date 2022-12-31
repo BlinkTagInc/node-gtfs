@@ -3,29 +3,23 @@
 import should from 'should';
 
 import config from '../test-config.js';
-import {
-  openDb,
-  getDb,
-  closeDb,
-  importGtfs,
-  getTimetablePages,
-} from '../../index.js';
+import { openDb, closeDb, importGtfs, getTimetablePages } from '../../index.js';
 
 describe('getTimetablePages():', () => {
   before(async () => {
-    await openDb(config);
+    openDb(config);
     await importGtfs(config);
   });
 
-  after(async () => {
-    const db = getDb(config);
-    await closeDb(db);
+  after(() => {
+    const db = openDb(config);
+    closeDb(db);
   });
 
-  it('should return empty array if no timetable pages (GTFS-to-HTML timetables)', async () => {
+  it('should return empty array if no timetable pages (GTFS-to-HTML timetables)', () => {
     const timetablePageId = 'fake-timetable-page-id';
 
-    const results = await getTimetablePages({
+    const results = getTimetablePages({
       timetable_page_id: timetablePageId,
     });
     should.exists(results);

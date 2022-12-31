@@ -3,39 +3,33 @@
 import should from 'should';
 
 import config from '../test-config.js';
-import {
-  openDb,
-  getDb,
-  closeDb,
-  importGtfs,
-  getCalendarDates,
-} from '../../index.js';
+import { openDb, closeDb, importGtfs, getCalendarDates } from '../../index.js';
 
 describe('getCalendarDates():', () => {
   before(async () => {
-    await openDb(config);
+    openDb(config);
     await importGtfs(config);
   });
 
-  after(async () => {
-    const db = getDb(config);
-    await closeDb(db);
+  after(() => {
+    const db = openDb(config);
+    closeDb(db);
   });
 
-  it('should return empty array if no calendar dates exist', async () => {
+  it('should return empty array if no calendar dates exist', () => {
     const serviceId = 'fake-service-id';
 
-    const results = await getCalendarDates({
+    const results = getCalendarDates({
       service_id: serviceId,
     });
     should.exists(results);
     results.should.have.length(0);
   });
 
-  it('should return expected calendar dates', async () => {
+  it('should return expected calendar dates', () => {
     const serviceId = 'CT-16APR-Caltrain-Weekday-01';
 
-    const results = await getCalendarDates({
+    const results = getCalendarDates({
       service_id: serviceId,
     });
 
@@ -78,10 +72,10 @@ describe('getCalendarDates():', () => {
     }
   });
 
-  it('should return only specific keys for expected calendar dates, sorted by date', async () => {
+  it('should return only specific keys for expected calendar dates, sorted by date', () => {
     const serviceId = 'CT-16APR-Caltrain-Weekday-01';
 
-    const results = await getCalendarDates(
+    const results = getCalendarDates(
       {
         service_id: serviceId,
       },

@@ -3,28 +3,22 @@
 import should from 'should';
 
 import config from '../test-config.js';
-import {
-  openDb,
-  getDb,
-  closeDb,
-  importGtfs,
-  getAttributions,
-} from '../../index.js';
+import { openDb, closeDb, importGtfs, getAttributions } from '../../index.js';
 
 describe('getAttributions():', () => {
   before(async () => {
-    await openDb(config);
+    openDb(config);
     await importGtfs(config);
   });
 
-  after(async () => {
-    const db = getDb(config);
-    await closeDb(db);
+  after(() => {
+    const db = openDb(config);
+    closeDb(db);
   });
 
-  it('should return empty array if no attributions exist', async () => {
+  it('should return empty array if no attributions exist', () => {
     const attributionId = 'fake-attribution-id';
-    const results = await getAttributions({
+    const results = getAttributions({
       attribution_id: attributionId,
     });
     should.exists(results);

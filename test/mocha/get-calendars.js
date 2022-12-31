@@ -3,37 +3,31 @@
 import should from 'should';
 
 import config from '../test-config.js';
-import {
-  openDb,
-  getDb,
-  closeDb,
-  importGtfs,
-  getCalendars,
-} from '../../index.js';
+import { openDb, closeDb, importGtfs, getCalendars } from '../../index.js';
 
 describe('getCalendars():', () => {
   before(async () => {
-    await openDb(config);
+    openDb(config);
     await importGtfs(config);
   });
 
-  after(async () => {
-    const db = getDb(config);
-    await closeDb(db);
+  after(() => {
+    const db = openDb(config);
+    closeDb(db);
   });
 
-  it('should return empty array if no calendars', async () => {
+  it('should return empty array if no calendars', () => {
     const serviceId = 'fake-service-id';
 
-    const results = await getCalendars({
+    const results = getCalendars({
       service_id: serviceId,
     });
     should.exists(results);
     results.should.have.length(0);
   });
 
-  it('should return expected calendars by day', async () => {
-    const results = await getCalendars({
+  it('should return expected calendars by day', () => {
+    const results = getCalendars({
       sunday: 1,
     });
 
@@ -55,8 +49,8 @@ describe('getCalendars():', () => {
     expectedResult.should.match(results[0]);
   });
 
-  it('should return expected calendars by array of service_ids', async () => {
-    const results = await getCalendars({
+  it('should return expected calendars by array of service_ids', () => {
+    const results = getCalendars({
       service_id: [
         'CT-16APR-Caltrain-Saturday-02',
         'CT-16APR-Caltrain-Sunday-02',

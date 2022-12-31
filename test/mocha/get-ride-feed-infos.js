@@ -3,27 +3,21 @@
 import should from 'should';
 
 import config from '../test-config.js';
-import {
-  openDb,
-  getDb,
-  closeDb,
-  importGtfs,
-  getRideFeedInfos,
-} from '../../index.js';
+import { openDb, closeDb, importGtfs, getRideFeedInfos } from '../../index.js';
 
 describe('getRideFeedInfos():', () => {
   before(async () => {
-    await openDb(config);
+    openDb(config);
     await importGtfs(config);
   });
 
-  after(async () => {
-    const db = getDb(config);
-    await closeDb(db);
+  after(() => {
+    const db = openDb(config);
+    closeDb(db);
   });
 
-  it('should return empty array if no ride-feed-infos (GTFS-ride)', async () => {
-    const results = await getRideFeedInfos({});
+  it('should return empty array if no ride-feed-infos (GTFS-ride)', () => {
+    const results = getRideFeedInfos({});
     should.exists(results);
     results.should.have.length(0);
   });

@@ -12,7 +12,6 @@ import { unzip, generateFolderName } from '../../lib/file-utils.js';
 import config from '../test-config.js';
 import {
   openDb,
-  getDb,
   closeDb,
   importGtfs,
   exportGtfs,
@@ -22,13 +21,13 @@ import models from '../../models/models.js';
 
 describe('exportGtfs():', function () {
   before(async () => {
-    await openDb(config);
+    openDb(config);
     await importGtfs(config);
   });
 
   after(async () => {
-    const db = getDb(config);
-    await closeDb(db);
+    const db = openDb(config);
+    closeDb(db);
   });
 
   this.timeout(10000);
@@ -86,7 +85,7 @@ describe('exportGtfs():', function () {
     });
 
     after(async () => {
-      const agencies = await getAgencies({}, ['agency_name']);
+      const agencies = getAgencies({}, ['agency_name']);
       await rm(
         path.join(
           process.cwd(),
@@ -99,7 +98,7 @@ describe('exportGtfs():', function () {
 
     for (const model of models) {
       it(`should import the same number of ${model.filenameBase}`, async () => {
-        const agencies = await getAgencies({}, ['agency_name']);
+        const agencies = getAgencies({}, ['agency_name']);
         const filePath = path.join(
           process.cwd(),
           'gtfs-export',

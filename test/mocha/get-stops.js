@@ -3,31 +3,31 @@
 import should from 'should';
 
 import config from '../test-config.js';
-import { openDb, getDb, closeDb, importGtfs, getStops } from '../../index.js';
+import { openDb, closeDb, importGtfs, getStops } from '../../index.js';
 
 describe('getStops():', () => {
   before(async () => {
-    await openDb(config);
+    openDb(config);
     await importGtfs(config);
   });
 
-  after(async () => {
-    const db = getDb(config);
-    await closeDb(db);
+  after(() => {
+    const db = openDb(config);
+    closeDb(db);
   });
 
-  it('should return an empty array if no stops exist', async () => {
+  it('should return an empty array if no stops exist', () => {
     const stopId = 'fake-stop-id';
 
-    const results = await getStops({
+    const results = getStops({
       stop_id: stopId,
     });
     should.exists(results);
     results.should.have.length(0);
   });
 
-  it('should return array of stops', async () => {
-    const results = await getStops();
+  it('should return array of stops', () => {
+    const results = getStops();
 
     const expectedResult = {
       stop_id: 'ctbu',
@@ -52,10 +52,10 @@ describe('getStops():', () => {
     results.should.containEql(expectedResult);
   });
 
-  it('should return array of stops for a specific stopId', async () => {
+  it('should return array of stops for a specific stopId', () => {
     const stopId = '70031';
 
-    const results = await getStops({
+    const results = getStops({
       stop_id: stopId,
     });
 
@@ -84,10 +84,10 @@ describe('getStops():', () => {
     results.should.match(expectedResult);
   });
 
-  it('should return array of stops if it exists for a specific route_id', async () => {
+  it('should return array of stops if it exists for a specific route_id', () => {
     const routeId = 'Bu-16APR';
 
-    const results = await getStops(
+    const results = getStops(
       {
         route_id: routeId,
       },
@@ -132,11 +132,11 @@ describe('getStops():', () => {
     }
   });
 
-  it('should return array of stops if it exists for a specific route_id and direction_id', async () => {
+  it('should return array of stops if it exists for a specific route_id and direction_id', () => {
     const routeId = 'Bu-16APR';
     const directionId = 1;
 
-    const results = await getStops(
+    const results = getStops(
       {
         route_id: routeId,
         direction_id: directionId,
@@ -170,10 +170,10 @@ describe('getStops():', () => {
     }
   });
 
-  it('should return array of stops for a specific trip_id', async () => {
+  it('should return array of stops for a specific trip_id', () => {
     const tripId = '427a';
 
-    const results = await getStops(
+    const results = getStops(
       {
         trip_id: tripId,
       },
@@ -218,10 +218,10 @@ describe('getStops():', () => {
     }
   });
 
-  it('should return array of stops if it exists for a specific shape_id', async () => {
+  it('should return array of stops if it exists for a specific shape_id', () => {
     const shapeId = 'cal_sf_tam';
 
-    const results = await getStops(
+    const results = getStops(
       {
         shape_id: shapeId,
       },

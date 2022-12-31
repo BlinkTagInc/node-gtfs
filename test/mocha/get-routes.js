@@ -3,31 +3,31 @@
 import should from 'should';
 
 import config from '../test-config.js';
-import { openDb, getDb, closeDb, importGtfs, getRoutes } from '../../index.js';
+import { openDb, closeDb, importGtfs, getRoutes } from '../../index.js';
 
 describe('getRoutes():', () => {
   before(async () => {
-    await openDb(config);
+    openDb(config);
     await importGtfs(config);
   });
 
-  after(async () => {
-    const db = getDb(config);
-    await closeDb(db);
+  after(() => {
+    const db = openDb(config);
+    closeDb(db);
   });
 
-  it('should return empty array if no routes for given agency exist', async () => {
+  it('should return empty array if no routes for given agency exist', () => {
     const routeId = 'fake-route-id';
 
-    const results = await getRoutes({
+    const results = getRoutes({
       route_id: routeId,
     });
     should.exists(results);
     results.should.have.length(0);
   });
 
-  it('should return expected routes', async () => {
-    const results = await getRoutes({}, [], [['route_long_name', 'ASC']]);
+  it('should return expected routes', () => {
+    const results = getRoutes({}, [], [['route_long_name', 'ASC']]);
 
     const expectedResults = [
       {
@@ -97,8 +97,8 @@ describe('getRoutes():', () => {
     expectedResults.should.match(results);
   });
 
-  it('should return expected routes for a specific stop_id', async () => {
-    const results = await getRoutes(
+  it('should return expected routes for a specific stop_id', () => {
+    const results = getRoutes(
       { stop_id: '70321' },
       [],
       [['route_long_name', 'ASC']]
@@ -127,8 +127,8 @@ describe('getRoutes():', () => {
     expectedResults.should.match(results);
   });
 
-  it('should return no routes for a invalid stop_id', async () => {
-    const results = await getRoutes(
+  it('should return no routes for a invalid stop_id', () => {
+    const results = getRoutes(
       { stop_id: 'not-valid' },
       [],
       [['route_long_name', 'ASC']]

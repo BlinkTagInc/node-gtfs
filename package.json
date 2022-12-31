@@ -74,6 +74,7 @@
   },
   "dependencies": {
     "@turf/helpers": "^6.5.0",
+    "better-sqlite3": "^8.0.1",
     "csv-parse": "^5.3.3",
     "csv-stringify": "^6.2.3",
     "gtfs-realtime-bindings": "^0.0.6",
@@ -85,8 +86,6 @@
     "promise-map-series": "^0.3.0",
     "recursive-copy": "^2.0.14",
     "sanitize-filename": "^1.6.3",
-    "sqlite": "^4.1.2",
-    "sqlite3": "^5.1.4",
     "sqlstring-sqlite": "^0.1.1",
     "strip-bom-stream": "^5.0.0",
     "tmp-promise": "^3.0.3",

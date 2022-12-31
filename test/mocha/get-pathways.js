@@ -3,29 +3,23 @@
 import should from 'should';
 
 import config from '../test-config.js';
-import {
-  openDb,
-  getDb,
-  closeDb,
-  importGtfs,
-  getPathways,
-} from '../../index.js';
+import { openDb, closeDb, importGtfs, getPathways } from '../../index.js';
 
 describe('getPathways():', () => {
   before(async () => {
-    await openDb(config);
+    openDb(config);
     await importGtfs(config);
   });
 
-  after(async () => {
-    const db = getDb(config);
-    await closeDb(db);
+  after(() => {
+    const db = openDb(config);
+    closeDb(db);
   });
 
-  it('should return empty array if no pathways', async () => {
+  it('should return empty array if no pathways', () => {
     const pathwayId = 'not_real';
 
-    const results = await getPathways({
+    const results = getPathways({
       pathway_id: pathwayId,
     });
     should.exists(results);

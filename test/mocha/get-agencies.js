@@ -2,36 +2,30 @@
 import should from 'should';
 
 import config from '../test-config.js';
-import {
-  openDb,
-  getDb,
-  closeDb,
-  importGtfs,
-  getAgencies,
-} from '../../index.js';
+import { openDb, closeDb, importGtfs, getAgencies } from '../../index.js';
 
 describe('getAgencies():', () => {
   before(async () => {
-    await openDb(config);
+    openDb(config);
     await importGtfs(config);
   });
 
-  after(async () => {
-    const db = getDb(config);
-    await closeDb(db);
+  after(() => {
+    const db = openDb(config);
+    closeDb(db);
   });
 
-  it('should return empty array if no agencies exist', async () => {
+  it('should return empty array if no agencies exist', () => {
     const agencyId = 'fake-agency-id';
-    const results = await getAgencies({
+    const results = getAgencies({
       agency_id: agencyId,
     });
     should.exists(results);
     results.should.have.length(0);
   });
 
-  it('should return expected agencies with no query', async () => {
-    const results = await getAgencies();
+  it('should return expected agencies with no query', () => {
+    const results = getAgencies();
 
     const expectedResult = {
       id: 1,
@@ -50,11 +44,11 @@ describe('getAgencies():', () => {
     expectedResult.should.match(results[0]);
   });
 
-  it('should return expected agency for agency_id and agency_lang', async () => {
+  it('should return expected agency for agency_id and agency_lang', () => {
     const agencyId = 'CT';
     const agencyLand = 'en';
 
-    const results = await getAgencies({
+    const results = getAgencies({
       agency_id: agencyId,
       agency_lang: agencyLand,
     });
@@ -76,10 +70,10 @@ describe('getAgencies():', () => {
     expectedResult.should.match(results[0]);
   });
 
-  it('should return only specific keys for expected agency for agency_id', async () => {
+  it('should return only specific keys for expected agency for agency_id', () => {
     const agencyId = 'CT';
 
-    const results = await getAgencies(
+    const results = getAgencies(
       {
         agency_id: agencyId,
       },

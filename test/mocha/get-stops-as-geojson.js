@@ -3,28 +3,22 @@
 import should from 'should';
 
 import config from '../test-config.js';
-import {
-  openDb,
-  getDb,
-  closeDb,
-  importGtfs,
-  getStopsAsGeoJSON,
-} from '../../index.js';
+import { openDb, closeDb, importGtfs, getStopsAsGeoJSON } from '../../index.js';
 
 describe('getStopsAsGeoJSON(): ', () => {
   before(async () => {
-    await openDb(config);
+    openDb(config);
     await importGtfs(config);
   });
 
-  after(async () => {
-    const db = getDb(config);
-    await closeDb(db);
+  after(() => {
+    const db = openDb(config);
+    closeDb(db);
   });
 
-  it('should return geojson with an empty features array if no stops exist', async () => {
+  it('should return geojson with an empty features array if no stops exist', () => {
     const stopId = 'fake-stop-id';
-    const geojson = await getStopsAsGeoJSON({
+    const geojson = getStopsAsGeoJSON({
       stop_id: stopId,
     });
 
@@ -33,8 +27,8 @@ describe('getStopsAsGeoJSON(): ', () => {
     geojson.features.should.have.length(0);
   });
 
-  it('should return geojson with stops if they exist', async () => {
-    const geojson = await getStopsAsGeoJSON();
+  it('should return geojson with stops if they exist', () => {
+    const geojson = getStopsAsGeoJSON();
 
     should.exist(geojson);
     geojson.type.should.equal('FeatureCollection');
@@ -43,10 +37,10 @@ describe('getStopsAsGeoJSON(): ', () => {
     geojson.features[0].geometry.coordinates.length.should.equal(2);
   });
 
-  it('should return geojson with stops if they exist for a specific stopId', async () => {
+  it('should return geojson with stops if they exist for a specific stopId', () => {
     const stopId = '70031';
 
-    const geojson = await getStopsAsGeoJSON({
+    const geojson = getStopsAsGeoJSON({
       stop_id: stopId,
     });
 
@@ -57,10 +51,10 @@ describe('getStopsAsGeoJSON(): ', () => {
     geojson.features[0].geometry.coordinates.length.should.equal(2);
   });
 
-  it('should return geojson with stops if they exist for a specific shapeId', async () => {
+  it('should return geojson with stops if they exist for a specific shapeId', () => {
     const shapeId = 'cal_sf_tam';
 
-    const geojson = await getStopsAsGeoJSON({
+    const geojson = getStopsAsGeoJSON({
       shape_id: shapeId,
     });
 

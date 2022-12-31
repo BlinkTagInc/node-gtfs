@@ -3,9 +3,9 @@
 import should from 'should';
 
 import config from '../test-config.js';
-import { openDb, closeDb, importGtfs, getRiderships } from '../../index.js';
+import { openDb, closeDb, importGtfs, getFareLegRules } from '../../index.js';
 
-describe('getRiderships():', () => {
+describe('getFareLegRules():', () => {
   before(async () => {
     openDb(config);
     await importGtfs(config);
@@ -16,11 +16,10 @@ describe('getRiderships():', () => {
     closeDb(db);
   });
 
-  it('should return empty array if no riderships (GTFS-ride)', () => {
-    const routeId = 'fake-route-id';
-
-    const results = getRiderships({
-      route_id: routeId,
+  it('should return empty array if no fare_leg_rules exist', () => {
+    const legGroupId = 'fake-leg-group-id';
+    const results = getFareLegRules({
+      leg_group_id: legGroupId,
     });
     should.exists(results);
     results.should.have.length(0);

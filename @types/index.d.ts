@@ -1,12 +1,8 @@
 import CsvParse = require('csv-parse');
-import * as Sqlite3 from 'sqlite';
+
 import { FeatureCollection, Geometry } from '@turf/helpers';
 
 export {}; // disable implicit exporting of types
-
-type Unpromise<T> = T extends Promise<infer U> ? U : T;
-
-export type SqlDatabase = Unpromise<ReturnType<typeof Sqlite3.open>>;
 
 export type SqlValue =
   | undefined
@@ -147,11 +143,6 @@ export function openDb(config: DbConfig): Promise<SqlDatabase>;
 export function closeDb(db?: SqlDatabase): Promise<void>;
 
 /**
- * Get open database. Throws error if no database is open.
- */
-export function getDb(config?: DbConfig): Promise<SqlDatabase>;
-
-/**
  * Queries agencies and returns a promise for an array of agencies.
  */
 export function getAgencies(
@@ -159,7 +150,7 @@ export function getAgencies(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries attributions and returns a promise for an array of attributions.
@@ -169,7 +160,7 @@ export function getAttributions(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries routes and returns a promise for an array of routes.
@@ -179,7 +170,7 @@ export function getRoutes(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries stops and returns a promise for an array of stops.
@@ -189,7 +180,7 @@ export function getStops(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries stops and returns a promise for an geoJSON object of stops.
@@ -208,7 +199,7 @@ export function getStoptimes(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries trips and returns a promise for an array of trips.
@@ -218,7 +209,7 @@ export function getTrips(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries shapes and returns a promise for an array of shapes.
@@ -228,7 +219,7 @@ export function getShapes(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries shapes and returns a promise for an geoJSON object of shapes.
@@ -247,7 +238,7 @@ export function getCalendars(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries calendar_dates and returns a promise for an array of calendar_dates.
@@ -257,7 +248,7 @@ export function getCalendarDates(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries fare_attributes and returns a promise for an array of fare_attributes.
@@ -267,7 +258,7 @@ export function getFareAttributes(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries fare_rules and returns a promise for an array of fare_rules.
@@ -277,7 +268,7 @@ export function getFareRules(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries feed_info and returns a promise for an array of feed_infos.
@@ -287,7 +278,7 @@ export function getFeedInfo(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries frequencies and returns a promise for an array of frequencies.
@@ -297,7 +288,7 @@ export function getFrequencies(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries levels and returns a promise for an array of levels.
@@ -307,7 +298,7 @@ export function getLevels(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries pathways and returns a promise for an array of pathways.
@@ -317,7 +308,7 @@ export function getPathways(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries transfers and returns a promise for an array of transfers.
@@ -327,7 +318,7 @@ export function getTransfers(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries translations and returns a promise for an array of translations.
@@ -337,7 +328,7 @@ export function getTranslations(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries directions and returns a promise for an array of directions.
@@ -348,7 +339,7 @@ export function getDirections(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries stop_attributes and returns a promise for an array of stop_attributes.
@@ -359,7 +350,7 @@ export function getStopAttributes(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries timetables and returns a promise for an array of timetables.
@@ -370,7 +361,7 @@ export function getTimetables(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries timetable_stop_orders and returns a promise for an array of timetable_stop_orders.
@@ -381,7 +372,7 @@ export function getTimetableStopOrders(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries timetable_pages and returns a promise for an array of timetable_pages.
@@ -392,7 +383,7 @@ export function getTimetablePages(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries timetable_notes and returns a promise for an array of timetable_notes.
@@ -403,7 +394,7 @@ export function getTimetableNotes(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries timetable_notes_references and returns a promise for an array of timetable_notes references.
@@ -414,7 +405,7 @@ export function getTimetableNotesReferences(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries board-alights and returns a promise for an array of board-alights.
@@ -424,7 +415,7 @@ export function getBoardAlights(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries ride-feed-info and returns a promise for an array of ride-feed-info.
@@ -434,7 +425,7 @@ export function getRideFeedInfos(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries rider trips and returns a promise for an array of rider trips.
@@ -444,7 +435,7 @@ export function getRiderTrips(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries riderships and returns a promise for an array of riderships.
@@ -454,7 +445,7 @@ export function getRiderships(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries trip-capacities and returns a promise for an array of trip-capacities.
@@ -464,7 +455,7 @@ export function getTripCapacities(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries trip-capacities and returns a promise for an array of service-alerts.
@@ -474,7 +465,7 @@ export function getServiceAlerts(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries trip-capacities and returns a promise for an array of trip-updates.
@@ -484,7 +475,7 @@ export function getTripUpdates(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries trip-capacities and returns a promise for an array of vehicle-positions.
@@ -494,7 +485,7 @@ export function getVehiclePositions(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Queries trip-capacities and returns a promise for an array of stop-times-updates.
@@ -504,7 +495,7 @@ export function getStopTimesUpdates(
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
   options?: QueryOptions
-): Promise<SqlResults>;
+): SqlResults;
 
 /**
  * Runs an advanced query.
@@ -512,20 +503,4 @@ export function getStopTimesUpdates(
 export function advancedQuery(
   table?: SqlTableName,
   advancedQueryOptions?: AdvancedQueryOptions
-): Promise<SqlResults>;
-
-/**
- * Runs an raw query retuning all rows.
- */
-export function runRawQuery(
-  sql?: SqlQueryString,
-  options?: QueryOptions
-): Promise<SqlResults>;
-
-/**
- * Executing an raw query.
- */
-export function execRawQuery(
-  sql?: SqlQueryString,
-  options?: QueryOptions
-): Promise<any>;
+): SqlResults;

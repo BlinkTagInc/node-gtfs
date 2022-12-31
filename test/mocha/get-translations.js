@@ -3,29 +3,23 @@
 import should from 'should';
 
 import config from '../test-config.js';
-import {
-  openDb,
-  getDb,
-  closeDb,
-  importGtfs,
-  getTranslations,
-} from '../../index.js';
+import { openDb, closeDb, importGtfs, getTranslations } from '../../index.js';
 
 describe('getTranslations():', () => {
   before(async () => {
-    await openDb(config);
+    openDb(config);
     await importGtfs(config);
   });
 
-  after(async () => {
-    const db = getDb(config);
-    await closeDb(db);
+  after(() => {
+    const db = openDb(config);
+    closeDb(db);
   });
 
-  it('should return empty array if no translations', async () => {
+  it('should return empty array if no translations', () => {
     const fieldName = 'fake-field-name';
 
-    const results = await getTranslations({
+    const results = getTranslations({
       field_name: fieldName,
     });
     should.exists(results);

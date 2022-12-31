@@ -1,4 +1,11 @@
-import { Config, exportGtfs, getAgencies, getDb, getShapesAsGeoJSON, importGtfs, openDb } from "gtfs";
+import {
+  Config,
+  exportGtfs,
+  getAgencies,
+  getShapesAsGeoJSON,
+  importGtfs,
+  openDb,
+} from 'gtfs';
 
 /**
  * This is type-checked (but not executed) by dtslint.
@@ -6,21 +13,19 @@ import { Config, exportGtfs, getAgencies, getDb, getShapesAsGeoJSON, importGtfs,
  */
 
 (async () => {
-    const config: Config = {
-        agencies: [{ path: "example.zip" }],
-        verbose: false,
-    };
+  const config: Config = {
+    agencies: [{ path: 'example.zip' }],
+    verbose: false,
+  };
 
-    await importGtfs(config); // $ExpectType void
+  await importGtfs(config); // $ExpectType void
 
-    await exportGtfs(config); // $ExpectType void
+  await exportGtfs(config); // $ExpectType void
 
-    await openDb(config); // $ExpectType Database<Database, Statement>
+  openDb(config); // $ExpectType Database<Database, Statement>
 
-    await getDb(); // $ExpectType Database<Database, Statement>
+  const results = getAgencies();
+  results[0]; // $ExpectType Record<string, any>
 
-    const results = await getAgencies();
-    results[0]; // $ExpectType Record<string, any>
-
-    await getShapesAsGeoJSON(); // $ExpectType FeatureCollection<Geometry, { [name: string]: any; }>
+  getShapesAsGeoJSON(); // $ExpectType FeatureCollection<Geometry, { [name: string]: any; }>
 })();

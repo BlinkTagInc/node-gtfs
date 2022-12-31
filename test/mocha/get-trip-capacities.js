@@ -3,29 +3,23 @@
 import should from 'should';
 
 import config from '../test-config.js';
-import {
-  openDb,
-  getDb,
-  closeDb,
-  importGtfs,
-  getTripCapacities,
-} from '../../index.js';
+import { openDb, closeDb, importGtfs, getTripCapacities } from '../../index.js';
 
 describe('getTripCapacities():', () => {
   before(async () => {
-    await openDb(config);
+    openDb(config);
     await importGtfs(config);
   });
 
-  after(async () => {
-    const db = getDb(config);
-    await closeDb(db);
+  after(() => {
+    const db = openDb(config);
+    closeDb(db);
   });
 
-  it('should return empty array if no trip capacities (GTFS-ride)', async () => {
+  it('should return empty array if no trip capacities (GTFS-ride)', () => {
     const tripId = 'fake-trip-id';
 
-    const results = await getTripCapacities({
+    const results = getTripCapacities({
       trip_id: tripId,
     });
     should.exists(results);

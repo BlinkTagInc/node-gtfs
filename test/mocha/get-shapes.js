@@ -3,34 +3,34 @@
 import should from 'should';
 
 import config from '../test-config.js';
-import { openDb, getDb, closeDb, importGtfs, getShapes } from '../../index.js';
+import { openDb, closeDb, importGtfs, getShapes } from '../../index.js';
 
 describe('getShapes():', () => {
   before(async () => {
-    await openDb(config);
+    openDb(config);
     await importGtfs(config);
   });
 
-  after(async () => {
-    const db = getDb(config);
-    await closeDb(db);
+  after(() => {
+    const db = openDb(config);
+    closeDb(db);
   });
 
-  it('should return an empty array if no shapes exist', async () => {
+  it('should return an empty array if no shapes exist', () => {
     const shapeId = 'fake-shape-id';
 
-    const results = await getShapes({
+    const results = getShapes({
       shape_id: shapeId,
     });
     should.exists(results);
     results.should.have.length(0);
   });
 
-  it('should return an empty array if no matching trips exist', async () => {
+  it('should return an empty array if no matching trips exist', () => {
     const routeId = 'TaSj-16APR';
     const serviceId = 'fake-service-id';
 
-    const results = await getShapes({
+    const results = getShapes({
       route_id: routeId,
       service_id: serviceId,
     });
@@ -38,8 +38,8 @@ describe('getShapes():', () => {
     results.should.have.length(0);
   });
 
-  it('should return array of shapes', async () => {
-    const results = await getShapes({}, [
+  it('should return array of shapes', () => {
+    const results = getShapes({}, [
       'shape_id',
       'shape_pt_lat',
       'shape_pt_lon',
@@ -60,9 +60,9 @@ describe('getShapes():', () => {
     results.should.containEql(expectedResult);
   });
 
-  it('should return array of shapes by route', async () => {
+  it('should return array of shapes by route', () => {
     const routeId = 'TaSj-16APR';
-    const results = await getShapes(
+    const results = getShapes(
       {
         route_id: routeId,
       },
@@ -88,8 +88,8 @@ describe('getShapes():', () => {
     results.should.containEql(expectedResult);
   });
 
-  it('should return array of shapes for multiple routes', async () => {
-    const results = await getShapes(
+  it('should return array of shapes for multiple routes', () => {
+    const results = getShapes(
       {
         route_id: ['Lo-16APR', 'Li-16APR'],
       },
@@ -115,8 +115,8 @@ describe('getShapes():', () => {
     results.should.containEql(expectedResult);
   });
 
-  it('should return empty array of for invalid route', async () => {
-    const results = await getShapes({
+  it('should return empty array of for invalid route', () => {
+    const results = getShapes({
       route_id: 'not-valid',
     });
 
@@ -124,10 +124,10 @@ describe('getShapes():', () => {
     results.length.should.equal(0);
   });
 
-  it('should return array of shapes by route and direction', async () => {
+  it('should return array of shapes by route and direction', () => {
     const routeId = 'TaSj-16APR';
     const directionId = 0;
-    const results = await getShapes(
+    const results = getShapes(
       {
         route_id: routeId,
         direction_id: directionId,
@@ -154,9 +154,9 @@ describe('getShapes():', () => {
     results.should.containEql(expectedResult);
   });
 
-  it('should return array of shapes for specific trip_id', async () => {
+  it('should return array of shapes for specific trip_id', () => {
     const tripId = '329';
-    const results = await getShapes(
+    const results = getShapes(
       {
         trip_id: tripId,
       },
@@ -182,9 +182,9 @@ describe('getShapes():', () => {
     results.should.containEql(expectedResult);
   });
 
-  it('should return array of shapes for specific service_id', async () => {
+  it('should return array of shapes for specific service_id', () => {
     const serviceId = 'CT-16APR-Caltrain-Sunday-02';
-    const results = await getShapes(
+    const results = getShapes(
       {
         service_id: serviceId,
       },
@@ -210,9 +210,9 @@ describe('getShapes():', () => {
     results.should.containEql(expectedResult);
   });
 
-  it('should return array of shapes for specific shape_id', async () => {
+  it('should return array of shapes for specific shape_id', () => {
     const shapeId = 'cal_sf_tam';
-    const results = await getShapes(
+    const results = getShapes(
       {
         shape_id: shapeId,
       },
