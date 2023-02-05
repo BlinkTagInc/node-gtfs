@@ -11,7 +11,7 @@
   <br /><br />
   <a href="https://www.npmjs.com/package/gtfs" rel="nofollow"><img src="https://img.shields.io/npm/v/gtfs.svg?style=flat" style="max-width: 100%;"></a>
   <a href="https://www.npmjs.com/package/gtfs" rel="nofollow"><img src="https://img.shields.io/npm/dm/gtfs.svg?style=flat" style="max-width: 100%;"></a>
-  <a href="https://github.com/BlinkTagInc/node-gtfs/actions?query=workflow%3A%22Node+CI%22"><img src="https://img.shields.io/github/workflow/status/BlinkTagInc/node-gtfs/Node%20CI.svg" alt="CircleCI" style="max-width: 100%;"></a>
+  <a href="https://github.com/BlinkTagInc/node-gtfs/actions?query=workflow%3A%22Node+CI%22"><img src="https://img.shields.io/github/actions/workflow/status/BlinkTagInc/node-gtfs/nodejs.yml?branch=master" style="max-width: 100%;"></a>
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg">
   <br /><br />
   Import and Export GTFS transit data into SQLite. Query or change routes, stops, times, fares and more.
