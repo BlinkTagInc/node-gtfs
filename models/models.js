@@ -42,6 +42,12 @@ import vehiclePositions from './gtfs-realtime/vehicle-positions.js';
 import serviceAlerts from './gtfs-realtime/service-alerts.js';
 import serviceAlertTargets from './gtfs-realtime/service-alert-targets.js';
 
+import deadheadTimes from './ods/deadhead-times.js';
+import deadheads from './ods/deadheads.js';
+import opsLocations from './ods/ops-locations.js';
+import runEvents from './ods/run-events.js';
+import runsPieces from './ods/runs-pieces.js';
+
 const models = [
   agency,
   areas,
@@ -83,6 +89,11 @@ const models = [
   vehiclePositions,
   serviceAlerts,
   serviceAlertTargets,
+  deadheadTimes,
+  deadheads,
+  opsLocations,
+  runEvents,
+  runsPieces,
 ];
 
 export default models;
