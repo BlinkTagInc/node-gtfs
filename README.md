@@ -493,15 +493,29 @@ await exportGtfs(config);
 
 ## Query Methods
 
-This library includes many methods you can use in your project to query GTFS data.
+This library includes many methods you can use in your project to query GTFS data. In addition to standard static GTFS, `node-gtfs` supports the following extensions to GTFS:
 
-Most methods accept three optional arguments: `query`, `fields`, `sortBy` and `options`.
+- [GTFS-Realtime](https://gtfs.org/realtime/) - Realtime alerts, vehicle positions and predictions
+- [GTFS-Ride](https://gtfsride.org) - Passenger counts
+- [Operational Data Standard (ODS)](https://docs.calitp.org/operational-data-standard/) - Deadheads and personnel info
+- [GTFS-Timetables](https://gtfstohtml.com) - Information for creating human-readable timetables
 
-For more advanced queries, you can use `advancedQuery` or any query method from [better-sqlite3](#raw-sqlite-query).
+There are also methods for retrieving stops and shapes in geoJSON format.
 
-You need to run `openDb(config)` before using any query methods.
+Most query methods accept three optional arguments: `query`, `fields`, `sortBy` and `options`.
 
-#### Query
+For more advanced queries, you can use `advancedQuery` or raw SQL queries using query method from [better-sqlite3](#raw-sqlite-query).
+
+### Setup
+
+To use any of the query methods, first open the database before making any queries:
+
+```js
+import { openDb } from 'gtfs';
+const db = openDb(config);
+```
+
+### Examples
 
 For example, to get a list of all routes with just `route_id`, `route_short_name` and `route_color` sorted by `route_short_name`:
 
@@ -558,21 +572,9 @@ const stops = getStops(
 );
 ```
 
-### Setup
+### Static GTFS Files
 
-Include this library.
-
-```js
-import { openDb } from 'gtfs';
-```
-
-Open database before making any queries
-
-```js
-const db = openDb(config);
-```
-
-### getAgencies(query, fields, sortBy, options)
+#### getAgencies(query, fields, sortBy, options)
 
 Returns an array of agencies that match query parameters. [Details on agency.txt](https://gtfs.org/schedule/reference/#agencytxt)
 
@@ -588,7 +590,7 @@ const agencies = getAgencies({
 });
 ```
 
-### getAreas(query, fields, sortBy, options)
+#### getAreas(query, fields, sortBy, options)
 
 Returns an array of areas that match query parameters. [Details on areas.txt](https://gtfs.org/schedule/reference/#areastxt)
 
@@ -604,7 +606,7 @@ const areas = getAreas({
 });
 ```
 
-### getAttributions(query, fields, sortBy, options)
+#### getAttributions(query, fields, sortBy, options)
 
 Returns an array of attributions that match query parameters. [Details on attributions.txt](https://gtfs.org/schedule/reference/#attributionstxt)
 
@@ -620,7 +622,7 @@ const attributions = getAttributions({
 });
 ```
 
-### getRoutes(query, fields, sortBy, options)
+#### getRoutes(query, fields, sortBy, options)
 
 Returns an array of routes that match query parameters. [Details on routes.txt](https://gtfs.org/schedule/reference/#routestxt)
 
@@ -648,7 +650,7 @@ const routes = getRoutes(
 );
 ```
 
-### getStops(query, fields, sortBy, options)
+#### getStops(query, fields, sortBy, options)
 
 Returns an array of stops that match query parameters. [Details on stops.txt](https://gtfs.org/schedule/reference/#stopstxt)
 
@@ -688,7 +690,7 @@ const stops = getStops({
 });
 ```
 
-### getStopsAsGeoJSON(query, options)
+#### getStopsAsGeoJSON(query, options)
 
 Returns geoJSON object of stops that match query parameters. All valid queries for `getStops()` work for `getStopsAsGeoJSON()`.
 
@@ -704,7 +706,7 @@ const stopsGeojson = getStopsAsGeoJSON({
 });
 ```
 
-### getStoptimes(query, fields, sortBy, options)
+#### getStoptimes(query, fields, sortBy, options)
 
 Returns an array of stop_times that match query parameters. [Details on stop_times.txt](https://gtfs.org/schedule/reference/#stop_timestxt)
 
@@ -735,7 +737,7 @@ const stoptimes = getStoptimes({
 });
 ```
 
-### getTrips(query, fields, sortBy, options)
+#### getTrips(query, fields, sortBy, options)
 
 Returns an array of trips that match query parameters. [Details on trips.txt](https://gtfs.org/schedule/reference/#tripstxt)
 
@@ -765,7 +767,7 @@ const trips = getTrips({
 });
 ```
 
-### getShapes(query, fields, sortBy, options)
+#### getShapes(query, fields, sortBy, options)
 
 Returns an array of shapes that match query parameters. [Details on shapes.txt](https://gtfs.org/schedule/reference/#shapestxt)
 
@@ -800,7 +802,7 @@ const shapes = getShapes({
 });
 ```
 
-### getShapesAsGeoJSON(query, options)
+#### getShapesAsGeoJSON(query, options)
 
 Returns a geoJSON object of shapes that match query parameters. All valid queries for `getShapes()` work for `getShapesAsGeoJSON()`.
 
@@ -831,7 +833,7 @@ const shapesGeojson = getShapesAsGeoJSON({
 });
 ```
 
-### getCalendars(query, fields, sortBy, options)
+#### getCalendars(query, fields, sortBy, options)
 
 Returns an array of calendars that match query parameters. [Details on calendar.txt](https://gtfs.org/schedule/reference/#calendartxt)
 
@@ -847,7 +849,7 @@ const calendars = getCalendars({
 });
 ```
 
-### getCalendarDates(query, fields, sortBy, options)
+#### getCalendarDates(query, fields, sortBy, options)
 
 Returns an array of calendar_dates that match query parameters. [Details on calendar_dates.txt](https://gtfs.org/schedule/reference/#calendar_datestxt)
 
@@ -863,7 +865,7 @@ const calendarDates = getCalendarDates({
 });
 ```
 
-### getFareAttributes(query, fields, sortBy, options)
+#### getFareAttributes(query, fields, sortBy, options)
 
 Returns an array of fare_attributes that match query parameters. [Details on fare_attributes.txt](https://gtfs.org/schedule/reference/#fare_attributestxt)
 
@@ -879,7 +881,7 @@ const fareAttributes = getFareAttributes({
 });
 ```
 
-### getFareLegRules(query, fields, sortBy, options)
+#### getFareLegRules(query, fields, sortBy, options)
 
 Returns an array of fare_leg_rules that match query parameters. [Details on fare_leg_rules.txt](https://gtfs.org/schedule/reference/#fare_leg_rulestxt)
 
@@ -895,7 +897,7 @@ const fareLegRules = getFareLegRules({
 });
 ```
 
-### getFareProducts(query, fields, sortBy, options)
+#### getFareProducts(query, fields, sortBy, options)
 
 Returns an array of fare_products that match query parameters. [Details on fare_products.txt](https://gtfs.org/schedule/reference/#fare_productstxt)
 
@@ -911,7 +913,7 @@ const fareProducts = getFareProducts({
 });
 ```
 
-### getFareRules(query, fields, sortBy, options)
+#### getFareRules(query, fields, sortBy, options)
 
 Returns an array of fare_rules that match query parameters. [Details on fare_rules.txt](https://gtfs.org/schedule/reference/#fare_rulestxt)
 
@@ -927,7 +929,7 @@ const fareRules = getFareRules({
 });
 ```
 
-### getFareTransferRules(query, fields, sortBy, options)
+#### getFareTransferRules(query, fields, sortBy, options)
 
 Returns an array of fare_transfer_rules that match query parameters. [Details on fare_transfer_rules.txt](https://gtfs.org/schedule/reference/#fare_transfer_rulestxt)
 
@@ -943,7 +945,7 @@ const fareTransferRules = getFareTransferRules({
 });
 ```
 
-### getFeedInfo(query, fields, sortBy, options)
+#### getFeedInfo(query, fields, sortBy, options)
 
 Returns an array of feed_info that match query parameters. [Details on feed_info.txt](https://gtfs.org/schedule/reference/#feed_infotxt)
 
@@ -954,7 +956,7 @@ import { getFeedInfo } from 'gtfs';
 const feedInfo = getFeedInfo();
 ```
 
-### getFrequencies(query, fields, sortBy, options)
+#### getFrequencies(query, fields, sortBy, options)
 
 Returns an array of frequencies that match query parameters. [Details on frequencies.txt](https://gtfs.org/schedule/reference/#frequenciestxt)
 
@@ -970,7 +972,7 @@ const frequencies = getFrequencies({
 });
 ```
 
-### getLevels(query, fields, sortBy, options)
+#### getLevels(query, fields, sortBy, options)
 
 Returns an array of levels that match query parameters. [Details on levels.txt](https://gtfs.org/schedule/reference/#levelstxt)
 
@@ -981,7 +983,7 @@ import { getLevels } from 'gtfs';
 const levels = getLevels();
 ```
 
-### getPathways(query, fields, sortBy, options)
+#### getPathways(query, fields, sortBy, options)
 
 Returns an array of pathways that match query parameters. [Details on pathways.txt](https://gtfs.org/schedule/reference/#pathwaystxt)
 
@@ -992,7 +994,7 @@ import { getPathways } from 'gtfs';
 const pathways = getPathways();
 ```
 
-### getTransfers(query, fields, sortBy, options)
+#### getTransfers(query, fields, sortBy, options)
 
 Returns an array of transfers that match query parameters. [Details on transfers.txt](https://gtfs.org/schedule/reference/#transferstxt)
 
@@ -1008,7 +1010,7 @@ const transfers = getTransfers({
 });
 ```
 
-### getTranslations(query, fields, sortBy, options)
+#### getTranslations(query, fields, sortBy, options)
 
 Returns an array of translations that match query parameters. [Details on translations.txt](https://gtfs.org/schedule/reference/#translationstxt)
 
@@ -1019,7 +1021,7 @@ import { getTranslations } from 'gtfs';
 const translations = getTranslations();
 ```
 
-### getStopAreas(query, fields, sortBy, options)
+#### getStopAreas(query, fields, sortBy, options)
 
 Returns an array of stop_areas that match query parameters. [Details on stop_areas.txt](https://gtfs.org/schedule/reference/#stop_areastxt)
 
@@ -1030,7 +1032,293 @@ import { getStopAreas } from 'gtfs';
 const stopAreas = getStopAreas();
 ```
 
-### getDirections(query, fields, sortBy, options)
+### GTFS-Timetables files
+
+#### getTimetables(query, fields, sortBy, options)
+
+Returns an array of timetables that match query parameters. This is for the non-standard `timetables.txt` file used in GTFS-to-HTML. [Details on timetables.txt](https://gtfstohtml.com/docs/timetables)
+
+```js
+import { getTimetables } from 'gtfs';
+
+// Get all timetables for an agency
+const timetables = getTimetables();
+
+// Get a specific timetable
+const timetables = getTimetables({
+  timetable_id: '1',
+});
+```
+
+#### getTimetableStopOrders(query, fields, sortBy, options)
+
+Returns an array of timetable_stop_orders that match query parameters. This is for the non-standard `timetable_stop_order.txt` file used in GTFS-to-HTML. [Details on timetable_stop_order.txt](https://gtfstohtml.com/docs/timetable-stop-order)
+
+```js
+import { getTimetableStopOrders } from 'gtfs';
+
+// Get all timetable_stop_orders
+const timetableStopOrders = getTimetableStopOrders();
+
+// Get timetable_stop_orders for a specific timetable
+const timetableStopOrders = getTimetableStopOrders({
+  timetable_id: '1',
+});
+```
+
+#### getTimetablePages(query, fields, sortBy, options)
+
+Returns an array of timetable_pages that match query parameters. This is for the non-standard `timetable_pages.txt` file used in GTFS-to-HTML. [Details on timetable_pages.txt](https://gtfstohtml.com/docs/timetable-pages)
+
+```js
+import { getTimetablePages } from 'gtfs';
+
+// Get all timetable_pages for an agency
+const timetablePages = getTimetablePages();
+
+// Get a specific timetable_page
+const timetablePages = getTimetablePages({
+  timetable_page_id: '2',
+});
+```
+
+#### getTimetableNotes(query, fields, sortBy, options)
+
+Returns an array of timetable_notes that match query parameters. This is for the non-standard `timetable_notes.txt` file used in GTFS-to-HTML. [Details on timetable_notes.txt](https://gtfstohtml.com/docs/timetable-notes)
+
+```js
+import { getTimetableNotes } from 'gtfs';
+
+// Get all timetable_notes for an agency
+const timetableNotes = getTimetableNotes();
+
+// Get a specific timetable_note
+const timetableNotes = getTimetableNotes({
+  note_id: '1',
+});
+```
+
+#### getTimetableNotesReferences(query, fields, sortBy, options)
+
+Returns an array of timetable_notes_references that match query parameters. This is for the non-standard `timetable_notes_references.txt` file used in GTFS-to-HTML. [Details on timetable_notes_references.txt](https://gtfstohtml.com/docs/timetable-notes-references)
+
+```js
+import { getTimetableNotesReferences } from 'gtfs';
+
+// Get all timetable_notes_references for an agency
+const timetableNotesReferences = getTimetableNotesReferences();
+
+// Get all timetable_notes_references for a specific timetable
+const timetableNotesReferences = getTimetableNotesReferences({
+  timetable_id: '4',
+});
+```
+
+### GTFS-Realtime
+
+In order to use GTFS-Realtime query methods, you must first configure GTFS Realtime import in node-gtfs
+
+#### getServiceAlerts(query, fields, sortBy, options)
+
+Returns an array of GTFS Realtime service alerts that match query parameters. [Details on Service Alerts](https://gtfs.org/realtime/feed-entities/service-alerts/)
+
+```js
+import { getServiceAlerts } from 'gtfs';
+
+// Get service alerts
+const serviceAlerts = getServiceAlerts();
+```
+
+#### getTripUpdates(query, fields, sortBy, options)
+
+Returns an array of GTFS Realtime trip updates that match query parameters. [Details on Trip Updates](https://gtfs.org/realtime/feed-entities/trip-updates/)
+
+```js
+import { getTripUpdates } from 'gtfs';
+
+// Get all trip updates
+const tripUpdates = getTripUpdates();
+```
+
+#### getStopTimesUpdates(query, fields, sortBy, options)
+
+Returns an array of GTFS Realtime stop time updates that match query parameters. [Details on Stop Time Updates](https://gtfs.org/realtime/feed-entities/trip-updates/#stoptimeupdate)
+
+```js
+import { getStopTimesUpdates } from 'gtfs';
+
+// Get all stop times updates
+const stopTimesUpdates = getStopTimesUpdates();
+```
+
+#### getVehiclePositions(query, fields, sortBy, options)
+
+Returns an array of GTFS Realtime vehicle positions that match query parameters. [Details on Vehicle Positions](https://gtfs.org/realtime/feed-entities/vehicle-positions/)
+
+```js
+import { getVehiclePositions } from 'gtfs';
+
+// Get all vehicle position data
+const vehiclePositions = getVehiclePositions();
+```
+
+### GTFS-Ride Files
+
+#### getBoardAlights(query, fields, sortBy, options)
+
+Returns an array of board_alight that match query parameters. [Details on board_alight.txt](http://gtfsride.org/specification#board_alighttxt)
+
+```js
+import { getBoardAlights } from 'gtfs';
+
+// Get all board_alight
+const boardAlights = getBoardAlights();
+
+// Get board_alight for a specific trip
+const boardAlights = getBoardAlights({
+  trip_id: '123',
+});
+```
+
+#### getRideFeedInfos(query, fields, sortBy, options)
+
+Returns an array of ride_feed_info that match query parameters. [Details on ride_feed_info.txt](http://gtfsride.org/specification#ride_feed_infotxt)
+
+```js
+import { getRideFeedInfos } from 'gtfs';
+
+// Get all ride_feed_info
+const rideFeedInfos = getRideFeedInfos();
+```
+
+#### getRiderTrips(query, fields, sortBy, options)
+
+Returns an array of rider_trip that match query parameters. [Details on rider_trip.txt](http://gtfsride.org/specification#rider_triptxt)
+
+```js
+import { getRiderTrips } from 'gtfs';
+
+// Get all rider_trip
+const riderTrips = getRiderTrips();
+
+// Get rider_trip for a specific trip
+const riderTrips = getRiderTrips({
+  trip_id: '123',
+});
+```
+
+#### getRiderships(query, fields, sortBy, options)
+
+Returns an array of ridership that match query parameters. [Details on ridership.txt](http://gtfsride.org/specification#ridershiptxt)
+
+```js
+import { getRiderships } from 'gtfs';
+
+// Get all ridership
+const riderships = getRiderships();
+
+// Get ridership for a specific route
+const riderships = getRiderships({
+  route_id: '123',
+});
+```
+
+#### getTripCapacities(query, fields, sortBy, options)
+
+Returns an array of trip_capacity that match query parameters. [Details on trip_capacity.txt](http://gtfsride.org/specification#trip_capacitytxt)
+
+```js
+import { getTripCapacities } from 'gtfs';
+
+// Get all trip_capacity
+const tripCapacities = getTripCapacities();
+
+// Get trip_capacity for a specific trip
+const tripCapacities = getTripCapacities({
+  trip_id: '123',
+});
+```
+
+### Operational Data Standard (ODS) Files
+
+#### getDeadheads(query, fields, sortBy, options)
+
+Returns an array of deadheads that match query parameters. [Details on deadheads.txt](https://docs.calitp.org/operational-data-standard/spec/#deadheadstxt)
+
+```js
+import { getDeadheads } from 'gtfs';
+
+// Get all deadheads
+const deadheads = getDeadheads();
+
+// Get deadheads for a specific block
+const deadheads = getDeadheads({
+  block_id: '123',
+});
+```
+
+#### getDeadheadTimes(query, fields, sortBy, options)
+
+Returns an array of deadhead_times that match query parameters. [Details on deadhead_times.txt](https://docs.calitp.org/operational-data-standard/spec/#deadhead_timestxt)
+
+```js
+import { getDeadheadTimes } from 'gtfs';
+
+// Get all deadhead_times
+const deadheadTimes = getDeadheadTimes();
+
+// Get deadhead_times for a specific deadhead
+const deadheadTimes = getDeadheadTimes({
+  deadhead_id: '123',
+});
+```
+
+#### getOpsLocations(query, fields, sortBy, options)
+
+Returns an array of ops_locations that match query parameters. [Details on ops_locations.txt](https://docs.calitp.org/operational-data-standard/spec/#ops_locationstxt)
+
+```js
+import { getOpsLocations } from 'gtfs';
+
+// Get all ops_locations
+const opsLocations = getOpsLocations();
+
+// Get a specific ops_locations
+const opsLocations = getOpsLocations({
+  ops_location_id: '123',
+});
+```
+
+#### getRunsPieces(query, fields, sortBy, options)
+
+Returns an array of runs_pieces that match query parameters. [Details on runs_pieces.txt](https://docs.calitp.org/operational-data-standard/spec/#runs_piecestxt)
+
+```js
+import { getRunsPieces } from 'gtfs';
+
+// Get all runs_pieces
+const runsPieces = getRunsPieces();
+```
+
+#### getRunEvents(query, fields, sortBy, options)
+
+Returns an array of run_events that match query parameters. [Details on run_events.txt](https://docs.calitp.org/operational-data-standard/spec/#run_eventstxt)
+
+```js
+import { getRunEvents } from 'gtfs';
+
+// Get all run_events
+const runEvents = runEvents();
+
+// Get a run_events for a specific piece
+const runEvents = runEvents({
+  piece_id: '123',
+});
+```
+
+### Non-standard GTFS Files
+
+#### getDirections(query, fields, sortBy, options)
 
 Returns an array of directions that match query parameters. This is for the non-standard `directions.txt` file. [Details on directions.txt](https://trilliumtransit.com/gtfs/reference/#directions)
 
@@ -1052,7 +1340,7 @@ const directions = getDirections({
 });
 ```
 
-### getStopAttributes(query, fields, sortBy, options)
+#### getStopAttributes(query, fields, sortBy, options)
 
 Returns an array of stop_attributes that match query parameters. This is for the non-standard `stop_attributes.txt` file. [Details on stop_attributes.txt](https://trilliumtransit.com/gtfs/reference/#stop_attributes)
 
@@ -1068,142 +1356,20 @@ const stopAttributes = getStopAttributes({
 });
 ```
 
-### getTimetables(query, fields, sortBy, options)
-
-Returns an array of timetables that match query parameters. This is for the non-standard `timetables.txt` file used in GTFS-to-HTML. [Details on timetables.txt](https://gtfstohtml.com/docs/timetables)
-
-```js
-import { getTimetables } from 'gtfs';
-
-// Get all timetables for an agency
-const timetables = getTimetables();
-
-// Get a specific timetable
-const timetables = getTimetables({
-  timetable_id: '1',
-});
-```
-
-### getTimetableStopOrders(query, fields, sortBy, options)
-
-Returns an array of timetable_stop_orders that match query parameters. This is for the non-standard `timetable_stop_order.txt` file used in GTFS-to-HTML. [Details on timetable_stop_order.txt](https://gtfstohtml.com/docs/timetable-stop-order)
-
-```js
-import { getTimetableStopOrders } from 'gtfs';
-
-// Get all timetable_stop_orders
-const timetableStopOrders = getTimetableStopOrders();
-
-// Get timetable_stop_orders for a specific timetable
-const timetableStopOrders = getTimetableStopOrders({
-  timetable_id: '1',
-});
-```
-
-### getTimetablePages(query, fields, sortBy, options)
-
-Returns an array of timetable_pages that match query parameters. This is for the non-standard `timetable_pages.txt` file used in GTFS-to-HTML. [Details on timetable_pages.txt](https://gtfstohtml.com/docs/timetable-pages)
-
-```js
-import { getTimetablePages } from 'gtfs';
-
-// Get all timetable_pages for an agency
-const timetablePages = getTimetablePages();
-
-// Get a specific timetable_page
-const timetablePages = getTimetablePages({
-  timetable_page_id: '2',
-});
-```
-
-### getTimetableNotes(query, fields, sortBy, options)
-
-Returns an array of timetable_notes that match query parameters. This is for the non-standard `timetable_notes.txt` file used in GTFS-to-HTML. [Details on timetable_notes.txt](https://gtfstohtml.com/docs/timetable-notes)
-
-```js
-import { getTimetableNotes } from 'gtfs';
-
-// Get all timetable_notes for an agency
-const timetableNotes = getTimetableNotes();
-
-// Get a specific timetable_note
-const timetableNotes = getTimetableNotes({
-  note_id: '1',
-});
-```
-
-### getTimetableNotesReferences(query, fields, sortBy, options)
-
-Returns an array of timetable_notes_references that match query parameters. This is for the non-standard `timetable_notes_references.txt` file used in GTFS-to-HTML. [Details on timetable_notes_references.txt](https://gtfstohtml.com/docs/timetable-notes-references)
-
-```js
-import { getTimetableNotesReferences } from 'gtfs';
-
-// Get all timetable_notes_references for an agency
-const timetableNotesReferences = getTimetableNotesReferences();
-
-// Get all timetable_notes_references for a specific timetable
-const timetableNotesReferences = getTimetableNotesReferences({
-  timetable_id: '4',
-});
-```
-
-### getTripsDatedVehicleJourneys(query, fields, sortBy, options)
+#### getTripsDatedVehicleJourneys(query, fields, sortBy, options)
 
 Returns an array of trips_dated_vehicle_journey that match query parameters. This is for the non-standard `trips_dated_vehicle_journey.txt` file. [Details on trips_dated_vehicle_journey.txt](https://www.trafiklab.se/api/trafiklab-apis/gtfs-regional/extra-files/)
 
 ```js
 import { getTripsDatedVehicleJourneys } from 'gtfs';
 
-// Get all timetable_stop_orders
+// Get all trips_dated_vehicle_journey
 const tripsDatedVehicleJourneys = getTripsDatedVehicleJourneys();
 ```
 
-### getServiceAlerts(query, fields, sortBy, options)
+### Advanced Query Methods
 
-Returns an array of GTFS Realtime service alerts that match query parameters. This only works if you configure GTFS Realtime import in node-gtfs. [Details on Service Alerts](https://gtfs.org/realtime/feed-entities/service-alerts/)
-
-```js
-import { getServiceAlerts } from 'gtfs';
-
-// Get service alerts
-const serviceAlerts = getServiceAlerts();
-```
-
-### getTripUpdates(query, fields, sortBy, options)
-
-Returns an array of GTFS Realtime trip updates that match query parameters. This only works if you configure GTFS Realtime import in node-gtfs. [Details on Trip Updates](https://gtfs.org/realtime/feed-entities/trip-updates/)
-
-```js
-import { getTripUpdates } from 'gtfs';
-
-// Get all trip updates
-const tripUpdates = getTripUpdates();
-```
-
-### getStopTimesUpdates(query, fields, sortBy, options)
-
-Returns an array of GTFS Realtime stop time updates that match query parameters. This only works if you configure GTFS Realtime import in node-gtfs. [Details on Stop Time Updates](https://gtfs.org/realtime/feed-entities/trip-updates/#stoptimeupdate)
-
-```js
-import { getStopTimesUpdates } from 'gtfs';
-
-// Get all stop times updates
-const stopTimesUpdates = getStopTimesUpdates();
-```
-
-### getVehiclePositions(query, fields, sortBy, options)
-
-Returns an array of GTFS Realtime vehicle positions that match query parameters. This only works if you configure GTFS Realtime import in node-gtfs. [Details on Vehicle Positions](https://gtfs.org/realtime/feed-entities/vehicle-positions/)
-
-```js
-import { getVehiclePositions } from 'gtfs';
-
-// Get all vehicle position data
-const vehiclePositions = getVehiclePositions();
-```
-
-### advancedQuery(table, advancedQueryOptions)
+#### advancedQuery(table, advancedQueryOptions)
 
 Queries the database with support for table joins and custom tables and returns an array of data.
 
@@ -1228,7 +1394,7 @@ const advancedQueryOptions = {
 const stoptimes = advancedQuery('stop_times', advancedQueryOptions);
 ```
 
-### Raw SQLite Query
+#### Raw SQLite Query
 
 Use the `openDb` function to get the db object, and then use any query method from [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) to query GTFS data.
 
