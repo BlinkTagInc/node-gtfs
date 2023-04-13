@@ -2,11 +2,6 @@ const model = {
   filenameBase: 'fare_rules',
   schema: [
     {
-      name: 'id',
-      type: 'integer',
-      primary: true,
-    },
-    {
       name: 'fare_id',
       type: 'varchar(255)',
       required: true,

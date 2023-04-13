@@ -2,11 +2,6 @@ const model = {
   filenameBase: 'feed_info',
   schema: [
     {
-      name: 'id',
-      type: 'integer',
-      primary: true,
-    },
-    {
       name: 'feed_publisher_name',
       type: 'varchar(255)',
       required: true,

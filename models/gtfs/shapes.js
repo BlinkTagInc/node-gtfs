@@ -2,15 +2,10 @@ const model = {
   filenameBase: 'shapes',
   schema: [
     {
-      name: 'id',
-      type: 'integer',
-      primary: true,
-    },
-    {
       name: 'shape_id',
       type: 'varchar(255)',
       required: true,
-      index: true,
+      primary: true,
     },
     {
       name: 'shape_pt_lat',
@@ -30,6 +25,7 @@ const model = {
       name: 'shape_pt_sequence',
       type: 'integer',
       required: true,
+      primary: true,
       min: 0,
     },
     {

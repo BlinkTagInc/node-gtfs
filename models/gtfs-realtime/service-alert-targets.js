@@ -7,7 +7,6 @@ const model = {
       type: 'varchar(255)',
       required: true,
       primary: true,
-      index: true,
       source: 'parent.id',
     },
     {

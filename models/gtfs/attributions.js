@@ -5,6 +5,7 @@ const model = {
       name: 'attribution_id',
       type: 'varchar(255)',
       primary: true,
+      required: true,
     },
     {
       name: 'agency_id',

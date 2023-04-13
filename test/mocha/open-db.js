@@ -83,7 +83,6 @@ describe('openDb():', () => {
     );
 
     const expectedResult = {
-      id: 1424,
       shape_id: 'cal_sf_tam',
       shape_pt_lat: 37.45375587083584,
       shape_pt_lon: -122.18063950538635,

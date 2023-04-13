@@ -28,7 +28,6 @@ describe('getAgencies():', () => {
     const results = getAgencies();
 
     const expectedResult = {
-      id: 1,
       agency_id: 'CT',
       agency_name: 'Caltrain',
       agency_url: 'http://www.caltrain.com',
@@ -54,7 +53,6 @@ describe('getAgencies():', () => {
     });
 
     const expectedResult = {
-      id: 1,
       agency_id: 'CT',
       agency_name: 'Caltrain',
       agency_url: 'http://www.caltrain.com',

@@ -8,19 +8,23 @@ const model = {
     {
       name: 'network_id',
       type: 'varchar(255)',
+      primary: true,
     },
     {
       name: 'from_area_id',
       type: 'varchar(255)',
+      primary: true,
     },
     {
       name: 'to_area_id',
       type: 'varchar(255)',
+      primary: true,
     },
     {
       name: 'fare_product_id',
       type: 'varchar(255)',
       required: true,
+      primary: true,
     },
   ],
 };

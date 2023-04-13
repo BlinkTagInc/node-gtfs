@@ -2,21 +2,16 @@ const model = {
   filenameBase: 'calendar_dates',
   schema: [
     {
-      name: 'id',
-      type: 'integer',
-      primary: true,
-    },
-    {
       name: 'service_id',
       type: 'varchar(255)',
       required: true,
-      index: true,
+      primary: true,
     },
     {
       name: 'date',
       type: 'integer',
       required: true,
-      index: true,
+      primary: true,
     },
     {
       name: 'exception_type',

@@ -2,20 +2,16 @@ const model = {
   filenameBase: 'frequencies',
   schema: [
     {
-      name: 'id',
-      type: 'integer',
-      primary: true,
-    },
-    {
       name: 'trip_id',
       type: 'varchar(255)',
       required: true,
-      index: true,
+      primary: true,
     },
     {
       name: 'start_time',
       type: 'varchar(255)',
       required: true,
+      primary: true,
     },
     {
       name: 'start_timestamp',

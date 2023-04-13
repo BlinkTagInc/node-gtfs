@@ -2,15 +2,10 @@ const model = {
   filenameBase: 'stop_times',
   schema: [
     {
-      name: 'id',
-      type: 'integer',
-      primary: true,
-    },
-    {
       name: 'trip_id',
       type: 'varchar(255)',
       required: true,
-      index: true,
+      primary: true,
     },
     {
       name: 'arrival_time',
@@ -39,8 +34,8 @@ const model = {
       name: 'stop_sequence',
       type: 'integer',
       required: true,
+      primary: true,
       min: 0,
-      index: true,
     },
     {
       name: 'stop_headsign',

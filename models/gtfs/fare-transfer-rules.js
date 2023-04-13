@@ -4,15 +4,18 @@ const model = {
     {
       name: 'from_leg_group_id',
       type: 'varchar(255)',
+      primary: true,
     },
     {
       name: 'to_leg_group_id',
       type: 'varchar(255)',
+      primary: true,
     },
     {
       name: 'transfer_count',
       type: 'integer',
       min: -1,
+      primary: true,
     },
     {
       name: 'transfer_id',
@@ -22,6 +25,7 @@ const model = {
       name: 'duration_limit',
       type: 'integer',
       min: 0,
+      primary: true,
     },
     {
       name: 'duration_limit_type',
@@ -34,10 +38,12 @@ const model = {
       type: 'integer',
       min: 0,
       max: 2,
+      required: true,
     },
     {
       name: 'fare_product_id',
       type: 'varchar(255)',
+      primary: true,
     },
   ],
 };

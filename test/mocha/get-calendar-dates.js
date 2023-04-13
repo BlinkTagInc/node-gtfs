@@ -38,28 +38,24 @@ describe('getCalendarDates():', () => {
 
     const expectedResults = [
       {
-        id: 2,
         service_id: 'CT-16APR-Caltrain-Weekday-01',
         date: 20161124,
         exception_type: 2,
         holiday_name: null,
       },
       {
-        id: 4,
         service_id: 'CT-16APR-Caltrain-Weekday-01',
         date: 20160905,
         exception_type: 2,
         holiday_name: null,
       },
       {
-        id: 6,
         service_id: 'CT-16APR-Caltrain-Weekday-01',
         date: 20160704,
         exception_type: 2,
         holiday_name: null,
       },
       {
-        id: 8,
         service_id: 'CT-16APR-Caltrain-Weekday-01',
         date: 20160530,
         exception_type: 2,

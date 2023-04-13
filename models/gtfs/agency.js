@@ -2,13 +2,9 @@ const model = {
   filenameBase: 'agency',
   schema: [
     {
-      name: 'id',
-      type: 'integer',
-      primary: true,
-    },
-    {
       name: 'agency_id',
       type: 'varchar(255)',
+      primary: true,
     },
     {
       name: 'agency_name',

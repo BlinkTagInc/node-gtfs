@@ -12,6 +12,11 @@ const model = {
       type: 'varchar(255)',
     },
     {
+      name: 'fare_media_id',
+      type: 'varchar(255)',
+      primary: true,
+    },
+    {
       name: 'amount',
       type: 'real',
       required: true,
