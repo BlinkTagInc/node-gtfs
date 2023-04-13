@@ -692,7 +692,7 @@ const stops = getStops({
 
 #### getStopsAsGeoJSON(query, options)
 
-Returns geoJSON object of stops that match query parameters. All valid queries for `getStops()` work for `getStopsAsGeoJSON()`.
+Returns geoJSON object of stops that match query parameters. Stops will include all properties of each stop from stops.txt and stop_attributes.txt if present. All valid queries for `getStops()` work for `getStopsAsGeoJSON()`.
 
 ```js
 import { getStopsAsGeoJSON } from 'gtfs';
@@ -804,7 +804,7 @@ const shapes = getShapes({
 
 #### getShapesAsGeoJSON(query, options)
 
-Returns a geoJSON object of shapes that match query parameters. All valid queries for `getShapes()` work for `getShapesAsGeoJSON()`.
+Returns a geoJSON object of shapes that match query parameters. Shapes will include all properties of each route from routes.txt and route_attributes.txt if present. All valid queries for `getShapes()` work for `getShapesAsGeoJSON()`.
 
 ```js
 import { getShapesAsGeoJSON } from 'gtfs';
