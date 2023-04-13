@@ -21,14 +21,17 @@ import transfers from '../models/gtfs/transfers.js';
 import translations from '../models/gtfs/translations.js';
 import trips from '../models/gtfs/trips.js';
 
-import directions from '../models/non-standard/directions.js';
-import stopAttributes from '../models/non-standard/stop-attributes.js';
 import timetables from '../models/non-standard/timetables.js';
 import timetablePages from '../models/non-standard/timetable-pages.js';
 import timetableStopOrder from '../models/non-standard/timetable-stop-order.js';
 import timetableNotes from '../models/non-standard/timetable-notes.js';
 import timetableNotesReferences from '../models/non-standard/timetable-notes-references.js';
 import tripsDatedVehicleJourney from '../models/non-standard/trips-dated-vehicle-journey.js';
+
+import calendarAttributes from '../models/gtfs-plus/calendar-attributes.js';
+import directions from '../models/gtfs-plus/directions.js';
+import routeAttributes from '../models/gtfs-plus/route-attributes.js';
+import stopAttributes from '../models/gtfs-plus/stop-attributes.js';
 
 import boardAlight from '../models/gtfs-ride/board-alight.js';
 import riderTrip from '../models/gtfs-ride/rider-trip.js';
@@ -71,14 +74,16 @@ const models = [
   transfers,
   translations,
   trips,
-  directions,
-  stopAttributes,
   timetables,
   timetablePages,
   timetableStopOrder,
   timetableNotes,
   timetableNotesReferences,
   tripsDatedVehicleJourney,
+  calendarAttributes,
+  directions,
+  routeAttributes,
+  stopAttributes,
   boardAlight,
   rideFeedInfo,
   riderTrip,

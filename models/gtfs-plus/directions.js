@@ -1,6 +1,7 @@
 const model = {
-  filenameBase: 'stop_attributes',
+  filenameBase: 'directions',
   nonstandard: true,
+  extension: 'gtfs-plus',
   schema: [
     {
       name: 'id',
@@ -8,15 +9,22 @@ const model = {
       primary: true,
     },
     {
-      name: 'stop_id',
+      name: 'route_id',
       type: 'varchar(255)',
       required: true,
       index: true,
     },
     {
-      name: 'stop_city',
+      name: 'direction_id',
+      type: 'integer',
+      min: 0,
+      max: 1,
+      index: true,
+    },
+    {
+      name: 'direction',
       type: 'varchar(255)',
-      nocase: true,
+      required: true,
     },
   ],
 };

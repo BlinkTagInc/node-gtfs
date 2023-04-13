@@ -1162,7 +1162,81 @@ import { getVehiclePositions } from 'gtfs';
 const vehiclePositions = getVehiclePositions();
 ```
 
+### GTFS+ Files
+
+#### getCalendarAttributes(query, fields, sortBy, options)
+
+Returns an array of calendar_attributes that match query parameters.
+
+```js
+import { getCalendarAttributes } from 'gtfs';
+
+// Get all calendar attributes
+const calendarAttributes = getCalendarAttributes();
+
+// Get calendar attributes for specific service
+const calendarAttributes = getCalendarAttributes({
+  service_id: '1234',
+});
+```
+
+#### getDirections(query, fields, sortBy, options)
+
+Returns an array of directions that match query parameters.
+
+```js
+import { getDirections } from 'gtfs';
+
+// Get all directions
+const directions = getDirections();
+
+// Get directions for a specific route
+const directions = getDirections({
+  route_id: '1234',
+});
+
+// Get directions for a specific route and direction
+const directions = getDirections({
+  route_id: '1234',
+  direction_id: 1,
+});
+```
+
+#### getRouteAttributes(query, fields, sortBy, options)
+
+Returns an array of route_attributes that match query parameters.
+
+```js
+import { getRouteAttributes } from 'gtfs';
+
+// Get all route attributes
+const routeAttributes = getRouteAttributes();
+
+// Get route attributes for specific route
+const routeAttributes = getRouteAttributes({
+  route_id: '1234',
+});
+```
+
+#### getStopAttributes(query, fields, sortBy, options)
+
+Returns an array of stop_attributes that match query parameters.
+
+```js
+import { getStopAttributes } from 'gtfs';
+
+// Get all stop attributes
+const stopAttributes = getStopAttributes();
+
+// Get stop attributes for specific stop
+const stopAttributes = getStopAttributes({
+  stop_id: '1234',
+});
+```
+
 ### GTFS-Ride Files
+
+See full [documentation of GTFS Ride](https://gtfsride.org).
 
 #### getBoardAlights(query, fields, sortBy, options)
 
@@ -1316,45 +1390,7 @@ const runEvents = runEvents({
 });
 ```
 
-### Non-standard GTFS Files
-
-#### getDirections(query, fields, sortBy, options)
-
-Returns an array of directions that match query parameters. This is for the non-standard `directions.txt` file. [Details on directions.txt](https://trilliumtransit.com/gtfs/reference/#directions)
-
-```js
-import { getDirections } from 'gtfs';
-
-// Get all directions
-const directions = getDirections();
-
-// Get directions for a specific route
-const directions = getDirections({
-  route_id: '1234',
-});
-
-// Get directions for a specific route and direction
-const directions = getDirections({
-  route_id: '1234',
-  direction_id: 1,
-});
-```
-
-#### getStopAttributes(query, fields, sortBy, options)
-
-Returns an array of stop_attributes that match query parameters. This is for the non-standard `stop_attributes.txt` file. [Details on stop_attributes.txt](https://trilliumtransit.com/gtfs/reference/#stop_attributes)
-
-```js
-import { getStopAttributes } from 'gtfs';
-
-// Get all stop attributes
-const stopAttributes = getStopAttributes();
-
-// Get stop attributes for specific stop
-const stopAttributes = getStopAttributes({
-  stop_id: '1234',
-});
-```
+### Other Non-standard GTFS Files
 
 #### getTripsDatedVehicleJourneys(query, fields, sortBy, options)
 
