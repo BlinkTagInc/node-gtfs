@@ -6,18 +6,21 @@ const model = {
       type: 'varchar(255)',
       required: true,
       index: true,
+      prefix: true,
     },
     {
       name: 'service_id',
       type: 'varchar(255)',
       required: true,
       index: true,
+      prefix: true,
     },
     {
       name: 'trip_id',
       type: 'varchar(255)',
       primary: true,
       required: true,
+      prefix: true,
     },
     {
       name: 'trip_headsign',
@@ -40,11 +43,13 @@ const model = {
       name: 'block_id',
       type: 'varchar(255)',
       index: true,
+      prefix: true,
     },
     {
       name: 'shape_id',
       type: 'varchar(255)',
       index: true,
+      prefix: true,
     },
     {
       name: 'wheelchair_accessible',

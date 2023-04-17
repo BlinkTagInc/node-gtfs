@@ -7,12 +7,14 @@ const model = {
       name: 'id',
       type: 'integer',
       primary: true,
+      prefix: true,
     },
     {
       name: 'deadhead_id',
       type: 'varchar(255)',
       required: true,
       index: true,
+      prefix: true,
     },
     {
       name: 'arrival_time',
@@ -37,10 +39,12 @@ const model = {
     {
       name: 'ops_location_id',
       type: 'varchar(255)',
+      prefix: true,
     },
     {
       name: 'stop_id',
       type: 'varchar(255)',
+      prefix: true,
     },
     {
       name: 'location_sequence',

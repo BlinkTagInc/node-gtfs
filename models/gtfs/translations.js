@@ -28,11 +28,13 @@ const model = {
       name: 'record_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
     {
       name: 'record_sub_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
     {
       name: 'field_value',

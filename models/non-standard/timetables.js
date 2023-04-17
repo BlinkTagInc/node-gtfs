@@ -6,14 +6,17 @@ const model = {
       name: 'id',
       type: 'integer',
       primary: true,
+      prefix: true,
     },
     {
       name: 'timetable_id',
       type: 'varchar(255)',
+      prefix: true,
     },
     {
       name: 'route_id',
       type: 'varchar(255)',
+      prefix: true,
     },
     {
       name: 'direction_id',

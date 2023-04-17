@@ -5,31 +5,37 @@ const model = {
       name: 'from_stop_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
     {
       name: 'to_stop_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
     {
       name: 'from_route_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
     {
       name: 'to_route_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
     {
       name: 'from_trip_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
     {
       name: 'to_trip_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
     {
       name: 'transfer_type',

@@ -6,10 +6,12 @@ const model = {
       type: 'varchar(255)',
       primary: true,
       required: true,
+      prefix: true,
     },
     {
       name: 'agency_id',
       type: 'varchar(255)',
+      prefix: true,
     },
     {
       name: 'route_short_name',
@@ -68,6 +70,7 @@ const model = {
     {
       name: 'network_id',
       type: 'varchar(255)',
+      prefix: true,
     },
   ],
 };

@@ -8,6 +8,7 @@ const model = {
       type: 'varchar(255)',
       primary: true,
       required: true,
+      prefix: true,
     },
     {
       name: 'ops_location_code',

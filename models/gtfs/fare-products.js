@@ -6,6 +6,7 @@ const model = {
       type: 'varchar(255)',
       required: true,
       primary: true,
+      prefix: true,
     },
     {
       name: 'fare_product_name',
@@ -15,6 +16,7 @@ const model = {
       name: 'fare_media_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
     {
       name: 'amount',

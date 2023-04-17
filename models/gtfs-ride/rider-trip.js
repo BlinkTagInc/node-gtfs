@@ -7,21 +7,25 @@ const model = {
       name: 'rider_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
     {
       name: 'agency_id',
       type: 'varchar(255)',
       index: true,
+      prefix: true,
     },
     {
       name: 'trip_id',
       type: 'varchar(255)',
       index: true,
+      prefix: true,
     },
     {
       name: 'boarding_stop_id',
       type: 'varchar(255)',
       index: true,
+      prefix: true,
     },
     {
       name: 'boarding_stop_sequence',
@@ -33,6 +37,7 @@ const model = {
       name: 'alighting_stop_id',
       type: 'varchar(255)',
       index: true,
+      prefix: true,
     },
     {
       name: 'alighting_stop_sequence',

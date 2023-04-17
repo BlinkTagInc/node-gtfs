@@ -6,16 +6,19 @@ const model = {
       type: 'varchar(255)',
       primary: true,
       required: true,
+      prefix: true,
     },
     {
       name: 'from_stop_id',
       type: 'varchar(255)',
       required: true,
+      prefix: true,
     },
     {
       name: 'to_stop_id',
       type: 'varchar(255)',
       required: true,
+      prefix: true,
     },
     {
       name: 'pathway_mode',

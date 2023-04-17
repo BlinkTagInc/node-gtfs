@@ -7,11 +7,13 @@ const model = {
       name: 'agency_id',
       type: 'varchar(255)',
       index: true,
+      prefix: true,
     },
     {
       name: 'trip_id',
       type: 'varchar(255)',
       index: true,
+      prefix: true,
     },
     {
       name: 'service_date',
