@@ -279,6 +279,23 @@ API along with your API token.
 }
 ```
 
+- When importing multiple agencies their IDs may overlap - specify prefix added to every ID in feed to maintain uniqueness. Provided string will be prepended to every ID in feed, number will be added (number IDs required, otherwise error will be thrown)
+
+```json
+{
+  "agencies": [
+    {
+      "path": "/path/to/the/gtfs.zip",
+      "prefix": "A"
+    },
+    {
+      "path": "/path/to/the/othergtfs.zip",
+      "prefix": 10000
+    }
+  ]
+}
+```
+
 ### csvOptions
 
 {Object} Add options to be passed to [`csv-parse`](https://csv.js.org/parse/) with the key `csvOptions`. This is an optional parameter.
