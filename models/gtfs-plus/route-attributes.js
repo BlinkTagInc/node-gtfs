@@ -7,6 +7,7 @@ const model = {
       name: 'route_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
     {
       name: 'category',

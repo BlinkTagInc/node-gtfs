@@ -7,6 +7,7 @@ const model = {
       name: 'service_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
     {
       name: 'service_description',

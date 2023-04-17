@@ -6,6 +6,7 @@ const model = {
       name: 'timetable_page_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
     {
       name: 'timetable_page_label',

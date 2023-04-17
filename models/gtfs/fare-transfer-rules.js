@@ -5,11 +5,13 @@ const model = {
       name: 'from_leg_group_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
     {
       name: 'to_leg_group_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
     {
       name: 'transfer_count',
@@ -20,6 +22,7 @@ const model = {
     {
       name: 'transfer_id',
       type: 'varchar(255)',
+      prefix: true,
     },
     {
       name: 'duration_limit',
@@ -44,6 +47,7 @@ const model = {
       name: 'fare_product_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
   ],
 };

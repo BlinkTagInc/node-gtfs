@@ -5,26 +5,31 @@ const model = {
     {
       name: 'note_id',
       type: 'varchar(255)',
+      prefix: true,
     },
     {
       name: 'timetable_id',
       type: 'varchar(255)',
       index: true,
+      prefix: true,
     },
     {
       name: 'route_id',
       type: 'varchar(255)',
       index: true,
+      prefix: true,
     },
     {
       name: 'trip_id',
       type: 'varchar(255)',
       index: true,
+      prefix: true,
     },
     {
       name: 'stop_id',
       type: 'varchar(255)',
       index: true,
+      prefix: true,
     },
     {
       name: 'stop_sequence',

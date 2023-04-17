@@ -7,6 +7,7 @@ const model = {
       type: 'varchar(255)',
       required: true,
       index: true,
+      prefix: true,
     },
     {
       name: 'operating_day_date',
