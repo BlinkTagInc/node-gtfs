@@ -506,13 +506,29 @@ Most query methods accept three optional arguments: `query`, `fields`, `sortBy` 
 
 For more advanced queries, you can use `advancedQuery` or raw SQL queries using query method from [better-sqlite3](#raw-sqlite-query).
 
-### Setup
+### Database Setup
 
-To use any of the query methods, first open the database before making any queries:
+To use any of the query methods, first open the database using `openDb` before making any queries:
 
 ```js
 import { openDb } from 'gtfs';
+import { readFile } from 'fs/promises';
+const config = JSON.parse(
+  await readFile(new URL('./config.json', import.meta.url))
+);
 const db = openDb(config);
+```
+
+If you no longer need a database (especially if using an in-memory database) you can use `closeDb`:
+
+```js
+import { closeDb, openDb } from 'gtfs';
+const db = openDb(config);
+
+// Do some stuff here
+
+// Close database connection when done.
+closeDb(db);
 ```
 
 ### Examples
@@ -520,7 +536,7 @@ const db = openDb(config);
 For example, to get a list of all routes with just `route_id`, `route_short_name` and `route_color` sorted by `route_short_name`:
 
 ```js
-import { openDb, getRoutes } from 'gtfs';
+import { closeDb, openDb, getRoutes } from 'gtfs';
 import { readFile } from 'fs/promises';
 const config = JSON.parse(
   await readFile(new URL('./config.json', import.meta.url))
@@ -533,12 +549,14 @@ const routes = getRoutes(
   [['route_short_name', 'ASC']], // Sort by this field and direction
   { db: db } // Options for the query. Can specify which database to use if more than one are open
 );
+
+closeDb(db);
 ```
 
 To get a list of all trip_ids for a specific route:
 
 ```js
-import { openDb, getTrips } from 'gtfs';
+import { closeDb, openDb, getTrips } from 'gtfs';
 import { readFile } from 'fs/promises';
 const config = JSON.parse(
   await readFile(new URL('./config.json', import.meta.url))
@@ -551,12 +569,14 @@ const trips = getTrips(
   },
   ['trip_id']
 );
+
+closeDb(db);
 ```
 
 To get a few stops by specific stop_ids:
 
 ```js
-import { openDb, getStops } from 'gtfs';
+import { closeDb, openDb, getStops } from 'gtfs';
 import { readFile } from 'fs/promises';
 const config = JSON.parse(await readFile(new URL('./config.json', import.meta.url)));
 
@@ -570,6 +590,8 @@ const stops = getStops(
     ]
   }
 );
+
+closeDb(db);
 ```
 
 ### Static GTFS Files
