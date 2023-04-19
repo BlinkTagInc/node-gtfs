@@ -63,16 +63,14 @@ describe('importGtfs():', function () {
       routes.length.should.equal(4);
     });
 
-    it("should throw an error when importing from local filesystem which doesn't exist", async () => {
-      return importGtfs({
-        ...config,
-        agencies: [
-          {
-            path: '/does/not/exist',
-          },
-        ],
-      }).should.be.rejected();
-    });
+    it("should throw an error when importing from local filesystem which doesn't exist", async () => importGtfs({
+      ...config,
+      agencies: [
+        {
+          path: '/does/not/exist',
+        },
+      ],
+    }).should.be.rejected());
   });
 
   describe('Verify data imported into database', () => {

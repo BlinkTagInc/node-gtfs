@@ -47,6 +47,7 @@ const model = {
       name: 'service_id',
       type: 'varchar(255)',
       index: true,
+      prefix: true,
     },
     {
       name: 'monday',
@@ -94,11 +95,13 @@ const model = {
       name: 'agency_id',
       type: 'varchar(255)',
       index: true,
+      prefix: true,
     },
     {
       name: 'route_id',
       type: 'varchar(255)',
       index: true,
+      prefix: true,
     },
     {
       name: 'direction_id',
@@ -110,10 +113,12 @@ const model = {
     {
       name: 'trip_id',
       type: 'varchar(255)',
+      prefix: true,
     },
     {
       name: 'stop_id',
       type: 'varchar(255)',
+      prefix: true,
     },
   ],
 };

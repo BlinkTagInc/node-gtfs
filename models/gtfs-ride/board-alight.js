@@ -8,12 +8,14 @@ const model = {
       type: 'varchar(255)',
       required: true,
       index: true,
+      prefix: true,
     },
     {
       name: 'stop_id',
       type: 'varchar(255)',
       required: true,
       index: true,
+      prefix: true,
     },
     {
       name: 'stop_sequence',

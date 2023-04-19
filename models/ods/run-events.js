@@ -8,11 +8,13 @@ const model = {
       type: 'varchar(255)',
       primary: true,
       required: true,
+      prefix: true,
     },
     {
       name: 'piece_id',
       type: 'varchar(255)',
       required: true,
+      prefix: true,
     },
     {
       name: 'event_type',
@@ -47,6 +49,7 @@ const model = {
     {
       name: 'event_from_location_id',
       type: 'varchar(255)',
+      prefix: true,
     },
     {
       name: 'event_to_location_type',
@@ -58,6 +61,7 @@ const model = {
     {
       name: 'event_to_location_id',
       type: 'varchar(255)',
+      prefix: true,
     },
   ],
 };

@@ -5,6 +5,7 @@ const model = {
       name: 'agency_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
     {
       name: 'agency_name',

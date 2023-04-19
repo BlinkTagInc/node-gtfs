@@ -8,6 +8,7 @@ const model = {
       type: 'varchar(255)',
       required: true,
       primary: true,
+      prefix: true,
     },
     {
       name: 'direction_id',

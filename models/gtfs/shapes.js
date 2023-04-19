@@ -6,6 +6,7 @@ const model = {
       type: 'varchar(255)',
       required: true,
       primary: true,
+      prefix: true,
     },
     {
       name: 'shape_pt_lat',

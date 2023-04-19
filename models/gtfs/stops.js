@@ -6,6 +6,7 @@ const model = {
       type: 'varchar(255)',
       primary: true,
       required: true,
+      prefix: true,
     },
     {
       name: 'stop_code',
@@ -41,6 +42,7 @@ const model = {
     {
       name: 'zone_id',
       type: 'varchar(255)',
+      prefix: true,
     },
     {
       name: 'stop_url',
@@ -70,6 +72,7 @@ const model = {
     {
       name: 'level_id',
       type: 'varchar(255)',
+      prefix: true,
     },
     {
       name: 'platform_code',

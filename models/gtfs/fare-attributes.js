@@ -6,6 +6,7 @@ const model = {
       type: 'varchar(255)',
       required: true,
       primary: true,
+      prefix: true,
     },
     {
       name: 'price',
@@ -33,6 +34,7 @@ const model = {
     {
       name: 'agency_id',
       type: 'varchar(255)',
+      prefix: true,
     },
     {
       name: 'transfer_duration',

@@ -6,18 +6,22 @@ const model = {
       type: 'varchar(255)',
       primary: true,
       required: true,
+      prefix: true,
     },
     {
       name: 'agency_id',
-      type: 'varchar(255)',
+      type: 'varchar(255)',      
+      prefix: true,
     },
     {
       name: 'route_id',
       type: 'varchar(255)',
+      prefix: true,      
     },
     {
       name: 'trip_id',
       type: 'varchar(255)',
+      prefix: true,
     },
     {
       name: 'organization_name',

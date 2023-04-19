@@ -6,6 +6,7 @@ const model = {
       name: 'note_id',
       type: 'varchar(255)',
       primary: true,
+      prefix: true,
     },
     {
       name: 'symbol',
