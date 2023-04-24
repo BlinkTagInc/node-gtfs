@@ -8,7 +8,11 @@ import { rm } from 'node:fs/promises';
 import { parse } from 'csv-parse';
 import should from 'should';
 
-import { unzip, generateFolderName } from '../../lib/file-utils.js';
+import {
+  unzip,
+  generateFolderName,
+  prepDirectory,
+} from '../../lib/file-utils.js';
 import config from '../test-config.js';
 import {
   openDb,
@@ -45,6 +49,7 @@ describe('exportGtfs():', function () {
     );
 
     before(async () => {
+      await prepDirectory(temporaryDir);
       await unzip(config.agencies[0].path, temporaryDir);
 
       await Promise.all(

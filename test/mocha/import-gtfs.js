@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { parse } from 'csv-parse';
 import should from 'should';
 
-import { unzip } from '../../lib/file-utils.js';
+import { prepDirectory, unzip } from '../../lib/file-utils.js';
 import config from '../test-config.js';
 import {
   openDb,
@@ -109,6 +109,7 @@ describe('importGtfs():', function () {
     );
 
     before(async () => {
+      await prepDirectory(temporaryDir);
       await unzip(agenciesFixturesLocal[0].path, temporaryDir);
 
       await Promise.all(
