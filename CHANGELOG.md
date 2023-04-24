@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated Readme to add closeDb documentation
 - Use node-stream-zip instead of unzipper
 
+### Added
+
+- Support for prefixes when importing multiple GTFS files
+
 ## [4.2.0] - 2023-04-13
 
 ### Updated
