@@ -176,11 +176,21 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 
 For GTFS files that contain more than one agency, you only need to list each GTFS file once in the `agencies` array, not once per agency that it contains.
 
-To find an agency's GTFS file, visit [transitfeeds.com](http://transitfeeds.com). You can use the
-URL from the agency's website or you can use a URL generated from the transitfeeds.com
-API along with your API token.
+To find an agency's GTFS file, visit [transitfeeds.com](http://transitfeeds.com).
 
-- Specify a download URL:
+#### agencies options
+
+| option            | type   | description                                                                                                                        |
+| ----------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `url`             | string | The URL to a zipped GTFS file. Required if `path` not present.                                                                     |
+| `path`            | string | A path to a zipped GTFS file or a directory of unzipped .txt files. Required if `url` is not present.                              |
+| `headers`         | object | An object of HTTP headers in key:value format to use when fetching GTFS from the `url` specified. Optional.                        |
+| `prefix`          | string | A prefix to be added to every ID field maintain uniqueness when importing multiple GTFS from multiple agencies. Optional.          |
+| `exclude`         | array  | An array of GTFS file names (without `.txt`) to exclude when importing. Optional.                                                  |
+| `realtimeUrls`    | array  | An array of GTFS-Realtime urls to import. Optional.                                                                                |
+| `realtimeHeaders` | array  | An object of HTTP headers in key:value format to use when fetching GTFS-Realtime data from the `realtimeUrls` specified. Optional. |
+
+- Specify a `url` to download GTFS:
 
 ```json
 {
@@ -192,7 +202,7 @@ API along with your API token.
 }
 ```
 
-- Specify a download URL with custom headers:
+- Specify a download URL with custom headers using the `headers` field:
 
 ```json
 {
@@ -208,7 +218,7 @@ API along with your API token.
 }
 ```
 
-- Specify a path to a zipped GTFS file:
+- Specify a `path` to a zipped GTFS file:
 
 ```json
 {
@@ -220,7 +230,7 @@ API along with your API token.
 }
 ```
 
-- Specify a path to an unzipped GTFS file:
+- Specify a `path` to an unzipped GTFS file:
 
 ```json
 {
@@ -232,7 +242,7 @@ API along with your API token.
 }
 ```
 
-- Exclude files - if you don't want all GTFS files to be imported, you can specify an array of files to exclude.
+- If you don't want all GTFS files to be imported, you can specify an array of files to `exclude`. This can save a lot of time for larger GTFS.
 
 ```json
 {
@@ -279,7 +289,7 @@ API along with your API token.
 }
 ```
 
-- When importing multiple agencies their IDs may overlap - specify prefix added to every ID in feed to maintain uniqueness. Provided string will be prepended to every ID in feed, number will be added (number IDs required, otherwise error will be thrown)
+- When importing multiple agencies their IDs may overlap. Specify a `prefix` to be added to every ID field to maintain uniqueness.
 
 ```json
 {
