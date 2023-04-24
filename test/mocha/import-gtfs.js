@@ -9,7 +9,13 @@ import should from 'should';
 
 import { unzip } from '../../lib/file-utils.js';
 import config from '../test-config.js';
-import { openDb, closeDb, importGtfs, getRoutes } from '../../index.js';
+import {
+  openDb,
+  closeDb,
+  importGtfs,
+  getRoutes,
+  getStops,
+} from '../../index.js';
 import models from '../../models/models.js';
 
 let db;
@@ -63,14 +69,36 @@ describe('importGtfs():', function () {
       routes.length.should.equal(4);
     });
 
-    it("should throw an error when importing from local filesystem which doesn't exist", async () => importGtfs({
-      ...config,
-      agencies: [
-        {
-          path: '/does/not/exist',
-        },
-      ],
-    }).should.be.rejected());
+    it("should throw an error when importing from local filesystem which doesn't exist", async () =>
+      importGtfs({
+        ...config,
+        agencies: [
+          {
+            path: '/does/not/exist',
+          },
+        ],
+      }).should.be.rejected());
+
+    it('should add a prefix to imported data if present in config', async () => {
+      const prefix = 'test-prefix';
+      await importGtfs({
+        ...config,
+        agencies: [
+          {
+            ...agenciesFixturesLocal[0],
+            prefix,
+          },
+        ],
+      });
+
+      const routes = getRoutes();
+      should.exist(routes);
+      routes[0].route_id.should.startWith(prefix);
+
+      const stops = getStops();
+      should.exist(stops);
+      stops[0].stop_id.should.startWith(prefix);
+    });
   });
 
   describe('Verify data imported into database', () => {
