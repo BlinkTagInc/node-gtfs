@@ -81,6 +81,7 @@
     "lodash-es": "^4.17.21",
     "long": "^5.2.1",
     "node-fetch": "^3.3.1",
+    "node-stream-zip": "^1.15.0",
     "pluralize": "^8.0.0",
     "pretty-error": "^4.0.0",
     "promise-map-series": "^0.3.0",
@@ -90,7 +91,6 @@
     "strip-bom-stream": "^5.0.0",
     "tmp-promise": "^3.0.3",
     "untildify": "^4.0.0",
-    "unzipper": "^0.10.11",
     "yargs": "^17.7.1",
     "yoctocolors": "^1.0.0"
   },
