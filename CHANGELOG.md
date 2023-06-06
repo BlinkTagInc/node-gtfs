@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Ignore system directories within zip file
 
+### Updated
+
+- Dependency updates
+
 ## [4.3.0] - 2023-05-04
 
 ### Updated
