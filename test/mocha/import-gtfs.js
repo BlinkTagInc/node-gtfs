@@ -125,8 +125,9 @@ describe('importGtfs():', function () {
           const parser = parse(
             {
               columns: true,
-              relax: true,
+              relax_quotes: true,
               trim: true,
+              skip_empty_lines: true,
             },
             (error, data) => {
               if (error) {
