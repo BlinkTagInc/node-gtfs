@@ -90,7 +90,7 @@
     "sqlstring-sqlite": "^0.1.1",
     "strip-bom-stream": "^5.0.0",
     "tmp-promise": "^3.0.3",
-    "untildify": "^4.0.0",
+    "untildify": "^5.0.0",
     "yargs": "^17.7.2",
     "yoctocolors": "^1.0.0"
   },
