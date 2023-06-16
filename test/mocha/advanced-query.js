@@ -57,14 +57,14 @@ describe('advancedQuery():', () => {
     const results = advancedQuery('stop_times', advancedQueryOptions);
 
     const expectedResults = [
-      { trip_id: '329', arrival_time: '7:56:00' },
-      { trip_id: '329', arrival_time: '8:03:00' },
-      { trip_id: '329', arrival_time: '8:16:00' },
-      { trip_id: '329', arrival_time: '8:27:00' },
-      { trip_id: '329', arrival_time: '8:35:00' },
-      { trip_id: '329', arrival_time: '8:44:00' },
-      { trip_id: '329', arrival_time: '8:52:00' },
-      { trip_id: '329', arrival_time: '9:09:00' },
+      { trip_id: '329', arrival_time: '07:56:00' },
+      { trip_id: '329', arrival_time: '08:03:00' },
+      { trip_id: '329', arrival_time: '08:16:00' },
+      { trip_id: '329', arrival_time: '08:27:00' },
+      { trip_id: '329', arrival_time: '08:35:00' },
+      { trip_id: '329', arrival_time: '08:44:00' },
+      { trip_id: '329', arrival_time: '08:52:00' },
+      { trip_id: '329', arrival_time: '09:09:00' },
     ];
 
     should.exist(results);

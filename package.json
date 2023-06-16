@@ -56,7 +56,8 @@
     "Mike Brocks",
     "Matt Moran",
     "Daniel Sörlöv",
-    "Ali Zarghami <alizarghami@gmail.com>"
+    "Ali Zarghami <alizarghami@gmail.com>",
+    "David Abell"
   ],
   "type": "module",
   "main": "index.js",
