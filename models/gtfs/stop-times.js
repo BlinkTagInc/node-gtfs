@@ -31,6 +31,7 @@ const model = {
       type: 'varchar(255)',
       required: true,
       prefix: true,
+      index: true,
     },
     {
       name: 'stop_sequence',
