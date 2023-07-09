@@ -108,7 +108,7 @@
     "should": "^13.2.3"
   },
   "engines": {
-    "node": ">= 14.17.0"
+    "node": ">= 18.0.0"
   },
   "release-it": {
     "github": {
