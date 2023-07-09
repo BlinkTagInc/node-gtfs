@@ -57,7 +57,8 @@
     "Matt Moran",
     "Daniel Sörlöv",
     "Ali Zarghami <alizarghami@gmail.com>",
-    "David Abell"
+    "David Abell",
+    "Matthias Feist <matze@matf.de>"
   ],
   "type": "module",
   "main": "index.js",
