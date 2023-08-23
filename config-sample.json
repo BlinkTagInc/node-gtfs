@@ -1,7 +1,7 @@
 {
   "agencies": [
     {
-      "url": "~/path/to/my/gtfs"
+      "path": "~/path/to/my/gtfs"
     }
   ],
   "sqlitePath": "/tmp/gtfs"
