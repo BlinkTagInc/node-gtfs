@@ -67,7 +67,7 @@
     "gtfs-import": "bin/gtfs-import.js",
     "gtfsrealtime-update": "bin/gtfsrealtime-update.js"
   },
-  "types": "@types",
+  "types": "@types/index.d.ts",
   "scripts": {
     "test": "NODE_ENV=test mocha ./test/mocha/**/*.js --timeout 2000"
   },
