@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dependency updates
 
+### Fixed
+
+- Exclude agency_id from export if empty
+
 ## [4.5.0] - 2023-08-23
 
 ### Updated
