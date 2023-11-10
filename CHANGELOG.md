@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Updated
 
 - Dependency updates
+- Use path to types file instead of directory in package.json
 
 ### Fixed
 
