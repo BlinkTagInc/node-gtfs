@@ -1,5 +1,5 @@
 const model = {
-  filenameBase: 'stop_times_updates',
+  filenameBase: 'stop_time_updates',
   extension: 'gtfs-realtime',
   schema: [
     {
@@ -7,6 +7,18 @@ const model = {
       type: 'varchar(255)',
       index: true,
       source: 'parent.tripUpdate.trip.tripId',
+      default: null,
+    },
+    {
+      name: 'trip_start_time',
+      type: 'varchar(255)',
+      source: 'parent.tripUpdate.trip.startTime',
+      default: null,
+    },
+    {
+      name: 'direction_id',
+      type: 'integer',
+      source: 'parent.tripUpdate.trip.directionId',
       default: null,
     },
     {
@@ -54,7 +66,13 @@ const model = {
       default: null,
     },
     {
-      name: 'isUpdated',
+      name: 'schedule_relationship',
+      type: 'varchar(255)',
+      source: 'scheduleRelationship',
+      default: null,
+    },
+    {
+      name: 'is_updated',
       type: 'integer',
       required: true,
       min: 0,

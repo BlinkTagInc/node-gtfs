@@ -47,7 +47,7 @@ const model = {
       default: '',
     },
     {
-      name: 'isUpdated',
+      name: 'is_updated',
       type: 'integer',
       required: true,
       min: 0,

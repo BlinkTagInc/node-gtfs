@@ -152,7 +152,7 @@ export function getAgencies(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -162,7 +162,7 @@ export function getAreas(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -172,7 +172,7 @@ export function getAttributions(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -182,7 +182,7 @@ export function getRoutes(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -192,7 +192,7 @@ export function getStops(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -201,7 +201,7 @@ export function getStops(
  */
 export function getStopsAsGeoJSON(
   query?: SqlWhere,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): Promise<FeatureCollection<Geometry, { [name: string]: any }>>;
 
 /**
@@ -211,7 +211,7 @@ export function getStoptimes(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -221,7 +221,7 @@ export function getTrips(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -231,7 +231,7 @@ export function getShapes(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -240,7 +240,7 @@ export function getShapes(
  */
 export function getShapesAsGeoJSON(
   query?: SqlWhere,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): FeatureCollection<Geometry, { [name: string]: any }>;
 
 /**
@@ -250,7 +250,7 @@ export function getCalendars(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -260,7 +260,7 @@ export function getCalendarDates(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -270,7 +270,7 @@ export function getFareAttributes(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -280,7 +280,7 @@ export function getFareLegRules(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -290,7 +290,7 @@ export function getFareProducts(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -300,7 +300,7 @@ export function getFareRules(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -310,7 +310,7 @@ export function getFareTransferRules(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -320,7 +320,7 @@ export function getFeedInfo(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -330,7 +330,7 @@ export function getFrequencies(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -340,7 +340,7 @@ export function getLevels(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -350,7 +350,7 @@ export function getPathways(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -360,7 +360,7 @@ export function getTransfers(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -370,7 +370,7 @@ export function getTranslations(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -380,7 +380,7 @@ export function getStopAreas(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -391,7 +391,7 @@ export function getCalendarAttributes(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -402,7 +402,7 @@ export function getDirections(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -413,7 +413,7 @@ export function getRouteAttributes(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -424,7 +424,7 @@ export function getStopAttributes(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -435,7 +435,7 @@ export function getTimetables(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -446,7 +446,7 @@ export function getTimetableStopOrders(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -457,7 +457,7 @@ export function getTimetablePages(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -468,7 +468,7 @@ export function getTimetableNotes(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -479,7 +479,7 @@ export function getTimetableNotesReferences(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -490,7 +490,7 @@ export function getTripsDatedVehicleJourneys(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -501,7 +501,7 @@ export function getServiceAlerts(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -512,18 +512,18 @@ export function getTripUpdates(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
  * Returns an array of GTFS Realtime stop time updates that match query parameters.
  * This only works if you configure GTFS Realtime import in node-gtfs.
  */
-export function getStopTimesUpdates(
+export function getStopTimeUpdates(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -534,7 +534,7 @@ export function getVehiclePositions(
   query?: SqlWhere,
   fields?: SqlSelect,
   sortBy?: SqlOrderBy,
-  options?: QueryOptions
+  options?: QueryOptions,
 ): SqlResults;
 
 /**
@@ -542,5 +542,5 @@ export function getVehiclePositions(
  */
 export function advancedQuery(
   table?: SqlTableName,
-  advancedQueryOptions?: AdvancedQueryOptions
+  advancedQueryOptions?: AdvancedQueryOptions,
 ): SqlResults;

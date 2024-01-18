@@ -40,7 +40,7 @@ import tripCapacity from '../models/gtfs-ride/trip-capacity.js';
 import rideFeedInfo from './gtfs-ride/ride-feed-info.js';
 
 import tripUpdates from './gtfs-realtime/trip-updates.js';
-import stopTimesUpdates from './gtfs-realtime/stop-times-updates.js';
+import stopTimeUpdates from './gtfs-realtime/stop-time-updates.js';
 import vehiclePositions from './gtfs-realtime/vehicle-positions.js';
 import serviceAlerts from './gtfs-realtime/service-alerts.js';
 import serviceAlertTargets from './gtfs-realtime/service-alert-targets.js';
@@ -90,7 +90,7 @@ const models = [
   ridership,
   tripCapacity,
   tripUpdates,
-  stopTimesUpdates,
+  stopTimeUpdates,
   vehiclePositions,
   serviceAlerts,
   serviceAlertTargets,

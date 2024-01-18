@@ -25,6 +25,25 @@ const model = {
       default: null,
     },
     {
+      name: 'trip_start_time',
+      type: 'varchar(255)',
+      source: 'tripUpdate.trip.startTime',
+      default: null,
+    },
+    {
+      name: 'direction_id',
+      type: 'integer',
+      source: 'tripUpdate.trip.directionId',
+      default: null,
+    },
+    {
+      name: 'route_id',
+      type: 'varchar(255)',
+      index: true,
+      source: 'tripUpdate.trip.routeId',
+      default: null,
+    },
+    {
       name: 'start_date',
       type: 'varchar(255)',
       source: 'tripUpdate.trip.startDate',
@@ -37,7 +56,13 @@ const model = {
       default: null,
     },
     {
-      name: 'isUpdated',
+      name: 'schedule_relationship',
+      type: 'varchar(255)',
+      source: 'tripUpdate.trip.scheduleRelationship',
+      default: null,
+    },
+    {
+      name: 'is_updated',
       type: 'integer',
       required: true,
       min: 0,

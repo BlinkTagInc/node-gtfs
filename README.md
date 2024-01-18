@@ -1189,15 +1189,15 @@ import { getTripUpdates } from 'gtfs';
 const tripUpdates = getTripUpdates();
 ```
 
-#### getStopTimesUpdates(query, fields, sortBy, options)
+#### getStopTimeUpdates(query, fields, sortBy, options)
 
 Returns an array of GTFS Realtime stop time updates that match query parameters. [Details on Stop Time Updates](https://gtfs.org/realtime/feed-entities/trip-updates/#stoptimeupdate)
 
 ```js
-import { getStopTimesUpdates } from 'gtfs';
+import { getStopTimeUpdates } from 'gtfs';
 
-// Get all stop times updates
-const stopTimesUpdates = getStopTimesUpdates();
+// Get all stop time updates
+const stopTimeUpdates = getStopTimeUpdates();
 ```
 
 #### getVehiclePositions(query, fields, sortBy, options)
