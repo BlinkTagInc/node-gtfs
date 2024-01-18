@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added `schedule_relationship`, `trip_start_time`, `direction_id` and `route_id` fields to stop_time_updates and trip_updates tables.
 
+### Updated
+
+- Dependency updates
+
 ## [4.5.1] - 2023-11-09
 
 ### Updated
