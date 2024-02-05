@@ -266,4 +266,73 @@ describe('getStops():', () => {
       );
     }
   });
+
+  it('should return array of stops for specific GPS boundaries', () => {
+    const distance = 100;
+    const stopLatitude = 37.709538;
+    const stopLongitude = -122.401586;
+
+    const results = getStops({
+      stop_lat: stopLatitude,
+      stop_lon: stopLongitude,
+    },
+      [], [], { "boundary_side_m": distance }
+    );
+
+    const expectedResult = [
+      {
+        stop_id: 'ctba',
+        stop_code: null,
+        stop_name: 'Bayshore Caltrain',
+        tts_stop_name: null,
+        stop_desc: null,
+        stop_lat: 37.709544,
+        stop_lon: -122.401318,
+        zone_id: null,
+        stop_url: 'http://www.caltrain.com/stations/bayshorestation.html',
+        location_type: 1,
+        parent_station: null,
+        stop_timezone: null,
+        wheelchair_boarding: 1,
+        level_id: null,
+        platform_code: null
+      }, {
+        stop_id: '70032',
+        stop_code: '70032',
+        stop_name: 'Bayshore Caltrain',
+        tts_stop_name: null,
+        stop_desc: null,
+        stop_lat: 37.709544,
+        stop_lon: -122.40198,
+        zone_id: '1',
+        stop_url: 'http://www.caltrain.com/stations/bayshorestation.html',
+        location_type: 0,
+        parent_station: 'ctba',
+        stop_timezone: null,
+        wheelchair_boarding: 1,
+        level_id: null,
+        platform_code: 'SB'
+      }, {
+        stop_id: '70031',
+        stop_code: '70031',
+        stop_name: 'Bayshore Caltrain',
+        tts_stop_name: null,
+        stop_desc: null,
+        stop_lat: 37.709537,
+        stop_lon: -122.401586,
+        zone_id: '1',
+        stop_url: 'http://www.caltrain.com/stations/bayshorestation.html',
+        location_type: 0,
+        parent_station: 'ctba',
+        stop_timezone: null,
+        wheelchair_boarding: 1,
+        level_id: null,
+        platform_code: 'NB'
+      }
+    ];
+
+    should.exist(results);
+    results.length.should.equal(3);
+    results.should.match(expectedResult);
+  });
 });
