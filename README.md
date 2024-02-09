@@ -737,6 +737,24 @@ const stops = getStops({
 const stops = getStops({
   shape_id: 'cal_sf_tam',
 });
+
+/*
+ * `getStops` allows passing a `bounding_box_side_m` value in the options
+ * parameter object. If included, it will return all stops within a square
+ * bounding box around the `stop_lat` and `stop_lon` parameters passed to
+ * the query using the size in meters specified.
+ */
+const stops = getStops(
+  {
+    stop_lat: 37.58764,
+    stop_lon: -122.36265
+  },
+  [],
+  [],
+  {
+    bounding_box_side_m: 1000
+  }
+);
 ```
 
 #### getStopsAsGeoJSON(query, options)
@@ -753,6 +771,17 @@ const stopsGeojson = getStopsAsGeoJSON();
 const stopsGeojson = getStopsAsGeoJSON({
   route_id: 'Lo-16APR',
 });
+
+// Get all stops within a 1000m bounding box as geoJSON
+const stopsGeojson = getStopsAsGeoJSON(
+  {
+    stop_lat: 37.58764,
+    stop_lon: -122.36265
+  },
+  {
+    bounding_box_side_m: 1000
+  }
+);
 ```
 
 #### getStoptimes(query, fields, sortBy, options)

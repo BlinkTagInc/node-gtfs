@@ -64,4 +64,24 @@ describe('getStopsAsGeoJSON(): ', () => {
     should.exist(geojson.features[0].geometry.coordinates);
     geojson.features[0].geometry.coordinates.length.should.equal(2);
   });
+
+  it('should return geojson with specific stops for bounding box query', () => {
+    const distance = 100;
+    const stopLatitude = 37.709538;
+    const stopLongitude = -122.401586;
+
+    const geojson = getStopsAsGeoJSON(
+      {
+        stop_lat: stopLatitude,
+        stop_lon: stopLongitude,
+      },
+      { bounding_box_side_m: distance },
+    );
+
+    should.exist(geojson);
+    geojson.type.should.equal('FeatureCollection');
+    geojson.features.length.should.equal(2);
+    should.exist(geojson.features[0].geometry.coordinates);
+    geojson.features[0].geometry.coordinates.length.should.equal(2);
+  });
 });

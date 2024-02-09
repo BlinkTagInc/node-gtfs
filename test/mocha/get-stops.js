@@ -92,7 +92,7 @@ describe('getStops():', () => {
         route_id: routeId,
       },
       [],
-      [['stop_id', 'ASC']]
+      [['stop_id', 'ASC']],
     );
 
     const expectedStopIds = [
@@ -127,7 +127,7 @@ describe('getStops():', () => {
     for (const [idx, stop] of results.entries()) {
       expectedStopIds[idx].should.equal(
         stop.stop_id,
-        'The order of stops are expected to be the same'
+        'The order of stops are expected to be the same',
       );
     }
   });
@@ -142,7 +142,7 @@ describe('getStops():', () => {
         direction_id: directionId,
       },
       [],
-      [['stop_id', 'ASC']]
+      [['stop_id', 'ASC']],
     );
 
     const expectedStopIds = [
@@ -165,7 +165,7 @@ describe('getStops():', () => {
     for (const [idx, stop] of results.entries()) {
       expectedStopIds[idx].should.equal(
         stop.stop_id,
-        'The order of stops are expected to be the same'
+        'The order of stops are expected to be the same',
       );
     }
   });
@@ -178,7 +178,7 @@ describe('getStops():', () => {
         trip_id: tripId,
       },
       [],
-      [['stop_id', 'ASC']]
+      [['stop_id', 'ASC']],
     );
 
     const expectedStopIds = [
@@ -213,7 +213,7 @@ describe('getStops():', () => {
     for (const [idx, stop] of results.entries()) {
       expectedStopIds[idx].should.equal(
         stop.stop_id,
-        'The order of stops are expected to be the same'
+        'The order of stops are expected to be the same',
       );
     }
   });
@@ -226,7 +226,7 @@ describe('getStops():', () => {
         shape_id: shapeId,
       },
       [],
-      [['stop_id', 'ASC']]
+      [['stop_id', 'ASC']],
     );
 
     const expectedStopIds = [
@@ -262,21 +262,24 @@ describe('getStops():', () => {
     for (const [idx, stop] of results.entries()) {
       expectedStopIds[idx].should.equal(
         stop.stop_id,
-        'The order of stops are expected to be the same'
+        'The order of stops are expected to be the same',
       );
     }
   });
 
-  it('should return array of stops for specific GPS boundaries', () => {
+  it('should return array of stops for bounding box query', () => {
     const distance = 100;
     const stopLatitude = 37.709538;
     const stopLongitude = -122.401586;
 
-    const results = getStops({
-      stop_lat: stopLatitude,
-      stop_lon: stopLongitude,
-    },
-      [], [], { "boundary_side_m": distance }
+    const results = getStops(
+      {
+        stop_lat: stopLatitude,
+        stop_lon: stopLongitude,
+      },
+      [],
+      [],
+      { bounding_box_side_m: distance },
     );
 
     const expectedResult = [
@@ -295,8 +298,9 @@ describe('getStops():', () => {
         stop_timezone: null,
         wheelchair_boarding: 1,
         level_id: null,
-        platform_code: null
-      }, {
+        platform_code: null,
+      },
+      {
         stop_id: '70032',
         stop_code: '70032',
         stop_name: 'Bayshore Caltrain',
@@ -311,8 +315,9 @@ describe('getStops():', () => {
         stop_timezone: null,
         wheelchair_boarding: 1,
         level_id: null,
-        platform_code: 'SB'
-      }, {
+        platform_code: 'SB',
+      },
+      {
         stop_id: '70031',
         stop_code: '70031',
         stop_name: 'Bayshore Caltrain',
@@ -327,8 +332,8 @@ describe('getStops():', () => {
         stop_timezone: null,
         wheelchair_boarding: 1,
         level_id: null,
-        platform_code: 'NB'
-      }
+        platform_code: 'NB',
+      },
     ];
 
     should.exist(results);
