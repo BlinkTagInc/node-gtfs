@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added `bounding_box_side_m` option to `getStops` and `getStopsAsGeoJSON` to find all stops within a bounding box.
 
+### Updated
+
+- Dependency updates
+
 ## [4.6.0] - 2024-01-17
 
 ### Changed
