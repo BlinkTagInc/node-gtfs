@@ -59,7 +59,8 @@
     "Ali Zarghami <alizarghami@gmail.com>",
     "David Abell",
     "Matthias Feist <matze@matf.de>",
-    "Oliv4945"
+    "Oliv4945",
+    "Kyle Ramey"
   ],
   "type": "module",
   "main": "index.js",
@@ -74,7 +75,7 @@
   },
   "dependencies": {
     "@turf/helpers": "^6.5.0",
-    "better-sqlite3": "^9.4.0",
+    "better-sqlite3": "^9.4.1",
     "csv-parse": "^5.5.3",
     "csv-stringify": "^6.4.5",
     "gtfs-realtime-bindings": "^1.1.1",
@@ -95,7 +96,7 @@
     "yoctocolors": "^1.0.0"
   },
   "devDependencies": {
-    "husky": "^9.0.10",
+    "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "mocha": "^10.3.0",
     "prettier": "^3.2.5",
