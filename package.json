@@ -75,9 +75,9 @@
   },
   "dependencies": {
     "@turf/helpers": "^6.5.0",
-    "better-sqlite3": "^9.4.1",
-    "csv-parse": "^5.5.3",
-    "csv-stringify": "^6.4.5",
+    "better-sqlite3": "^9.4.3",
+    "csv-parse": "^5.5.5",
+    "csv-stringify": "^6.4.6",
     "gtfs-realtime-bindings": "^1.1.1",
     "lodash-es": "^4.17.21",
     "long": "^5.2.3",
@@ -93,7 +93,7 @@
     "tmp-promise": "^3.0.3",
     "untildify": "^5.0.0",
     "yargs": "^17.7.2",
-    "yoctocolors": "^1.0.0"
+    "yoctocolors": "^2.0.0"
   },
   "devDependencies": {
     "husky": "^9.0.11",

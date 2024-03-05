@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Updated
 
-- Show info about ignoreDuplicates option when primary key contraint issue happens
+- Show info about ignoreDuplicates option when primary key constraint issue happens
+- Dependency updates
 
 ## [4.7.1] - 2024-02-18
 
