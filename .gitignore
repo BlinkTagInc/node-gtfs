@@ -6,3 +6,4 @@ gtfs-export
 
 .git
 .DS_Store
+dist/

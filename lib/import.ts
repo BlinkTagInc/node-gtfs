@@ -534,7 +534,7 @@ const importFiles = (task) =>
   mapSeries(
     models,
     (model) =>
-      new Promise((resolve, reject) => {
+      new Promise<void>((resolve, reject) => {
         // Loop through each GTFS file
         // Filter out excluded files from config
         if (task.exclude && task.exclude.includes(model.filenameBase)) {
