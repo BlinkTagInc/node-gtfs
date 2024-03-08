@@ -63,15 +63,23 @@
     "Kyle Ramey"
   ],
   "type": "module",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "files": [
+    "docs/",
+    "dist/",
+    "README.md",
+    "LICENSE.md"
+  ],
   "bin": {
-    "gtfs-export": "bin/gtfs-export.js",
-    "gtfs-import": "bin/gtfs-import.js",
-    "gtfsrealtime-update": "bin/gtfsrealtime-update.js"
+    "gtfs-export": "dist/bin/gtfs-export.js",
+    "gtfs-import": "dist/bin/gtfs-import.js",
+    "gtfsrealtime-update": "dist/bin/gtfsrealtime-update.js"
   },
-  "types": "@types/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "NODE_ENV=test mocha ./test/mocha/**/*.js --timeout 2000"
+    "build": "tsup index.ts --dts --format cjs,esm",
+    "test": "NODE_ENV=test mocha ./test/mocha/**/*.js --timeout 2000",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@turf/helpers": "^6.5.0",
@@ -96,11 +104,14 @@
     "yoctocolors": "^2.0.0"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.9",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "mocha": "^10.3.0",
     "prettier": "^3.2.5",
-    "should": "^13.2.3"
+    "should": "^13.2.3",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.2"
   },
   "engines": {
     "node": ">= 18.0.0"
