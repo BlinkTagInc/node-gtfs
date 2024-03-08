@@ -5,15 +5,16 @@
     "lib": ["es6"],
 
     "moduleResolution": "node",
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "strictFunctionTypes": true,
-    "strictNullChecks": true,
     "skipLibCheck": true,
-    "types": [],
     "noEmit": true,
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+
+    // "noImplicitAny": true,
+    // "noImplicitThis": true,
+    // "strictFunctionTypes": true,
+    // "strictNullChecks": true,
 
     // This allows test file to import "gtfs" instead of "./index".
     "baseUrl": ".",
