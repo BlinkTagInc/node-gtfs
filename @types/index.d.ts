@@ -63,6 +63,11 @@ export interface DbConfig {
    * A path to a SQLite database. Defaults to using an in-memory database.
    */
   sqlitePath?: string;
+
+  /**
+   * A better-sqlite3 database object. If provided, sqlitePath will be ignored.
+   */
+  db?: Database.Database;
 }
 
 export interface ExportConfig extends DbConfig, VerboseConfig {
@@ -114,6 +119,16 @@ export interface ImportConfig extends DbConfig, VerboseConfig {
    * Options passed to csv-parse for parsing GTFS CSV files.
    */
   csvOptions?: CsvParse.Options;
+
+  /**
+   * A timeout in milliseconds for downloading GTFS files. Defaults to no timeout.
+   */
+  downloadTimeout?: number;
+
+  /**
+   * Whether or not to ignore errors during import. Defaults to false.
+   */
+  ignoreErrors?: boolean;
 }
 
 export interface QueryOptions {
