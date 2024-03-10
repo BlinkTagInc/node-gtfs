@@ -30,7 +30,7 @@ const agenciesFixturesLocal = [
   {
     path: path.join(
       path.dirname(fileURLToPath(import.meta.url)),
-      '../fixture/caltrain_20160406.zip'
+      '../fixture/caltrain_20160406.zip',
     ),
   },
 ];
@@ -56,6 +56,18 @@ describe('importGtfs():', function () {
       const routes = getRoutes();
       should.exist(routes);
       routes.length.should.equal(4);
+    });
+
+    it('should be able to download and import from HTTP with a downloadTimeout', async () => {
+      try {
+        await importGtfs({
+          ...config,
+          agencies: agenciesFixturesRemote,
+          downloadTimeout: 1,
+        });
+      } catch (error) {
+        error.name.should.equal('AbortError');
+      }
     });
 
     it('should be able to download and import from local filesystem', async () => {
@@ -105,7 +117,7 @@ describe('importGtfs():', function () {
     const countData = {};
     const temporaryDir = path.join(
       path.dirname(fileURLToPath(import.meta.url)),
-      '../fixture/tmp/'
+      '../fixture/tmp/',
     );
 
     before(async () => {
@@ -135,7 +147,7 @@ describe('importGtfs():', function () {
               }
 
               countData[model.filenameBase] = data.length;
-            }
+            },
           );
 
           return createReadStream(filePath)
@@ -144,7 +156,7 @@ describe('importGtfs():', function () {
               countData[model.collection] = 0;
               throw new Error(error);
             });
-        })
+        }),
       );
 
       await importGtfs({
