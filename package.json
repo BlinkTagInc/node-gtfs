@@ -60,7 +60,8 @@
     "David Abell",
     "Matthias Feist <matze@matf.de>",
     "Oliv4945",
-    "Kyle Ramey"
+    "Kyle Ramey",
+    "Anton Bracke"
   ],
   "type": "module",
   "main": "index.js",

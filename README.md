@@ -161,14 +161,17 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 
     cp config-sample.json config.json
 
-| option                                  | type    | description                                                                                                                            |
-| --------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| [`agencies`](#agencies)                 | array   | An array of GTFS files to be imported, and which files to exclude.                                                                     |
-| [`csvOptions`](#csvOptions)             | object  | Options passed to `csv-parse` for parsing GTFS CSV files. Optional.                                                                    |
-| [`exportPath`](#exportPath)             | string  | A path to a directory to put exported GTFS files. Optional, defaults to `gtfs-export/<agency_name>`.                                   |
-| [`ignoreDuplicates`](#ignoreduplicates) | boolean | Whether or not to ignore unique constraints on ids when importing GTFS, such as `trip_id`, `calendar_id`. Optional, defaults to false. |
-| [`sqlitePath`](#sqlitePath)             | string  | A path to an SQLite database. Optional, defaults to using an in-memory database.                                                       |
-| [`verbose`](#verbose)                   | boolean | Whether or not to print output to the console. Optional, defaults to true.                                                             |
+| option                                  | type              | description                                                                                                                                                         |
+| --------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`agencies`](#agencies)                 | array             | An array of GTFS files to be imported, and which files to exclude.                                                                                                  |
+| [`csvOptions`](#csvOptions)             | object            | Options passed to `csv-parse` for parsing GTFS CSV files. Optional.                                                                                                 |
+| [`db`](#db)                             | database instance | An existing database instance to use instead of relying on node-gtfs to connect. Optional.                                                                         |
+| [`downloadTimeout`](#downloadtimeout)   | integer           | The number of milliseconds to wait before throwing an error when downloading GTFS. Optional.                                                                        |
+| [`exportPath`](#exportPath)             | string            | A path to a directory to put exported GTFS files. Optional, defaults to `gtfs-export/<agency_name>`.                                                                |
+| [`ignoreDuplicates`](#ignoreduplicates) | boolean           | Whether or not to ignore unique constraints on ids when importing GTFS, such as `trip_id`, `calendar_id`. Optional, defaults to false.                              |
+| [`ignoreErrors`](#ignoreerrors)         | boolean           | Whether or not to ignore errors during the import process. If true, when importing multiple agencies, failed agencies will be skipped. Optional, defaults to false. |
+| [`sqlitePath`](#sqlitePath)             | string            | A path to an SQLite database. Optional, defaults to using an in-memory database.                                                                                    |
+| [`verbose`](#verbose)                   | boolean           | Whether or not to print output to the console. Optional, defaults to true.                                                                                          |
 
 ### agencies
 
@@ -320,6 +323,60 @@ For instance, if you wanted to skip importing invalid lines in the GTFS file:
 
 See [full list of options](https://csv.js.org/parse/options/).
 
+### db
+
+{Database Instance} When passing configuration to `importGtfs` in javascript, you can pass a `db` parameter with an existing database instance. This is not possible using a json configuration file Optional.
+
+```js
+// Using better-sqlite3 to open database
+import { importGtfs } from 'gtfs';
+import Database from 'better-sqlite3';
+
+const db = new Database('/path/to/database');
+
+importGtfs({
+  agencies: [
+    {
+      path: '/path/to/the/unzipped/gtfs/',
+    },
+  ],
+  db: db,
+});
+```
+
+```js
+// Using `openDb` from node-gtfs to open database
+import { importGtfs, openDb } from 'gtfs';
+
+const db = openDb({
+  sqlitePath: '/path/to/database',
+});
+
+importGtfs({
+  agencies: [
+    {
+      path: '/path/to/the/unzipped/gtfs/',
+    },
+  ],
+  db: db,
+});
+```
+
+### downloadTimeout
+
+{Integer} A number of milliseconds to wait when downloading GTFS before throwing an error. Optional.
+
+```json
+{
+  "agencies": [
+    {
+      "path": "/path/to/the/unzipped/gtfs/"
+    }
+  ],
+  "downloadTimeout": 5000
+}
+```
+
 ### exportPath
 
 {String} A path to a directory to put exported GTFS files. If the directory does not exist, it will be created. Used when running `gtfs-export` script or `exportGtfs()`. Optional, defaults to `gtfs-export/<agency_name>` where `<agency_name>` is a sanitized, [snake-cased](https://en.wikipedia.org/wiki/Snake_case) version of the first `agency_name` in `agency.txt`.
@@ -347,6 +404,21 @@ See [full list of options](https://csv.js.org/parse/options/).
     }
   ],
   "ignoreDuplicates": false
+}
+```
+
+### ignoreErrors
+
+{Boolean} When importing GTFS from multiple agencies, if you don't want node-GTFS to throw an error and instead skip failed GTFS importants proceed to the next agency. Defaults to `false`.
+
+```json
+{
+  "agencies": [
+    {
+      "path": "/path/to/the/unzipped/gtfs/"
+    }
+  ],
+  "ignoreErrors": true
 }
 ```
 
