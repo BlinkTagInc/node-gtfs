@@ -5,7 +5,7 @@ import { hideBin } from 'yargs/helpers';
 
 import { getConfig } from '../lib/file-utils.js';
 import { formatError } from '../lib/log-utils.js';
-import { importGtfs } from '../lib/gtfs.js';
+import { closeDb, importGtfs, openDb } from '../lib/gtfs.js';
 
 const { argv } = yargs(hideBin(process.argv))
   .usage('Usage: $0 --configPath ./config.json')
@@ -38,6 +38,11 @@ const handleError = (error) => {
 const setupImport = async () => {
   const config = await getConfig(argv);
   await importGtfs(config);
+
+  const db = openDb(config);
+  if (db.name !== ':memory:') {
+    closeDb(db);
+  }
   process.exit();
 };
 
