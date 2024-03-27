@@ -2,7 +2,6 @@
 /* eslint-disable max-nested-callbacks */
 
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { createReadStream, existsSync } from 'node:fs';
 import { rm } from 'node:fs/promises';
 import { parse } from 'csv-parse';
@@ -43,10 +42,7 @@ describe('exportGtfs():', function () {
 
   describe('Verify data exported', () => {
     const countData = {};
-    const temporaryDir = path.join(
-      path.dirname(fileURLToPath(import.meta.url)),
-      '../fixture/tmp/'
-    );
+    const temporaryDir = path.join(import.meta.dirname, '../fixture/tmp/');
 
     before(async () => {
       await prepDirectory(temporaryDir);
@@ -75,7 +71,7 @@ describe('exportGtfs():', function () {
               }
 
               countData[model.filenameBase] = data.length;
-            }
+            },
           );
 
           return createReadStream(filePath)
@@ -84,7 +80,7 @@ describe('exportGtfs():', function () {
               countData[model.collection] = 0;
               throw new Error(error);
             });
-        })
+        }),
       );
 
       await importGtfs(config);
@@ -96,9 +92,9 @@ describe('exportGtfs():', function () {
         path.join(
           process.cwd(),
           'gtfs-export',
-          generateFolderName(agencies[0].agency_name)
+          generateFolderName(agencies[0].agency_name),
         ),
-        { recursive: true, force: true }
+        { recursive: true, force: true },
       );
     });
 
@@ -109,7 +105,7 @@ describe('exportGtfs():', function () {
           process.cwd(),
           'gtfs-export',
           generateFolderName(agencies[0].agency_name),
-          `${model.filenameBase}.txt`
+          `${model.filenameBase}.txt`,
         );
 
         // GTFS has optional files
@@ -134,7 +130,7 @@ describe('exportGtfs():', function () {
             should.not.exist(error);
 
             data.length.should.equal(countData[model.filenameBase]);
-          }
+          },
         );
 
         return createReadStream(filePath)

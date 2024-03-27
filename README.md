@@ -84,9 +84,10 @@ or
 ```js
 import { importGtfs } from 'gtfs';
 import { readFile } from 'fs/promises';
+import path from 'node:path';
 
 const config = JSON.parse(
-  await readFile(new URL('./config.json', import.meta.url))
+  await readFile(path.join(import.meta.dirname, 'config.json'))
 );
 
 try {
@@ -485,9 +486,10 @@ Use `importGtfs()` in your code to run an import of a GTFS file specified in a c
 ```js
 import { importGtfs } from 'gtfs';
 import { readFile } from 'fs/promises';
+import path from 'node:path';
 
 const config = JSON.parse(
-  await readFile(new URL('./config.json', import.meta.url))
+  await readFile(path.join(import.meta.dirname, 'config.json'))
 );
 
 await importGtfs(config);
@@ -530,9 +532,10 @@ Use `updateGtfsRealtime()` in your code to run an update of a GTFS-Realtime data
 ```js
 import { updateGtfsRealtime } from 'gtfs';
 import { readFile } from 'fs/promises';
+import path from 'node:path';
 
 const config = JSON.parse(
-  await readFile(new URL('./config.json', import.meta.url))
+  await readFile(path.join(import.meta.dirname, 'config.json'))
 );
 
 await updateGtfsRealtime(config);
@@ -612,9 +615,12 @@ To use any of the query methods, first open the database using `openDb` before m
 ```js
 import { openDb } from 'gtfs';
 import { readFile } from 'fs/promises';
+import path from 'node:path';
+
 const config = JSON.parse(
-  await readFile(new URL('./config.json', import.meta.url))
+  await readFile(path.join(import.meta.dirname, 'config.json'))
 );
+
 const db = openDb(config);
 ```
 
@@ -637,8 +643,10 @@ For example, to get a list of all routes with just `route_id`, `route_short_name
 ```js
 import { closeDb, openDb, getRoutes } from 'gtfs';
 import { readFile } from 'fs/promises';
+import path from 'node:path';
+
 const config = JSON.parse(
-  await readFile(new URL('./config.json', import.meta.url))
+  await readFile(path.join(import.meta.dirname, 'config.json'))
 );
 
 const db = openDb(config);
@@ -657,8 +665,10 @@ To get a list of all trip_ids for a specific route:
 ```js
 import { closeDb, openDb, getTrips } from 'gtfs';
 import { readFile } from 'fs/promises';
+import path from 'node:path';
+
 const config = JSON.parse(
-  await readFile(new URL('./config.json', import.meta.url))
+  await readFile(path.join(import.meta.dirname, 'config.json'))
 );
 
 const db = openDb(config);
@@ -677,8 +687,11 @@ To get a few stops by specific stop_ids:
 ```js
 import { closeDb, openDb, getStops } from 'gtfs';
 import { readFile } from 'fs/promises';
-const config = JSON.parse(await readFile(new URL('./config.json', import.meta.url)));
+import path from 'node:path';
 
+const config = JSON.parse(
+  await readFile(path.join(import.meta.dirname, 'config.json'))
+);
 const db = openDb(config);
 const stops = getStops(
   {

@@ -3,7 +3,6 @@
 
 import { createReadStream, existsSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { parse } from 'csv-parse';
 import should from 'should';
 
@@ -28,10 +27,7 @@ const agenciesFixturesRemote = [
 
 const agenciesFixturesLocal = [
   {
-    path: path.join(
-      path.dirname(fileURLToPath(import.meta.url)),
-      '../fixture/caltrain_20160406.zip',
-    ),
+    path: path.join(import.meta.dirname, '../fixture/caltrain_20160406.zip'),
   },
 ];
 
@@ -115,10 +111,7 @@ describe('importGtfs():', function () {
 
   describe('Verify data imported into database', () => {
     const countData = {};
-    const temporaryDir = path.join(
-      path.dirname(fileURLToPath(import.meta.url)),
-      '../fixture/tmp/',
-    );
+    const temporaryDir = path.join(import.meta.dirname, '../fixture/tmp/');
 
     before(async () => {
       await prepDirectory(temporaryDir);
