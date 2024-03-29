@@ -25,4 +25,4 @@ describe('getTimeframes():', () => {
     should.exists(results);
     results.should.have.length(0);
   });
-})
+});

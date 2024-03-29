@@ -25,6 +25,18 @@ const model = {
       prefix: true,
     },
     {
+      name: 'from_timeframe_group_id',
+      type: 'varchar(255)',
+      primary: true,
+      prefix: true,
+    },
+    {
+      name: 'to_timeframe_group_id',
+      type: 'varchar(255)',
+      primary: true,
+      prefix: true,
+    },
+    {
       name: 'fare_product_id',
       type: 'varchar(255)',
       required: true,
