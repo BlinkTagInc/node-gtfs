@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Updated
+
+- Dependency updates
+
+## [4.10.0] - 2024-03-29
+
 ### Added
 
 - Support for [fare_media.txt](https://gtfs.org/schedule/reference/#fare_mediatxt)
