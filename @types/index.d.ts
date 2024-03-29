@@ -369,6 +369,16 @@ export function getPathways(
 ): SqlResults;
 
 /**
+ * Returns an array of timeframes that match query parameters.
+ */
+export function getTimeframes(
+  query?: SqlWhere,
+  fields?: SqlSelect,
+  sortBy?: SqlOrderBy,
+  options?: QueryOptions,
+): SqlResults;
+
+/**
  * Returns an array of transfers that match query parameters.
  */
 export function getTransfers(
