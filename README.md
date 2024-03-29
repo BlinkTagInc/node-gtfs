@@ -1144,6 +1144,17 @@ import { getPathways } from 'gtfs';
 const pathways = getPathways();
 ```
 
+#### getTimeframes(query, fields, sortBy, options)
+
+Returns an array of timeframes that match query parameters. [Details on levels.txt](https://gtfs.org/schedule/reference/#timeframestxt)
+
+```js
+import { getTimeframes } from 'gtfs';
+
+// Get all timeframes
+const levels = getTimeframes();
+```
+
 #### getTransfers(query, fields, sortBy, options)
 
 Returns an array of transfers that match query parameters. [Details on transfers.txt](https://gtfs.org/schedule/reference/#transferstxt)

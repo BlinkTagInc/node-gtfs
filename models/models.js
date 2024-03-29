@@ -17,6 +17,7 @@ import shapes from '../models/gtfs/shapes.js';
 import stopAreas from '../models/gtfs/stop-areas.js';
 import stopTimes from '../models/gtfs/stop-times.js';
 import stops from '../models/gtfs/stops.js';
+import timeframes from '../models/gtfs/timesframes.js';
 import transfers from '../models/gtfs/transfers.js';
 import translations from '../models/gtfs/translations.js';
 import trips from '../models/gtfs/trips.js';
@@ -71,6 +72,7 @@ const models = [
   stopAreas,
   stopTimes,
   stops,
+  timeframes,
   transfers,
   translations,
   trips,
