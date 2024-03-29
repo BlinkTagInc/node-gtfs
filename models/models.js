@@ -5,6 +5,7 @@ import calendarDates from '../models/gtfs/calendar-dates.js';
 import calendar from '../models/gtfs/calendar.js';
 import fareAttributes from '../models/gtfs/fare-attributes.js';
 import fareLegRules from '../models/gtfs/fare-leg-rules.js';
+import fareMedia from '../models/gtfs/fare-media.js';
 import fareProducts from '../models/gtfs/fare-products.js';
 import fareRules from '../models/gtfs/fare-rules.js';
 import fareTransferRules from '../models/gtfs/fare-transfer-rules.js';
@@ -60,6 +61,7 @@ const models = [
   calendar,
   fareAttributes,
   fareLegRules,
+  fareMedia,
   fareProducts,
   fareRules,
   fareTransferRules,

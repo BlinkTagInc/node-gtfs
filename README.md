@@ -1060,6 +1060,22 @@ const fareLegRules = getFareLegRules({
 });
 ```
 
+#### getFareMedia(query, fields, sortBy, options)
+
+Returns an array of fare_media that match query parameters. [Details on fare_media.txt](https://gtfs.org/schedule/reference/#fare_mediatxt)
+
+```js
+import { getFareMedia } from 'gtfs';
+
+// Get all fare media
+const getFareMedia = getFareMedia();
+
+// Get a specific fare media
+const fareMedia = getFareMedia({
+  fare_media_id: 'media1',
+});
+```
+
 #### getFareProducts(query, fields, sortBy, options)
 
 Returns an array of fare_products that match query parameters. [Details on fare_products.txt](https://gtfs.org/schedule/reference/#fare_productstxt)

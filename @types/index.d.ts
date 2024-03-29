@@ -299,6 +299,16 @@ export function getFareLegRules(
 ): SqlResults;
 
 /**
+ * Returns an array of fare_media that match query parameters.
+ */
+export function getFareMedia(
+  query?: SqlWhere,
+  fields?: SqlSelect,
+  sortBy?: SqlOrderBy,
+  options?: QueryOptions,
+): SqlResults;
+
+/**
  * Returns an array of fare_products that match query parameters.
  */
 export function getFareProducts(
