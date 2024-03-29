@@ -419,6 +419,26 @@ export function getStopAreas(
 ): SqlResults;
 
 /**
+ * Returns an array of networks that match query parameters.
+ */
+export function getNetworks(
+  query?: SqlWhere,
+  fields?: SqlSelect,
+  sortBy?: SqlOrderBy,
+  options?: QueryOptions,
+): SqlResults;
+
+/**
+ * Returns an array of route_networks that match query parameters.
+ */
+export function getRouteNetworks(
+  query?: SqlWhere,
+  fields?: SqlSelect,
+  sortBy?: SqlOrderBy,
+  options?: QueryOptions,
+): SqlResults;
+
+/**
  * Returns an array of calendar_attributes that match query parameters.
  * This is for the non-standard `calendar_attributes.txt` file.
  */

@@ -9,8 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support for [timeframes.txt](https://gtfs.org/schedule/reference/#timeframestxt)
 - Support for [fare_media.txt](https://gtfs.org/schedule/reference/#fare_mediatxt)
+- Support for [networks.txt](https://gtfs.org/schedule/reference/#networkstxt)
+- Support for [route_networks.txt](https://gtfs.org/schedule/reference/#route_networkstxt)
+- Support for [timeframes.txt](https://gtfs.org/schedule/reference/#timeframestxt)
 
 ## [4.9.0] - 2024-03-12
 

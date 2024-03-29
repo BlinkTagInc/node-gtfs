@@ -1222,6 +1222,38 @@ import { getStopAreas } from 'gtfs';
 const stopAreas = getStopAreas();
 ```
 
+#### getNetworks(query, fields, sortBy, options)
+
+Returns an array of networks that match query parameters. [Details on networks.txt](https://gtfs.org/schedule/reference/#networkstxt)
+
+```js
+import { getNetworks } from 'gtfs';
+
+// Get all networks
+const networks = getNetworks();
+
+// Get networks for a specific network_id
+const networks = getNetworks({
+  network_id: '1234',
+});
+```
+
+#### getRouteNetworks(query, fields, sortBy, options)
+
+Returns an array of route_networks that match query parameters. [Details on route_networks.txt](https://gtfs.org/schedule/reference/#route_networkstxt)
+
+```js
+import { getRouteNetworks } from 'gtfs';
+
+// Get all route_networks
+const routeNetworks = getRouteNetworks();
+
+// Get route_networks for a specific network_id
+const routeNetworks = getRouteNetworks({
+  network_id: '1234',
+});
+```
+
 ### GTFS-Timetables files
 
 #### getTimetables(query, fields, sortBy, options)

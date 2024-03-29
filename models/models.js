@@ -12,7 +12,9 @@ import fareTransferRules from '../models/gtfs/fare-transfer-rules.js';
 import feedInfo from '../models/gtfs/feed-info.js';
 import frequencies from '../models/gtfs/frequencies.js';
 import levels from '../models/gtfs/levels.js';
+import networks from '../models/gtfs/networks.js';
 import pathways from '../models/gtfs/pathways.js';
+import routeNetworks from '../models/gtfs/route-networks.js';
 import routes from '../models/gtfs/routes.js';
 import shapes from '../models/gtfs/shapes.js';
 import stopAreas from '../models/gtfs/stop-areas.js';
@@ -68,7 +70,9 @@ const models = [
   feedInfo,
   frequencies,
   levels,
+  networks,
   pathways,
+  routeNetworks,
   routes,
   shapes,
   stopAreas,
