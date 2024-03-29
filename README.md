@@ -1147,6 +1147,7 @@ const pathways = getPathways();
 #### getTimeframes(query, fields, sortBy, options)
 
 Returns an array of timeframes that match query parameters. [Details on levels.txt](https://gtfs.org/schedule/reference/#timeframestxt)
+Returns an array of timeframes that match query parameters. [Details on timeframes.txt](https://gtfs.org/schedule/reference/#timeframestxt)
 
 ```js
 import { getTimeframes } from 'gtfs';
