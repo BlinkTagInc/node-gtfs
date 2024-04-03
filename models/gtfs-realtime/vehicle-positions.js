@@ -40,6 +40,12 @@ const model = {
       default: null,
     },
     {
+      name: 'current_stop_sequence',
+      type: 'integer',
+      source: 'vehicle.currentStopSequence',
+      default: null,
+    },
+    {
       name: 'trip_id',
       type: 'varchar(255)',
       index: true,
@@ -47,10 +53,42 @@ const model = {
       default: null,
     },
     {
+      name: 'trip_start_date',
+      type: 'varchar(255)',
+      index: true,
+      source: 'vehicle.trip.startDate',
+      default: null,
+    },
+    {
+      name: 'trip_start_time',
+      type: 'varchar(255)',
+      index: true,
+      source: 'vehicle.trip.startTime',
+      default: null,
+    },
+    {
       name: 'vehicle_id',
       type: 'varchar(255)',
       index: true,
       source: 'vehicle.vehicle.id',
+      default: null,
+    },
+    {
+      name: 'congestion_level',
+      type: 'varchar(255)',
+      source: 'vehicle.congestionLevel',
+      default: null,
+    },
+    {
+      name: 'occupancy_status',
+      type: 'varchar(255)',
+      source: 'vehicle.occupancyStatus',
+      default: null,
+    },
+    {
+      name: 'occupancy_percentage',
+      type: 'integer',
+      source: 'vehicle.occupancyPercentage',
       default: null,
     },
     {

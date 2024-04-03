@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Better error message for `gtfsrealtime-update` command
+- Support additional fields for vehiclePosition GTFS-Realtime data
 
 ## [4.10.1] - 2024-03-29
 
