@@ -67,13 +67,6 @@ const model = {
       default: null,
     },
     {
-      name: 'vehicle_id',
-      type: 'varchar(255)',
-      index: true,
-      source: 'vehicle.vehicle.id',
-      default: null,
-    },
-    {
       name: 'congestion_level',
       type: 'varchar(255)',
       source: 'vehicle.congestionLevel',
@@ -89,6 +82,37 @@ const model = {
       name: 'occupancy_percentage',
       type: 'integer',
       source: 'vehicle.occupancyPercentage',
+      default: null,
+    },
+    {
+      name: 'vehicle_stop_status',
+      type: 'varchar(255)',
+      source: 'vehicle.vehicleStopStatus',
+      default: null,
+    },
+    {
+      name: 'vehicle_id',
+      type: 'varchar(255)',
+      index: true,
+      source: 'vehicle.vehicle.id',
+      default: null,
+    },
+    {
+      name: 'vehicle_label',
+      type: 'varchar(255)',
+      source: 'vehicle.vehicle.label',
+      default: null,
+    },
+    {
+      name: 'vehicle_license_plate',
+      type: 'varchar(255)',
+      source: 'vehicle.vehicle.licensePlate',
+      default: null,
+    },
+    {
+      name: 'vehicle_wheelchair_accessible',
+      type: 'varchar(255)',
+      source: 'vehicle.vehicle.wheelchairAccessible',
       default: null,
     },
     {
