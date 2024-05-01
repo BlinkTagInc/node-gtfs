@@ -1338,11 +1338,13 @@ const timetableNotesReferences = getTimetableNotesReferences({
 
 ### GTFS-Realtime
 
-In order to use GTFS-Realtime query methods, you must first configure GTFS Realtime import in node-gtfs
+In order to use GTFS-Realtime query methods, you must first run the [GTFS-Realtime update script or function](#gtfsrealtime-update-script) to pull data into your database.
 
 #### getServiceAlerts(query, fields, sortBy, options)
 
-Returns an array of GTFS Realtime service alerts that match query parameters. [Details on Service Alerts](https://gtfs.org/realtime/feed-entities/service-alerts/)
+Returns an array of GTFS Realtime service alerts that match query parameters. Note that this does not refresh the data from GTFS-Realtime feeds, it only fetches what is stored in the database. In order to fetch the latest service alerts from GTFS-Realtime feeds and store in your database, use the [GTFS-Realtime update script or function](#gtfsrealtime-update-script).
+
+[More details on Service Alerts](https://gtfs.org/realtime/feed-entities/service-alerts/)
 
 ```js
 import { getServiceAlerts } from 'gtfs';
@@ -1353,7 +1355,9 @@ const serviceAlerts = getServiceAlerts();
 
 #### getTripUpdates(query, fields, sortBy, options)
 
-Returns an array of GTFS Realtime trip updates that match query parameters. [Details on Trip Updates](https://gtfs.org/realtime/feed-entities/trip-updates/)
+Returns an array of GTFS Realtime trip updates that match query parameters. Note that this does not refresh the data from GTFS-Realtime feeds, it only fetches what is stored in the database. In order to fetch the latest trip updates from GTFS-Realtime feeds and store in your database, use the [GTFS-Realtime update script or function](#gtfsrealtime-update-script).
+
+[More details on Trip Updates](https://gtfs.org/realtime/feed-entities/trip-updates/)
 
 ```js
 import { getTripUpdates } from 'gtfs';
@@ -1364,7 +1368,9 @@ const tripUpdates = getTripUpdates();
 
 #### getStopTimeUpdates(query, fields, sortBy, options)
 
-Returns an array of GTFS Realtime stop time updates that match query parameters. [Details on Stop Time Updates](https://gtfs.org/realtime/feed-entities/trip-updates/#stoptimeupdate)
+Returns an array of GTFS Realtime stop time updates that match query parameters. Note that this does not refresh the data from GTFS-Realtime feeds, it only fetches what is stored in the database. In order to fetch the latest stop time updates from GTFS-Realtime feeds and store in your database, use the [GTFS-Realtime update script or function](#gtfsrealtime-update-script).
+
+[More details on Stop Time Updates](https://gtfs.org/realtime/feed-entities/trip-updates/#stoptimeupdate)
 
 ```js
 import { getStopTimeUpdates } from 'gtfs';
@@ -1375,7 +1381,9 @@ const stopTimeUpdates = getStopTimeUpdates();
 
 #### getVehiclePositions(query, fields, sortBy, options)
 
-Returns an array of GTFS Realtime vehicle positions that match query parameters. [Details on Vehicle Positions](https://gtfs.org/realtime/feed-entities/vehicle-positions/)
+Returns an array of GTFS Realtime vehicle positions that match query parameters. Note that this does not refresh the data from GTFS-Realtime feeds, it only fetches what is stored in the database. In order to fetch the latest vehicle positions from GTFS-Realtime feeds and store in your database, use the [GTFS-Realtime update script or function](#gtfsrealtime-update-script).
+
+[More details on Vehicle Positions](https://gtfs.org/realtime/feed-entities/vehicle-positions/)
 
 ```js
 import { getVehiclePositions } from 'gtfs';
