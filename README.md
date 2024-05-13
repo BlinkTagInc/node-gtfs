@@ -636,6 +636,20 @@ const db = openDb(config);
 closeDb(db);
 ```
 
+### Deleting a Database
+
+You can use `deleteDb` to delete a sqlite3 database from the filesystem.
+
+```js
+import { deleteDb, openDb } from 'gtfs';
+const db = openDb(config);
+
+// Do some stuff here
+
+// Delete the database
+deleteDb(db);
+```
+
 ### Examples
 
 For example, to get a list of all routes with just `route_id`, `route_short_name` and `route_color` sorted by `route_short_name`:

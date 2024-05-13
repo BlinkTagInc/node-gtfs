@@ -161,6 +161,11 @@ export function openDb(config: DbConfig): Database.Database;
 export function closeDb(db?: Database.Database): void;
 
 /**
+ * Deletes the specified database.
+ */
+export function deleteDb(db?: Database.Database): void;
+
+/**
  * Returns an array of agencies that match query parameters.
  */
 export function getAgencies(
