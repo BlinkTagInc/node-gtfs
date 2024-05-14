@@ -2,10 +2,13 @@
 
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
+import PrettyError from 'pretty-error';
 
 import { getConfig } from '../lib/file-utils.js';
 import { formatError } from '../lib/log-utils.js';
 import { exportGtfs } from '../lib/gtfs.js';
+
+const pe = new PrettyError();
 
 const { argv } = yargs(hideBin(process.argv))
   .usage('Usage: $0 --configPath ./config.json')
@@ -26,6 +29,7 @@ const { argv } = yargs(hideBin(process.argv))
 
 const handleError = (error = 'Unknown Error') => {
   process.stdout.write(`\n${formatError(error)}\n`);
+  console.error(pe.render(error));
   process.exit(1);
 };
 
