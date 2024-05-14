@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Improved error messages
 - Don't use pretty-error globally
+- Dependency updates
 
 ## [4.10.3] - 2024-05-12
 
