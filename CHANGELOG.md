@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Support for [GTFS Flex](https://mobilitydata.org/🎉-gtfs-flex-is-officially-adopted-everything-you-need-to-know/)
+- Support for [booking_rules.txt](https://gtfs.org/schedule/reference/#booking_rulestxt)
+- Support for [location_groups.txt](https://gtfs.org/schedule/reference/#location_groupstxt)
+- Support for [location_group_stops.txt](https://gtfs.org/schedule/reference/#location_group_stopstxt)
+- Add `rule_priority` field to `fare_leg_rules.txt`
+
 ## [4.10.4] - 2024-05-14
 
 ### Updated

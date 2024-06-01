@@ -43,6 +43,11 @@ const model = {
       primary: true,
       prefix: true,
     },
+    {
+      name: 'rule_priority',
+      type: 'integer',
+      min: 0,
+    },
   ],
 };
 

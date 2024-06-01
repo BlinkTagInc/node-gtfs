@@ -27,6 +27,18 @@ const model = {
       index: true,
     },
     {
+      name: 'location_group_id',
+      type: 'varchar(255)',
+      prefix: true,
+      index: true,
+    },
+    {
+      name: 'location_id',
+      type: 'varchar(255)',
+      prefix: true,
+      index: true,
+    },
+    {
       name: 'stop_id',
       type: 'varchar(255)',
       required: true,
@@ -44,6 +56,15 @@ const model = {
       name: 'stop_headsign',
       type: 'varchar(255)',
       nocase: true,
+    },
+    {
+      name: 'start_pickup_drop_off_window',
+      type: 'varchar(255)',
+    },
+    {
+      name: 'start_pickup_drop_off_window_timestamp',
+      type: 'integer',
+      index: true,
     },
     {
       name: 'pickup_type',
@@ -79,6 +100,18 @@ const model = {
       type: 'integer',
       min: 0,
       max: 1,
+    },
+    {
+      name: 'pickup_booking_rule_id',
+      type: 'varchar(255)',
+      prefix: true,
+      index: true,
+    },
+    {
+      name: 'drop_off_booking_rule_id',
+      type: 'varchar(255)',
+      prefix: true,
+      index: true,
     },
   ],
 };

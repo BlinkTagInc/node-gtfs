@@ -1,6 +1,7 @@
 import agency from '../models/gtfs/agency.js';
 import areas from '../models/gtfs/areas.js';
 import attributions from '../models/gtfs/attributions.js';
+import bookingRules from '../models/gtfs/booking-rules.js';
 import calendarDates from '../models/gtfs/calendar-dates.js';
 import calendar from '../models/gtfs/calendar.js';
 import fareAttributes from '../models/gtfs/fare-attributes.js';
@@ -12,6 +13,8 @@ import fareTransferRules from '../models/gtfs/fare-transfer-rules.js';
 import feedInfo from '../models/gtfs/feed-info.js';
 import frequencies from '../models/gtfs/frequencies.js';
 import levels from '../models/gtfs/levels.js';
+import locationGroups from '../models/gtfs/location-groups.js';
+import locationGroupStops from '../models/gtfs/location-group-stops.js';
 import networks from '../models/gtfs/networks.js';
 import pathways from '../models/gtfs/pathways.js';
 import routeNetworks from '../models/gtfs/route-networks.js';
@@ -59,6 +62,7 @@ const models = [
   agency,
   areas,
   attributions,
+  bookingRules,
   calendarDates,
   calendar,
   fareAttributes,
@@ -70,6 +74,8 @@ const models = [
   feedInfo,
   frequencies,
   levels,
+  locationGroups,
+  locationGroupStops,
   networks,
   pathways,
   routeNetworks,

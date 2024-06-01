@@ -770,6 +770,22 @@ const attributions = getAttributions({
 });
 ```
 
+#### getBookingRules(query, fields, sortBy, options)
+
+Returns an array of booking rules that match query parameters. [Details on booking_rules.txt](https://gtfs.org/schedule/reference/#booking_rulestxt)
+
+```js
+import { getBookingRules } from 'gtfs';
+
+// Get all booking rules
+const bookingRules = getBookingRules();
+
+// Get a specific booking rule
+const bookingRules = getBookingRules({
+  booking_rule_id: '1234',
+});
+```
+
 #### getRoutes(query, fields, sortBy, options)
 
 Returns an array of routes that match query parameters. [Details on routes.txt](https://gtfs.org/schedule/reference/#routestxt)
@@ -1174,6 +1190,38 @@ import { getLevels } from 'gtfs';
 
 // Get all levels
 const levels = getLevels();
+```
+
+#### getLocationGroups(query, fields, sortBy, options)
+
+Returns an array of location groups that match query parameters. [Details on location_groups.txt](https://gtfs.org/schedule/reference/#location_groupstxt)
+
+```js
+import { getLocationGroups } from 'gtfs';
+
+// Get all location groups
+const locationGroups = getLocationGroups();
+
+// Get a specific location group
+const locationGroups = getLocationGroups({
+  location_group_id: '1234',
+});
+```
+
+#### getLocationGroupStops(query, fields, sortBy, options)
+
+Returns an array of location group stops that match query parameters. [Details on location_group_stops.txt](https://gtfs.org/schedule/reference/#location_group_stopstxt)
+
+```js
+import { getLocationGroupStops } from 'gtfs';
+
+// Get all location group stops
+const locationGroupStops = getLocationGroupStops();
+
+// Get location group stops for a specific stop_id
+const locationGroups = getLocationGroupStops({
+  stop_id: '1234',
+});
 ```
 
 #### getPathways(query, fields, sortBy, options)
