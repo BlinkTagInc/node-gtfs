@@ -72,7 +72,7 @@ describe('getShapes():', () => {
         'shape_pt_lon',
         'shape_pt_sequence',
         'shape_dist_traveled',
-      ]
+      ],
     );
 
     const expectedResult = {
@@ -99,7 +99,7 @@ describe('getShapes():', () => {
         'shape_pt_lon',
         'shape_pt_sequence',
         'shape_dist_traveled',
-      ]
+      ],
     );
 
     const expectedResult = {
@@ -138,7 +138,7 @@ describe('getShapes():', () => {
         'shape_pt_lon',
         'shape_pt_sequence',
         'shape_dist_traveled',
-      ]
+      ],
     );
 
     const expectedResult = {
@@ -166,7 +166,7 @@ describe('getShapes():', () => {
         'shape_pt_lon',
         'shape_pt_sequence',
         'shape_dist_traveled',
-      ]
+      ],
     );
 
     const expectedResult = {
@@ -194,7 +194,7 @@ describe('getShapes():', () => {
         'shape_pt_lon',
         'shape_pt_sequence',
         'shape_dist_traveled',
-      ]
+      ],
     );
 
     const expectedResult = {
@@ -222,7 +222,7 @@ describe('getShapes():', () => {
         'shape_pt_lon',
         'shape_pt_sequence',
         'shape_dist_traveled',
-      ]
+      ],
     );
 
     const expectedResult = {

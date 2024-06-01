@@ -166,7 +166,7 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 | --------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`agencies`](#agencies)                 | array             | An array of GTFS files to be imported, and which files to exclude.                                                                                                  |
 | [`csvOptions`](#csvOptions)             | object            | Options passed to `csv-parse` for parsing GTFS CSV files. Optional.                                                                                                 |
-| [`db`](#db)                             | database instance | An existing database instance to use instead of relying on node-gtfs to connect. Optional.                                                                         |
+| [`db`](#db)                             | database instance | An existing database instance to use instead of relying on node-gtfs to connect. Optional.                                                                          |
 | [`downloadTimeout`](#downloadtimeout)   | integer           | The number of milliseconds to wait before throwing an error when downloading GTFS. Optional.                                                                        |
 | [`exportPath`](#exportPath)             | string            | A path to a directory to put exported GTFS files. Optional, defaults to `gtfs-export/<agency_name>`.                                                                |
 | [`ignoreDuplicates`](#ignoreduplicates) | boolean           | Whether or not to ignore unique constraints on ids when importing GTFS, such as `trip_id`, `calendar_id`. Optional, defaults to false.                              |
@@ -668,7 +668,7 @@ const routes = getRoutes(
   {}, // No query filters
   ['route_id', 'route_short_name', 'route_color'], // Only return these fields
   [['route_short_name', 'ASC']], // Sort by this field and direction
-  { db: db } // Options for the query. Can specify which database to use if more than one are open
+  { db: db }, // Options for the query. Can specify which database to use if more than one are open
 );
 
 closeDb(db);
@@ -690,7 +690,7 @@ const trips = getTrips(
   {
     route_id: '123',
   },
-  ['trip_id']
+  ['trip_id'],
 );
 
 closeDb(db);
@@ -810,7 +810,7 @@ const routes = getRoutes(
     stop_id: '70011',
   },
   [],
-  [['stop_name', 'ASC']]
+  [['stop_name', 'ASC']],
 );
 ```
 
@@ -862,7 +862,7 @@ const stops = getStops({
 const stops = getStops(
   {
     stop_lat: 37.58764,
-    stop_lon: -122.36265
+    stop_lon: -122.36265,
   },
   [],
   [],
@@ -891,11 +891,11 @@ const stopsGeojson = getStopsAsGeoJSON({
 const stopsGeojson = getStopsAsGeoJSON(
   {
     stop_lat: 37.58764,
-    stop_lon: -122.36265
+    stop_lon: -122.36265,
   },
   {
-    bounding_box_side_m: 1000
-  }
+    bounding_box_side_m: 1000,
+  },
 );
 ```
 
@@ -920,7 +920,7 @@ const stoptimes = getStoptimes(
     trip_id: '37a',
   },
   [],
-  [['stop_sequence', 'ASC']]
+  [['stop_sequence', 'ASC']],
 );
 
 // Get all stoptimes for a specific stop and service_id

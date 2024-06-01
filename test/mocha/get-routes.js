@@ -101,7 +101,7 @@ describe('getRoutes():', () => {
     const results = getRoutes(
       { stop_id: '70321' },
       [],
-      [['route_long_name', 'ASC']]
+      [['route_long_name', 'ASC']],
     );
 
     const expectedResults = [
@@ -131,7 +131,7 @@ describe('getRoutes():', () => {
     const results = getRoutes(
       { stop_id: 'not-valid' },
       [],
-      [['route_long_name', 'ASC']]
+      [['route_long_name', 'ASC']],
     );
 
     const expectedResults = [];

@@ -48,7 +48,7 @@ describe('getStoptimes():', () => {
         trip_id: tripId,
       },
       [],
-      [['stop_sequence', 'ASC']]
+      [['stop_sequence', 'ASC']],
     );
 
     should.exist(results);

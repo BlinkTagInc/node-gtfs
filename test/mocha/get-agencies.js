@@ -75,7 +75,7 @@ describe('getAgencies():', () => {
       {
         agency_id: agencyId,
       },
-      ['agency_url', 'agency_lang']
+      ['agency_url', 'agency_lang'],
     );
 
     const expectedResult = {

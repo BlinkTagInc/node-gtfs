@@ -79,7 +79,7 @@ describe('getCalendarDates():', () => {
       [
         ['date', 'ASC'],
         ['service_id', 'ASC'],
-      ]
+      ],
     );
 
     const expectedResults = [

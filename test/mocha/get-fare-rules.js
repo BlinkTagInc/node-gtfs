@@ -33,7 +33,7 @@ describe('getFareRules():', () => {
       {
         route_id: routeId,
       },
-      ['fare_id', 'route_id', 'origin_id', 'destination_id']
+      ['fare_id', 'route_id', 'origin_id', 'destination_id'],
     );
 
     const expectedResult = {
