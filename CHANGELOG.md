@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for [location_group_stops.txt](https://gtfs.org/schedule/reference/#location_group_stopstxt)
 - Add `rule_priority` field to `fare_leg_rules.txt`
 
+### Updated
+
+- Dependency updates
+
 ## [4.10.4] - 2024-05-14
 
 ### Updated
