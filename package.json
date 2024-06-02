@@ -88,7 +88,6 @@
     "pluralize": "^8.0.0",
     "pretty-error": "^4.0.0",
     "promise-map-series": "^0.3.0",
-    "recursive-copy": "^2.0.14",
     "sanitize-filename": "^1.6.3",
     "sqlstring-sqlite": "^0.1.1",
     "strip-bom-stream": "^5.0.0",
