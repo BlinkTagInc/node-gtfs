@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Don't throw error on GTFS-Realtime import HTTP error
+
 ### Updated
 
 - Remove recursive-copy module
+- Dependency updates
 
 ## [4.11.0] - 2024-06-01
 
