@@ -29,27 +29,9 @@ You can use it as a [command-line tool](#command-line-examples) or as a [node.js
 
 This library has four parts: the [GTFS import script](#gtfs-import-script), [GTFS export script](#gtfs-export-script) and [GTFS-Realtime update script](#gtfsrealtime-update-script) and the [query methods](#query-methods)
 
-## Breaking changes in Version 4
-
-Version 4 of node-gtfs switched to using the better-sqlite3 library. This allowed all query methods to become synchronous and speeds up import and export.
-
-- All query methods are now synchronous.
-
-```js
-// Version 3
-const routes = await getRoutes();
-
-// Version 4
-const routes = getRoutes();
-```
-
-- `runRawQuery` has been removed. Use [Raw SQLite Query](#raw-sqlite-query) instead.
-- `execRawQuery` has been removed. Use [Raw SQLite Query](#raw-sqlite-query) instead.
-- `getDb` has been removed. Use `openDb` instead.
-
 ## Installation
 
-To use this library as a command-line utility, install it globally [npm](https://npmjs.org):
+To use this library as a command-line utility, install it globally with [npm](https://npmjs.org):
 
     npm install gtfs -g
 
