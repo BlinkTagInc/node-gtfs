@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'booking_rules',
+  filenameExtension: 'txt',
   schema: [
     {
       name: 'booking_rule_id',

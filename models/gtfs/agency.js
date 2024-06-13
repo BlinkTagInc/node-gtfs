@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'agency',
+  filenameExtension: 'txt',
   schema: [
     {
       name: 'agency_id',

@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'shapes',
+  filenameExtension: 'txt',
   schema: [
     {
       name: 'shape_id',

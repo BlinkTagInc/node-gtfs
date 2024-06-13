@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'stop_areas',
+  filenameExtension: 'txt',
   schema: [
     {
       name: 'area_id',

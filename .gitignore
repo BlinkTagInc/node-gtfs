@@ -1,7 +1,7 @@
 node_modules
 config*.json
 !config-sample*.json
-test/fixture/tmp/*.txt
+test/fixture/tmp*
 gtfs-export
 
 .git

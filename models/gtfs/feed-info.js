@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'feed_info',
+  filenameExtension: 'txt',
   schema: [
     {
       name: 'feed_publisher_name',

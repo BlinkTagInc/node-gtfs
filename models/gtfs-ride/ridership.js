@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'ridership',
+  filenameExtension: 'txt',
   nonstandard: true,
   extension: 'gtfs-ride',
   schema: [

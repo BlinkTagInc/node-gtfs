@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'deadheads',
+  filenameExtension: 'txt',
   nonstandard: true,
   extension: 'ods',
   schema: [

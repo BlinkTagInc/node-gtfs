@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'translations',
+  filenameExtension: 'txt',
   schema: [
     {
       name: 'table_name',

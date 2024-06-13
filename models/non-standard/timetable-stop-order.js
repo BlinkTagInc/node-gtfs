@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'timetable_stop_order',
+  filenameExtension: 'txt',
   nonstandard: true,
   schema: [
     {

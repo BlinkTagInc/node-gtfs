@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'fare_transfer_rules',
+  filenameExtension: 'txt',
   schema: [
     {
       name: 'from_leg_group_id',

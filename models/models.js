@@ -15,6 +15,7 @@ import frequencies from '../models/gtfs/frequencies.js';
 import levels from '../models/gtfs/levels.js';
 import locationGroups from '../models/gtfs/location-groups.js';
 import locationGroupStops from '../models/gtfs/location-group-stops.js';
+import locations from '../models/gtfs/locations.js';
 import networks from '../models/gtfs/networks.js';
 import pathways from '../models/gtfs/pathways.js';
 import routeNetworks from '../models/gtfs/route-networks.js';
@@ -76,6 +77,7 @@ const models = [
   levels,
   locationGroups,
   locationGroupStops,
+  locations,
   networks,
   pathways,
   routeNetworks,

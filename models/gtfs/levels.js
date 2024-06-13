@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'levels',
+  filenameExtension: 'txt',
   schema: [
     {
       name: 'level_id',

@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'ride_feed_info',
+  filenameExtension: 'txt',
   nonstandard: true,
   extension: 'gtfs-ride',
   schema: [

@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'trips_dated_vehicle_journeys',
+  filenameExtension: 'txt',
   nonstandard: true,
   schema: [
     {

@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'board_alight',
+  filenameExtension: 'txt',
   nonstandard: true,
   extension: 'gtfs-ride',
   schema: [

@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'transfers',
+  filenameExtension: 'txt',
   schema: [
     {
       name: 'from_stop_id',

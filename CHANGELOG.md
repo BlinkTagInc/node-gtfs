@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Support for [locations.geojson](https://gtfs.org/schedule/reference/#locationsgeojson)
+
 ### Updated
 
  - Update sqlite type for all models

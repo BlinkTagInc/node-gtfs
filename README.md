@@ -1206,6 +1206,17 @@ const locationGroups = getLocationGroupStops({
 });
 ```
 
+#### getLocations(query, fields, sortBy, options)
+
+Returns an array of locations that match query parameters. Each location is text that can be parsed into a geojson object. [Details on locations.geojson](https://gtfs.org/schedule/reference/#locationsgeojson)
+
+```js
+import { getLocations } from 'gtfs';
+
+// Get all locations
+const locations = getLocations();
+```
+
 #### getPathways(query, fields, sortBy, options)
 
 Returns an array of pathways that match query parameters. [Details on pathways.txt](https://gtfs.org/schedule/reference/#pathwaystxt)

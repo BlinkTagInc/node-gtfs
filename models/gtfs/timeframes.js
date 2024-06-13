@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'timeframes',
+  filenameExtension: 'txt',
   schema: [
     {
       name: 'timeframe_group_id',

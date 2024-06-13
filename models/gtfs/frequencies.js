@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'frequencies',
+  filenameExtension: 'txt',
   schema: [
     {
       name: 'trip_id',

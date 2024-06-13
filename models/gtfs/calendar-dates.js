@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'calendar_dates',
+  filenameExtension: 'txt',
   schema: [
     {
       name: 'service_id',

@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'runs_pieces',
+  filenameExtension: 'txt',
   nonstandard: true,
   extension: 'ods',
   schema: [

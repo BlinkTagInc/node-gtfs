@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'route_attributes',
+  filenameExtension: 'txt',
   nonstandard: true,
   extension: 'gtfs-plus',
   schema: [

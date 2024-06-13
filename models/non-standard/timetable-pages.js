@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'timetable_pages',
+  filenameExtension: 'txt',
   nonstandard: true,
   schema: [
     {

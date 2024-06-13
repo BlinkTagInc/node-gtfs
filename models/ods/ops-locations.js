@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'ops_locations',
+  filenameExtension: 'txt',
   nonstandard: true,
   extension: 'ods',
   schema: [

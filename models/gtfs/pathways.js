@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'pathways',
+  filenameExtension: 'txt',
   schema: [
     {
       name: 'pathway_id',

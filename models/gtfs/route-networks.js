@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'route_networks',
+  filenameExtension: 'txt',
   schema: [
     {
       name: 'network_id',

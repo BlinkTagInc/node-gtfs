@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'fare_rules',
+  filenameExtension: 'txt',
   schema: [
     {
       name: 'fare_id',

@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'timetables',
+  filenameExtension: 'txt',
   nonstandard: true,
   schema: [
     {

@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'directions',
+  filenameExtension: 'txt',
   nonstandard: true,
   extension: 'gtfs-plus',
   schema: [

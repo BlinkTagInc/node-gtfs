@@ -50,7 +50,10 @@ describe('exportGtfs():', function () {
 
       await Promise.all(
         models.map((model) => {
-          const filePath = path.join(temporaryDir, `${model.filenameBase}.txt`);
+          const filePath = path.join(
+            temporaryDir,
+            `${model.filenameBase}.${model.filenameExtension}`,
+          );
 
           // GTFS has optional files
           if (!existsSync(filePath)) {
@@ -105,7 +108,7 @@ describe('exportGtfs():', function () {
           process.cwd(),
           'gtfs-export',
           generateFolderName(agencies[0].agency_name),
-          `${model.filenameBase}.txt`,
+          `${model.filenameBase}.${model.filenameExtension}`,
         );
 
         // GTFS has optional files

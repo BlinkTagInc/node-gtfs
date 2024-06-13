@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'fare_media',
+  filenameExtension: 'txt',
   schema: [
     {
       name: 'fare_media_id',

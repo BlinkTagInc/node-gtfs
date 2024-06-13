@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'run_event',
+  filenameExtension: 'txt',
   nonstandard: true,
   extension: 'ods',
   schema: [

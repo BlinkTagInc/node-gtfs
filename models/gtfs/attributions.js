@@ -1,5 +1,6 @@
 const model = {
   filenameBase: 'attributions',
+  filenameExtension: 'txt',
   schema: [
     {
       name: 'attribution_id',
