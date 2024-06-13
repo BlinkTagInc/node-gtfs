@@ -17,7 +17,6 @@ const locationsConfig = {
     },
   ],
   verbose: false,
-  sqlitePath: '/tmp/locations',
 };
 
 describe('getLocations():', () => {
@@ -25,7 +24,6 @@ describe('getLocations():', () => {
     openDb(locationsConfig);
 
     // Add locations.geojson to test GTFS dataset
-    const temporaryDir = path.join(import.meta.dirname, '../fixture/tmp2/');
     await prepDirectory(temporaryDir);
     await unzip(config.agencies[0].path, temporaryDir);
 
