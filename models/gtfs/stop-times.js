@@ -3,14 +3,14 @@ const model = {
   schema: [
     {
       name: 'trip_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       primary: true,
       prefix: true,
     },
     {
       name: 'arrival_time',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'arrival_timestamp',
@@ -19,7 +19,7 @@ const model = {
     },
     {
       name: 'departure_time',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'departure_timestamp',
@@ -28,19 +28,19 @@ const model = {
     },
     {
       name: 'location_group_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
       index: true,
     },
     {
       name: 'location_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
       index: true,
     },
     {
       name: 'stop_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       prefix: true,
       index: true,
@@ -54,12 +54,12 @@ const model = {
     },
     {
       name: 'stop_headsign',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'start_pickup_drop_off_window',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'start_pickup_drop_off_window_timestamp',
@@ -103,13 +103,13 @@ const model = {
     },
     {
       name: 'pickup_booking_rule_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
       index: true,
     },
     {
       name: 'drop_off_booking_rule_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
       index: true,
     },

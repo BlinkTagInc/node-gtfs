@@ -3,13 +3,13 @@ const model = {
   schema: [
     {
       name: 'from_leg_group_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       prefix: true,
     },
     {
       name: 'to_leg_group_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       prefix: true,
     },
@@ -21,7 +21,7 @@ const model = {
     },
     {
       name: 'transfer_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
     {
@@ -45,7 +45,7 @@ const model = {
     },
     {
       name: 'fare_product_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       prefix: true,
     },

@@ -3,20 +3,20 @@ const model = {
   schema: [
     {
       name: 'pathway_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       required: true,
       prefix: true,
     },
     {
       name: 'from_stop_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       prefix: true,
     },
     {
       name: 'to_stop_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       prefix: true,
     },
@@ -59,12 +59,12 @@ const model = {
     },
     {
       name: 'signposted_as',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'reversed_signposted_as',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
   ],

@@ -5,7 +5,7 @@ const model = {
   schema: [
     {
       name: 'stop_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       primary: true,
       prefix: true,
@@ -17,15 +17,15 @@ const model = {
     },
     {
       name: 'cardinal_direction',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'relative_position',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'stop_city',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
   ],

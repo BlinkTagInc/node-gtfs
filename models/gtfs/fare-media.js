@@ -3,14 +3,14 @@ const model = {
   schema: [
     {
       name: 'fare_media_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       primary: true,
       prefix: true,
     },
     {
       name: 'fare_media_name',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'fare_media_type',

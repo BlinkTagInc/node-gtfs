@@ -3,7 +3,7 @@ const model = {
   schema: [
     {
       name: 'shape_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       primary: true,
       prefix: true,

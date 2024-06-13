@@ -3,29 +3,29 @@ const model = {
   schema: [
     {
       name: 'route_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       required: true,
       prefix: true,
     },
     {
       name: 'agency_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
     {
       name: 'route_short_name',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'route_long_name',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'route_desc',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
@@ -38,16 +38,16 @@ const model = {
     },
     {
       name: 'route_url',
-      type: 'varchar(2047)',
+      type: 'text',
     },
     {
       name: 'route_color',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'route_text_color',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
@@ -69,7 +69,7 @@ const model = {
     },
     {
       name: 'network_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
   ],

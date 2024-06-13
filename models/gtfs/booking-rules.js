@@ -3,7 +3,7 @@ const model = {
   schema: [
     {
       name: 'booking_rule_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       prefix: true,
     },
@@ -31,7 +31,7 @@ const model = {
     },
     {
       name: 'prior_notice_last_time',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'prior_notice_last_timestamp',
@@ -45,7 +45,7 @@ const model = {
     },
     {
       name: 'prior_notice_start_time',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'prior_notice_start_timestamp',
@@ -54,36 +54,36 @@ const model = {
     },
     {
       name: 'prior_notice_service_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
     {
       name: 'message',
-      type: 'varchar(2047)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'pickup_message',
-      type: 'varchar(2047)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'drop_off_message',
-      type: 'varchar(2047)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'phone_number',
-      type: 'varchar(64)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'info_url',
-      type: 'varchar(2047)',
+      type: 'text',
     },
     {
       name: 'booking_url',
-      type: 'varchar(2047)',
+      type: 'text',
     },
   ],
 };

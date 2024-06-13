@@ -10,12 +10,12 @@ const model = {
     },
     {
       name: 'timetable_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
     {
       name: 'route_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
     {
@@ -83,7 +83,7 @@ const model = {
     },
     {
       name: 'start_time',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'start_timestamp',
@@ -91,7 +91,7 @@ const model = {
     },
     {
       name: 'end_time',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'end_timestamp',
@@ -99,21 +99,21 @@ const model = {
     },
     {
       name: 'timetable_label',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'service_notes',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'orientation',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'timetable_page_id',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'timetable_sequence',
@@ -123,7 +123,7 @@ const model = {
     },
     {
       name: 'direction_name',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'include_exceptions',

@@ -3,7 +3,7 @@ const model = {
   schema: [
     {
       name: 'fare_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       primary: true,
       prefix: true,
@@ -15,7 +15,7 @@ const model = {
     },
     {
       name: 'currency_type',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
     },
     {
@@ -33,7 +33,7 @@ const model = {
     },
     {
       name: 'agency_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
     {

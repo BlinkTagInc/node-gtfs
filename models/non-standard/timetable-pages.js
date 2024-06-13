@@ -4,17 +4,17 @@ const model = {
   schema: [
     {
       name: 'timetable_page_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       prefix: true,
     },
     {
       name: 'timetable_page_label',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'filename',
-      type: 'varchar(255)',
+      type: 'text',
     },
   ],
 };

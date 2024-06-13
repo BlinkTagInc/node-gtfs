@@ -3,7 +3,7 @@ const model = {
   schema: [
     {
       name: 'service_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       primary: true,
       prefix: true,
@@ -24,7 +24,7 @@ const model = {
     },
     {
       name: 'holiday_name',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
   ],

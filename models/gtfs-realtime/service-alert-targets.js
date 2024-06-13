@@ -4,21 +4,21 @@ const model = {
   schema: [
     {
       name: 'alert_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       primary: true,
       source: 'parent.id',
     },
     {
       name: 'stop_id',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       source: 'stopId',
       default: null,
     },
     {
       name: 'route_id',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       source: 'routeId',
       default: null,

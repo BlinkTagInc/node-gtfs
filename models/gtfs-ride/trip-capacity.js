@@ -5,13 +5,13 @@ const model = {
   schema: [
     {
       name: 'agency_id',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       prefix: true,
     },
     {
       name: 'trip_id',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       prefix: true,
     },
@@ -22,7 +22,7 @@ const model = {
     },
     {
       name: 'vehicle_description',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'seated_capacity',

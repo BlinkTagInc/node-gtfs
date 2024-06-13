@@ -3,43 +3,43 @@ const model = {
   schema: [
     {
       name: 'agency_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       prefix: true,
     },
     {
       name: 'agency_name',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       nocase: true,
     },
     {
       name: 'agency_url',
-      type: 'varchar(2047)',
+      type: 'text',
       required: true,
     },
     {
       name: 'agency_timezone',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
     },
     {
       name: 'agency_lang',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'agency_phone',
-      type: 'varchar(64)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'agency_fare_url',
-      type: 'varchar(2047)',
+      type: 'text',
     },
     {
       name: 'agency_email',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
   ],

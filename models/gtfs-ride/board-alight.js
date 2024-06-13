@@ -5,14 +5,14 @@ const model = {
   schema: [
     {
       name: 'trip_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       index: true,
       prefix: true,
     },
     {
       name: 'stop_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       index: true,
       prefix: true,
@@ -103,7 +103,7 @@ const model = {
     },
     {
       name: 'service_arrival_time',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'service_arrival_timestamp',
@@ -112,7 +112,7 @@ const model = {
     },
     {
       name: 'service_departure_time',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'service_departure_timestamp',

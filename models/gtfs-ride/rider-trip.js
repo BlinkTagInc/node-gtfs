@@ -5,25 +5,25 @@ const model = {
   schema: [
     {
       name: 'rider_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       prefix: true,
     },
     {
       name: 'agency_id',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       prefix: true,
     },
     {
       name: 'trip_id',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       prefix: true,
     },
     {
       name: 'boarding_stop_id',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       prefix: true,
     },
@@ -35,7 +35,7 @@ const model = {
     },
     {
       name: 'alighting_stop_id',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       prefix: true,
     },
@@ -52,7 +52,7 @@ const model = {
     },
     {
       name: 'boarding_time',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'boarding_timestamp',
@@ -61,7 +61,7 @@ const model = {
     },
     {
       name: 'alighting_time',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'alighting_timestamp',
@@ -76,7 +76,7 @@ const model = {
     },
     {
       name: 'rider_type_description',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'fare_paid',

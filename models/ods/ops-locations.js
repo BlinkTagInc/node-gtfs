@@ -5,24 +5,24 @@ const model = {
   schema: [
     {
       name: 'ops_location_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       required: true,
       prefix: true,
     },
     {
       name: 'ops_location_code',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'ops_location_name',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       nocase: true,
     },
     {
       name: 'ops_location_desc',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {

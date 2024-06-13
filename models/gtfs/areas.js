@@ -3,14 +3,14 @@ const model = {
   schema: [
     {
       name: 'area_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       primary: true,
       prefix: true,
     },
     {
       name: 'area_name',
-      type: 'varchar(255)',
+      type: 'text',
     },
   ],
 };

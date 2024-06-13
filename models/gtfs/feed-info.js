@@ -3,23 +3,23 @@ const model = {
   schema: [
     {
       name: 'feed_publisher_name',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       nocase: true,
     },
     {
       name: 'feed_publisher_url',
-      type: 'varchar(2047)',
+      type: 'text',
       required: true,
     },
     {
       name: 'feed_lang',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
     },
     {
       name: 'default_lang',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
@@ -32,16 +32,16 @@ const model = {
     },
     {
       name: 'feed_version',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'feed_contact_email',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'feed_contact_url',
-      type: 'varchar(2047)',
+      type: 'text',
     },
   ],
 };

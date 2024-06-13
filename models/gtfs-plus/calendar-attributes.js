@@ -5,13 +5,13 @@ const model = {
   schema: [
     {
       name: 'service_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       prefix: true,
     },
     {
       name: 'service_description',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       nocase: true,
     },

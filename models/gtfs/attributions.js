@@ -3,29 +3,29 @@ const model = {
   schema: [
     {
       name: 'attribution_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       required: true,
       prefix: true,
     },
     {
       name: 'agency_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
     {
       name: 'route_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
     {
       name: 'trip_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
     {
       name: 'organization_name',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       nocase: true,
     },
@@ -49,16 +49,16 @@ const model = {
     },
     {
       name: 'attribution_url',
-      type: 'varchar(2047)',
+      type: 'text',
     },
     {
       name: 'attribution_email',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'attribution_phone',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
   ],

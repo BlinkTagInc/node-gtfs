@@ -3,28 +3,28 @@ const model = {
   schema: [
     {
       name: 'stop_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       required: true,
       prefix: true,
     },
     {
       name: 'stop_code',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'stop_name',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'tts_stop_name',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'stop_desc',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
@@ -41,12 +41,12 @@ const model = {
     },
     {
       name: 'zone_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
     {
       name: 'stop_url',
-      type: 'varchar(2047)',
+      type: 'text',
     },
     {
       name: 'location_type',
@@ -56,12 +56,12 @@ const model = {
     },
     {
       name: 'parent_station',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
     },
     {
       name: 'stop_timezone',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'wheelchair_boarding',
@@ -71,12 +71,12 @@ const model = {
     },
     {
       name: 'level_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
     {
       name: 'platform_code',
-      type: 'varchar(255)',
+      type: 'text',
     },
   ],
 };

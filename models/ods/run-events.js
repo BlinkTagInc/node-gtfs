@@ -5,14 +5,14 @@ const model = {
   schema: [
     {
       name: 'run_event_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       required: true,
       prefix: true,
     },
     {
       name: 'piece_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       prefix: true,
     },
@@ -25,12 +25,12 @@ const model = {
     },
     {
       name: 'event_name',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'event_time',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
     },
     {
@@ -48,7 +48,7 @@ const model = {
     },
     {
       name: 'event_from_location_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
     {
@@ -60,7 +60,7 @@ const model = {
     },
     {
       name: 'event_to_location_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
   ],

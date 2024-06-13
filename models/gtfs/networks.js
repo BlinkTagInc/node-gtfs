@@ -3,14 +3,14 @@ const model = {
   schema: [
     {
       name: 'network_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       required: true,
       prefix: true,
     },
     {
       name: 'network_name',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
   ],

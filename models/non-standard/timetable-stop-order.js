@@ -10,13 +10,13 @@ const model = {
     },
     {
       name: 'timetable_id',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       prefix: true,
     },
     {
       name: 'stop_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
     {

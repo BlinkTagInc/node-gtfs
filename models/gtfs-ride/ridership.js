@@ -27,7 +27,7 @@ const model = {
     },
     {
       name: 'ridership_start_time',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'ridership_start_timestamp',
@@ -36,7 +36,7 @@ const model = {
     },
     {
       name: 'ridership_end_time',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'ridership_end_timestamp',
@@ -45,7 +45,7 @@ const model = {
     },
     {
       name: 'service_id',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       prefix: true,
     },
@@ -93,13 +93,13 @@ const model = {
     },
     {
       name: 'agency_id',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       prefix: true,
     },
     {
       name: 'route_id',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       prefix: true,
     },
@@ -112,12 +112,12 @@ const model = {
     },
     {
       name: 'trip_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
     {
       name: 'stop_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
   ],

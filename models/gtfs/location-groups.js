@@ -3,13 +3,13 @@ const model = {
   schema: [
     {
       name: 'location_group_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       prefix: true,
     },
     {
       name: 'location_group_name',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
   ],

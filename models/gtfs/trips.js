@@ -3,33 +3,33 @@ const model = {
   schema: [
     {
       name: 'route_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       index: true,
       prefix: true,
     },
     {
       name: 'service_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       index: true,
       prefix: true,
     },
     {
       name: 'trip_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       required: true,
       prefix: true,
     },
     {
       name: 'trip_headsign',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
       name: 'trip_short_name',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
     {
@@ -41,13 +41,13 @@ const model = {
     },
     {
       name: 'block_id',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       prefix: true,
     },
     {
       name: 'shape_id',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       prefix: true,
     },

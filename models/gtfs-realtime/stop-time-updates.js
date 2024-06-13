@@ -4,14 +4,14 @@ const model = {
   schema: [
     {
       name: 'trip_id',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       source: 'parent.tripUpdate.trip.tripId',
       default: null,
     },
     {
       name: 'trip_start_time',
-      type: 'varchar(255)',
+      type: 'text',
       source: 'parent.tripUpdate.trip.startTime',
       default: null,
     },
@@ -23,14 +23,14 @@ const model = {
     },
     {
       name: 'route_id',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       source: 'parent.tripUpdate.trip.routeId',
       default: null,
     },
     {
       name: 'stop_id',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       source: 'stopId',
       default: null,
@@ -55,19 +55,19 @@ const model = {
     },
     {
       name: 'departure_timestamp',
-      type: 'varchar(255)',
+      type: 'text',
       source: 'departure.time',
       default: null,
     },
     {
       name: 'arrival_timestamp',
-      type: 'varchar(255)',
+      type: 'text',
       source: 'arrival.time',
       default: null,
     },
     {
       name: 'schedule_relationship',
-      type: 'varchar(255)',
+      type: 'text',
       source: 'scheduleRelationship',
       default: null,
     },

@@ -4,17 +4,17 @@ const model = {
   schema: [
     {
       name: 'note_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       prefix: true,
     },
     {
       name: 'symbol',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'note',
-      type: 'varchar(2047)',
+      type: 'text',
       nocase: true,
     },
   ],

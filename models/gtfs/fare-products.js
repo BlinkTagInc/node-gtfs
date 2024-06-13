@@ -3,18 +3,18 @@ const model = {
   schema: [
     {
       name: 'fare_product_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       primary: true,
       prefix: true,
     },
     {
       name: 'fare_product_name',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'fare_media_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       prefix: true,
     },
@@ -25,7 +25,7 @@ const model = {
     },
     {
       name: 'currency',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
     },
   ],

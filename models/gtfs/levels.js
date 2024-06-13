@@ -3,7 +3,7 @@ const model = {
   schema: [
     {
       name: 'level_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       required: true,
       prefix: true,
@@ -15,7 +15,7 @@ const model = {
     },
     {
       name: 'level_name',
-      type: 'varchar(255)',
+      type: 'text',
       nocase: true,
     },
   ],

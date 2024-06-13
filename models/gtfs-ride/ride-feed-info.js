@@ -27,11 +27,11 @@ const model = {
     },
     {
       name: 'default_currency_type',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'ride_feed_version',
-      type: 'varchar(255)',
+      type: 'text',
     },
   ],
 };

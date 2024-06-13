@@ -11,14 +11,14 @@ const model = {
     },
     {
       name: 'deadhead_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       index: true,
       prefix: true,
     },
     {
       name: 'arrival_time',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
     },
     {
@@ -28,7 +28,7 @@ const model = {
     },
     {
       name: 'departure_time',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
     },
     {
@@ -38,12 +38,12 @@ const model = {
     },
     {
       name: 'ops_location_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
     {
       name: 'stop_id',
-      type: 'varchar(255)',
+      type: 'text',
       prefix: true,
     },
     {

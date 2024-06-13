@@ -3,14 +3,14 @@ const model = {
   schema: [
     {
       name: 'trip_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       primary: true,
       prefix: true,
     },
     {
       name: 'start_time',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       primary: true,
     },
@@ -20,7 +20,7 @@ const model = {
     },
     {
       name: 'end_time',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
     },
     {

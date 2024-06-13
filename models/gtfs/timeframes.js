@@ -3,21 +3,21 @@ const model = {
   schema: [
     {
       name: 'timeframe_group_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       prefix: true,
     },
     {
       name: 'start_time',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'end_time',
-      type: 'varchar(255)',
+      type: 'text',
     },
     {
       name: 'service_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       index: true,
       prefix: true,

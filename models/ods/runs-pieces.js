@@ -5,12 +5,12 @@ const model = {
   schema: [
     {
       name: 'run_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
     },
     {
       name: 'piece_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       required: true,
     },
@@ -24,7 +24,7 @@ const model = {
     },
     {
       name: 'start_trip_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       index: true,
     },
@@ -43,7 +43,7 @@ const model = {
     },
     {
       name: 'end_trip_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       index: true,
     },

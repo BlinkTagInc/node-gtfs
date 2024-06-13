@@ -5,7 +5,7 @@ const model = {
   schema: [
     {
       name: 'route_id',
-      type: 'varchar(255)',
+      type: 'text',
       primary: true,
       prefix: true,
     },

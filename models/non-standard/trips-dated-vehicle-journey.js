@@ -4,20 +4,20 @@ const model = {
   schema: [
     {
       name: 'trip_id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       index: true,
       prefix: true,
     },
     {
       name: 'operating_day_date',
-      type: 'varchar(255)',
+      type: 'text',
       index: true,
       required: true,
     },
     {
       name: 'dated_vehicle_journey_gid',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
     },
     {

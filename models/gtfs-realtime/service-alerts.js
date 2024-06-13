@@ -4,7 +4,7 @@ const model = {
   schema: [
     {
       name: 'id',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       primary: true,
       index: true,
@@ -20,28 +20,28 @@ const model = {
     },
     {
       name: 'start_time',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       source: 'alert.activePeriod[0].start',
       default: '',
     },
     {
       name: 'end_time',
-      type: 'varchar(255)',
+      type: 'text',
       required: true,
       source: 'alert.activePeriod[0].end',
       default: '',
     },
     {
       name: 'headline',
-      type: 'varchar(2048)',
+      type: 'text',
       required: true,
       source: 'alert.headerText.translation[0].text',
       default: '',
     },
     {
       name: 'description',
-      type: 'varchar(4096)',
+      type: 'text',
       required: true,
       source: 'alert.descriptionText.translation[0].text',
       default: '',
