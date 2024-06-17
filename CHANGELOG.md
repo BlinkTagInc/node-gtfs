@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support for `service_id` in `getRoutes`
 
+### Changed
+
+- Use tempy for temporary directory creation
+
 ## [4.11.3] - 2024-06-13
 
 ### Fixed
