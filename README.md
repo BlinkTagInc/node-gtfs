@@ -95,6 +95,10 @@ try {
     <td><a href="https://github.com/blinktaginc/gtfs-to-chart">GTFS-to-chart</a> generates a stringline chart in D3 for all trips for a specific route using data from an agency's GTFS. It uses `node-gtfs` for downloading, importing and querying GTFS data.</td>
   </tr>
   <tr>
+    <td><img src="https://github.com/BlinkTagInc/gtfs-accessibility-validator/raw/main/docs/images/gtfs-accessibility-validator-logo.svg" alt="GTFS Accessibility Validator" width="200"></td>
+    <td><a href="https://github.com/blinktaginc/gtfs-accessibility-validator">GTFS Accessibility Validator</a> checks for accessiblity-realted fields and files and flags any issues. It uses `node-gtfs` for downloading, importing and querying GTFS data.</td>
+  </tr>
+  <tr>
     <td><img src="https://github.com/BlinkTagInc/gtfs-tts/raw/main/docs/images/gtfs-tts-logo.svg" alt="GTFS-TTS" width="200"></td>
     <td><a href="https://github.com/blinktaginc/gtfs-tts">GTFS-Text-to-Speech</a> app tests GTFS stop name pronunciation for text-to-speech. It uses `node-gtfs` for loading stop names from GTFS data.</td>
   </tr>
