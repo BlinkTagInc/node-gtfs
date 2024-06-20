@@ -62,12 +62,14 @@ const model = {
       default: null,
     },
     {
-      name: 'is_updated',
+      name: 'created_timestamp',
       type: 'integer',
       required: true,
-      min: 0,
-      max: 1,
-      default: 1,
+    },
+    {
+      name: 'expiration_timestamp',
+      type: 'integer',
+      required: true,
     },
   ],
 };

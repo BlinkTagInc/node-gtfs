@@ -12,5 +12,6 @@
   "csvOptions": {
     "skip_lines_with_error": true
   },
-  "sqlitePath": "/tmp/gtfs"
+  "sqlitePath": "/tmp/gtfs",
+  "gtfsRealtimeExpirationSeconds": 60
 }

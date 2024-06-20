@@ -155,6 +155,7 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 | [`db`](#db)                             | database instance | An existing database instance to use instead of relying on node-gtfs to connect. Optional.                                                                          |
 | [`downloadTimeout`](#downloadtimeout)   | integer           | The number of milliseconds to wait before throwing an error when downloading GTFS. Optional.                                                                        |
 | [`exportPath`](#exportPath)             | string            | A path to a directory to put exported GTFS files. Optional, defaults to `gtfs-export/<agency_name>`.                                                                |
+| [`gtfsRealtimeExpirationSeconds`](#gtfsrealtimeexpirationseconds) | integer           | Amount of time in seconds to allow GTFS-Realtime data to be stored in database before allowing to be deleted. Optional, defaults to 0.                              |
 | [`ignoreDuplicates`](#ignoreduplicates) | boolean           | Whether or not to ignore unique constraints on ids when importing GTFS, such as `trip_id`, `calendar_id`. Optional, defaults to false.                              |
 | [`ignoreErrors`](#ignoreerrors)         | boolean           | Whether or not to ignore errors during the import process. If true, when importing multiple agencies, failed agencies will be skipped. Optional, defaults to false. |
 | [`sqlitePath`](#sqlitePath)             | string            | A path to an SQLite database. Optional, defaults to using an in-memory database.                                                                                    |
@@ -378,6 +379,27 @@ importGtfs({
   "exportPath": "~/path/to/export/gtfs"
 }
 ```
+
+### gtfsRealtimeExpirationSeconds
+
+{Integer} Amount of time in seconds to allow GTFS-Realtime data to be stored in database before allowing to be deleted. Defaults to 0 (old GTFS-Realtime is deleted immediately when new data arrives).
+
+```json
+{
+  "agencies": [
+    {
+      "url": "https://agency.com/gtfs.zip",
+      "realtimeUrls": [
+        "https://agency.com/gtfs-rt/alerts",
+        "https://agency.com/gtfs-rt/tripupdates",
+        "https://agency.com/gtfs-rt/vehiclepositions"
+      ]
+    }
+  ],
+  "gtfsRealtimeExpirationSeconds": false
+}
+```
+
 
 ### ignoreDuplicates
 
