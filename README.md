@@ -1786,8 +1786,4 @@ To run tests:
 
 To run a specific test:
 
-    NODE_ENV=test mocha ./test/mocha/gtfs.get-stoptimes.js
-
-### Linting
-
-    npm run lint
+    npm test -- get-stoptimes

@@ -65,15 +65,20 @@
     "Emma K Alexandra <emma@emma.sh>"
   ],
   "type": "module",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "bin": {
-    "gtfs-export": "bin/gtfs-export.js",
-    "gtfs-import": "bin/gtfs-import.js",
-    "gtfsrealtime-update": "bin/gtfsrealtime-update.js"
+    "gtfs-export": "dist/bin/gtfs-export.js",
+    "gtfs-import": "dist/bin/gtfs-import.js",
+    "gtfsrealtime-update": "dist/bin/gtfsrealtime-update.js"
   },
-  "types": "@types/index.d.ts",
   "scripts": {
-    "test": "NODE_ENV=test mocha ./test/mocha/**/*.js --timeout 2000"
+    "prepare": "husky install",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "build": "tsup"
   },
   "dependencies": {
     "@turf/helpers": "^7.0.0",
@@ -83,7 +88,6 @@
     "gtfs-realtime-bindings": "^1.1.1",
     "lodash-es": "^4.17.21",
     "long": "^5.2.3",
-    "node-fetch": "^3.3.2",
     "node-stream-zip": "^1.15.0",
     "pluralize": "^8.0.0",
     "pretty-error": "^4.0.0",
@@ -97,11 +101,21 @@
     "yoctocolors": "^2.0.2"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.10",
+    "@types/geojson": "^7946.0.14",
+    "@types/jest": "^29.5.12",
+    "@types/lodash-es": "^4.17.12",
+    "@types/node": "^20.14.9",
+    "@types/pluralize": "^0.0.33",
+    "@types/yargs": "^17.0.32",
     "husky": "^9.0.11",
+    "jest": "^29.7.0",
     "lint-staged": "^15.2.7",
-    "mocha": "^10.4.0",
     "prettier": "^3.3.2",
-    "should": "^13.2.3"
+    "ts-jest": "^29.1.5",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.1.0",
+    "typescript": "^5.5.2"
   },
   "engines": {
     "node": ">= 20.11.0"
