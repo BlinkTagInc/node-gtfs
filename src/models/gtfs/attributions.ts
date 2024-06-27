@@ -5,8 +5,6 @@ const model = {
     {
       name: 'attribution_id',
       type: 'text',
-      primary: true,
-      required: true,
       prefix: true,
     },
     {
