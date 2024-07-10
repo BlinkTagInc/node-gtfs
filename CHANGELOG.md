@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Updated
 - Convert to Typescript
 - Move tests to Jest from Mocha
+- Dependency Updates
 
 ### Fixed
 - Make attribution_id optional
