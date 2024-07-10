@@ -108,7 +108,7 @@ describe('importGtfs():', function () {
     } = {};
     const temporaryDir = temporaryDirectory();
 
-    beforeEach(async () => {
+    beforeAll(async () => {
       await prepDirectory(temporaryDir);
       await unzip(agenciesFixturesLocal[0].path, temporaryDir);
 
@@ -153,7 +153,7 @@ describe('importGtfs():', function () {
       await importGtfs(config);
     });
 
-    afterEach(async () => {
+    afterAll(async () => {
       await rm(temporaryDir, { recursive: true, force: true });
     });
 
