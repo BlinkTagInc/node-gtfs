@@ -20,12 +20,12 @@ const agenciesFixturesLocal = config.agencies;
 describe('importGtfs():', function () {
   describe('Download and import from different GTFS sources', () => {
     beforeEach(async () => {
-      openDb(config);
+      openDb();
       await importGtfs(config);
     });
 
     afterEach(() => {
-      const db = openDb(config);
+      const db = openDb();
       closeDb(db);
     });
 
@@ -163,7 +163,7 @@ describe('importGtfs():', function () {
 
     for (const model of modelsToValidate) {
       it(`should import the same number of ${model.filenameBase}`, () => {
-        const db = openDb(config);
+        const db = openDb();
         const result = db
           .prepare(`SELECT COUNT(*) FROM ${model.filenameBase};`)
           .get() as { 'COUNT(*)': number };

@@ -18,12 +18,12 @@ import models from '../models/models.ts';
 describe('exportGtfs():', function () {
   describe('Export GTFS', () => {
     beforeEach(async () => {
-      openDb(config);
+      openDb();
       await importGtfs(config);
     });
 
     afterEach(async () => {
-      const db = openDb(config);
+      const db = openDb();
       closeDb(db);
     });
 
@@ -84,7 +84,7 @@ describe('exportGtfs():', function () {
     });
 
     afterAll(async () => {
-      openDb(config);
+      openDb();
       const agencies = getAgencies({}, ['agency_name']);
       await rm(
         path.join(

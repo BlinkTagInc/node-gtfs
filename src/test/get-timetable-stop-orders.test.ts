@@ -7,12 +7,12 @@ import {
 } from '../index.ts';
 
 beforeAll(async () => {
-  openDb(config);
+  openDb();
   await importGtfs(config);
 });
 
 afterAll(async () => {
-  const db = openDb(config);
+  const db = openDb();
   closeDb(db);
 });
 

@@ -26,12 +26,12 @@ const db3Config = {
 };
 
 beforeEach(async () => {
-  openDb(config);
+  openDb({ sqlitePath: ':memory:' });
   await importGtfs(config);
 });
 
 afterEach(() => {
-  const db = openDb(config);
+  const db = openDb({ sqlitePath: ':memory:' });
   closeDb(db);
 
   // Close db2 and then delete it
@@ -48,7 +48,7 @@ afterEach(() => {
 describe('openDb():', () => {
   it('should allow raw db queries: calendar_dates', () => {
     const serviceIds = ['CT-16APR-Caltrain-Weekday-01'];
-    const db = openDb();
+    const db = openDb({ sqlitePath: ':memory:' });
     const results = db
       .prepare(
         `SELECT * FROM calendar_dates WHERE exception_type = 1 AND service_id NOT IN (${serviceIds
@@ -64,7 +64,7 @@ describe('openDb():', () => {
     // Find all trips between two stop ids
     const startStopId = '70261';
     const endStopId = '70131';
-    const db = openDb();
+    const db = openDb({ sqlitePath: ':memory:' });
     const results = db
       .prepare(
         'SELECT * from trips where trips.trip_id IN (SELECT start_stop_times.trip_id FROM stop_times as start_stop_times WHERE stop_id = ? AND start_stop_times.stop_sequence < (SELECT end_stop_times.stop_sequence FROM stop_times as end_stop_times WHERE end_stop_times.stop_sequence > start_stop_times.stop_sequence AND end_stop_times.trip_id = start_stop_times.trip_id AND end_stop_times.stop_id = ? ))',
@@ -78,7 +78,7 @@ describe('openDb():', () => {
     const db2 = openDb(db2Config);
     await importGtfs(db2Config);
 
-    const db1 = openDb(config);
+    const db1 = openDb({ sqlitePath: ':memory:' });
 
     expect(db1.name).toEqual(':memory:');
     expect(db2.name).toEqual('./tmpdb2');

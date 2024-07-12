@@ -3,12 +3,12 @@ import { openDb, closeDb, importGtfs, getStops } from '../index.ts';
 import exp from 'constants';
 
 beforeAll(async () => {
-  openDb(config);
+  openDb();
   await importGtfs(config);
 });
 
 afterAll(async () => {
-  const db = openDb(config);
+  const db = openDb();
   closeDb(db);
 });
 

@@ -201,7 +201,6 @@ const updateRealtimeData = async (task: IRealtimeTask) => {
 
   const db = openDb({
     sqlitePath: task.sqlitePath,
-    agencies: [],
   });
 
   const vehiclePositionsModel = models.find(
@@ -549,7 +548,6 @@ const importLines = (
 ) => {
   const db = openDb({
     sqlitePath: task.sqlitePath,
-    agencies: [],
   });
 
   if (lines.length === 0) {

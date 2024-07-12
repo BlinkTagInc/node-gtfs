@@ -3,9 +3,6 @@ import fs from 'fs';
 import Database from 'better-sqlite3';
 import untildify from 'untildify';
 
-import { setDefaultConfig } from './utils.ts';
-import { IConfig } from '../types/global_interfaces.ts';
-
 const dbs: { [key: string]: Database.Database } = {};
 
 function setupDb(sqlitePath: string) {
@@ -18,19 +15,30 @@ function setupDb(sqlitePath: string) {
   return db;
 }
 
-export function openDb(config: IConfig | null = null): Database.Database {
+export function openDb(
+  config: { db?: Database.Database; sqlitePath?: string } | null = null,
+): Database.Database {
   // If config is passed, use that to open or return db
   if (config) {
-    const { sqlitePath, db } = setDefaultConfig(config);
+    const { sqlitePath = ':memory:', db } = config;
+
+    // If db connection is passed, use it
     if (db) {
       return db;
     }
 
+    // If db connection already exists, return it
     if (dbs[sqlitePath]) {
       return dbs[sqlitePath];
     }
 
+    // If no db connection exists, create it
     return setupDb(sqlitePath);
+  }
+
+  // If no db connection exists, create a new one in memory
+  if (Object.keys(dbs).length === 0) {
+    return setupDb(':memory:');
   }
 
   // If only one db connection already exists, use it

@@ -2,12 +2,12 @@ import config from './test-config.ts';
 import { openDb, closeDb, importGtfs, getShapes } from '../index.ts';
 
 beforeAll(async () => {
-  openDb(config);
+  openDb();
   await importGtfs(config);
 });
 
 afterAll(async () => {
-  const db = openDb(config);
+  const db = openDb();
   closeDb(db);
 });
 

@@ -19,7 +19,7 @@ const locationsConfig = {
 
 describe('getLocations():', () => {
   beforeAll(async () => {
-    openDb(locationsConfig);
+    openDb();
 
     // Add locations.geojson to test GTFS dataset
     await prepDirectory(temporaryDir);
@@ -55,7 +55,7 @@ describe('getLocations():', () => {
   });
 
   afterAll(() => {
-    const db = openDb(locationsConfig);
+    const db = openDb();
     closeDb(db);
 
     // Delete temporary directory

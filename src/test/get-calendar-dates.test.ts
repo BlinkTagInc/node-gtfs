@@ -3,12 +3,12 @@ import { openDb, closeDb, importGtfs, getCalendarDates } from '../index.ts';
 import { sortBy } from 'lodash-es';
 
 beforeAll(async () => {
-  openDb(config);
+  openDb();
   await importGtfs(config);
 });
 
 afterAll(async () => {
-  const db = openDb(config);
+  const db = openDb();
   closeDb(db);
 });
 
