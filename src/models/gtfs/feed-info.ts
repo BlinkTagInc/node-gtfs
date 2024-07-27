@@ -25,11 +25,11 @@ const model = {
     },
     {
       name: 'feed_start_date',
-      type: 'integer',
+      type: 'date',
     },
     {
       name: 'feed_end_date',
-      type: 'integer',
+      type: 'date',
     },
     {
       name: 'feed_version',

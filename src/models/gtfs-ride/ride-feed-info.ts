@@ -13,17 +13,17 @@ const model = {
     },
     {
       name: 'ride_start_date',
-      type: 'integer',
+      type: 'date',
       index: true,
     },
     {
       name: 'ride_end_date',
-      type: 'integer',
+      type: 'date',
       index: true,
     },
     {
       name: 'gtfs_feed_date',
-      type: 'integer',
+      type: 'date',
       index: true,
     },
     {

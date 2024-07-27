@@ -27,11 +27,11 @@ const model = {
     },
     {
       name: 'start_date',
-      type: 'integer',
+      type: 'date',
     },
     {
       name: 'end_date',
-      type: 'integer',
+      type: 'date',
     },
     {
       name: 'monday',

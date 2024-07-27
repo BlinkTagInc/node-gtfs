@@ -11,7 +11,7 @@ const model = {
     },
     {
       name: 'date',
-      type: 'integer',
+      type: 'date',
       required: true,
       primary: true,
     },

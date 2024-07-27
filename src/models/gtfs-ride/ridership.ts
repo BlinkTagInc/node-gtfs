@@ -18,12 +18,12 @@ const model = {
     },
     {
       name: 'ridership_start_date',
-      type: 'integer',
+      type: 'date',
       index: true,
     },
     {
       name: 'ridership_end_date',
-      type: 'integer',
+      type: 'date',
       index: true,
     },
     {

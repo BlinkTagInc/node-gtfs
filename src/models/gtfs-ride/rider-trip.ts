@@ -48,7 +48,7 @@ const model = {
     },
     {
       name: 'service_date',
-      type: 'integer',
+      type: 'date',
       index: true,
     },
     {

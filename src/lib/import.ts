@@ -459,7 +459,21 @@ const formatLine = (
   for (const columnSchema of model.schema) {
     const lineValue = line[columnSchema.name];
 
-    if (columnSchema.type === 'integer') {
+    if (columnSchema.type === 'date') {
+      if (lineValue !== '' && lineValue !== undefined) {
+        // Convert fields that are dates into integers
+        // Allow YYYYMMDD and YYYY-MM-DD formats
+        const dateValue = lineValue.replace(/-/g, '');
+
+        if (dateValue.length !== 8) {
+          throw new Error(
+            `Invalid date in ${model.filenameBase}.${model.filenameExtension} for ${columnSchema.name} on line ${lineNumber}.`,
+          );
+        }
+
+        formattedLine[columnSchema.name] = Number.parseInt(dateValue, 10);
+      }
+    } else if (columnSchema.type === 'integer') {
       // Convert fields that should be integer
       formattedLine[columnSchema.name] = Number.parseInt(lineValue, 10);
     } else if (columnSchema.type === 'real') {
