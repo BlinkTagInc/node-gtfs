@@ -101,11 +101,19 @@ function formatHexColor(color: null | undefined) {
 }
 
 function formatProperties(properties: Record<string, any>) {
-  const formattedProperties: Record<string, any> = {
-    ...cloneDeep(omitBy(properties, (value) => value === null)),
-    route_color: formatHexColor(properties.route_color),
-    route_text_color: formatHexColor(properties.route_text_color),
-  };
+  const formattedProperties: Record<string, any> = cloneDeep(
+    omitBy(properties, (value) => value === null || value === undefined),
+  );
+  const formattedRouteColor = formatHexColor(properties.route_color);
+  const formattedRouteTextColor = formatHexColor(properties.route_text_color);
+
+  if (formattedRouteColor) {
+    formattedProperties.route_color = formattedRouteColor;
+  }
+
+  if (formattedRouteTextColor) {
+    formattedProperties.route_text_color = formattedRouteTextColor;
+  }
 
   if (properties.routes) {
     formattedProperties.routes = properties.routes.map(

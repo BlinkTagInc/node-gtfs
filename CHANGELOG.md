@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Updated
 - Dependency Updates
+- Omit undefined properties from geojson
 
 ## [4.13.1] - 2024-07-12
 
