@@ -124,24 +124,22 @@ function formatProperties(properties: Record<string, any>) {
   return formattedProperties;
 }
 
-export function shapesToGeoJSONFeatures(shapes: SqlResults, properties = {}) {
+export function shapesToGeoJSONFeature(shapes: SqlResults, properties = {}) {
   const shapeGroups = Object.values(groupBy(shapes, 'shape_id')).map(
     (shapeGroup) => sortBy(shapeGroup, 'shape_pt_sequence'),
   );
   const lineStrings = consolidateShapes(shapeGroups) as Position[][];
 
-  return lineStrings.map((lineString) =>
-    feature(
-      {
-        type: 'LineString',
-        coordinates: lineString,
-      },
-      formatProperties(properties),
-    ),
+  return feature(
+    {
+      type: 'MultiLineString',
+      coordinates: lineStrings,
+    },
+    formatProperties(properties),
   );
 }
 
-export function stopsToGeoJSON(stops: SqlResults) {
+export function stopsToGeoJSONFeatureCollection(stops: SqlResults) {
   const features = stops.map((stop) =>
     feature(
       {

@@ -1,4 +1,4 @@
-import { omit, pick } from 'lodash-es';
+import { compact, omit, pick, uniq } from 'lodash-es';
 import { FeatureCollection } from 'geojson';
 import sqlString from 'sqlstring-sqlite';
 import { featureCollection } from '@turf/helpers';
@@ -17,7 +17,7 @@ import {
   formatWhereClause,
   formatWhereClauses,
 } from '../utils.ts';
-import { shapesToGeoJSONFeatures } from '../geojson-utils.ts';
+import { shapesToGeoJSONFeature } from '../geojson-utils.ts';
 import shapes from '../../models/gtfs/shapes.ts';
 import { getAgencies } from './agencies.ts';
 import { getRoutes } from './routes.ts';
@@ -91,38 +91,43 @@ export function getShapesAsGeoJSON(
   const agencies = getAgencies({}, [], [], options);
   const routeQuery = pick(query, ['route_id']);
   const routes = getRoutes(routeQuery, [], [], options);
-  const features = [];
+  const features = compact(
+    routes.map((route) => {
+      const shapeQuery = {
+        route_id: route.route_id,
+        ...omit(query, 'route_id'),
+      };
+      const shapes = getShapes(
+        shapeQuery,
+        ['shape_id', 'shape_pt_sequence', 'shape_pt_lon', 'shape_pt_lat'],
+        [],
+        options,
+      );
 
-  for (const route of routes) {
-    const shapeQuery = {
-      route_id: route.route_id,
-      ...omit(query, 'route_id'),
-    };
-    const shapes = getShapes(
-      shapeQuery,
-      ['shape_id', 'shape_pt_sequence', 'shape_pt_lon', 'shape_pt_lat'],
-      [],
-      options,
-    );
-    const routeAttributes = getRouteAttributes(
-      { route_id: route.route_id },
-      [],
-      [],
-      options,
-    );
+      if (shapes.length === 0) {
+        return;
+      }
 
-    const agency = agencies.find(
-      (agency) => agency.agency_id === route.agency_id,
-    );
+      const routeAttributes = getRouteAttributes(
+        { route_id: route.route_id },
+        [],
+        [],
+        options,
+      );
 
-    const geojsonProperties = {
-      agency_name: agency ? agency.agency_name : undefined,
-      shape_id: query.shape_id,
-      ...route,
-      ...(routeAttributes?.[0] || []),
-    };
-    features.push(...shapesToGeoJSONFeatures(shapes, geojsonProperties));
-  }
+      const agency = agencies.find(
+        (agency) => agency.agency_id === route.agency_id,
+      );
+
+      const geojsonProperties = {
+        agency_name: agency ? agency.agency_name : undefined,
+        shape_id: query.shape_id,
+        ...route,
+        ...(routeAttributes?.[0] || []),
+      };
+      return shapesToGeoJSONFeature(shapes, geojsonProperties);
+    }),
+  );
 
   return featureCollection(features);
 }

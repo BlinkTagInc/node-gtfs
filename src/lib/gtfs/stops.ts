@@ -17,7 +17,7 @@ import {
   formatWhereClauseBoundingBox,
   formatWhereClauses,
 } from '../utils.ts';
-import { stopsToGeoJSON } from '../geojson-utils.ts';
+import { stopsToGeoJSONFeatureCollection } from '../geojson-utils.ts';
 import stops from '../../models/gtfs/stops.ts';
 import { getAgencies } from './agencies.ts';
 import { getStopAttributes } from '../gtfs-plus/stop-attributes.ts';
@@ -153,5 +153,5 @@ export function getStopsAsGeoJSON(
   // Exclude stops not part of any route
   const filteredStops = preparedStops.filter((stop) => stop.routes.length > 0);
 
-  return stopsToGeoJSON(filteredStops);
+  return stopsToGeoJSONFeatureCollection(filteredStops);
 }
