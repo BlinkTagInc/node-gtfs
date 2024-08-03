@@ -28,6 +28,9 @@ describe('getShapesAsGeoJSON():', () => {
     expect(geojson.type).toEqual('FeatureCollection');
     expect(geojson.features).toHaveLength(8);
     expect(
+      (geojson.features[0].geometry as GeoJSON.LineString).coordinates,
+    ).toHaveLength(381);
+    expect(
       (geojson.features[0].geometry as GeoJSON.LineString).coordinates[0],
     ).toHaveLength(2);
     expect(geojson.features[0].properties?.route_color).toMatch(/^#/);
@@ -42,6 +45,9 @@ describe('getShapesAsGeoJSON():', () => {
 
     expect(geojson.type).toEqual('FeatureCollection');
     expect(geojson.features).toHaveLength(2);
+    expect(
+      (geojson.features[0].geometry as GeoJSON.LineString).coordinates,
+    ).toHaveLength(556);
     expect(
       (geojson.features[0].geometry as GeoJSON.LineString).coordinates[0],
     ).toHaveLength(2);
@@ -60,6 +66,9 @@ describe('getShapesAsGeoJSON():', () => {
     expect(geojson.type).toEqual('FeatureCollection');
     expect(geojson.features).toHaveLength(2);
     expect(
+      (geojson.features[0].geometry as GeoJSON.LineString).coordinates,
+    ).toHaveLength(382);
+    expect(
       (geojson.features[0].geometry as GeoJSON.LineString).coordinates[0],
     ).toHaveLength(2);
     expect(geojson.features[0].properties?.route_color).toMatch(/^#/);
@@ -74,6 +83,9 @@ describe('getShapesAsGeoJSON():', () => {
 
     expect(geojson.type).toEqual('FeatureCollection');
     expect(geojson.features).toHaveLength(3);
+    expect(
+      (geojson.features[0].geometry as GeoJSON.LineString).coordinates,
+    ).toHaveLength(401);
     expect(
       (geojson.features[0].geometry as GeoJSON.LineString).coordinates[0],
     ).toHaveLength(2);
