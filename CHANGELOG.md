@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- getShapesAsGeoJSON returns MultiLineString
+
+### Updated
+- Omit undefined properties from geojson
+- Better geojson tests
+- Dependency Updates
+
 ## [4.13.2] - 2024-07-27
 
 ### Fixed
@@ -12,9 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Updated
 - Dependency Updates
-- Omit undefined properties from geojson
-- Better geojson tests
-- getShapesAsGeoJSON returns MultiLineString
 
 ## [4.13.1] - 2024-07-12
 
