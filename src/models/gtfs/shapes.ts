@@ -1,4 +1,4 @@
-const model = {
+export const shapes = {
   filenameBase: 'shapes',
   filenameExtension: 'txt',
   schema: [
@@ -37,5 +37,3 @@ const model = {
     },
   ],
 };
-
-export default model;

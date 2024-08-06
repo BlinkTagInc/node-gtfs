@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,7 +11,6 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import tripUpdates from '../../models/gtfs-realtime/trip-updates.ts';
 
 /*
  * Returns an array of all trip updates that match the query parameters.
@@ -25,7 +22,7 @@ export function getTripUpdates(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(tripUpdates.filenameBase);
+  const tableName = 'trip_updates';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

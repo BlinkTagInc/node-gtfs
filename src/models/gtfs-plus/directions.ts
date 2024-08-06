@@ -1,4 +1,4 @@
-const model = {
+export const directions = {
   filenameBase: 'directions',
   filenameExtension: 'txt',
   nonstandard: true,
@@ -25,5 +25,3 @@ const model = {
     },
   ],
 };
-
-export default model;

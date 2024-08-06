@@ -1,4 +1,4 @@
-const model = {
+export const ridership = {
   filenameBase: 'ridership',
   filenameExtension: 'txt',
   nonstandard: true,
@@ -123,5 +123,3 @@ const model = {
     },
   ],
 };
-
-export default model;

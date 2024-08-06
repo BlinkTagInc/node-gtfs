@@ -1,4 +1,4 @@
-const model = {
+export const runsPieces = {
   filenameBase: 'runs_pieces',
   filenameExtension: 'txt',
   nonstandard: true,
@@ -55,5 +55,3 @@ const model = {
     },
   ],
 };
-
-export default model;

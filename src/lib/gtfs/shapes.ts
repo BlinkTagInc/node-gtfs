@@ -1,6 +1,5 @@
-import { compact, omit, pick, uniq } from 'lodash-es';
+import { compact, omit, pick } from 'lodash-es';
 import { FeatureCollection } from 'geojson';
-import sqlString from 'sqlstring-sqlite';
 import { featureCollection } from '@turf/helpers';
 
 import {
@@ -18,7 +17,6 @@ import {
   formatWhereClauses,
 } from '../utils.ts';
 import { shapesToGeoJSONFeature } from '../geojson-utils.ts';
-import shapes from '../../models/gtfs/shapes.ts';
 import { getAgencies } from './agencies.ts';
 import { getRoutes } from './routes.ts';
 import { getRouteAttributes } from '../gtfs-plus/route-attributes.ts';
@@ -41,7 +39,7 @@ export function getShapes(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(shapes.filenameBase);
+  const tableName = 'shapes';
   const selectClause = formatSelectClause(fields);
   let whereClause = '';
   const orderByClause = formatOrderByClause(orderBy);

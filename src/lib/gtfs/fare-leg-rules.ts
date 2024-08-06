@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,7 +11,6 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import fareLegRules from '../../models/gtfs/fare-leg-rules.ts';
 
 /*
  * Returns an array of all fare leg rules that match the query parameters.
@@ -25,7 +22,7 @@ export function getFareLegRules(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(fareLegRules.filenameBase);
+  const tableName = 'fare_leg_rules';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

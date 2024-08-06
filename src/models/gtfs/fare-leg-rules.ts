@@ -1,4 +1,4 @@
-const model = {
+export const fareLegRules = {
   filenameBase: 'fare_leg_rules',
   filenameExtension: 'txt',
   schema: [
@@ -51,5 +51,3 @@ const model = {
     },
   ],
 };
-
-export default model;

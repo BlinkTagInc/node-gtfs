@@ -1,4 +1,4 @@
-const model = {
+export const deadheadTimes = {
   filenameBase: 'deadhead_times',
   filenameExtension: 'txt',
   nonstandard: true,
@@ -61,5 +61,3 @@ const model = {
     },
   ],
 };
-
-export default model;

@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,7 +11,6 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import feedInfo from '../../models/gtfs/feed-info.ts';
 
 /*
  * Returns an array of all feed info that match the query parameters.
@@ -25,7 +22,7 @@ export function getFeedInfo(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(feedInfo.filenameBase);
+  const tableName = 'feed_info';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

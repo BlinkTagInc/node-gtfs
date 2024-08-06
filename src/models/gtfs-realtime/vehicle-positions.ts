@@ -1,4 +1,4 @@
-const model = {
+export const vehiclePositions = {
   filenameBase: 'vehicle_positions',
   extension: 'gtfs-realtime',
   schema: [
@@ -133,5 +133,3 @@ const model = {
     },
   ],
 };
-
-export default model;

@@ -1,4 +1,4 @@
-const model = {
+export const fareMedia = {
   filenameBase: 'fare_media',
   filenameExtension: 'txt',
   schema: [
@@ -22,5 +22,3 @@ const model = {
     },
   ],
 };
-
-export default model;

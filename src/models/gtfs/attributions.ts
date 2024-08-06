@@ -1,4 +1,4 @@
-const model = {
+export const attributions = {
   filenameBase: 'attributions',
   filenameExtension: 'txt',
   schema: [
@@ -62,5 +62,3 @@ const model = {
     },
   ],
 };
-
-export default model;

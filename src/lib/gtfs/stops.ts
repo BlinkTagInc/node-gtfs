@@ -1,5 +1,4 @@
 import { omit, orderBy, pick } from 'lodash-es';
-import sqlString from 'sqlstring-sqlite';
 import { FeatureCollection } from 'geojson';
 
 import {
@@ -18,7 +17,6 @@ import {
   formatWhereClauses,
 } from '../utils.ts';
 import { stopsToGeoJSONFeatureCollection } from '../geojson-utils.ts';
-import stops from '../../models/gtfs/stops.ts';
 import { getAgencies } from './agencies.ts';
 import { getStopAttributes } from '../gtfs-plus/stop-attributes.ts';
 
@@ -47,7 +45,7 @@ export function getStops(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(stops.filenameBase);
+  const tableName = 'stops';
   const selectClause = formatSelectClause(fields);
   let whereClause = '';
   const orderByClause = formatOrderByClause(orderBy);

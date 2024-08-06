@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,7 +11,6 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import transfers from '../../models/gtfs/transfers.ts';
 
 /*
  * Returns an array of all transfers that match the query parameters.
@@ -25,7 +22,7 @@ export function getTransfers(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(transfers.filenameBase);
+  const tableName = 'transfers';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

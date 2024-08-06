@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,8 +11,6 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import serviceAlerts from '../../models/gtfs-realtime/service-alerts.ts';
-import serviceAlertTargets from '../../models/gtfs-realtime/service-alert-targets.ts';
 
 /*
  * Returns an array of all service alerts that match the query parameters.
@@ -26,15 +22,15 @@ export function getServiceAlerts(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(serviceAlerts.filenameBase);
-  const joinTable = sqlString.escapeId(serviceAlertTargets.filenameBase);
+  const tableName = 'service_alerts';
+  const joinTableName = 'service_alert_targets';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
-      `${selectClause} FROM ${tableName} INNER JOIN ${joinTable} ON ${tableName}.id=${joinTable}.alert_id ${whereClause} ${orderByClause};`,
+      `${selectClause} FROM ${tableName} INNER JOIN ${joinTableName} ON ${tableName}.id=${joinTableName}.alert_id ${whereClause} ${orderByClause};`,
     )
     .all() as SqlResults;
 }

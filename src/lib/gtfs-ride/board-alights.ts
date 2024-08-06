@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,7 +11,6 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import boardAlights from '../../models/gtfs-ride/board-alight.ts';
 
 /*
  * Returns an array of all board-alights that match the query parameters.
@@ -25,7 +22,7 @@ export function getBoardAlights(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(boardAlights.filenameBase);
+  const tableName = 'board_alight';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

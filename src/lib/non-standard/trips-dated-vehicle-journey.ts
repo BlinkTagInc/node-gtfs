@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,7 +11,6 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import directions from '../../models/non-standard/trips-dated-vehicle-journey.ts';
 
 /*
  * Returns an array of all trips dated vehicle journeys that match the query parameters.
@@ -25,7 +22,7 @@ export function getTripsDatedVehicleJourneys(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(directions.filenameBase);
+  const tableName = 'trips_dated_vehicle_journey';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

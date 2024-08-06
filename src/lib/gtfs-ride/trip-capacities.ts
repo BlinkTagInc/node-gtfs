@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,7 +11,6 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import tripCapacity from '../../models/gtfs-ride/trip-capacity.ts';
 
 /*
  * Returns an array of all trip-capacities that match the query parameters.
@@ -25,7 +22,7 @@ export function getTripCapacities(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(tripCapacity.filenameBase);
+  const tableName = 'trip_capacity';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

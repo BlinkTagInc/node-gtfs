@@ -1,5 +1,5 @@
 import config from './test-config.ts';
-import { openDb, closeDb, importGtfs, getRideFeedInfos } from '../index.ts';
+import { openDb, closeDb, importGtfs, getRideFeedInfo } from '../index.ts';
 
 beforeAll(async () => {
   openDb();
@@ -11,9 +11,9 @@ afterAll(async () => {
   closeDb(db);
 });
 
-describe('getRideFeedInfos():', () => {
+describe('getRideFeedInfo():', () => {
   it('should return empty array if no ride-feed-infos (GTFS-ride)', () => {
-    const results = getRideFeedInfos({});
+    const results = getRideFeedInfo({});
 
     expect(results).toHaveLength(0);
   });

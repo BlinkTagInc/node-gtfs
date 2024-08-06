@@ -1,4 +1,4 @@
-const model = {
+export const runEvents = {
   filenameBase: 'run_event',
   filenameExtension: 'txt',
   nonstandard: true,
@@ -66,5 +66,3 @@ const model = {
     },
   ],
 };
-
-export default model;

@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,7 +11,6 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import fareProducts from '../../models/gtfs/fare-products.ts';
 
 /*
  * Returns an array of all fare products that match the query parameters.
@@ -25,7 +22,7 @@ export function getFareProducts(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(fareProducts.filenameBase);
+  const tableName = 'fare_products';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

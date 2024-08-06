@@ -1,4 +1,4 @@
-const model = {
+export const calendar = {
   filenameBase: 'calendar',
   filenameExtension: 'txt',
   schema: [
@@ -72,5 +72,3 @@ const model = {
     },
   ],
 };
-
-export default model;

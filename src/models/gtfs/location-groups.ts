@@ -1,4 +1,4 @@
-const model = {
+export const locationGroups = {
   filenameBase: 'location_groups',
   filenameExtension: 'txt',
   schema: [
@@ -15,5 +15,3 @@ const model = {
     },
   ],
 };
-
-export default model;

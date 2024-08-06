@@ -1,4 +1,4 @@
-const model = {
+export const timetableStopOrder = {
   filenameBase: 'timetable_stop_order',
   filenameExtension: 'txt',
   nonstandard: true,
@@ -28,5 +28,3 @@ const model = {
     },
   ],
 };
-
-export default model;

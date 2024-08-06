@@ -80,6 +80,16 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "build": "tsup"
   },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./models": {
+      "import": "./dist/models/models.js",
+      "types": "./dist/models/models.d.ts"
+    }
+  },
   "dependencies": {
     "@turf/helpers": "^7.0.0",
     "better-sqlite3": "^11.1.2",

@@ -1,4 +1,4 @@
-const model = {
+export const areas = {
   filenameBase: 'areas',
   filenameExtension: 'txt',
   schema: [
@@ -15,5 +15,3 @@ const model = {
     },
   ],
 };
-
-export default model;

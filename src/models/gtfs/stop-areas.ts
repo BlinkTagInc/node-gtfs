@@ -1,4 +1,4 @@
-const model = {
+export const stopAreas = {
   filenameBase: 'stop_areas',
   filenameExtension: 'txt',
   schema: [
@@ -16,5 +16,3 @@ const model = {
     },
   ],
 };
-
-export default model;

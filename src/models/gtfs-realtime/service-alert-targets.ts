@@ -1,4 +1,4 @@
-const model = {
+export const serviceAlertTargets = {
   filenameBase: 'service_alert_targets',
   extension: 'gtfs-realtime',
   schema: [
@@ -35,5 +35,3 @@ const model = {
     },
   ],
 };
-
-export default model;

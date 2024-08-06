@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,7 +11,6 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import vehiclePositions from '../../models/gtfs-realtime/vehicle-positions.ts';
 
 /*
  * Returns an array of all vehicle positions that match the query parameters.
@@ -25,7 +22,7 @@ export function getVehiclePositions(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(vehiclePositions.filenameBase);
+  const tableName = 'vehicle_positions';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

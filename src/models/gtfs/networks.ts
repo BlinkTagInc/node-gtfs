@@ -1,4 +1,4 @@
-const model = {
+export const networks = {
   filenameBase: 'networks',
   filenameExtension: 'txt',
   schema: [
@@ -16,5 +16,3 @@ const model = {
     },
   ],
 };
-
-export default model;

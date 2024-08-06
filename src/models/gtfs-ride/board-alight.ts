@@ -1,4 +1,4 @@
-const model = {
+export const boardAlight = {
   filenameBase: 'board_alight',
   filenameExtension: 'txt',
   nonstandard: true,
@@ -128,5 +128,3 @@ const model = {
     },
   ],
 };
-
-export default model;

@@ -1,5 +1,5 @@
 import config from './test-config.ts';
-import { openDb, closeDb, importGtfs, getRiderships } from '../index.ts';
+import { openDb, closeDb, importGtfs, getRidership } from '../index.ts';
 
 beforeAll(async () => {
   openDb();
@@ -11,11 +11,11 @@ afterAll(async () => {
   closeDb(db);
 });
 
-describe('getRiderships():', () => {
+describe('getRidership():', () => {
   it('should return empty array if no riderships (GTFS-ride)', () => {
     const routeId = 'fake-route-id';
 
-    const results = getRiderships({
+    const results = getRidership({
       route_id: routeId,
     });
 

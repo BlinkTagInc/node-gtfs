@@ -7,7 +7,8 @@ import { temporaryDirectory } from 'tempy';
 import { prepDirectory, unzip } from '../lib/file-utils.ts';
 import config from './test-config.ts';
 import { openDb, closeDb, importGtfs, getRoutes, getStops } from '../index.ts';
-import models from '../models/models.ts';
+import * as models from '../models/models.ts';
+import { IModel } from '../types/global_interfaces.ts';
 
 const agenciesFixturesRemote = [
   {
@@ -113,7 +114,7 @@ describe('importGtfs():', function () {
       await unzip(agenciesFixturesLocal[0].path, temporaryDir);
 
       await Promise.all(
-        models.map((model) => {
+        Object.values(models).map((model: IModel) => {
           const filePath = path.join(
             temporaryDir,
             `${model.filenameBase}.${model.filenameExtension}`,
@@ -157,8 +158,8 @@ describe('importGtfs():', function () {
       await rm(temporaryDir, { recursive: true, force: true });
     });
 
-    const modelsToValidate = models.filter(
-      (model) => model.extension !== 'gtfs-realtime',
+    const modelsToValidate: IModel[] = Object.values(models).filter(
+      (model: IModel) => model.extension !== 'gtfs-realtime',
     );
 
     for (const model of modelsToValidate) {

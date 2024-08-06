@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,7 +11,6 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import timetableNotes from '../../models/non-standard/timetable-notes.ts';
 
 /*
  * Returns an array of all timetable notes that match the query parameters.
@@ -25,7 +22,7 @@ export function getTimetableNotes(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(timetableNotes.filenameBase);
+  const tableName = 'timetable_notes';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

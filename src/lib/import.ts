@@ -11,7 +11,7 @@ import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 import sqlString from 'sqlstring-sqlite';
 import Database from 'better-sqlite3';
 
-import models from '../models/models.ts';
+import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
 import { unzip } from './file-utils.ts';
 import { isValidJSON } from './geojson-utils.ts';
@@ -203,33 +203,6 @@ const updateRealtimeData = async (task: IRealtimeTask) => {
     sqlitePath: task.sqlitePath,
   });
 
-  const vehiclePositionsModel = models.find(
-    (x) => x.filenameBase === 'vehicle_positions',
-  );
-  const tripUpdatesModel = models.find(
-    (x) => x.filenameBase === 'trip_updates',
-  );
-  const stoptimeUpdatesModel = models.find(
-    (x) => x.filenameBase === 'stop_time_updates',
-  );
-  const serviceAlertsModel = models.find(
-    (x) => x.filenameBase === 'service_alerts',
-  );
-  const serviceAlertTargetsModel = models.find(
-    (x) => x.filenameBase === 'service_alert_targets',
-  );
-
-  if (
-    !vehiclePositionsModel ||
-    !tripUpdatesModel ||
-    !stoptimeUpdatesModel ||
-    !serviceAlertsModel ||
-    !serviceAlertTargetsModel
-  ) {
-    task.logError('GTFS-Realtime models definitions not found');
-    return;
-  }
-
   task.log(
     `Starting GTFS-Realtime import from ${task.realtime_urls.length} urls`,
   );
@@ -251,15 +224,15 @@ const updateRealtimeData = async (task: IRealtimeTask) => {
       // Determine the type of GTFS-Realtime
       let model;
       if (entity.vehicle) {
-        model = vehiclePositionsModel;
+        model = models.vehiclePositions;
       }
 
       if (entity.tripUpdate) {
-        model = tripUpdatesModel;
+        model = models.tripUpdates;
       }
 
       if (entity.alert) {
-        model = serviceAlertsModel;
+        model = models.serviceAlerts;
       }
 
       if (!model) {
@@ -286,7 +259,7 @@ const updateRealtimeData = async (task: IRealtimeTask) => {
         const stopTimeUpdateArray = [];
         for (const stopTimeUpdate of entity.tripUpdate.stopTimeUpdate) {
           stopTimeUpdate.parent = entity;
-          const subValues = stoptimeUpdatesModel.schema.map((column) =>
+          const subValues = models.stopTimeUpdates.schema.map((column) =>
             prepareRealtimeValue(stopTimeUpdate, column, task),
           );
           stopTimeUpdateArray.push(`(${subValues.join(', ')})`);
@@ -295,7 +268,7 @@ const updateRealtimeData = async (task: IRealtimeTask) => {
 
         try {
           db.prepare(
-            `REPLACE INTO ${stoptimeUpdatesModel.filenameBase} (${stoptimeUpdatesModel.schema
+            `REPLACE INTO ${models.stopTimeUpdates.filenameBase} (${models.stopTimeUpdates.schema
               .map((column) => column.name)
               .join(', ')}) VALUES ${stopTimeUpdateArray.join(', ')}`,
           ).run();
@@ -309,7 +282,7 @@ const updateRealtimeData = async (task: IRealtimeTask) => {
         const alertTargetArray = [];
         for (const informedEntity of entity.alert.informedEntity) {
           informedEntity.parent = entity;
-          const subValues = serviceAlertTargetsModel.schema.map((column) =>
+          const subValues = models.serviceAlertTargets.schema.map((column) =>
             prepareRealtimeValue(informedEntity, column, task),
           );
           alertTargetArray.push(`(${subValues.join(', ')})`);
@@ -318,7 +291,7 @@ const updateRealtimeData = async (task: IRealtimeTask) => {
 
         try {
           db.prepare(
-            `REPLACE INTO ${serviceAlertTargetsModel.filenameBase} (${serviceAlertTargetsModel.schema
+            `REPLACE INTO ${models.serviceAlertTargets.filenameBase} (${models.serviceAlertTargets.schema
               .map((column) => column.name)
               .join(', ')}) VALUES ${alertTargetArray.join(', ')}`,
           ).run();
@@ -401,7 +374,7 @@ const readFiles = async (task: ITask) => {
 };
 
 const createTables = (db: Database.Database) => {
-  for (const model of models as IModel[]) {
+  for (const model of Object.values(models) as IModel[]) {
     if (!model.schema) {
       return;
     }
@@ -625,7 +598,7 @@ const importLines = (
 
 const importFiles = (task: ITask) =>
   mapSeries(
-    models,
+    Object.values(models),
     (model: IModel) =>
       new Promise<void>((resolve, reject) => {
         const lines: {}[] = [];

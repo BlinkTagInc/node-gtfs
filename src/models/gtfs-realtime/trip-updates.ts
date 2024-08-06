@@ -1,4 +1,4 @@
-const model = {
+export const tripUpdates = {
   filenameBase: 'trip_updates',
   extension: 'gtfs-realtime',
   schema: [
@@ -73,5 +73,3 @@ const model = {
     },
   ],
 };
-
-export default model;

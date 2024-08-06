@@ -1,4 +1,4 @@
-const model = {
+export const routeAttributes = {
   filenameBase: 'route_attributes',
   filenameExtension: 'txt',
   nonstandard: true,
@@ -30,5 +30,3 @@ const model = {
     },
   ],
 };
-
-export default model;

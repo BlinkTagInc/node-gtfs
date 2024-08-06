@@ -1,4 +1,4 @@
-const model = {
+export const frequencies = {
   filenameBase: 'frequencies',
   filenameExtension: 'txt',
   schema: [
@@ -42,5 +42,3 @@ const model = {
     },
   ],
 };
-
-export default model;

@@ -1,4 +1,4 @@
-const model = {
+export const routes = {
   filenameBase: 'routes',
   filenameExtension: 'txt',
   schema: [
@@ -75,5 +75,3 @@ const model = {
     },
   ],
 };
-
-export default model;

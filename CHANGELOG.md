@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
+### Fixed
 - Correction to trips_dated_vehicle_journey
+
+### Updated
+- Changed model exports
 
 ## [4.13.3] - 2024-08-03
 

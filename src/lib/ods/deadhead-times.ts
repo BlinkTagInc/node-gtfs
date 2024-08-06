@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,7 +11,6 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import deadheadTimes from '../../models/ods/deadhead-times.ts';
 
 /*
  * Returns an array of all deadhead_times that match the query parameters.
@@ -25,7 +22,7 @@ export function getDeadheadTimes(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(deadheadTimes.filenameBase);
+  const tableName = 'deadhead_times';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

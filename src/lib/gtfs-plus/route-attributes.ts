@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,7 +11,6 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import routeAttributes from '../../models/gtfs-plus/route-attributes.ts';
 
 /*
  * Returns an array of all route_attributes that match the query parameters.
@@ -25,7 +22,7 @@ export function getRouteAttributes(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(routeAttributes.filenameBase);
+  const tableName = 'route_attributes';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

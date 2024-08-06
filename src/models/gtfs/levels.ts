@@ -1,4 +1,4 @@
-const model = {
+export const levels = {
   filenameBase: 'levels',
   filenameExtension: 'txt',
   schema: [
@@ -21,5 +21,3 @@ const model = {
     },
   ],
 };
-
-export default model;

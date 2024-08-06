@@ -1,4 +1,4 @@
-const model = {
+export const calendarDates = {
   filenameBase: 'calendar_dates',
   filenameExtension: 'txt',
   schema: [
@@ -30,5 +30,3 @@ const model = {
     },
   ],
 };
-
-export default model;

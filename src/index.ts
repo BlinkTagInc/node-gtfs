@@ -58,9 +58,9 @@ export { getTripsDatedVehicleJourneys } from './lib/non-standard/trips-dated-veh
 
 // GTFS-ride
 export { getBoardAlights } from './lib/gtfs-ride/board-alights.ts';
-export { getRideFeedInfos } from './lib/gtfs-ride/ride-feed-infos.ts';
+export { getRideFeedInfo } from './lib/gtfs-ride/ride-feed-info.ts';
 export { getRiderTrips } from './lib/gtfs-ride/rider-trips.ts';
-export { getRiderships } from './lib/gtfs-ride/riderships.ts';
+export { getRidership } from './lib/gtfs-ride/ridership.ts';
 export { getTripCapacities } from './lib/gtfs-ride/trip-capacities.ts';
 
 // GTFS-Realtime

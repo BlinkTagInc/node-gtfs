@@ -1,5 +1,4 @@
 import { omit, pick } from 'lodash-es';
-import sqlString from 'sqlstring-sqlite';
 
 import {
   QueryOptions,
@@ -15,7 +14,6 @@ import {
   formatWhereClause,
   formatWhereClauses,
 } from '../utils.ts';
-import routes from '../../models/gtfs/routes.ts';
 
 function buildStoptimeSubquery(query: { [key: string]: string }) {
   const whereClause = formatWhereClauses(query);
@@ -55,7 +53,7 @@ export function getRoutes(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(routes.filenameBase);
+  const tableName = 'routes';
   const selectClause = formatSelectClause(fields);
   let whereClause = '';
   const orderByClause = formatOrderByClause(orderBy);

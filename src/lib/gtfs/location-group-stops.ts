@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,7 +11,6 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import locationGroupStops from '../../models/gtfs/location-group-stops.ts';
 
 /*
  * Returns an array of all location group stops that match the query parameters.
@@ -25,7 +22,7 @@ export function getLocationGroupStops(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(locationGroupStops.filenameBase);
+  const tableName = 'location_group_stops';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

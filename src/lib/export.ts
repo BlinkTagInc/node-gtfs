@@ -9,7 +9,7 @@ import Database from 'better-sqlite3';
 import mapSeries from 'promise-map-series';
 import untildify from 'untildify';
 
-import models from '../models/models.ts';
+import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
 import { prepDirectory, generateFolderName } from './file-utils.ts';
 import { log as _log, logWarning as _logWarning } from './log-utils.ts';
@@ -70,8 +70,8 @@ export const exportGtfs = async (initialConfig: IConfig) => {
   await prepDirectory(exportPath);
 
   // Loop through each GTFS file
-  const modelsToExport = models.filter(
-    (model) => model.extension !== 'gtfs-realtime',
+  const modelsToExport = Object.values(models).filter(
+    (model: IModel) => model.extension !== 'gtfs-realtime',
   );
   const exportedFiles = await mapSeries(
     modelsToExport,

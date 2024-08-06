@@ -1,4 +1,4 @@
-const model = {
+export const tripCapacity = {
   filenameBase: 'trip_capacity',
   filenameExtension: 'txt',
   nonstandard: true,
@@ -47,5 +47,3 @@ const model = {
     },
   ],
 };
-
-export default model;

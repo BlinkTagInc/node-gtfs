@@ -1,4 +1,4 @@
-const model = {
+export const stopTimeUpdates = {
   filenameBase: 'stop_time_updates',
   extension: 'gtfs-realtime',
   schema: [
@@ -83,5 +83,3 @@ const model = {
     },
   ],
 };
-
-export default model;

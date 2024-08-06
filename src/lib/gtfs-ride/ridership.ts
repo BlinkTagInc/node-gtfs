@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,19 +11,18 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import riderships from '../../models/gtfs-ride/ridership.ts';
 
 /*
- * Returns an array of all riderships that match the query parameters.
+ * Returns an array of all ridership that match the query parameters.
  */
-export function getRiderships(
+export function getRidership(
   query: SqlWhere = {},
   fields: SqlSelect = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(riderships.filenameBase);
+  const tableName = 'ridership';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

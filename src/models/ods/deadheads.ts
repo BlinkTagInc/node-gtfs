@@ -1,4 +1,4 @@
-const model = {
+export const deadheads = {
   filenameBase: 'deadheads',
   filenameExtension: 'txt',
   nonstandard: true,
@@ -56,5 +56,3 @@ const model = {
     },
   ],
 };
-
-export default model;

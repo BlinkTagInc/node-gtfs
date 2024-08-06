@@ -1,4 +1,4 @@
-const model = {
+export const stopTimes = {
   filenameBase: 'stop_times',
   filenameExtension: 'txt',
   schema: [
@@ -116,5 +116,3 @@ const model = {
     },
   ],
 };
-
-export default model;

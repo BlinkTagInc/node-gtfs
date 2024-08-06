@@ -1,4 +1,4 @@
-const model = {
+export const timetableNotesReferences = {
   filenameBase: 'timetable_notes_references',
   filenameExtension: 'txt',
   nonstandard: true,
@@ -46,5 +46,3 @@ const model = {
     },
   ],
 };
-
-export default model;

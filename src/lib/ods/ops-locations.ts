@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,7 +11,6 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import opsLocations from '../../models/ods/ops-locations.ts';
 
 /*
  * Returns an array of all ops_locations that match the query parameters.
@@ -25,7 +22,7 @@ export function getOpsLocations(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(opsLocations.filenameBase);
+  const tableName = 'ops_locations';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

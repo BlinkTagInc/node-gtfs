@@ -1,4 +1,4 @@
-const model = {
+export const pathways = {
   filenameBase: 'pathways',
   filenameExtension: 'txt',
   schema: [
@@ -70,5 +70,3 @@ const model = {
     },
   ],
 };
-
-export default model;

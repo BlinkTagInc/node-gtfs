@@ -1,4 +1,4 @@
-const model = {
+export const stopAttributes = {
   filenameBase: 'stop_attributes',
   filenameExtension: 'txt',
   nonstandard: true,
@@ -31,5 +31,3 @@ const model = {
     },
   ],
 };
-
-export default model;

@@ -1565,15 +1565,15 @@ const boardAlights = getBoardAlights({
 });
 ```
 
-#### getRideFeedInfos(query, fields, sortBy, options)
+#### getRideFeedInfo(query, fields, sortBy, options)
 
 Returns an array of ride_feed_info that match query parameters. [Details on ride_feed_info.txt](http://gtfsride.org/specification#ride_feed_infotxt)
 
 ```js
-import { getRideFeedInfos } from 'gtfs';
+import { getRideFeedInfo } from 'gtfs';
 
 // Get all ride_feed_info
-const rideFeedInfos = getRideFeedInfos();
+const rideFeedInfos = getRideFeedInfo();
 ```
 
 #### getRiderTrips(query, fields, sortBy, options)
@@ -1592,18 +1592,18 @@ const riderTrips = getRiderTrips({
 });
 ```
 
-#### getRiderships(query, fields, sortBy, options)
+#### getRidership(query, fields, sortBy, options)
 
 Returns an array of ridership that match query parameters. [Details on ridership.txt](http://gtfsride.org/specification#ridershiptxt)
 
 ```js
-import { getRiderships } from 'gtfs';
+import { getRidership } from 'gtfs';
 
 // Get all ridership
-const riderships = getRiderships();
+const riderships = getRidership();
 
 // Get ridership for a specific route
-const riderships = getRiderships({
+const riderships = getRidership({
   route_id: '123',
 });
 ```

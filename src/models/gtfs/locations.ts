@@ -1,4 +1,4 @@
-const model = {
+export const locations = {
   filenameBase: 'locations',
   filenameExtension: 'geojson',
   schema: [
@@ -8,5 +8,3 @@ const model = {
     },
   ],
 };
-
-export default model;

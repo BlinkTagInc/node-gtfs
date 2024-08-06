@@ -1,4 +1,4 @@
-const model = {
+export const opsLocations = {
   filenameBase: 'ops_locations',
   filenameExtension: 'txt',
   nonstandard: true,
@@ -42,5 +42,3 @@ const model = {
     },
   ],
 };
-
-export default model;

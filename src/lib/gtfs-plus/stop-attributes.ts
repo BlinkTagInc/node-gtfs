@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,7 +11,6 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import stopAttributes from '../../models/gtfs-plus/stop-attributes.ts';
 
 /*
  * Returns an array of all stop attributes that match the query parameters.
@@ -25,7 +22,7 @@ export function getStopAttributes(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(stopAttributes.filenameBase);
+  const tableName = 'stop_attributes';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

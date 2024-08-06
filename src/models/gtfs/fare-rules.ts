@@ -1,4 +1,4 @@
-const model = {
+export const fareRules = {
   filenameBase: 'fare_rules',
   filenameExtension: 'txt',
   schema: [
@@ -30,5 +30,3 @@ const model = {
     },
   ],
 };
-
-export default model;

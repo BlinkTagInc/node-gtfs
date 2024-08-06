@@ -1,4 +1,4 @@
-const model = {
+export const rideFeedInfo = {
   filenameBase: 'ride_feed_info',
   filenameExtension: 'txt',
   nonstandard: true,
@@ -36,5 +36,3 @@ const model = {
     },
   ],
 };
-
-export default model;

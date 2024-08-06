@@ -1,5 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
-
 import {
   QueryOptions,
   SqlOrderBy,
@@ -13,7 +11,6 @@ import {
   formatSelectClause,
   formatWhereClauses,
 } from '../utils.ts';
-import calendarDates from '../../models/gtfs/calendar-dates.ts';
 
 /*
  * Returns an array of calendarDates that match the query parameters.
@@ -25,7 +22,7 @@ export function getCalendarDates(
   options: QueryOptions = {},
 ): SqlResults {
   const db = options.db ?? openDb();
-  const tableName = sqlString.escapeId(calendarDates.filenameBase);
+  const tableName = 'calendar_dates';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

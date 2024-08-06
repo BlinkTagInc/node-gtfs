@@ -1,4 +1,4 @@
-const model = {
+export const calendarAttributes = {
   filenameBase: 'calendar_attributes',
   filenameExtension: 'txt',
   nonstandard: true,
@@ -18,5 +18,3 @@ const model = {
     },
   ],
 };
-
-export default model;

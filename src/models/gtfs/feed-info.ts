@@ -1,4 +1,4 @@
-const model = {
+export const feedInfo = {
   filenameBase: 'feed_info',
   filenameExtension: 'txt',
   schema: [
@@ -46,5 +46,3 @@ const model = {
     },
   ],
 };
-
-export default model;

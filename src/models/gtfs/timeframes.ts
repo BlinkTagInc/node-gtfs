@@ -1,4 +1,4 @@
-const model = {
+export const timeframes = {
   filenameBase: 'timeframes',
   filenameExtension: 'txt',
   schema: [
@@ -25,5 +25,3 @@ const model = {
     },
   ],
 };
-
-export default model;
