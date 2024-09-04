@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Changed config structure for GTFS-Realtime urls
 
+### Updated
+- Dependency Updates
+
 ## [4.13.4] - 2024-08-05
 
 ### Fixed
