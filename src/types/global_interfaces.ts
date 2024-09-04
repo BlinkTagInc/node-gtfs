@@ -1,6 +1,26 @@
 import CsvParse = require('csv-parse');
 import Database = require('better-sqlite3');
 
+export interface IAgency {
+  exclude?: string[];
+  url?: string;
+  path?: string;
+  headers?: Record<string, string>;
+  realtimeAlerts?: {
+    url: string;
+    headers?: Record<string, string>;
+  };
+  realtimeTripUpdates?: {
+    url: string;
+    headers?: Record<string, string>;
+  };
+  realtimeVehiclePositions?: {
+    url: string;
+    headers?: Record<string, string>;
+  };
+  prefix?: string;
+}
+
 export interface IConfig {
   db?: Database.Database;
   sqlitePath?: string;
@@ -10,15 +30,7 @@ export interface IConfig {
   csvOptions?: CsvParse.Options;
   exportPath?: string;
   ignoreErrors?: boolean;
-  agencies: {
-    exclude?: string[];
-    url?: string;
-    path?: string;
-    headers?: Record<string, string>;
-    realtimeHeaders?: Record<string, string>;
-    realtimeUrls?: string[];
-    prefix?: string;
-  }[];
+  agencies: IAgency[];
   verbose?: boolean;
   logFunction?: (message: string) => void;
 }

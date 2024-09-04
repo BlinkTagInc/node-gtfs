@@ -178,8 +178,9 @@ To find an agency's GTFS file, visit [transitfeeds.com](http://transitfeeds.com)
 | `headers`         | object | An object of HTTP headers in key:value format to use when fetching GTFS from the `url` specified. Optional.                        |
 | `prefix`          | string | A prefix to be added to every ID field maintain uniqueness when importing multiple GTFS from multiple agencies. Optional.          |
 | `exclude`         | array  | An array of GTFS file names (without `.txt`) to exclude when importing. Optional.                                                  |
-| `realtimeUrls`    | array  | An array of GTFS-Realtime urls to import. Optional.                                                                                |
-| `realtimeHeaders` | array  | An object of HTTP headers in key:value format to use when fetching GTFS-Realtime data from the `realtimeUrls` specified. Optional. |
+| `realtimeAlerts`  | object  | An object containing a `url` field for GTFS-Realtime alerts and a `headers` field in key:value format to use when fetching GTFS-Realtime data. Optional.  |
+| `realtimeTripUpdates`  | object  | An object containing a `url` field for GTFS-Realtime trip updates and a `headers` field in key:value format to use when fetching GTFS-Realtime data. Optional.  |
+| `realtimeVehiclePositions`  | object  | An object containing a `url` field for GTFS-Realtime vehicle positions and a `headers` field in key:value format to use when fetching GTFS-Realtime data. Optional.  |
 
 - Specify a `url` to download GTFS:
 
@@ -187,7 +188,7 @@ To find an agency's GTFS file, visit [transitfeeds.com](http://transitfeeds.com)
 {
   "agencies": [
     {
-      "url": "http://countyconnection.com/GTFS/google_transit.zip"
+      "url": "https://opendata.somewhere.com/gtfs.zip"
     }
   ]
 }
@@ -199,7 +200,7 @@ To find an agency's GTFS file, visit [transitfeeds.com](http://transitfeeds.com)
 {
   "agencies": [
     {
-      "url": "http://countyconnection.com/GTFS/google_transit.zip",
+      "url": "https://opendata.somewhere.com/gtfs.zip",
       "headers": {
         "Content-Type": "application/json",
         "Authorization": "bearer 1234567890"
@@ -246,19 +247,30 @@ To find an agency's GTFS file, visit [transitfeeds.com](http://transitfeeds.com)
 }
 ```
 
-- Specify urls for GTFS-Realtime updates. `realtimeUrls` allows an array of GTFS-Realtime URLs. For example, a URL for trip updates, a URL for vehicle updates and a URL for service alerts. In addition, a `realtimeHeaders` parameter allows adding additional HTTP headers to the request.
+- Specify urls for GTFS-Realtime updates. `realtimeAlerts`, `realtimeTripUpdates` and `realtimeVehiclePositions` fields accept an object with a `url` and optional `headers` field to specify HTTP headers to include with the request, usually for authorization purposes.
 
 ```json
 {
   "agencies": [
     {
-      "url": "http://countyconnection.com/GTFS/google_transit.zip",
-      "realtimeUrls": [
-        "https://opendata.somewhere.com/gtfs-rt/VehicleUpdates.pb",
-        "https://opendata.somewhere.com/gtfs-rt/TripUpdates.pb"
-      ],
-      "realtimeHeaders": {
-        "Authorization": "bearer 1234567890"
+      "url": "https://opendata.somewhere.com/gtfs.zip",
+      "realtimeAlerts": {
+        "url": "https://opendata.somewhere.com/gtfs-rt/alerts",
+        "headers": {
+          "Authorization": "bearer 123456789"
+        }
+      },
+      "realtimeTripUpdates": {
+        "url": "https://opendata.somewhere.com/gtfs-rt/tripupdates",
+        "headers": {
+          "Authorization": "bearer 123456789"
+        }
+      },
+      "realtimeVehiclePositions": {
+        "url": "https://opendata.somewhere.com/gtfs-rt/vehiclepositions",
+        "headers": {
+          "Authorization": "bearer 123456789"
+        }
       }
     }
   ]
@@ -389,11 +401,15 @@ importGtfs({
   "agencies": [
     {
       "url": "https://agency.com/gtfs.zip",
-      "realtimeUrls": [
-        "https://agency.com/gtfs-rt/alerts",
-        "https://agency.com/gtfs-rt/tripupdates",
-        "https://agency.com/gtfs-rt/vehiclepositions"
-      ]
+      "realtimeAlerts": {
+        "url": "https://opendata.somewhere.com/gtfs-rt/alerts"
+      },
+      "realtimeTripUpdates": {
+        "url": "https://opendata.somewhere.com/gtfs-rt/tripupdates"
+      },
+      "realtimeVehiclePositions": {
+        "url": "https://opendata.somewhere.com/gtfs-rt/vehiclepositions"
+      }
     }
   ],
   "gtfsRealtimeExpirationSeconds": false
@@ -462,7 +478,7 @@ import { importGtfs } from 'gtfs';
 const config = {
   agencies: [
     {
-      url: 'http://countyconnection.com/GTFS/google_transit.zip',
+      url: 'https://opendata.somewhere.com/gtfs.zip',
       exclude: ['shapes'],
     },
   ],
@@ -512,7 +528,7 @@ const config = {
   sqlitePath: '/dev/sqlite/gtfs',
   agencies: [
     {
-      url: 'http://countyconnection.com/GTFS/google_transit.zip',
+      url: 'https://opendata.somewhere.com/gtfs.zip',
       exclude: ['shapes'],
     },
   ],
@@ -592,7 +608,7 @@ const config = {
   sqlitePath: '/dev/sqlite/gtfs',
   agencies: [
     {
-      url: 'http://countyconnection.com/GTFS/google_transit.zip',
+      url: 'https://opendata.somewhere.com/gtfs.zip',
       exclude: ['shapes'],
     },
   ],

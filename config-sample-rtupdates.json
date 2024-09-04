@@ -2,11 +2,15 @@
   "agencies": [
     {
       "url": "https://marintransit.org/data/google_transit.zip",
-      "realtimeUrls": [
-        "https://marintransit.net/gtfs-rt/alerts",
-        "https://marintransit.net/gtfs-rt/tripupdates",
-        "https://marintransit.net/gtfs-rt/vehiclepositions"
-      ]
+      "realtimeAlerts": {
+        "url": "https://marintransit.net/gtfs-rt/alerts"
+      },
+      "realtimeTripUpdates": {
+        "url": "https://marintransit.net/gtfs-rt/tripupdates"
+      },
+      "realtimeVehiclePositions": {
+        "url": "https://marintransit.net/gtfs-rt/vehiclepositions"
+      }
     }
   ],
   "csvOptions": {
