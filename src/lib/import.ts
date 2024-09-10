@@ -9,7 +9,7 @@ import untildify from 'untildify';
 import mapSeries from 'promise-map-series';
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 import sqlString from 'sqlstring-sqlite';
-import Database from 'better-sqlite3';
+import Database from 'libsql';
 
 import * as models from '../models/models.ts';
 import { openDb } from './db.ts';

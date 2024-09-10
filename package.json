@@ -92,10 +92,10 @@
   },
   "dependencies": {
     "@turf/helpers": "^7.1.0",
-    "better-sqlite3": "^11.2.1",
     "csv-parse": "^5.5.6",
     "csv-stringify": "^6.5.1",
     "gtfs-realtime-bindings": "^1.1.1",
+    "libsql": "^0.4.4",
     "lodash-es": "^4.17.21",
     "long": "^5.2.3",
     "node-stream-zip": "^1.15.0",
@@ -111,7 +111,6 @@
     "yoctocolors": "^2.1.1"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.11",
     "@types/geojson": "^7946.0.14",
     "@types/jest": "^29.5.12",
     "@types/lodash-es": "^4.17.12",
@@ -138,6 +137,9 @@
       "@release-it/keep-a-changelog": {
         "filename": "CHANGELOG.md"
       }
+    },
+    "hooks": {
+      "after:bump": "npm run build"
     }
   },
   "prettier": {

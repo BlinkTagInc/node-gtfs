@@ -43,7 +43,7 @@ const setupImport = async () => {
   await importGtfs(config);
 
   const db = openDb(config);
-  if (db.name !== ':memory:') {
+  if (db.memory === false) {
     closeDb(db);
   }
   process.exit();

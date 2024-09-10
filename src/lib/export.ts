@@ -5,7 +5,7 @@ import { without, compact } from 'lodash-es';
 import pluralize from 'pluralize';
 import { stringify } from 'csv-stringify';
 import sqlString from 'sqlstring-sqlite';
-import Database from 'better-sqlite3';
+import Database from 'libsql';
 import mapSeries from 'promise-map-series';
 import untildify from 'untildify';
 

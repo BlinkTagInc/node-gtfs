@@ -328,9 +328,9 @@ See [full list of options](https://csv.js.org/parse/options/).
 {Database Instance} When passing configuration to `importGtfs` in javascript, you can pass a `db` parameter with an existing database instance. This is not possible using a json configuration file Optional.
 
 ```js
-// Using better-sqlite3 to open database
+// Using libsql to open database
 import { importGtfs } from 'gtfs';
-import Database from 'better-sqlite3';
+import Database from 'libsql';
 
 const db = new Database('/path/to/database');
 
@@ -630,7 +630,7 @@ There are also methods for retrieving stops and shapes in geoJSON format.
 
 Most query methods accept three optional arguments: `query`, `fields`, `sortBy` and `options`.
 
-For more advanced queries, you can use `advancedQuery` or raw SQL queries using query method from [better-sqlite3](#raw-sqlite-query).
+For more advanced queries, you can use `advancedQuery` or raw SQL queries using query method from [libsql](https://github.com/tursodatabase/libsql-js).
 
 ### Database Setup
 
@@ -1759,7 +1759,7 @@ const stoptimes = advancedQuery('stop_times', advancedQueryOptions);
 
 #### Raw SQLite Query
 
-Use the `openDb` function to get the db object, and then use any query method from [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) to query GTFS data.
+Use the `openDb` function to get the db object, and then use any query method from [libsql](https://github.com/tursodatabase/libsql-js) to query GTFS data.
 
 ```js
 import { openDb } from 'gtfs';

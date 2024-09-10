@@ -1,5 +1,5 @@
 import sqlString from 'sqlstring-sqlite';
-import Database from 'better-sqlite3';
+import Database from 'libsql';
 
 import { openDb } from './db.ts';
 

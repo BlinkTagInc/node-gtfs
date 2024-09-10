@@ -1,12 +1,13 @@
 import fs from 'fs';
 
-import Database from 'better-sqlite3';
+import Database from 'libsql';
 import untildify from 'untildify';
 
 const dbs: { [key: string]: Database.Database } = {};
 
 function setupDb(sqlitePath: string) {
   const db = new Database(untildify(sqlitePath));
+  db.name = sqlitePath;
   db.pragma('journal_mode = OFF');
   db.pragma('synchronous = OFF');
   db.pragma('temp_store = MEMORY');
@@ -96,7 +97,9 @@ export function deleteDb(db: Database.Database | null = null): void {
 
   db.close();
 
-  fs.unlinkSync(db.name);
+  if (db.name !== ':memory:' && fs.existsSync(db.name)) {
+    fs.unlinkSync(db.name);
+  }
 
   delete dbs[db.name];
 }
