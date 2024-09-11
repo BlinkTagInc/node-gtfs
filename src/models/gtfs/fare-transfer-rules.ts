@@ -21,11 +21,6 @@ export const fareTransferRules = {
       primary: true,
     },
     {
-      name: 'transfer_id',
-      type: 'text',
-      prefix: true,
-    },
-    {
       name: 'duration_limit',
       type: 'integer',
       min: 0,

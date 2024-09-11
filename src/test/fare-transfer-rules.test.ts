@@ -13,9 +13,9 @@ afterAll(async () => {
 
 describe('getFareTransferRules():', () => {
   it('should return empty array if no fare_transfer_rules exist', () => {
-    const transferId = 'fake-transfer-id';
+    const groupId = 'fake-group-id';
     const results = getFareTransferRules({
-      transfer_id: transferId,
+      from_leg_group_id: groupId,
     });
 
     expect(results).toHaveLength(0);
