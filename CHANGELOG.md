@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update to fare_transfer_rules.txt model
 - Added types for all GTFS files
 
+### Updated
+- Dependency Updates
+
 ## [4.14.0] - 2024-09-04
 
 ### Changed
