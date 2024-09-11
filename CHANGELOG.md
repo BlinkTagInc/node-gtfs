@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fix for GTFS-Realtime vehicle positions import
 
+### Updated
+- Build before release-it
+
 ## [4.14.1] - 2024-09-10
 
 ### Changed
