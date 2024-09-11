@@ -1,9 +1,9 @@
 import {
   QueryOptions,
   SqlOrderBy,
-  SqlResults,
   SqlSelect,
   SqlWhere,
+  Timeframe,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
 import {
@@ -20,7 +20,7 @@ export function getTimeframes(
   fields: SqlSelect = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'timeframes';
   const selectClause = formatSelectClause(fields);
@@ -31,5 +31,5 @@ export function getTimeframes(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as Timeframe[];
 }

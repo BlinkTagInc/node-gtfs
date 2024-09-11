@@ -1,7 +1,7 @@
 import {
+  Area,
   QueryOptions,
   SqlOrderBy,
-  SqlResults,
   SqlSelect,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
@@ -20,7 +20,7 @@ export function getAreas(
   fields: SqlSelect = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'areas';
   const selectClause = formatSelectClause(fields);
@@ -31,5 +31,5 @@ export function getAreas(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as Area[];
 }

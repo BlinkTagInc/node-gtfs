@@ -1,7 +1,7 @@
 import sqlString from 'sqlstring-sqlite';
 import Long from 'long';
 import {
-  IConfig,
+  Config,
   JoinOptions,
   SqlWhere,
   SqlValue,
@@ -11,7 +11,7 @@ import {
 /*
  * Validate configuration.
  */
-export function validateConfigForImport(config: IConfig) {
+export function validateConfigForImport(config: Config) {
   if (!config.agencies || config.agencies.length === 0) {
     throw new Error('No `agencies` specified in config');
   }
@@ -30,7 +30,7 @@ export function validateConfigForImport(config: IConfig) {
 /*
  * Initialize configuration with defaults.
  */
-export function setDefaultConfig(initialConfig: IConfig) {
+export function setDefaultConfig(initialConfig: Config) {
   const defaults = {
     sqlitePath: ':memory:',
     ignoreDuplicates: false,

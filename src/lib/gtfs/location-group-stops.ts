@@ -1,7 +1,7 @@
 import {
+  LocationGroupStop,
   QueryOptions,
   SqlOrderBy,
-  SqlResults,
   SqlSelect,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
@@ -20,7 +20,7 @@ export function getLocationGroupStops(
   fields: SqlSelect = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'location_group_stops';
   const selectClause = formatSelectClause(fields);
@@ -31,5 +31,5 @@ export function getLocationGroupStops(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as LocationGroupStop[];
 }

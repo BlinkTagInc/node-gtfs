@@ -4,8 +4,8 @@ import { featureCollection } from '@turf/helpers';
 
 import {
   QueryOptions,
+  Shape,
   SqlOrderBy,
-  SqlResults,
   SqlSelect,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
@@ -37,7 +37,7 @@ export function getShapes(
   fields: SqlSelect = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'shapes';
   const selectClause = formatSelectClause(fields);
@@ -73,7 +73,7 @@ export function getShapes(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as Shape[];
 }
 
 /*

@@ -2,8 +2,8 @@ import { omit, pick } from 'lodash-es';
 
 import {
   QueryOptions,
+  Route,
   SqlOrderBy,
-  SqlResults,
   SqlSelect,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
@@ -51,7 +51,7 @@ export function getRoutes(
   fields: SqlSelect = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'routes';
   const selectClause = formatSelectClause(fields);
@@ -80,5 +80,5 @@ export function getRoutes(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as Route[];
 }

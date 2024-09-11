@@ -1,7 +1,7 @@
 import {
+  FareLegRule,
   QueryOptions,
   SqlOrderBy,
-  SqlResults,
   SqlSelect,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
@@ -20,7 +20,7 @@ export function getFareLegRules(
   fields: SqlSelect = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'fare_leg_rules';
   const selectClause = formatSelectClause(fields);
@@ -31,5 +31,5 @@ export function getFareLegRules(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as FareLegRule[];
 }

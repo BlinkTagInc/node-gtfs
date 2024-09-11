@@ -4,9 +4,9 @@ import { FeatureCollection } from 'geojson';
 import {
   QueryOptions,
   SqlOrderBy,
-  SqlResults,
   SqlSelect,
   SqlWhere,
+  Stop,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
 import {
@@ -43,7 +43,7 @@ export function getStops(
   fields: SqlSelect = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'stops';
   const selectClause = formatSelectClause(fields);
@@ -109,7 +109,7 @@ export function getStops(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as Stop[];
 }
 
 /*
@@ -137,14 +137,15 @@ export function getStopsAsGeoJSON(
 
     const stopAttributes = getStopAttributes({ stop_id: stop.stop_id });
 
-    stop.routes = orderBy(routes, (route: { route_short_name?: string }) =>
-      route?.route_short_name ? Number.parseInt(route.route_short_name, 10) : 0,
-    );
-    stop.agency_name = agencies[0].agency_name;
-
     return {
       ...stop,
       ...(stopAttributes?.[0] || []),
+      routes: orderBy(routes, (route: { route_short_name?: string }) =>
+        route?.route_short_name
+          ? Number.parseInt(route.route_short_name, 10)
+          : 0,
+      ),
+      agency_name: agencies[0].agency_name,
     };
   });
 

@@ -1,9 +1,9 @@
 import {
   QueryOptions,
   SqlOrderBy,
-  SqlResults,
   SqlSelect,
   SqlWhere,
+  Transfer,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
 import {
@@ -20,7 +20,7 @@ export function getTransfers(
   fields: SqlSelect = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'transfers';
   const selectClause = formatSelectClause(fields);
@@ -31,5 +31,5 @@ export function getTransfers(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as Transfer[];
 }

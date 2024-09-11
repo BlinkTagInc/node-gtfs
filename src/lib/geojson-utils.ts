@@ -1,5 +1,6 @@
 import {
   cloneDeep,
+  compact,
   filter,
   groupBy,
   last,
@@ -8,7 +9,7 @@ import {
   omitBy,
 } from 'lodash-es';
 import { feature, featureCollection } from '@turf/helpers';
-import { SqlResults } from '../types/global_interfaces.ts';
+import { Shape, Stop } from '../types/global_interfaces.ts';
 
 export function isValidJSON(string: string) {
   try {
@@ -42,10 +43,10 @@ function isValidLineString(lineString?: Position[]) {
   return true;
 }
 
-function consolidateShapes(shapes: SqlResults) {
+function consolidateShapes(shapeGroups: Shape[][]) {
   const keys = new Set();
-  const segmentsArray = shapes.map((shape) =>
-    shape.reduce(
+  const segmentsArray = shapeGroups.map((shapes) =>
+    shapes.reduce(
       (
         memo: any[][][],
         point: { shape_pt_lon: number; shape_pt_lat: number },
@@ -53,7 +54,7 @@ function consolidateShapes(shapes: SqlResults) {
       ) => {
         if (idx > 0) {
           memo.push([
-            [shape[idx - 1].shape_pt_lon, shape[idx - 1].shape_pt_lat],
+            [shapes[idx - 1].shape_pt_lon, shapes[idx - 1].shape_pt_lat],
             [point.shape_pt_lon, point.shape_pt_lat],
           ]);
         }
@@ -124,7 +125,7 @@ function formatProperties(properties: Record<string, any>) {
   return formattedProperties;
 }
 
-export function shapesToGeoJSONFeature(shapes: SqlResults, properties = {}) {
+export function shapesToGeoJSONFeature(shapes: Shape[], properties = {}) {
   const shapeGroups = Object.values(groupBy(shapes, 'shape_id')).map(
     (shapeGroup) => sortBy(shapeGroup, 'shape_pt_sequence'),
   );
@@ -139,15 +140,21 @@ export function shapesToGeoJSONFeature(shapes: SqlResults, properties = {}) {
   );
 }
 
-export function stopsToGeoJSONFeatureCollection(stops: SqlResults) {
-  const features = stops.map((stop) =>
-    feature(
-      {
-        type: 'Point',
-        coordinates: [stop.stop_lon, stop.stop_lat],
-      },
-      formatProperties(omit(stop, ['stop_lat', 'stop_lon'])),
-    ),
+export function stopsToGeoJSONFeatureCollection(stops: Stop[]) {
+  const features = compact(
+    stops.map((stop) => {
+      if (!stop.stop_lon || !stop.stop_lat) {
+        return;
+      }
+
+      return feature(
+        {
+          type: 'Point',
+          coordinates: [stop.stop_lon, stop.stop_lat],
+        },
+        formatProperties(omit(stop, ['stop_lat', 'stop_lon'])),
+      );
+    }),
   );
 
   return featureCollection(features);

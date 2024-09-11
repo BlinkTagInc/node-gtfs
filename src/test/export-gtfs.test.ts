@@ -14,7 +14,7 @@ import {
   getAgencies,
 } from '../index.ts';
 import * as models from '../models/models.ts';
-import { IModel } from '../types/global_interfaces.ts';
+import { Model } from '../types/global_interfaces.ts';
 
 describe('exportGtfs():', function () {
   describe('Export GTFS', () => {
@@ -44,7 +44,7 @@ describe('exportGtfs():', function () {
       await unzip(config.agencies[0].path, temporaryDir);
 
       await Promise.all(
-        Object.values(models).map((model: IModel) => {
+        Object.values(models).map((model: Model) => {
           const filePath = path.join(
             temporaryDir,
             `${model.filenameBase}.${model.filenameExtension}`,
@@ -99,8 +99,8 @@ describe('exportGtfs():', function () {
       await rm(temporaryDir, { recursive: true, force: true });
     });
 
-    const modelsToValidate: IModel[] = Object.values(models).filter(
-      (model: IModel) => model.extension !== 'gtfs-realtime',
+    const modelsToValidate: Model[] = Object.values(models).filter(
+      (model: Model) => model.extension !== 'gtfs-realtime',
     );
 
     for (const model of modelsToValidate) {

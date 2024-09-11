@@ -15,9 +15,9 @@ import { prepDirectory, generateFolderName } from './file-utils.ts';
 import { log as _log, logWarning as _logWarning } from './log-utils.ts';
 import { setDefaultConfig } from './utils.ts';
 
-import { IConfig, IModel, SqlResults } from '../types/global_interfaces.ts';
+import { Config, Model, SqlResults } from '../types/global_interfaces.ts';
 
-const getAgencies = (db: Database.Database, config: IConfig) => {
+const getAgencies = (db: Database.Database, config: Config) => {
   try {
     return db.prepare('SELECT agency_name FROM agency;').all() as {
       agency_name: string;
@@ -35,7 +35,7 @@ const getAgencies = (db: Database.Database, config: IConfig) => {
   }
 };
 
-export const exportGtfs = async (initialConfig: IConfig) => {
+export const exportGtfs = async (initialConfig: Config) => {
   const config = setDefaultConfig(initialConfig);
   const log = _log(config);
   const logWarning = _logWarning(config);
@@ -71,11 +71,11 @@ export const exportGtfs = async (initialConfig: IConfig) => {
 
   // Loop through each GTFS file
   const modelsToExport = Object.values(models).filter(
-    (model: IModel) => model.extension !== 'gtfs-realtime',
+    (model: Model) => model.extension !== 'gtfs-realtime',
   );
   const exportedFiles = await mapSeries(
     modelsToExport,
-    async (model: IModel) => {
+    async (model: Model) => {
       const filePath = path.join(
         exportPath,
         `${model.filenameBase}.${model.filenameExtension}`,

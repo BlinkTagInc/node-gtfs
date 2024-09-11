@@ -28,7 +28,7 @@ import {
   padLeadingZeros,
 } from './utils.ts';
 
-import { IConfig, IModel, IColumn } from '../types/global_interfaces.ts';
+import { Config, Model, ModelColumn } from '../types/global_interfaces.ts';
 
 interface ITask {
   exclude: string[];
@@ -179,7 +179,7 @@ function getDescendantProp(obj: any, defaultValue: any, source?: string) {
   return obj;
 }
 
-const deleteExpiredRealtimeData = (config: IConfig) => {
+const deleteExpiredRealtimeData = (config: Config) => {
   const log = _log(config);
   const db = openDb(config);
 
@@ -204,7 +204,7 @@ const deleteExpiredRealtimeData = (config: IConfig) => {
 
 const prepareRealtimeValue = (
   entity: any,
-  column: IColumn,
+  column: ModelColumn,
   task: IRealtimeTask,
 ) => {
   if (column.name === 'created_timestamp') {
@@ -246,8 +246,8 @@ const updateRealtimeData = async (task: IRealtimeTask) => {
 
       for (const entity of gtfsRealtimeData.entity) {
         // Do base processing
-        const fieldValues = models.serviceAlerts.schema.map((column: IColumn) =>
-          prepareRealtimeValue(entity, column, task),
+        const fieldValues = models.serviceAlerts.schema.map(
+          (column: ModelColumn) => prepareRealtimeValue(entity, column, task),
         );
 
         try {
@@ -298,8 +298,8 @@ const updateRealtimeData = async (task: IRealtimeTask) => {
 
       for (const entity of gtfsRealtimeData.entity) {
         // Do base processing
-        const fieldValues = models.tripUpdates.schema.map((column: IColumn) =>
-          prepareRealtimeValue(entity, column, task),
+        const fieldValues = models.tripUpdates.schema.map(
+          (column: ModelColumn) => prepareRealtimeValue(entity, column, task),
         );
 
         try {
@@ -350,8 +350,8 @@ const updateRealtimeData = async (task: IRealtimeTask) => {
 
       for (const entity of gtfsRealtimeData.entity) {
         // Do base processing
-        const fieldValues = models.tripUpdates.schema.map((column: IColumn) =>
-          prepareRealtimeValue(entity, column, task),
+        const fieldValues = models.tripUpdates.schema.map(
+          (column: ModelColumn) => prepareRealtimeValue(entity, column, task),
         );
 
         try {
@@ -439,7 +439,7 @@ const readFiles = async (task: ITask) => {
 };
 
 const createTables = (db: Database.Database) => {
-  for (const model of Object.values(models) as IModel[]) {
+  for (const model of Object.values(models) as Model[]) {
     if (!model.schema) {
       return;
     }
@@ -487,7 +487,7 @@ const createTables = (db: Database.Database) => {
 
 const formatLine = (
   line: { [x: string]: any; geojson?: string },
-  model: IModel,
+  model: Model,
   totalLineCount: number,
 ) => {
   const lineNumber = totalLineCount + 1;
@@ -595,7 +595,7 @@ const formatLine = (
 const importLines = (
   task: ITask,
   lines: { [x: string]: any; geojson?: string }[],
-  model: IModel,
+  model: Model,
   totalLineCount: number,
 ) => {
   const db = openDb({
@@ -664,7 +664,7 @@ const importLines = (
 const importFiles = (task: ITask) =>
   mapSeries(
     Object.values(models),
-    (model: IModel) =>
+    (model: Model) =>
       new Promise<void>((resolve, reject) => {
         const lines: {}[] = [];
         let totalLineCount = 0;
@@ -769,7 +769,7 @@ const importFiles = (task: ITask) =>
       }),
   );
 
-export async function importGtfs(initialConfig: IConfig) {
+export async function importGtfs(initialConfig: Config) {
   const config = setDefaultConfig(initialConfig);
   validateConfigForImport(config);
   const log = _log(config);
@@ -867,7 +867,7 @@ export async function importGtfs(initialConfig: IConfig) {
   }
 }
 
-export async function updateGtfsRealtime(initialConfig: IConfig) {
+export async function updateGtfsRealtime(initialConfig: Config) {
   const config = setDefaultConfig(initialConfig);
   validateConfigForImport(config);
   const log = _log(config);

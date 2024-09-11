@@ -1,9 +1,9 @@
 import {
   QueryOptions,
   SqlOrderBy,
-  SqlResults,
   SqlSelect,
   SqlWhere,
+  Translation,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
 import {
@@ -20,7 +20,7 @@ export function getTranslations(
   fields: SqlSelect = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'translations';
   const selectClause = formatSelectClause(fields);
@@ -31,5 +31,5 @@ export function getTranslations(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as Translation[];
 }

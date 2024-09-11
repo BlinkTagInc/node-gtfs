@@ -1,12 +1,12 @@
 import { clearLine, cursorTo } from 'node:readline';
 import { noop } from 'lodash-es';
 import * as colors from 'yoctocolors';
-import { IConfig } from '../types/global_interfaces.ts';
+import { Config } from '../types/global_interfaces.ts';
 
 /*
  * Returns a log function based on config settings
  */
-export function log(config: IConfig) {
+export function log(config: Config) {
   if (config.verbose === false) {
     return noop;
   }
@@ -30,7 +30,7 @@ export function log(config: IConfig) {
 /*
  * Returns an warning log function based on config settings
  */
-export function logWarning(config: IConfig) {
+export function logWarning(config: Config) {
   if (config.logFunction) {
     return config.logFunction;
   }
@@ -43,7 +43,7 @@ export function logWarning(config: IConfig) {
 /*
  * Returns an error log function based on config settings
  */
-export function logError(config: IConfig) {
+export function logError(config: Config) {
   if (config.logFunction) {
     return config.logFunction;
   }

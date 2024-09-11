@@ -1,7 +1,7 @@
 import {
   QueryOptions,
+  RouteNetwork,
   SqlOrderBy,
-  SqlResults,
   SqlSelect,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
@@ -20,7 +20,7 @@ export function getRouteNetworks(
   fields: SqlSelect = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'route_networks';
   const selectClause = formatSelectClause(fields);
@@ -31,5 +31,5 @@ export function getRouteNetworks(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as RouteNetwork[];
 }
