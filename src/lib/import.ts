@@ -350,13 +350,13 @@ const updateRealtimeData = async (task: IRealtimeTask) => {
 
       for (const entity of gtfsRealtimeData.entity) {
         // Do base processing
-        const fieldValues = models.tripUpdates.schema.map(
+        const fieldValues = models.vehiclePositions.schema.map(
           (column: ModelColumn) => prepareRealtimeValue(entity, column, task),
         );
 
         try {
           db.prepare(
-            `REPLACE INTO ${models.tripUpdates.filenameBase} (${models.tripUpdates.schema
+            `REPLACE INTO ${models.vehiclePositions.filenameBase} (${models.vehiclePositions.schema
               .map((column) => column.name)
               .join(', ')}) VALUES (${fieldValues.join(', ')})`,
           ).run();
