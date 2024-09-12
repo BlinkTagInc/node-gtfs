@@ -810,30 +810,30 @@ export async function importGtfs(initialConfig: Config) {
         path: any;
         prefix: any;
       }) => {
-        const tempPath = temporaryDirectory();
-
-        const task = {
-          exclude: agency.exclude,
-          url: agency.url,
-          headers: agency.headers,
-          realtimeAlerts: agency.realtimeAlerts,
-          realtimeTripUpdates: agency.realtimeTripUpdates,
-          realtimeVehiclePositions: agency.realtimeVehiclePositions,
-          downloadDir: tempPath,
-          downloadTimeout: config.downloadTimeout,
-          gtfsRealtimeExpirationSeconds: config.gtfsRealtimeExpirationSeconds,
-          path: agency.path,
-          csvOptions: config.csvOptions || {},
-          ignoreDuplicates: config.ignoreDuplicates,
-          sqlitePath: config.sqlitePath,
-          prefix: agency.prefix,
-          currentTimestamp: Math.floor(Date.now() / 1000),
-          log,
-          logWarning,
-          logError,
-        };
-
         try {
+          const tempPath = temporaryDirectory();
+
+          const task = {
+            exclude: agency.exclude,
+            url: agency.url,
+            headers: agency.headers,
+            realtimeAlerts: agency.realtimeAlerts,
+            realtimeTripUpdates: agency.realtimeTripUpdates,
+            realtimeVehiclePositions: agency.realtimeVehiclePositions,
+            downloadDir: tempPath,
+            downloadTimeout: config.downloadTimeout,
+            gtfsRealtimeExpirationSeconds: config.gtfsRealtimeExpirationSeconds,
+            path: agency.path,
+            csvOptions: config.csvOptions || {},
+            ignoreDuplicates: config.ignoreDuplicates,
+            sqlitePath: config.sqlitePath,
+            prefix: agency.prefix,
+            currentTimestamp: Math.floor(Date.now() / 1000),
+            log,
+            logWarning,
+            logError,
+          };
+
           if (task.url) {
             await downloadFiles(task);
           }
@@ -890,20 +890,28 @@ export async function updateGtfsRealtime(initialConfig: Config) {
 
     await Promise.all(
       config.agencies.map(async (agency) => {
-        const task = {
-          realtimeAlerts: agency.realtimeAlerts,
-          realtimeTripUpdates: agency.realtimeTripUpdates,
-          realtimeVehiclePositions: agency.realtimeVehiclePositions,
-          downloadTimeout: config.downloadTimeout,
-          gtfsRealtimeExpirationSeconds: config.gtfsRealtimeExpirationSeconds,
-          sqlitePath: config.sqlitePath,
-          currentTimestamp: Math.floor(Date.now() / 1000),
-          log,
-          logWarning,
-          logError,
-        };
+        try {
+          const task = {
+            realtimeAlerts: agency.realtimeAlerts,
+            realtimeTripUpdates: agency.realtimeTripUpdates,
+            realtimeVehiclePositions: agency.realtimeVehiclePositions,
+            downloadTimeout: config.downloadTimeout,
+            gtfsRealtimeExpirationSeconds: config.gtfsRealtimeExpirationSeconds,
+            sqlitePath: config.sqlitePath,
+            currentTimestamp: Math.floor(Date.now() / 1000),
+            log,
+            logWarning,
+            logError,
+          };
 
-        await updateRealtimeData(task);
+          await updateRealtimeData(task);
+        } catch (error: any) {
+          if (config.ignoreErrors) {
+            logError(error.message);
+          } else {
+            throw error;
+          }
+        }
       }),
     );
 
