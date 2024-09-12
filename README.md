@@ -394,7 +394,7 @@ importGtfs({
 
 ### gtfsRealtimeExpirationSeconds
 
-{Integer} Amount of time in seconds to allow GTFS-Realtime data to be stored in database before allowing to be deleted. Defaults to 0 (old GTFS-Realtime is deleted immediately when new data arrives).
+{Integer} Amount of time in seconds to allow GTFS-Realtime data to be stored in database before allowing to be deleted. Defaults to 0 (old GTFS-Realtime is deleted immediately when new data arrives). Note that if new data arrives for the same trip update, vehicle position or service alert before the expiration time, it will overwrite the existing data. The `gtfsRealtimeExpirationSeconds` only affects when data is deleted.
 
 ```json
 {
