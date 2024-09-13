@@ -34,6 +34,7 @@ export function setDefaultConfig(initialConfig: Config) {
   const defaults = {
     sqlitePath: ':memory:',
     ignoreDuplicates: false,
+    ignoreErrors: false,
     gtfsRealtimeExpirationSeconds: 0,
   };
 

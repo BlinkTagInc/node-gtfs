@@ -24,11 +24,11 @@ export interface ConfigAgency {
 export interface Config {
   db?: Database.Database;
   sqlitePath?: string;
-  ignoreDuplicates?: boolean;
   gtfsRealtimeExpirationSeconds?: number;
   downloadTimeout?: number;
   csvOptions?: CsvParse.Options;
   exportPath?: string;
+  ignoreDuplicates?: boolean;
   ignoreErrors?: boolean;
   agencies: ConfigAgency[];
   verbose?: boolean;

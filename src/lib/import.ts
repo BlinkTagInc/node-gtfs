@@ -28,12 +28,17 @@ import {
   padLeadingZeros,
 } from './utils.ts';
 
-import { Config, Model, ModelColumn } from '../types/global_interfaces.ts';
+import {
+  Config,
+  ConfigAgency,
+  Model,
+  ModelColumn,
+} from '../types/global_interfaces.ts';
 
 interface ITask {
-  exclude: string[];
-  url: string;
-  headers: Record<string, string>;
+  exclude?: string[];
+  url?: string;
+  headers?: Record<string, string>;
   realtimeAlerts?: {
     url: string;
     headers?: Record<string, string>;
@@ -49,9 +54,10 @@ interface ITask {
   downloadDir: string;
   downloadTimeout?: number;
   gtfsRealtimeExpirationSeconds: number;
-  path: string;
+  path?: string;
   csvOptions: {};
   ignoreDuplicates: boolean;
+  ignoreErrors: boolean;
   sqlitePath: string;
   prefix?: string;
   currentTimestamp: number;
@@ -75,6 +81,7 @@ interface IRealtimeTask {
   };
   downloadTimeout?: number;
   gtfsRealtimeExpirationSeconds: number;
+  ignoreErrors: boolean;
   sqlitePath: string;
   currentTimestamp: number;
   log: (message: string, newLine?: boolean) => void;
@@ -83,6 +90,10 @@ interface IRealtimeTask {
 }
 
 const downloadFiles = async (task: ITask) => {
+  if (!task.url) {
+    throw new Error('No `url` specified in config');
+  }
+
   task.log(`Downloading GTFS from ${task.url}`);
 
   task.path = `${task.downloadDir}/gtfs.zip`;
@@ -96,7 +107,9 @@ const downloadFiles = async (task: ITask) => {
   });
 
   if (response.status !== 200) {
-    throw new Error(`Unable to download GTFS from ${task.url}`);
+    throw new Error(
+      `Unable to download GTFS from ${task.url}. Got status ${response.status}.`,
+    );
   }
 
   const buffer = await response.arrayBuffer();
@@ -123,7 +136,7 @@ const downloadGtfsRealtimeData = async (
 
   if (response.status !== 200) {
     task.logWarning(
-      `Unable to download GTFS-Realtime from ${urlAndHeaders.url}`,
+      `Unable to download GTFS-Realtime from ${urlAndHeaders.url}. Got status ${response.status}.`,
     );
     return null;
   }
@@ -234,137 +247,161 @@ const updateRealtimeData = async (task: IRealtimeTask) => {
   });
 
   if (task.realtimeAlerts?.url) {
-    const gtfsRealtimeData = await downloadGtfsRealtimeData(
-      task.realtimeAlerts,
-      task,
-    );
+    try {
+      const gtfsRealtimeData = await downloadGtfsRealtimeData(
+        task.realtimeAlerts,
+        task,
+      );
 
-    if (gtfsRealtimeData?.entity) {
-      task.log(`Download successful`);
+      if (gtfsRealtimeData?.entity) {
+        task.log(`Download successful`);
 
-      let totalLineCount = 0;
+        let totalLineCount = 0;
 
-      for (const entity of gtfsRealtimeData.entity) {
-        // Do base processing
-        const fieldValues = models.serviceAlerts.schema.map(
-          (column: ModelColumn) => prepareRealtimeValue(entity, column, task),
-        );
-
-        try {
-          db.prepare(
-            `REPLACE INTO ${models.serviceAlerts.filenameBase} (${models.serviceAlerts.schema
-              .map((column) => column.name)
-              .join(', ')}) VALUES (${fieldValues.join(', ')})`,
-          ).run();
-        } catch (error: any) {
-          task.logWarning('Import error: ' + error.message);
-        }
-
-        const alertTargetArray = [];
-        for (const informedEntity of entity.alert.informedEntity) {
-          informedEntity.parent = entity;
-          const subValues = models.serviceAlertTargets.schema.map((column) =>
-            prepareRealtimeValue(informedEntity, column, task),
+        for (const entity of gtfsRealtimeData.entity) {
+          // Do base processing
+          const fieldValues = models.serviceAlerts.schema.map(
+            (column: ModelColumn) => prepareRealtimeValue(entity, column, task),
           );
-          alertTargetArray.push(`(${subValues.join(', ')})`);
-          totalLineCount++;
-        }
 
-        try {
-          db.prepare(
-            `REPLACE INTO ${models.serviceAlertTargets.filenameBase} (${models.serviceAlertTargets.schema
-              .map((column) => column.name)
-              .join(', ')}) VALUES ${alertTargetArray.join(', ')}`,
-          ).run();
-        } catch (error: any) {
-          task.logWarning('Import error: ' + error.message);
-        }
+          try {
+            db.prepare(
+              `REPLACE INTO ${models.serviceAlerts.filenameBase} (${models.serviceAlerts.schema
+                .map((column) => column.name)
+                .join(', ')}) VALUES (${fieldValues.join(', ')})`,
+            ).run();
+          } catch (error: any) {
+            task.logWarning('Import error: ' + error.message);
+          }
 
-        task.log(`Importing - ${totalLineCount++} entries imported\r`, true);
+          const alertTargetArray = [];
+          for (const informedEntity of entity.alert.informedEntity) {
+            informedEntity.parent = entity;
+            const subValues = models.serviceAlertTargets.schema.map((column) =>
+              prepareRealtimeValue(informedEntity, column, task),
+            );
+            alertTargetArray.push(`(${subValues.join(', ')})`);
+            totalLineCount++;
+          }
+
+          try {
+            db.prepare(
+              `REPLACE INTO ${models.serviceAlertTargets.filenameBase} (${models.serviceAlertTargets.schema
+                .map((column) => column.name)
+                .join(', ')}) VALUES ${alertTargetArray.join(', ')}`,
+            ).run();
+          } catch (error: any) {
+            task.logWarning('Import error: ' + error.message);
+          }
+
+          task.log(`Importing - ${totalLineCount++} entries imported\r`, true);
+        }
+      }
+    } catch (error: any) {
+      if (task.ignoreErrors) {
+        task.logError(error.message);
+      } else {
+        throw error;
       }
     }
   }
 
   if (task.realtimeTripUpdates?.url) {
-    const gtfsRealtimeData = await downloadGtfsRealtimeData(
-      task.realtimeTripUpdates,
-      task,
-    );
+    try {
+      const gtfsRealtimeData = await downloadGtfsRealtimeData(
+        task.realtimeTripUpdates,
+        task,
+      );
 
-    if (gtfsRealtimeData?.entity) {
-      task.log(`Download successful`);
+      if (gtfsRealtimeData?.entity) {
+        task.log(`Download successful`);
 
-      let totalLineCount = 0;
+        let totalLineCount = 0;
 
-      for (const entity of gtfsRealtimeData.entity) {
-        // Do base processing
-        const fieldValues = models.tripUpdates.schema.map(
-          (column: ModelColumn) => prepareRealtimeValue(entity, column, task),
-        );
-
-        try {
-          db.prepare(
-            `REPLACE INTO ${models.tripUpdates.filenameBase} (${models.tripUpdates.schema
-              .map((column) => column.name)
-              .join(', ')}) VALUES (${fieldValues.join(', ')})`,
-          ).run();
-        } catch (error: any) {
-          task.logWarning('Import error: ' + error.message);
-        }
-
-        const stopTimeUpdateArray = [];
-        for (const stopTimeUpdate of entity.tripUpdate.stopTimeUpdate) {
-          stopTimeUpdate.parent = entity;
-          const subValues = models.stopTimeUpdates.schema.map((column) =>
-            prepareRealtimeValue(stopTimeUpdate, column, task),
+        for (const entity of gtfsRealtimeData.entity) {
+          // Do base processing
+          const fieldValues = models.tripUpdates.schema.map(
+            (column: ModelColumn) => prepareRealtimeValue(entity, column, task),
           );
-          stopTimeUpdateArray.push(`(${subValues.join(', ')})`);
-          totalLineCount++;
-        }
 
-        try {
-          db.prepare(
-            `REPLACE INTO ${models.stopTimeUpdates.filenameBase} (${models.stopTimeUpdates.schema
-              .map((column) => column.name)
-              .join(', ')}) VALUES ${stopTimeUpdateArray.join(', ')}`,
-          ).run();
-        } catch (error: any) {
-          task.logWarning('Import error: ' + error.message);
-        }
+          try {
+            db.prepare(
+              `REPLACE INTO ${models.tripUpdates.filenameBase} (${models.tripUpdates.schema
+                .map((column) => column.name)
+                .join(', ')}) VALUES (${fieldValues.join(', ')})`,
+            ).run();
+          } catch (error: any) {
+            task.logWarning('Import error: ' + error.message);
+          }
 
-        task.log(`Importing - ${totalLineCount++} entries imported\r`, true);
+          const stopTimeUpdateArray = [];
+          for (const stopTimeUpdate of entity.tripUpdate.stopTimeUpdate) {
+            stopTimeUpdate.parent = entity;
+            const subValues = models.stopTimeUpdates.schema.map((column) =>
+              prepareRealtimeValue(stopTimeUpdate, column, task),
+            );
+            stopTimeUpdateArray.push(`(${subValues.join(', ')})`);
+            totalLineCount++;
+          }
+
+          try {
+            db.prepare(
+              `REPLACE INTO ${models.stopTimeUpdates.filenameBase} (${models.stopTimeUpdates.schema
+                .map((column) => column.name)
+                .join(', ')}) VALUES ${stopTimeUpdateArray.join(', ')}`,
+            ).run();
+          } catch (error: any) {
+            task.logWarning('Import error: ' + error.message);
+          }
+
+          task.log(`Importing - ${totalLineCount++} entries imported\r`, true);
+        }
+      }
+    } catch (error: any) {
+      if (task.ignoreErrors) {
+        task.logError(error.message);
+      } else {
+        throw error;
       }
     }
   }
 
   if (task.realtimeVehiclePositions?.url) {
-    const gtfsRealtimeData = await downloadGtfsRealtimeData(
-      task.realtimeVehiclePositions,
-      task,
-    );
+    try {
+      const gtfsRealtimeData = await downloadGtfsRealtimeData(
+        task.realtimeVehiclePositions,
+        task,
+      );
 
-    if (gtfsRealtimeData?.entity) {
-      task.log(`Download successful`);
+      if (gtfsRealtimeData?.entity) {
+        task.log(`Download successful`);
 
-      let totalLineCount = 0;
+        let totalLineCount = 0;
 
-      for (const entity of gtfsRealtimeData.entity) {
-        // Do base processing
-        const fieldValues = models.vehiclePositions.schema.map(
-          (column: ModelColumn) => prepareRealtimeValue(entity, column, task),
-        );
+        for (const entity of gtfsRealtimeData.entity) {
+          // Do base processing
+          const fieldValues = models.vehiclePositions.schema.map(
+            (column: ModelColumn) => prepareRealtimeValue(entity, column, task),
+          );
 
-        try {
-          db.prepare(
-            `REPLACE INTO ${models.vehiclePositions.filenameBase} (${models.vehiclePositions.schema
-              .map((column) => column.name)
-              .join(', ')}) VALUES (${fieldValues.join(', ')})`,
-          ).run();
-        } catch (error: any) {
-          task.logWarning('Import error: ' + error.message);
+          try {
+            db.prepare(
+              `REPLACE INTO ${models.vehiclePositions.filenameBase} (${models.vehiclePositions.schema
+                .map((column) => column.name)
+                .join(', ')}) VALUES (${fieldValues.join(', ')})`,
+            ).run();
+          } catch (error: any) {
+            task.logWarning('Import error: ' + error.message);
+          }
+
+          task.log(`Importing - ${totalLineCount++} entries imported\r`, true);
         }
-
-        task.log(`Importing - ${totalLineCount++} entries imported\r`, true);
+      }
+    } catch (error: any) {
+      if (task.ignoreErrors) {
+        task.logError(error.message);
+      } else {
+        throw error;
       }
     }
   }
@@ -378,6 +415,10 @@ const getTextFiles = async (folderPath: string) => {
 };
 
 const readFiles = async (task: ITask) => {
+  if (!task.path) {
+    throw new Error('No `path` specified in config');
+  }
+
   const gtfsPath = untildify(task.path);
   task.log(`Importing GTFS from ${task.path}\r`);
   if (path.extname(gtfsPath) === '.zip') {
@@ -789,69 +830,49 @@ export async function importGtfs(initialConfig: Config) {
 
     createTables(db);
 
-    await mapSeries(
-      config.agencies,
-      async (agency: {
-        exclude: any;
-        url: string;
-        headers?: any;
-        realtimeAlerts?: {
-          url: string;
-          headers?: Record<string, string>;
+    await mapSeries(config.agencies, async (agency: ConfigAgency) => {
+      try {
+        const tempPath = temporaryDirectory();
+
+        const task = {
+          exclude: agency.exclude,
+          url: agency.url,
+          headers: agency.headers,
+          realtimeAlerts: agency.realtimeAlerts,
+          realtimeTripUpdates: agency.realtimeTripUpdates,
+          realtimeVehiclePositions: agency.realtimeVehiclePositions,
+          downloadDir: tempPath,
+          downloadTimeout: config.downloadTimeout,
+          gtfsRealtimeExpirationSeconds: config.gtfsRealtimeExpirationSeconds,
+          path: agency.path,
+          csvOptions: config.csvOptions || {},
+          ignoreDuplicates: config.ignoreDuplicates,
+          ignoreErrors: config.ignoreErrors,
+          sqlitePath: config.sqlitePath,
+          prefix: agency.prefix,
+          currentTimestamp: Math.floor(Date.now() / 1000),
+          log,
+          logWarning,
+          logError,
         };
-        realtimeTripUpdates?: {
-          url: string;
-          headers?: Record<string, string>;
-        };
-        realtimeVehiclePositions?: {
-          url: string;
-          headers?: Record<string, string>;
-        };
-        path: any;
-        prefix: any;
-      }) => {
-        try {
-          const tempPath = temporaryDirectory();
 
-          const task = {
-            exclude: agency.exclude,
-            url: agency.url,
-            headers: agency.headers,
-            realtimeAlerts: agency.realtimeAlerts,
-            realtimeTripUpdates: agency.realtimeTripUpdates,
-            realtimeVehiclePositions: agency.realtimeVehiclePositions,
-            downloadDir: tempPath,
-            downloadTimeout: config.downloadTimeout,
-            gtfsRealtimeExpirationSeconds: config.gtfsRealtimeExpirationSeconds,
-            path: agency.path,
-            csvOptions: config.csvOptions || {},
-            ignoreDuplicates: config.ignoreDuplicates,
-            sqlitePath: config.sqlitePath,
-            prefix: agency.prefix,
-            currentTimestamp: Math.floor(Date.now() / 1000),
-            log,
-            logWarning,
-            logError,
-          };
-
-          if (task.url) {
-            await downloadFiles(task);
-          }
-
-          await readFiles(task);
-          await importFiles(task);
-          await updateRealtimeData(task);
-
-          await rm(tempPath, { recursive: true });
-        } catch (error: any) {
-          if (config.ignoreErrors) {
-            logError(error.message);
-          } else {
-            throw error;
-          }
+        if (task.url) {
+          await downloadFiles(task);
         }
-      },
-    );
+
+        await readFiles(task);
+        await importFiles(task);
+        await updateRealtimeData(task);
+
+        await rm(tempPath, { recursive: true });
+      } catch (error: any) {
+        if (config.ignoreErrors) {
+          logError(error.message);
+        } else {
+          throw error;
+        }
+      }
+    });
 
     log(
       `Completed GTFS import for ${pluralize('agency', agencyCount, true)}\n`,
@@ -888,32 +909,31 @@ export async function updateGtfsRealtime(initialConfig: Config) {
 
     deleteExpiredRealtimeData(config);
 
-    await Promise.all(
-      config.agencies.map(async (agency) => {
-        try {
-          const task = {
-            realtimeAlerts: agency.realtimeAlerts,
-            realtimeTripUpdates: agency.realtimeTripUpdates,
-            realtimeVehiclePositions: agency.realtimeVehiclePositions,
-            downloadTimeout: config.downloadTimeout,
-            gtfsRealtimeExpirationSeconds: config.gtfsRealtimeExpirationSeconds,
-            sqlitePath: config.sqlitePath,
-            currentTimestamp: Math.floor(Date.now() / 1000),
-            log,
-            logWarning,
-            logError,
-          };
+    await mapSeries(config.agencies, async (agency: ConfigAgency) => {
+      try {
+        const task = {
+          realtimeAlerts: agency.realtimeAlerts,
+          realtimeTripUpdates: agency.realtimeTripUpdates,
+          realtimeVehiclePositions: agency.realtimeVehiclePositions,
+          downloadTimeout: config.downloadTimeout,
+          gtfsRealtimeExpirationSeconds: config.gtfsRealtimeExpirationSeconds,
+          ignoreErrors: config.ignoreErrors,
+          sqlitePath: config.sqlitePath,
+          currentTimestamp: Math.floor(Date.now() / 1000),
+          log,
+          logWarning,
+          logError,
+        };
 
-          await updateRealtimeData(task);
-        } catch (error: any) {
-          if (config.ignoreErrors) {
-            logError(error.message);
-          } else {
-            throw error;
-          }
+        await updateRealtimeData(task);
+      } catch (error: any) {
+        if (config.ignoreErrors) {
+          logError(error.message);
+        } else {
+          throw error;
         }
-      }),
-    );
+      }
+    });
 
     log(
       `Completed GTFS-Realtime refresh for ${pluralize(
