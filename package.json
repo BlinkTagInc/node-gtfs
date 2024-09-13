@@ -113,7 +113,7 @@
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.11",
     "@types/geojson": "^7946.0.14",
-    "@types/jest": "^29.5.12",
+    "@types/jest": "^29.5.13",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^20",
     "@types/pluralize": "^0.0.33",
@@ -125,7 +125,7 @@
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "tsup": "^8.2.4",
-    "typescript": "^5.5.4"
+    "typescript": "~5.5.4"
   },
   "engines": {
     "node": ">= 20.11.0"

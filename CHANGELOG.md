@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Updated
-- Use `ignoreErrors` config for GTFS-Realtime fetching.
+- Use `ignoreErrors` config for GTFS-Realtime fetching
+- Dependency Updates
 
 ## [4.14.3] - 2024-09-12
 
