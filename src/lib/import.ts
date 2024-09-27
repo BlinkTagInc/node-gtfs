@@ -604,21 +604,9 @@ const formatLine = (
   }
 
   // Convert to midnight timestamp and add timestamp columns as integer seconds from midnight
-  const timeColumnNames = [
-    'start_time',
-    'end_time',
-    'arrival_time',
-    'departure_time',
-    'prior_notice_last_time',
-    'prior_notice_start_time',
-    'start_pickup_drop_off_window',
-  ];
 
-  for (const timeColumnName of timeColumnNames) {
+  for (const [timeColumnName, timestampColumnName] of timeColumnNamesCouples) {
     if (formattedLine[timeColumnName]) {
-      const timestampColumnName = timeColumnName.endsWith('time')
-        ? `${timeColumnName}stamp`
-        : `${timeColumnName}_timestamp`;
       formattedLine[timestampColumnName] = calculateSecondsFromMidnight(
         formattedLine[timeColumnName],
       );
@@ -632,6 +620,20 @@ const formatLine = (
 
   return formattedLine;
 };
+
+const timeColumnNames = [
+    'start_time',
+    'end_time',
+    'arrival_time',
+    'departure_time',
+    'prior_notice_last_time',
+    'prior_notice_start_time',
+    'start_pickup_drop_off_window',
+  ],
+  timeColumnNamesCouples = timeColumnNames.map((name) => [
+    name,
+    name.endsWith('time') ? `${name}stamp` : `${name}_timestamp`,
+  ]);
 
 const importLines = (
   task: ITask,
