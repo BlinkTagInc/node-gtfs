@@ -1,7 +1,13 @@
 import path from 'node:path';
-import { createReadStream, existsSync, lstatSync } from 'node:fs';
+import {
+  createWriteStream,
+  createReadStream,
+  existsSync,
+  lstatSync,
+} from 'node:fs';
 import { cp, readdir, rename, readFile, rm, writeFile } from 'node:fs/promises';
-import { parse } from 'csv-parse';
+import { finished } from 'node:stream/promises';
+import { parse, transform, stringify } from 'csv';
 import pluralize from 'pluralize';
 import stripBomStream from 'strip-bom-stream';
 import { temporaryDirectory } from 'tempy';
@@ -34,6 +40,7 @@ import {
   Model,
   ModelColumn,
 } from '../types/global_interfaces.ts';
+import { exec } from 'node:child_process';
 
 interface ITask {
   exclude?: string[];
@@ -717,7 +724,7 @@ const importLines = (
   );
 };
 
-const importFiles = (task: ITask) =>
+const importFiles = (task: ITask, db: Database.Database) =>
   mapSeries(
     Object.values(models),
     (model: Model) =>
@@ -764,44 +771,66 @@ const importFiles = (task: ITask) =>
         );
 
         if (model.filenameExtension === 'txt') {
-          const parser = parse({
-            columns: true,
-            relax_quotes: true,
-            trim: true,
-            skip_empty_lines: true,
-            ...task.csvOptions,
-          });
-
-          parser.on('readable', () => {
-            let record;
-
-            while ((record = parser.read())) {
-              try {
-                totalLineCount += 1;
-                lines.push(formatLine(record, model, totalLineCount));
-                // If we have a bunch of lines ready to insert, then do it
-                if (lines.length >= maxInsertVariables / model.schema.length) {
-                  importLines(task, lines, model, totalLineCount);
+          const out = filepath.replace('.txt', '2.csv');
+          console.log('Will write to ', out);
+          finished(
+            createReadStream(filepath)
+              .pipe(
+                parse({
+                  columns: true,
+                  relax_quotes: true,
+                  trim: true,
+                  skip_empty_lines: true,
+                  ...task.csvOptions,
+                }),
+              )
+              .pipe(
+                transform((record) => {
+                  totalLineCount += 1;
+                  return formatLine(record, model, totalLineCount);
+                }),
+              )
+              .pipe(stringify({ header: true }))
+              .pipe(createWriteStream(out)),
+          ).then(() => {
+            console.log('Done writing to ', out);
+            const command = `sqlite3 tatouille.db '.import "${out}" ${model.filenameBase} --csv'`;
+            console.log('Will ', command);
+            exec(
+              //`sqlite3 ${task.sqlitePath} '.import "${out}" ${model.filenameBase}'`,
+              command,
+              (error, stdout, stderr) => {
+                if (error) {
+                  console.error(`error: ${error.message}`);
+                  return;
                 }
-              } catch (error) {
-                reject(error);
+
+                if (stderr) {
+                  console.error(`stderr: ${stderr}`);
+                  return;
+                }
+
+                console.log(`stdout:\n${stdout}`);
+                resolve();
+              },
+            );
+
+            /*
+            exec('ls -alh ' + out, (error, stdout, stderr) => {
+              if (error) {
+                console.error(`error: ${error.message}`);
+                return;
               }
-            }
+
+              if (stderr) {
+                console.error(`stderr: ${stderr}`);
+                return;
+              }
+
+              console.log(`stdout:\n${stdout}`);
+            });
+			*/
           });
-
-          parser.on('end', () => {
-            try {
-              // Insert all remaining lines
-              importLines(task, lines, model, totalLineCount);
-            } catch (error) {
-              reject(error);
-            }
-            resolve();
-          });
-
-          parser.on('error', reject);
-
-          createReadStream(filepath).pipe(stripBomStream()).pipe(parser);
         } else if (model.filenameExtension === 'geojson') {
           readFile(filepath, 'utf8')
             .then((data) => {
@@ -876,7 +905,7 @@ export async function importGtfs(initialConfig: Config) {
         }
 
         await readFiles(task);
-        await importFiles(task);
+        await importFiles(task, db);
         await updateRealtimeData(task);
 
         await rm(tempPath, { recursive: true });
