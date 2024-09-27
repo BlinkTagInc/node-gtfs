@@ -606,19 +606,29 @@ const formatLine = (
   // Convert to midnight timestamp and add timestamp columns as integer seconds from midnight
 
   for (const [timeColumnName, timestampColumnName] of timeColumnNamesCouples) {
-    if (formattedLine[timeColumnName]) {
-      formattedLine[timestampColumnName] = calculateSecondsFromMidnight(
-        formattedLine[timeColumnName],
-      );
+    const value = formattedLine[timeColumnName];
+    if (value) {
+      formattedLine[timestampColumnName] =
+        cachedCalculateSecondsFromMidnight(value);
 
       // Ensure leading zeros for time columns
-      formattedLine[timeColumnName] = padLeadingZeros(
-        formattedLine[timeColumnName],
-      );
+      formattedLine[timeColumnName] = padLeadingZeros(value);
     }
   }
 
   return formattedLine;
+};
+
+interface Dictionary<T> {
+  [key: string]: T;
+}
+const cache: Dictionary<number | null> = {};
+const cachedCalculateSecondsFromMidnight = (value: string) => {
+  const cached = cache[value];
+  if (cached != null) return cached;
+  const computed = calculateSecondsFromMidnight(value);
+  cache[value] = computed;
+  return computed;
 };
 
 const timeColumnNames = [
