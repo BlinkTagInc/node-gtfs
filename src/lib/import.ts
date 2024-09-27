@@ -608,11 +608,11 @@ const formatLine = (
   for (const [timeColumnName, timestampColumnName] of timeColumnNamesCouples) {
     const value = formattedLine[timeColumnName];
     if (value) {
-      formattedLine[timestampColumnName] =
-        cachedCalculateSecondsFromMidnight(value);
+      const [seconds, date] = cachedCalculateDates(value);
+      formattedLine[timestampColumnName] = seconds;
 
       // Ensure leading zeros for time columns
-      formattedLine[timeColumnName] = padLeadingZeros(value);
+      formattedLine[timeColumnName] = date;
     }
   }
 
@@ -622,11 +622,14 @@ const formatLine = (
 interface Dictionary<T> {
   [key: string]: T;
 }
-const cache: Dictionary<number | null> = {};
-const cachedCalculateSecondsFromMidnight = (value: string) => {
+type Tuple = [seconds: number | null, date: string | null];
+const cache: Dictionary<Tuple> = {};
+const cachedCalculateDates = (value: string) => {
   const cached = cache[value];
   if (cached != null) return cached;
-  const computed = calculateSecondsFromMidnight(value);
+  const seconds = calculateSecondsFromMidnight(value);
+  const date = padLeadingZeros(value);
+  const computed: Tuple = [seconds, date];
   cache[value] = computed;
   return computed;
 };
