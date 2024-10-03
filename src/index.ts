@@ -1,5 +1,6 @@
-// GTFS export script
-export { importGtfs, updateGtfsRealtime } from './lib/import.ts';
+// GTFS import script
+export { importGtfs } from './lib/import-gtfs.ts';
+export { updateGtfsRealtime } from './lib/import-gtfs-realtime.ts';
 
 // GTFS export script
 export { exportGtfs } from './lib/export.ts';

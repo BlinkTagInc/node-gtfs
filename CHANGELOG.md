@@ -196,6 +196,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Avoid creating a new db connection for each importLines batch
 - Use sqlite's transaction method rather than batching prepare().run()
 - Fix getStops with bounding box test : order is not important
+- Move gtfs-realtime functions to new file
 
 ## [4.9.0] - 2024-03-12
 

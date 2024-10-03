@@ -7,14 +7,13 @@ import stripBomStream from 'strip-bom-stream';
 import { temporaryDirectory } from 'tempy';
 import untildify from 'untildify';
 import mapSeries from 'promise-map-series';
-import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
-import sqlString from 'sqlstring-sqlite';
 import Database from 'better-sqlite3';
 
 import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
 import { unzip } from './file-utils.ts';
 import { isValidJSON } from './geojson-utils.ts';
+import { updateGtfsRealtimeData } from './import-gtfs-realtime.ts';
 import {
   log as _log,
   logError as _logError,
@@ -24,18 +23,12 @@ import {
   calculateSecondsFromMidnight,
   setDefaultConfig,
   validateConfigForImport,
-  convertLongTimeToDate,
   padLeadingZeros,
 } from './utils.ts';
 
-import {
-  Config,
-  ConfigAgency,
-  Model,
-  ModelColumn,
-} from '../types/global_interfaces.ts';
+import { Config, ConfigAgency, Model } from '../types/global_interfaces.ts';
 
-interface ITask {
+interface GtfsImportTask {
   exclude?: string[];
   url?: string;
   headers?: Record<string, string>;
@@ -66,35 +59,14 @@ interface ITask {
   logError: (message: string) => void;
 }
 
-interface IRealtimeTask {
-  realtimeAlerts?: {
-    url: string;
-    headers?: Record<string, string>;
-  };
-  realtimeTripUpdates?: {
-    url: string;
-    headers?: Record<string, string>;
-  };
-  realtimeVehiclePositions?: {
-    url: string;
-    headers?: Record<string, string>;
-  };
-  downloadTimeout?: number;
-  gtfsRealtimeExpirationSeconds: number;
-  ignoreErrors: boolean;
-  sqlitePath: string;
-  currentTimestamp: number;
-  log: (message: string, newLine?: boolean) => void;
-  logWarning: (message: string) => void;
-  logError: (message: string) => void;
-}
-
 interface Dictionary<T> {
   [key: string]: T;
 }
 type Tuple = [seconds: number | null, date: string | null];
+
 const dateCache: Dictionary<Tuple> = {};
-const calculateAndCacheDate = (value: string) => {
+
+const calculateAndCacheDate = (value: string): Tuple => {
   const cached = dateCache[value];
   if (cached != null) {
     return cached;
@@ -107,7 +79,12 @@ const calculateAndCacheDate = (value: string) => {
   return computed;
 };
 
-const timeColumnNames = [
+const getTextFiles = async (folderPath: string): Promise<string[]> => {
+  const files = await readdir(folderPath);
+  return files.filter((filename) => filename.slice(-3) === 'txt');
+};
+
+const TIME_COLUMN_NAMES = [
   'start_time',
   'end_time',
   'arrival_time',
@@ -117,12 +94,12 @@ const timeColumnNames = [
   'start_pickup_drop_off_window',
 ];
 
-const timeColumnNamesCouples = timeColumnNames.map((name) => [
+const TIME_COLUMN_PAIRS = TIME_COLUMN_NAMES.map((name) => [
   name,
   name.endsWith('time') ? `${name}stamp` : `${name}_timestamp`,
 ]);
 
-const downloadFiles = async (task: ITask) => {
+const downloadGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
   if (!task.url) {
     throw new Error('No `url` specified in config');
   }
@@ -151,303 +128,7 @@ const downloadFiles = async (task: ITask) => {
   task.log('Download successful');
 };
 
-const downloadGtfsRealtimeData = async (
-  urlAndHeaders: { url: string; headers?: Record<string, string> },
-  task: IRealtimeTask,
-) => {
-  task.log(`Downloading GTFS-Realtime from ${urlAndHeaders.url}`);
-  const response = await fetch(urlAndHeaders.url, {
-    method: 'GET',
-    headers: {
-      ...(urlAndHeaders.headers ?? {}),
-      'Accept-Encoding': 'gzip',
-    },
-    signal: task.downloadTimeout
-      ? AbortSignal.timeout(task.downloadTimeout)
-      : undefined,
-  });
-
-  if (response.status !== 200) {
-    task.logWarning(
-      `Unable to download GTFS-Realtime from ${urlAndHeaders.url}. Got status ${response.status}.`,
-    );
-    return null;
-  }
-
-  const buffer = await response.arrayBuffer();
-  const message = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
-    new Uint8Array(buffer),
-  );
-  return GtfsRealtimeBindings.transit_realtime.FeedMessage.toObject(message, {
-    enums: String,
-    longs: String,
-    bytes: String,
-    defaults: true,
-    arrays: true,
-    objects: true,
-    oneofs: true,
-  });
-};
-
-function getDescendantProp(obj: any, defaultValue: any, source?: string) {
-  if (source === undefined) return defaultValue;
-  const arr = source.split('.');
-  while (arr.length) {
-    const nextKey = arr.shift();
-    if (nextKey === undefined) {
-      return defaultValue;
-    } else if (obj == null) {
-      return defaultValue;
-    } else if (nextKey?.includes('[')) {
-      const arrayKey = nextKey.match(/(\w*)\[(\d+)\]/);
-      if (arrayKey === null) {
-        return defaultValue;
-      }
-      if (obj[arrayKey[1]] === undefined) {
-        return defaultValue;
-      }
-
-      if (obj[arrayKey[1]][arrayKey[2]] === undefined) {
-        return defaultValue;
-      }
-
-      obj = obj[arrayKey[1]][arrayKey[2]];
-    } else {
-      if (obj[nextKey] === undefined) {
-        return defaultValue;
-      }
-      obj = obj[nextKey];
-    }
-  }
-
-  if (obj.__isLong__) return convertLongTimeToDate(obj);
-
-  return obj;
-}
-
-const deleteExpiredRealtimeData = (config: Config) => {
-  const log = _log(config);
-  const db = openDb(config);
-
-  log(`Removing expired GTFS-Realtime data`);
-  db.prepare(
-    `DELETE FROM vehicle_positions WHERE expiration_timestamp <= strftime('%s','now')`,
-  ).run();
-  db.prepare(
-    `DELETE FROM trip_updates WHERE expiration_timestamp <= strftime('%s','now')`,
-  ).run();
-  db.prepare(
-    `DELETE FROM stop_time_updates WHERE expiration_timestamp <= strftime('%s','now')`,
-  ).run();
-  db.prepare(
-    `DELETE FROM service_alerts WHERE expiration_timestamp <= strftime('%s','now')`,
-  ).run();
-  db.prepare(
-    `DELETE FROM service_alert_targets WHERE expiration_timestamp <= strftime('%s','now')`,
-  ).run();
-  log(`Removed expired GTFS-Realtime data\r`, true);
-};
-
-const prepareRealtimeValue = (
-  entity: any,
-  column: ModelColumn,
-  task: IRealtimeTask,
-) => {
-  if (column.name === 'created_timestamp') {
-    return task.currentTimestamp;
-  }
-
-  if (column.name === 'expiration_timestamp') {
-    return task.currentTimestamp + task.gtfsRealtimeExpirationSeconds;
-  }
-
-  return sqlString.escape(
-    getDescendantProp(entity, column.default, column.source),
-  );
-};
-
-const updateRealtimeData = async (task: IRealtimeTask) => {
-  if (
-    task.realtimeAlerts === undefined &&
-    task.realtimeTripUpdates === undefined &&
-    task.realtimeVehiclePositions === undefined
-  ) {
-    return;
-  }
-
-  const db = openDb({
-    sqlitePath: task.sqlitePath,
-  });
-
-  if (task.realtimeAlerts?.url) {
-    try {
-      const gtfsRealtimeData = await downloadGtfsRealtimeData(
-        task.realtimeAlerts,
-        task,
-      );
-
-      if (gtfsRealtimeData?.entity) {
-        task.log(`Download successful`);
-
-        let totalLineCount = 0;
-
-        for (const entity of gtfsRealtimeData.entity) {
-          // Do base processing
-          const fieldValues = models.serviceAlerts.schema.map(
-            (column: ModelColumn) => prepareRealtimeValue(entity, column, task),
-          );
-
-          try {
-            db.prepare(
-              `REPLACE INTO ${models.serviceAlerts.filenameBase} (${models.serviceAlerts.schema
-                .map((column) => column.name)
-                .join(', ')}) VALUES (${fieldValues.join(', ')})`,
-            ).run();
-          } catch (error: any) {
-            task.logWarning('Import error: ' + error.message);
-          }
-
-          const alertTargetArray = [];
-          for (const informedEntity of entity.alert.informedEntity) {
-            informedEntity.parent = entity;
-            const subValues = models.serviceAlertTargets.schema.map((column) =>
-              prepareRealtimeValue(informedEntity, column, task),
-            );
-            alertTargetArray.push(`(${subValues.join(', ')})`);
-            totalLineCount++;
-          }
-
-          try {
-            db.prepare(
-              `REPLACE INTO ${models.serviceAlertTargets.filenameBase} (${models.serviceAlertTargets.schema
-                .map((column) => column.name)
-                .join(', ')}) VALUES ${alertTargetArray.join(', ')}`,
-            ).run();
-          } catch (error: any) {
-            task.logWarning('Import error: ' + error.message);
-          }
-
-          task.log(`Importing - ${totalLineCount++} entries imported\r`, true);
-        }
-      }
-    } catch (error: any) {
-      if (task.ignoreErrors) {
-        task.logError(error.message);
-      } else {
-        throw error;
-      }
-    }
-  }
-
-  if (task.realtimeTripUpdates?.url) {
-    try {
-      const gtfsRealtimeData = await downloadGtfsRealtimeData(
-        task.realtimeTripUpdates,
-        task,
-      );
-
-      if (gtfsRealtimeData?.entity) {
-        task.log(`Download successful`);
-
-        let totalLineCount = 0;
-
-        for (const entity of gtfsRealtimeData.entity) {
-          // Do base processing
-          const fieldValues = models.tripUpdates.schema.map(
-            (column: ModelColumn) => prepareRealtimeValue(entity, column, task),
-          );
-
-          try {
-            db.prepare(
-              `REPLACE INTO ${models.tripUpdates.filenameBase} (${models.tripUpdates.schema
-                .map((column) => column.name)
-                .join(', ')}) VALUES (${fieldValues.join(', ')})`,
-            ).run();
-          } catch (error: any) {
-            task.logWarning('Import error: ' + error.message);
-          }
-
-          const stopTimeUpdateArray = [];
-          for (const stopTimeUpdate of entity.tripUpdate.stopTimeUpdate) {
-            stopTimeUpdate.parent = entity;
-            const subValues = models.stopTimeUpdates.schema.map((column) =>
-              prepareRealtimeValue(stopTimeUpdate, column, task),
-            );
-            stopTimeUpdateArray.push(`(${subValues.join(', ')})`);
-            totalLineCount++;
-          }
-
-          try {
-            db.prepare(
-              `REPLACE INTO ${models.stopTimeUpdates.filenameBase} (${models.stopTimeUpdates.schema
-                .map((column) => column.name)
-                .join(', ')}) VALUES ${stopTimeUpdateArray.join(', ')}`,
-            ).run();
-          } catch (error: any) {
-            task.logWarning('Import error: ' + error.message);
-          }
-
-          task.log(`Importing - ${totalLineCount++} entries imported\r`, true);
-        }
-      }
-    } catch (error: any) {
-      if (task.ignoreErrors) {
-        task.logError(error.message);
-      } else {
-        throw error;
-      }
-    }
-  }
-
-  if (task.realtimeVehiclePositions?.url) {
-    try {
-      const gtfsRealtimeData = await downloadGtfsRealtimeData(
-        task.realtimeVehiclePositions,
-        task,
-      );
-
-      if (gtfsRealtimeData?.entity) {
-        task.log(`Download successful`);
-
-        let totalLineCount = 0;
-
-        for (const entity of gtfsRealtimeData.entity) {
-          // Do base processing
-          const fieldValues = models.vehiclePositions.schema.map(
-            (column: ModelColumn) => prepareRealtimeValue(entity, column, task),
-          );
-
-          try {
-            db.prepare(
-              `REPLACE INTO ${models.vehiclePositions.filenameBase} (${models.vehiclePositions.schema
-                .map((column) => column.name)
-                .join(', ')}) VALUES (${fieldValues.join(', ')})`,
-            ).run();
-          } catch (error: any) {
-            task.logWarning('Import error: ' + error.message);
-          }
-
-          task.log(`Importing - ${totalLineCount++} entries imported\r`, true);
-        }
-      }
-    } catch (error: any) {
-      if (task.ignoreErrors) {
-        task.logError(error.message);
-      } else {
-        throw error;
-      }
-    }
-  }
-
-  task.log(`GTFS-Realtime data import complete`);
-};
-
-const getTextFiles = async (folderPath: string) => {
-  const files = await readdir(folderPath);
-  return files.filter((filename) => filename.slice(-3) === 'txt');
-};
-
-const readFiles = async (task: ITask) => {
+const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
   if (!task.path) {
     throw new Error('No `path` specified in config');
   }
@@ -512,7 +193,7 @@ const readFiles = async (task: ITask) => {
   }
 };
 
-const createTables = (db: Database.Database) => {
+const createGtfsTables = (db: Database.Database): void => {
   for (const model of Object.values(models) as Model[]) {
     if (!model.schema) {
       return;
@@ -553,7 +234,7 @@ const createTables = (db: Database.Database) => {
   }
 };
 
-const createIndexes = (db: Database.Database) => {
+const createGtfsIndexes = (db: Database.Database): void => {
   for (const model of Object.values(models) as Model[]) {
     if (!model.schema) {
       return;
@@ -566,11 +247,11 @@ const createIndexes = (db: Database.Database) => {
   }
 };
 
-const formatLine = (
+const formatGtfsLine = (
   line: { [x: string]: any; geojson?: string },
   model: Model,
   totalLineCount: number,
-) => {
+): Record<string, any> => {
   const lineNumber = totalLineCount + 1;
 
   const formattedLine: Record<string, any> = {};
@@ -644,8 +325,7 @@ const formatLine = (
   }
 
   // Convert to midnight timestamp and add timestamp columns as integer seconds from midnight
-
-  for (const [timeColumnName, timestampColumnName] of timeColumnNamesCouples) {
+  for (const [timeColumnName, timestampColumnName] of TIME_COLUMN_PAIRS) {
     const value = formattedLine[timeColumnName];
     if (value) {
       const [seconds, date] = calculateAndCacheDate(value);
@@ -659,7 +339,10 @@ const formatLine = (
   return formattedLine;
 };
 
-const importFiles = (db: Database.Database, task: ITask) =>
+const importGtfsFiles = (
+  db: Database.Database,
+  task: GtfsImportTask,
+): Promise<void[]> =>
   mapSeries(
     Object.values(models),
     (model: Model) =>
@@ -756,7 +439,7 @@ const importFiles = (db: Database.Database, task: ITask) =>
 
             while ((record = parser.read())) {
               totalLineCount += 1;
-              lines.push(formatLine(record, model, totalLineCount));
+              lines.push(formatGtfsLine(record, model, totalLineCount));
             }
           });
 
@@ -783,7 +466,11 @@ const importFiles = (db: Database.Database, task: ITask) =>
                 reject(new Error(`Invalid JSON in ${filename}`));
               }
               totalLineCount += 1;
-              const line = formatLine({ geojson: data }, model, totalLineCount);
+              const line = formatGtfsLine(
+                { geojson: data },
+                model,
+                totalLineCount,
+              );
               insertLines([line]);
               task.log(
                 `Importing - ${filename} - ${totalLineCount} lines imported\r`,
@@ -800,25 +487,22 @@ const importFiles = (db: Database.Database, task: ITask) =>
       }),
   );
 
-export async function importGtfs(initialConfig: Config) {
+export async function importGtfs(initialConfig: Config): Promise<void> {
   const config = setDefaultConfig(initialConfig);
   validateConfigForImport(config);
   const log = _log(config);
   const logError = _logError(config);
   const logWarning = _logWarning(config);
+
   try {
     const db = openDb(config);
-
     const agencyCount = config.agencies.length;
+
     log(
-      `Starting GTFS import for ${pluralize(
-        'file',
-        agencyCount,
-        true,
-      )} using SQLite database at ${config.sqlitePath}`,
+      `Starting GTFS import for ${pluralize('file', agencyCount, true)} using SQLite database at ${config.sqlitePath}`,
     );
 
-    createTables(db);
+    createGtfsTables(db);
 
     await mapSeries(config.agencies, async (agency: ConfigAgency) => {
       try {
@@ -847,101 +531,51 @@ export async function importGtfs(initialConfig: Config) {
         };
 
         if (task.url) {
-          await downloadFiles(task);
+          await downloadGtfsFiles(task);
         }
 
-        await readFiles(task);
-        await importFiles(db, task);
-        await updateRealtimeData(task);
+        await extractGtfsFiles(task);
+        await importGtfsFiles(db, task);
+        await updateGtfsRealtimeData(task);
 
         await rm(tempPath, { recursive: true });
       } catch (error: any) {
-        if (config.ignoreErrors) {
-          logError(error.message);
-        } else {
-          throw error;
-        }
+        handleImportError(error, config, logError);
       }
     });
 
-    log(`Will now create DB indexes`);
-    createIndexes(db);
+    log(`Creating DB indexes`);
+    createGtfsIndexes(db);
 
     log(
       `Completed GTFS import for ${pluralize('agency', agencyCount, true)}\n`,
     );
   } catch (error: any) {
-    if (error?.code === 'SQLITE_CANTOPEN') {
-      logError(
-        `Unable to open sqlite database "${config.sqlitePath}" defined as \`sqlitePath\` config.json. Ensure the parent directory exists or remove \`sqlitePath\` from config.json.`,
-      );
-    }
+    handleDatabaseError(error, config, logError);
+  }
+}
 
+function handleImportError(
+  error: any,
+  config: Config,
+  logError: (message: string) => void,
+): void {
+  if (config.ignoreErrors) {
+    logError(error.message);
+  } else {
     throw error;
   }
 }
 
-export async function updateGtfsRealtime(initialConfig: Config) {
-  const config = setDefaultConfig(initialConfig);
-  validateConfigForImport(config);
-  const log = _log(config);
-  const logError = _logError(config);
-  const logWarning = _logWarning(config);
-
-  try {
-    openDb(config);
-
-    const agencyCount = config.agencies.length;
-    log(
-      `Starting GTFS-Realtime refresh for ${pluralize(
-        'agencies',
-        agencyCount,
-        true,
-      )} using SQLite database at ${config.sqlitePath}`,
+function handleDatabaseError(
+  error: any,
+  config: Config,
+  logError: (message: string) => void,
+): void {
+  if (error?.code === 'SQLITE_CANTOPEN') {
+    logError(
+      `Unable to open sqlite database "${config.sqlitePath}" defined as \`sqlitePath\` config.json. Ensure the parent directory exists or remove \`sqlitePath\` from config.json.`,
     );
-
-    deleteExpiredRealtimeData(config);
-
-    await mapSeries(config.agencies, async (agency: ConfigAgency) => {
-      try {
-        const task = {
-          realtimeAlerts: agency.realtimeAlerts,
-          realtimeTripUpdates: agency.realtimeTripUpdates,
-          realtimeVehiclePositions: agency.realtimeVehiclePositions,
-          downloadTimeout: config.downloadTimeout,
-          gtfsRealtimeExpirationSeconds: config.gtfsRealtimeExpirationSeconds,
-          ignoreErrors: config.ignoreErrors,
-          sqlitePath: config.sqlitePath,
-          currentTimestamp: Math.floor(Date.now() / 1000),
-          log,
-          logWarning,
-          logError,
-        };
-
-        await updateRealtimeData(task);
-      } catch (error: any) {
-        if (config.ignoreErrors) {
-          logError(error.message);
-        } else {
-          throw error;
-        }
-      }
-    });
-
-    log(
-      `Completed GTFS-Realtime refresh for ${pluralize(
-        'agencies',
-        agencyCount,
-        true,
-      )}\n`,
-    );
-  } catch (error: any) {
-    if (error?.code === 'SQLITE_CANTOPEN') {
-      logError(
-        `Unable to open sqlite database "${config.sqlitePath}" defined as \`sqlitePath\` config.json. Ensure the parent directory exists or remove \`sqlitePath\` from config.json.`,
-      );
-    }
-
-    throw error;
   }
+  throw error;
 }
