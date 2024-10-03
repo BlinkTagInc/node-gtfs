@@ -185,7 +185,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for [route_networks.txt](https://gtfs.org/schedule/reference/#route_networkstxt)
 - Support for [timeframes.txt](https://gtfs.org/schedule/reference/#timeframestxt)
 
-## [Unreleased]
+## [4.15.0] - 2024-10-03
 
 ### Updated
 - Faster GTFS Import (thanks to Mael)
