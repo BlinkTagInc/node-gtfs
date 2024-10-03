@@ -494,6 +494,7 @@ const createTables = (db: Database.Database) => {
 
     const columns = model.schema.map((column) => {
       let check = '';
+      /*
       if (column.min !== undefined && column.max) {
         check = `CHECK( ${column.name} >= ${column.min} AND ${column.name} <= ${column.max} )`;
       } else if (column.min) {
@@ -501,6 +502,7 @@ const createTables = (db: Database.Database) => {
       } else if (column.max) {
         check = `CHECK( ${column.name} <= ${column.max} )`;
       }
+	  */
 
       const required = column.required ? 'NOT NULL' : '';
       const columnDefault = column.default ? 'DEFAULT ' + column.default : '';
@@ -524,6 +526,14 @@ const createTables = (db: Database.Database) => {
     db.prepare(
       `CREATE TABLE ${model.filenameBase} (${columns.join(', ')});`,
     ).run();
+  }
+};
+
+const createIndexes = (db: Database.Database) => {
+  for (const model of Object.values(models) as Model[]) {
+    if (!model.schema) {
+      return;
+    }
 
     for (const column of model.schema.filter((column) => column.index)) {
       db.prepare(
@@ -794,26 +804,23 @@ const importFiles = (task: ITask, db: Database.Database) =>
               .pipe(createWriteStream(out)),
           ).then(() => {
             console.log('Done writing to ', out);
-            const command = `sqlite3 tatouille.db '.import "${out}" ${model.filenameBase} --csv'`;
+            const testCommand = `sqlite3 tatouille.db '.import "${out}" ${model.filenameBase} --csv'`;
+            const command = `sqlite3 ${task.sqlitePath} '.import "${out}" ${model.filenameBase} --csv'`;
             console.log('Will ', command);
-            exec(
-              //`sqlite3 ${task.sqlitePath} '.import "${out}" ${model.filenameBase}'`,
-              command,
-              (error, stdout, stderr) => {
-                if (error) {
-                  console.error(`error: ${error.message}`);
-                  return;
-                }
+            exec(command, (error, stdout, stderr) => {
+              if (error) {
+                console.error(`error: ${error.message}`);
+                return;
+              }
 
-                if (stderr) {
-                  console.error(`stderr: ${stderr}`);
-                  return;
-                }
+              if (stderr) {
+                console.error(`stderr: ${stderr}`);
+                return;
+              }
 
-                console.log(`stdout:\n${stdout}`);
-                resolve();
-              },
-            );
+              console.log(`stdout:\n${stdout}`);
+              resolve();
+            });
 
             /*
             exec('ls -alh ' + out, (error, stdout, stderr) => {
@@ -917,6 +924,9 @@ export async function importGtfs(initialConfig: Config) {
         }
       }
     });
+
+    log(`Will now create DB indexes`);
+    createIndexes(db);
 
     log(
       `Completed GTFS import for ${pluralize('agency', agencyCount, true)}\n`,
