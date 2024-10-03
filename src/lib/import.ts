@@ -517,7 +517,14 @@ const createTables = (db: Database.Database) => {
     db.prepare(
       `CREATE TABLE ${model.filenameBase} (${columns.join(', ')});`,
     ).run();
+  }
+};
 
+const createIndexes = (db: Database.Database) => {
+  for (const model of Object.values(models) as Model[]) {
+    if (!model.schema) {
+      return;
+    }
     for (const column of model.schema.filter((column) => column.index)) {
       db.prepare(
         `CREATE INDEX idx_${model.filenameBase}_${column.name} ON ${model.filenameBase} (${column.name});`,
@@ -888,6 +895,9 @@ export async function importGtfs(initialConfig: Config) {
         }
       }
     });
+
+    log(`Will now create DB indexes`);
+    createIndexes(db);
 
     log(
       `Completed GTFS import for ${pluralize('agency', agencyCount, true)}\n`,
