@@ -656,15 +656,12 @@ const timeColumnNames = [
   ]);
 
 const importLines = (
+  db: Database.Database,
   task: ITask,
   lines: { [x: string]: any; geojson?: string }[],
   model: Model,
   totalLineCount: number,
 ) => {
-  const db = openDb({
-    sqlitePath: task.sqlitePath,
-  });
-
   if (lines.length === 0) {
     return;
   }
@@ -724,7 +721,7 @@ const importLines = (
   );
 };
 
-const importFiles = (task: ITask) =>
+const importFiles = (db: Database.Database, task: ITask) =>
   mapSeries(
     Object.values(models),
     (model: Model) =>
@@ -788,7 +785,7 @@ const importFiles = (task: ITask) =>
                 lines.push(formatLine(record, model, totalLineCount));
                 // If we have a bunch of lines ready to insert, then do it
                 if (lines.length >= maxInsertVariables / model.schema.length) {
-                  importLines(task, lines, model, totalLineCount);
+                  importLines(db, task, lines, model, totalLineCount);
                 }
               } catch (error) {
                 reject(error);
@@ -799,7 +796,7 @@ const importFiles = (task: ITask) =>
           parser.on('end', () => {
             try {
               // Insert all remaining lines
-              importLines(task, lines, model, totalLineCount);
+              importLines(db, task, lines, model, totalLineCount);
             } catch (error) {
               reject(error);
             }
@@ -820,7 +817,7 @@ const importFiles = (task: ITask) =>
                 );
               }
               const line = formatLine({ geojson: data }, model, totalLineCount);
-              importLines(task, [line], model, totalLineCount);
+              importLines(db, task, [line], model, totalLineCount);
               resolve();
             })
             .catch(reject);
@@ -883,7 +880,7 @@ export async function importGtfs(initialConfig: Config) {
         }
 
         await readFiles(task);
-        await importFiles(task);
+        await importFiles(db, task);
         await updateRealtimeData(task);
 
         await rm(tempPath, { recursive: true });
