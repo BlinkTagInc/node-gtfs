@@ -517,7 +517,14 @@ const createTables = (db: Database.Database) => {
     db.prepare(
       `CREATE TABLE ${model.filenameBase} (${columns.join(', ')});`,
     ).run();
+  }
+};
 
+const createIndexes = (db: Database.Database) => {
+  for (const model of Object.values(models) as Model[]) {
+    if (!model.schema) {
+      return;
+    }
     for (const column of model.schema.filter((column) => column.index)) {
       db.prepare(
         `CREATE INDEX idx_${model.filenameBase}_${column.name} ON ${model.filenameBase} (${column.name});`,
@@ -604,7 +611,37 @@ const formatLine = (
   }
 
   // Convert to midnight timestamp and add timestamp columns as integer seconds from midnight
-  const timeColumnNames = [
+
+  for (const [timeColumnName, timestampColumnName] of timeColumnNamesCouples) {
+    const value = formattedLine[timeColumnName];
+    if (value) {
+      const [seconds, date] = cachedCalculateDates(value);
+      formattedLine[timestampColumnName] = seconds;
+
+      // Ensure leading zeros for time columns
+      formattedLine[timeColumnName] = date;
+    }
+  }
+
+  return formattedLine;
+};
+
+interface Dictionary<T> {
+  [key: string]: T;
+}
+type Tuple = [seconds: number | null, date: string | null];
+const cache: Dictionary<Tuple> = {};
+const cachedCalculateDates = (value: string) => {
+  const cached = cache[value];
+  if (cached != null) return cached;
+  const seconds = calculateSecondsFromMidnight(value);
+  const date = padLeadingZeros(value);
+  const computed: Tuple = [seconds, date];
+  cache[value] = computed;
+  return computed;
+};
+
+const timeColumnNames = [
     'start_time',
     'end_time',
     'arrival_time',
@@ -612,37 +649,19 @@ const formatLine = (
     'prior_notice_last_time',
     'prior_notice_start_time',
     'start_pickup_drop_off_window',
-  ];
-
-  for (const timeColumnName of timeColumnNames) {
-    if (formattedLine[timeColumnName]) {
-      const timestampColumnName = timeColumnName.endsWith('time')
-        ? `${timeColumnName}stamp`
-        : `${timeColumnName}_timestamp`;
-      formattedLine[timestampColumnName] = calculateSecondsFromMidnight(
-        formattedLine[timeColumnName],
-      );
-
-      // Ensure leading zeros for time columns
-      formattedLine[timeColumnName] = padLeadingZeros(
-        formattedLine[timeColumnName],
-      );
-    }
-  }
-
-  return formattedLine;
-};
+  ],
+  timeColumnNamesCouples = timeColumnNames.map((name) => [
+    name,
+    name.endsWith('time') ? `${name}stamp` : `${name}_timestamp`,
+  ]);
 
 const importLines = (
+  db: Database.Database,
   task: ITask,
   lines: { [x: string]: any; geojson?: string }[],
   model: Model,
   totalLineCount: number,
 ) => {
-  const db = openDb({
-    sqlitePath: task.sqlitePath,
-  });
-
   if (lines.length === 0) {
     return;
   }
@@ -702,7 +721,7 @@ const importLines = (
   );
 };
 
-const importFiles = (task: ITask) =>
+const importFiles = (db: Database.Database, task: ITask) =>
   mapSeries(
     Object.values(models),
     (model: Model) =>
@@ -757,6 +776,37 @@ const importFiles = (task: ITask) =>
             ...task.csvOptions,
           });
 
+          const columns = model.schema.filter((column) => column.name !== 'id');
+
+          const placeholder = columns.map(({ name }) => '@' + name).join(', ');
+          const prepareStatement = `INSERT ${task.ignoreDuplicates ? 'OR IGNORE' : ''} INTO ${
+            model.filenameBase
+          } (${columns
+            .map((column) => column.name)
+            .join(', ')}) VALUES (${placeholder})`;
+
+          const insert = db.prepare(prepareStatement);
+
+          const insertMany = db.transaction((lines) => {
+            for (const line of lines) {
+              if (task.prefix === undefined) {
+                insert.run(line);
+              } else {
+                const prefixedLine = Object.fromEntries(
+                  Object.entries(line).map(([columnName, value], index) => [
+                    columnName,
+                    columns[index].prefix === true
+                      ? `${task.prefix}${value}`
+                      : value,
+                  ]),
+                );
+                insert.run(prefixedLine);
+              }
+            }
+          });
+
+          let lines: { [x: string]: any; geojson?: string }[] = [];
+
           parser.on('readable', () => {
             let record;
 
@@ -764,10 +814,6 @@ const importFiles = (task: ITask) =>
               try {
                 totalLineCount += 1;
                 lines.push(formatLine(record, model, totalLineCount));
-                // If we have a bunch of lines ready to insert, then do it
-                if (lines.length >= maxInsertVariables / model.schema.length) {
-                  importLines(task, lines, model, totalLineCount);
-                }
               } catch (error) {
                 reject(error);
               }
@@ -776,8 +822,7 @@ const importFiles = (task: ITask) =>
 
           parser.on('end', () => {
             try {
-              // Insert all remaining lines
-              importLines(task, lines, model, totalLineCount);
+              insertMany(lines);
             } catch (error) {
               reject(error);
             }
@@ -798,7 +843,7 @@ const importFiles = (task: ITask) =>
                 );
               }
               const line = formatLine({ geojson: data }, model, totalLineCount);
-              importLines(task, [line], model, totalLineCount);
+              importLines(db, task, [line], model, totalLineCount);
               resolve();
             })
             .catch(reject);
@@ -861,7 +906,7 @@ export async function importGtfs(initialConfig: Config) {
         }
 
         await readFiles(task);
-        await importFiles(task);
+        await importFiles(db, task);
         await updateRealtimeData(task);
 
         await rm(tempPath, { recursive: true });
@@ -873,6 +918,9 @@ export async function importGtfs(initialConfig: Config) {
         }
       }
     });
+
+    log(`Will now create DB indexes`);
+    createIndexes(db);
 
     log(
       `Completed GTFS import for ${pluralize('agency', agencyCount, true)}\n`,
