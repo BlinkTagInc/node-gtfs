@@ -62,7 +62,8 @@
     "Oliv4945",
     "Kyle Ramey",
     "Anton Bracke",
-    "Emma K Alexandra <emma@emma.sh>"
+    "Emma K Alexandra <emma@emma.sh>",
+    "Mael <laem@kont.me>"
   ],
   "type": "module",
   "main": "./dist/index.js",

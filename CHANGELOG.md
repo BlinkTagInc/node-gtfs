@@ -185,6 +185,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for [route_networks.txt](https://gtfs.org/schedule/reference/#route_networkstxt)
 - Support for [timeframes.txt](https://gtfs.org/schedule/reference/#timeframestxt)
 
+## [Unreleased]
+
+### Updated
+- Faster GTFS Import (thanks to Mael)
+- Avoid array creation and string interpolation at each formatLine run
+- Add a new build-watch script
+- Memoize the calculate seconds from midnight and date functions
+- Create indexes after importing all the GTFS files
+- Avoid creating a new db connection for each importLines batch
+- Use sqlite's transaction method rather than batching prepare().run()
+- Fix getStops with bounding box test : order is not important
+
 ## [4.9.0] - 2024-03-12
 
 ### Updated

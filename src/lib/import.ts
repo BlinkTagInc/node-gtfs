@@ -89,6 +89,39 @@ interface IRealtimeTask {
   logError: (message: string) => void;
 }
 
+interface Dictionary<T> {
+  [key: string]: T;
+}
+type Tuple = [seconds: number | null, date: string | null];
+const dateCache: Dictionary<Tuple> = {};
+const calculateAndCacheDate = (value: string) => {
+  const cached = dateCache[value];
+  if (cached != null) {
+    return cached;
+  }
+
+  const seconds = calculateSecondsFromMidnight(value);
+  const date = padLeadingZeros(value);
+  const computed: Tuple = [seconds, date];
+  dateCache[value] = computed;
+  return computed;
+};
+
+const timeColumnNames = [
+  'start_time',
+  'end_time',
+  'arrival_time',
+  'departure_time',
+  'prior_notice_last_time',
+  'prior_notice_start_time',
+  'start_pickup_drop_off_window',
+];
+
+const timeColumnNamesCouples = timeColumnNames.map((name) => [
+  name,
+  name.endsWith('time') ? `${name}stamp` : `${name}_timestamp`,
+]);
+
 const downloadFiles = async (task: ITask) => {
   if (!task.url) {
     throw new Error('No `url` specified in config');
@@ -615,7 +648,7 @@ const formatLine = (
   for (const [timeColumnName, timestampColumnName] of timeColumnNamesCouples) {
     const value = formattedLine[timeColumnName];
     if (value) {
-      const [seconds, date] = cachedCalculateDates(value);
+      const [seconds, date] = calculateAndCacheDate(value);
       formattedLine[timestampColumnName] = seconds;
 
       // Ensure leading zeros for time columns
@@ -626,146 +659,86 @@ const formatLine = (
   return formattedLine;
 };
 
-interface Dictionary<T> {
-  [key: string]: T;
-}
-type Tuple = [seconds: number | null, date: string | null];
-const cache: Dictionary<Tuple> = {};
-const cachedCalculateDates = (value: string) => {
-  const cached = cache[value];
-  if (cached != null) return cached;
-  const seconds = calculateSecondsFromMidnight(value);
-  const date = padLeadingZeros(value);
-  const computed: Tuple = [seconds, date];
-  cache[value] = computed;
-  return computed;
-};
-
-const timeColumnNames = [
-    'start_time',
-    'end_time',
-    'arrival_time',
-    'departure_time',
-    'prior_notice_last_time',
-    'prior_notice_start_time',
-    'start_pickup_drop_off_window',
-  ],
-  timeColumnNamesCouples = timeColumnNames.map((name) => [
-    name,
-    name.endsWith('time') ? `${name}stamp` : `${name}_timestamp`,
-  ]);
-
-const importLines = (
-  db: Database.Database,
-  task: ITask,
-  lines: { [x: string]: any; geojson?: string }[],
-  model: Model,
-  totalLineCount: number,
-) => {
-  if (lines.length === 0) {
-    return;
-  }
-
-  const linesToImportCount = lines.length;
-  const columns = model.schema.filter((column) => column.name !== 'id');
-  const placeholders = [];
-  const values = [];
-
-  while (lines.length > 0) {
-    const line = lines.pop();
-
-    if (line === undefined) {
-      continue;
-    }
-
-    placeholders.push(`(${columns.map(() => '?').join(', ')})`);
-    values.push(
-      ...columns.map((column) => {
-        if (task.prefix !== undefined && column.prefix === true) {
-          // Add prefixes to field values if needed
-          return `${task.prefix}${line[column.name]}`;
-        }
-
-        return line[column.name];
-      }),
-    );
-  }
-
-  try {
-    db.prepare(
-      `INSERT ${task.ignoreDuplicates ? 'OR IGNORE' : ''} INTO ${
-        model.filenameBase
-      } (${columns
-        .map((column) => column.name)
-        .join(', ')}) VALUES ${placeholders.join(',')}`,
-    ).run(...values);
-  } catch (error: any) {
-    if (error.code === 'SQLITE_CONSTRAINT_PRIMARYKEY') {
-      const primaryColumns = model.schema.filter((column) => column.primary);
-      task.logWarning(
-        `Duplicate values for primary key (${primaryColumns.map((column) => column.name).join(', ')}) found in ${model.filenameBase}.${model.filenameExtension}. Set the \`ignoreDuplicates\` option to true in config.json to ignore this error`,
-      );
-    }
-
-    task.logWarning(
-      `Check ${model.filenameBase}.${model.filenameExtension} for invalid data between lines ${
-        totalLineCount - linesToImportCount
-      } and ${totalLineCount}.`,
-    );
-    throw error;
-  }
-
-  task.log(
-    `Importing - ${model.filenameBase}.${model.filenameExtension} - ${totalLineCount} lines imported\r`,
-    true,
-  );
-};
-
 const importFiles = (db: Database.Database, task: ITask) =>
   mapSeries(
     Object.values(models),
     (model: Model) =>
       new Promise<void>((resolve, reject) => {
-        const lines: {}[] = [];
         let totalLineCount = 0;
-        const maxInsertVariables = 32_000;
+        const filename = `${model.filenameBase}.${model.filenameExtension}`;
 
-        // Loop through each GTFS file
         // Filter out excluded files from config
         if (task.exclude && task.exclude.includes(model.filenameBase)) {
-          task.log(
-            `Skipping - ${model.filenameBase}.${model.filenameExtension}\r`,
-          );
+          task.log(`Skipping - ${filename}\r`);
           resolve();
           return;
         }
 
-        // If the model is a database/gtfs-realtime model then silently exit
+        // If the model is a database/gtfs-realtime model then skip silently
         if (model.extension === 'gtfs-realtime') {
           resolve();
           return;
         }
 
-        const filepath = path.join(
-          task.downloadDir,
-          `${model.filenameBase}.${model.filenameExtension}`,
-        );
+        const filepath = path.join(task.downloadDir, `${filename}`);
 
+        // Log missing standard GTFS files, don't log nonstandard files
         if (!existsSync(filepath)) {
-          // Log only missing standard GTFS files
           if (!model.nonstandard) {
-            task.log(
-              `Importing - ${model.filenameBase}.${model.filenameExtension} - No file found\r`,
-            );
+            task.log(`Importing - ${filename} - No file found\r`);
           }
 
           resolve();
           return;
         }
 
-        task.log(
-          `Importing - ${model.filenameBase}.${model.filenameExtension}\r`,
-        );
+        task.log(`Importing - ${filename}\r`);
+
+        const columns = model.schema.filter((column) => column.name !== 'id');
+        const placeholder = columns.map(({ name }) => `@${name}`).join(', ');
+        const prepareStatement = `INSERT ${task.ignoreDuplicates ? 'OR IGNORE' : ''} INTO ${
+          model.filenameBase
+        } (${columns
+          .map((column) => column.name)
+          .join(', ')}) VALUES (${placeholder})`;
+
+        const insert = db.prepare(prepareStatement);
+
+        const insertLines = db.transaction((lines) => {
+          for (const [rowNumber, line] of Object.entries(lines)) {
+            try {
+              if (task.prefix === undefined) {
+                insert.run(line);
+              } else {
+                const prefixedLine = Object.fromEntries(
+                  Object.entries(
+                    line as { [x: string]: any; geojson?: string },
+                  ).map(([columnName, value]) => [
+                    columnName,
+                    columns.find((col) => col.name === columnName)?.prefix
+                      ? `${task.prefix}${value}`
+                      : value,
+                  ]),
+                );
+                insert.run(prefixedLine);
+              }
+            } catch (error: any) {
+              if (error.code === 'SQLITE_CONSTRAINT_PRIMARYKEY') {
+                const primaryColumns = model.schema.filter(
+                  (column) => column.primary,
+                );
+                task.logWarning(
+                  `Duplicate values for primary key (${primaryColumns.map((column) => column.name).join(', ')}) found in ${filename}. Set the \`ignoreDuplicates\` option to true in config.json to ignore this error`,
+                );
+              }
+
+              task.logWarning(
+                `Check ${filename} for invalid data on row ${rowNumber}.`,
+              );
+              throw error;
+            }
+          }
+        });
 
         if (model.filenameExtension === 'txt') {
           const parser = parse({
@@ -776,53 +749,24 @@ const importFiles = (db: Database.Database, task: ITask) =>
             ...task.csvOptions,
           });
 
-          const columns = model.schema.filter((column) => column.name !== 'id');
-
-          const placeholder = columns.map(({ name }) => '@' + name).join(', ');
-          const prepareStatement = `INSERT ${task.ignoreDuplicates ? 'OR IGNORE' : ''} INTO ${
-            model.filenameBase
-          } (${columns
-            .map((column) => column.name)
-            .join(', ')}) VALUES (${placeholder})`;
-
-          const insert = db.prepare(prepareStatement);
-
-          const insertMany = db.transaction((lines) => {
-            for (const line of lines) {
-              if (task.prefix === undefined) {
-                insert.run(line);
-              } else {
-                const prefixedLine = Object.fromEntries(
-                  Object.entries(line).map(([columnName, value], index) => [
-                    columnName,
-                    columns[index].prefix === true
-                      ? `${task.prefix}${value}`
-                      : value,
-                  ]),
-                );
-                insert.run(prefixedLine);
-              }
-            }
-          });
-
           let lines: { [x: string]: any; geojson?: string }[] = [];
 
           parser.on('readable', () => {
             let record;
 
             while ((record = parser.read())) {
-              try {
-                totalLineCount += 1;
-                lines.push(formatLine(record, model, totalLineCount));
-              } catch (error) {
-                reject(error);
-              }
+              totalLineCount += 1;
+              lines.push(formatLine(record, model, totalLineCount));
             }
           });
 
           parser.on('end', () => {
             try {
-              insertMany(lines);
+              insertLines(lines);
+              task.log(
+                `Importing - ${filename} - ${totalLineCount} lines imported\r`,
+                true,
+              );
             } catch (error) {
               reject(error);
             }
@@ -836,14 +780,15 @@ const importFiles = (db: Database.Database, task: ITask) =>
           readFile(filepath, 'utf8')
             .then((data) => {
               if (isValidJSON(data) === false) {
-                reject(
-                  new Error(
-                    `Invalid JSON in ${model.filenameBase}.${model.filenameExtension}`,
-                  ),
-                );
+                reject(new Error(`Invalid JSON in ${filename}`));
               }
+              totalLineCount += 1;
               const line = formatLine({ geojson: data }, model, totalLineCount);
-              importLines(db, task, [line], model, totalLineCount);
+              insertLines([line]);
+              task.log(
+                `Importing - ${filename} - ${totalLineCount} lines imported\r`,
+                true,
+              );
               resolve();
             })
             .catch(reject);

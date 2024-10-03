@@ -27,14 +27,16 @@ describe('getShapesAsGeoJSON():', () => {
 
     expect(geojson.type).toEqual('FeatureCollection');
     expect(geojson.features).toHaveLength(4);
+    const exampleFeature = geojson.features.find(
+      (feature) => feature?.properties?.route_id === 'Bu-16APR',
+    );
     expect(
-      (geojson.features[0].geometry as GeoJSON.MultiLineString).coordinates[0],
+      (exampleFeature?.geometry as GeoJSON.MultiLineString).coordinates[0],
     ).toHaveLength(381);
     expect(
-      (geojson.features[0].geometry as GeoJSON.MultiLineString)
-        .coordinates[0][0],
+      (exampleFeature?.geometry as GeoJSON.MultiLineString).coordinates[0][0],
     ).toHaveLength(2);
-    expect(geojson.features[0].properties?.route_color).toMatch(/^#/);
+    expect(exampleFeature?.properties?.route_color).toMatch(/^#/);
   });
 
   it('should return geojson with shapes for a specific routeId', () => {
