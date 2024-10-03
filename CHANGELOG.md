@@ -197,6 +197,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use sqlite's transaction method rather than batching prepare().run()
 - Fix getStops with bounding box test : order is not important
 - Move gtfs-realtime functions to new file
+- Dependency updates
 
 ## [4.9.0] - 2024-03-12
 
