@@ -776,6 +776,37 @@ const importFiles = (db: Database.Database, task: ITask) =>
             ...task.csvOptions,
           });
 
+          const columns = model.schema.filter((column) => column.name !== 'id');
+
+          const placeholder = columns.map(({ name }) => '@' + name).join(', ');
+          const prepareStatement = `INSERT ${task.ignoreDuplicates ? 'OR IGNORE' : ''} INTO ${
+            model.filenameBase
+          } (${columns
+            .map((column) => column.name)
+            .join(', ')}) VALUES (${placeholder})`;
+
+          const insert = db.prepare(prepareStatement);
+
+          const insertMany = db.transaction((lines) => {
+            for (const line of lines) {
+              if (task.prefix === undefined) {
+                insert.run(line);
+              } else {
+                const prefixedLine = Object.fromEntries(
+                  Object.entries(line).map(([columnName, value], index) => [
+                    columnName,
+                    columns[index].prefix === true
+                      ? `${task.prefix}${value}`
+                      : value,
+                  ]),
+                );
+                insert.run(prefixedLine);
+              }
+            }
+          });
+
+          let lines: { [x: string]: any; geojson?: string }[] = [];
+
           parser.on('readable', () => {
             let record;
 
@@ -783,10 +814,6 @@ const importFiles = (db: Database.Database, task: ITask) =>
               try {
                 totalLineCount += 1;
                 lines.push(formatLine(record, model, totalLineCount));
-                // If we have a bunch of lines ready to insert, then do it
-                if (lines.length >= maxInsertVariables / model.schema.length) {
-                  importLines(db, task, lines, model, totalLineCount);
-                }
               } catch (error) {
                 reject(error);
               }
@@ -795,8 +822,7 @@ const importFiles = (db: Database.Database, task: ITask) =>
 
           parser.on('end', () => {
             try {
-              // Insert all remaining lines
-              importLines(db, task, lines, model, totalLineCount);
+              insertMany(lines);
             } catch (error) {
               reject(error);
             }
