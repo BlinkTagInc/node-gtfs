@@ -1,5 +1,6 @@
 import config from './test-config.ts';
 import { openDb, closeDb, importGtfs, getStops } from '../index.ts';
+import { sortBy } from 'lodash-es';
 import exp from 'constants';
 
 beforeAll(async () => {
@@ -316,6 +317,10 @@ describe('getStops():', () => {
     ];
 
     expect(results).toHaveLength(3);
-    expect(results).toEqual(expectedResult);
+
+    // Results aren't sorted by distance, so the DB insert statement can influence the result order
+    expect(sortBy(results, 'stop_id')).toEqual(
+      sortBy(expectedResult, 'stop_id'),
+    );
   });
 });
