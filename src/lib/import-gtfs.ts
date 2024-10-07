@@ -254,85 +254,73 @@ const formatGtfsLine = (
   totalLineCount: number,
 ): Record<string, any> => {
   const lineNumber = totalLineCount + 1;
-
   const formattedLine: Record<string, any> = {};
 
+  // Pre-compute these values
+  const filenameBase = model.filenameBase;
+  const filenameExtension = model.filenameExtension;
+
   for (const columnSchema of model.schema) {
-    const lineValue = line[columnSchema.name];
+    const { name, type, required, min, max } = columnSchema;
+    let value = line[name];
 
-    if (columnSchema.type === 'date') {
-      if (lineValue !== '' && lineValue !== undefined) {
-        // Convert fields that are dates into integers
-        // Allow YYYYMMDD and YYYY-MM-DD formats
-        const dateValue = lineValue.replace(/-/g, '');
+    // Early null check
+    if (value === '' || value === undefined || value === null) {
+      formattedLine[name] = null;
+      if (required) {
+        throw new Error(
+          `Missing required value in ${filenameBase}.${filenameExtension} for ${name} on line ${lineNumber}.`,
+        );
+      }
+      continue;
+    }
 
-        if (dateValue.length !== 8) {
+    // Type conversion
+    switch (type) {
+      case 'date':
+        value = value.replace(/-/g, '');
+        if (value.length !== 8) {
           throw new Error(
-            `Invalid date in ${model.filenameBase}.${model.filenameExtension} for ${columnSchema.name} on line ${lineNumber}.`,
+            `Invalid date in ${filenameBase}.${filenameExtension} for ${name} on line ${lineNumber}.`,
           );
         }
-
-        formattedLine[columnSchema.name] = Number.parseInt(dateValue, 10);
-      }
-    } else if (columnSchema.type === 'integer') {
-      // Convert fields that should be integer
-      formattedLine[columnSchema.name] = Number.parseInt(lineValue, 10);
-    } else if (columnSchema.type === 'real') {
-      // Convert fields that should be float
-      formattedLine[columnSchema.name] = Number.parseFloat(lineValue);
-    } else {
-      formattedLine[columnSchema.name] = lineValue;
+        value = parseInt(value, 10);
+        break;
+      case 'integer':
+        value = parseInt(value, 10);
+        break;
+      case 'real':
+        value = parseFloat(value);
+        break;
     }
 
-    if (
-      formattedLine[columnSchema.name] === '' ||
-      formattedLine[columnSchema.name] === undefined ||
-      formattedLine[columnSchema.name] === null ||
-      Number.isNaN(formattedLine[columnSchema.name])
-    ) {
-      // Add null values
-      formattedLine[columnSchema.name] = null;
+    // Check for NaN after conversion
+    if (Number.isNaN(value)) {
+      formattedLine[name] = null;
+      continue;
     }
 
-    // Validate required
-    if (
-      columnSchema.required === true &&
-      formattedLine[columnSchema.name] === null
-    ) {
+    formattedLine[name] = value;
+
+    // Validate min/max
+    if (min !== undefined && value < min) {
       throw new Error(
-        `Missing required value in ${model.filenameBase}.${model.filenameExtension} for ${columnSchema.name} on line ${lineNumber}.`,
+        `Invalid value in ${filenameBase}.${filenameExtension} for ${name} on line ${lineNumber}: below minimum value of ${min}.`,
       );
     }
-
-    // Validate minimum
-    if (
-      columnSchema.min !== undefined &&
-      formattedLine[columnSchema.name] < columnSchema.min
-    ) {
+    if (max !== undefined && value > max) {
       throw new Error(
-        `Invalid value in ${model.filenameBase}.${model.filenameExtension} for ${columnSchema.name} on line ${lineNumber}: below minimum value of ${columnSchema.min}.`,
-      );
-    }
-
-    // Validate maximum
-    if (
-      columnSchema.max !== undefined &&
-      formattedLine[columnSchema.name] > columnSchema.max
-    ) {
-      throw new Error(
-        `Invalid value in ${model.filenameBase}.${model.filenameExtension} for ${columnSchema.name} on line ${lineNumber}: above maximum value of ${columnSchema.max}.`,
+        `Invalid value in ${filenameBase}.${filenameExtension} for ${name} on line ${lineNumber}: above maximum value of ${max}.`,
       );
     }
   }
 
-  // Convert to midnight timestamp and add timestamp columns as integer seconds from midnight
+  // Process time columns
   for (const [timeColumnName, timestampColumnName] of TIME_COLUMN_PAIRS) {
     const value = formattedLine[timeColumnName];
     if (value) {
       const [seconds, date] = calculateAndCacheDate(value);
       formattedLine[timestampColumnName] = seconds;
-
-      // Ensure leading zeros for time columns
       formattedLine[timeColumnName] = date;
     }
   }
