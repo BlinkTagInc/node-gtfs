@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Updated
 - Add elapsed time to output
 - Optimze formatGtfsLine function
+- Batch import into chunks
 
 ## [4.14.5] - 2024-09-23
 

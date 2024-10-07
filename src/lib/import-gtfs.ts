@@ -328,6 +328,8 @@ const formatGtfsLine = (
   return formattedLine;
 };
 
+const BATCH_SIZE = 100_000;
+
 const importGtfsFiles = (
   db: Database.Database,
   task: GtfsImportTask,
@@ -429,20 +431,40 @@ const importGtfsFiles = (
             while ((record = parser.read())) {
               totalLineCount += 1;
               lines.push(formatGtfsLine(record, model, totalLineCount));
+
+              if (lines.length >= BATCH_SIZE) {
+                try {
+                  insertLines(lines);
+                  lines = [];
+                } catch (error) {
+                  reject(error);
+                }
+
+                task.log(
+                  `Importing - ${filename} - ${totalLineCount} lines imported\r`,
+                  true,
+                );
+              }
             }
           });
 
           parser.on('end', () => {
             try {
-              insertLines(lines);
+              if (lines.length > 0) {
+                try {
+                  insertLines(lines);
+                } catch (error) {
+                  reject(error);
+                }
+              }
               task.log(
                 `Importing - ${filename} - ${totalLineCount} lines imported\r`,
                 true,
               );
+              resolve();
             } catch (error) {
               reject(error);
             }
-            resolve();
           });
 
           parser.on('error', reject);
