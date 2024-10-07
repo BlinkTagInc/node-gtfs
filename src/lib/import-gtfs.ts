@@ -5,6 +5,7 @@ import { parse } from 'csv-parse';
 import pluralize from 'pluralize';
 import stripBomStream from 'strip-bom-stream';
 import { temporaryDirectory } from 'tempy';
+import Timer from 'timer-machine';
 import untildify from 'untildify';
 import mapSeries from 'promise-map-series';
 import Database from 'better-sqlite3';
@@ -488,6 +489,9 @@ const importGtfsFiles = (
   );
 
 export async function importGtfs(initialConfig: Config): Promise<void> {
+  const timer = new Timer();
+  timer.start();
+
   const config = setDefaultConfig(initialConfig);
   validateConfigForImport(config);
   const log = _log(config);
@@ -547,8 +551,11 @@ export async function importGtfs(initialConfig: Config): Promise<void> {
     log(`Creating DB indexes`);
     createGtfsIndexes(db);
 
+    const seconds = Math.round(timer.time() / 1000);
+    timer.stop();
+
     log(
-      `Completed GTFS import for ${pluralize('agency', agencyCount, true)}\n`,
+      `Completed GTFS import for ${pluralize('agency', agencyCount, true)} in ${seconds} seconds\n`,
     );
   } catch (error: any) {
     handleDatabaseError(error, config, logError);
