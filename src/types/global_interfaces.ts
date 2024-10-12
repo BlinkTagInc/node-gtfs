@@ -1,5 +1,5 @@
-import CsvParse = require('csv-parse');
-import Database = require('better-sqlite3');
+import { Options } from 'csv-parse';
+import { Database } from 'better-sqlite3';
 
 export interface ConfigAgency {
   exclude?: string[];
@@ -22,11 +22,11 @@ export interface ConfigAgency {
 }
 
 export interface Config {
-  db?: Database.Database;
+  db?: Database;
   sqlitePath?: string;
   gtfsRealtimeExpirationSeconds?: number;
   downloadTimeout?: number;
-  csvOptions?: CsvParse.Options;
+  csvOptions?: Options;
   exportPath?: string;
   ignoreDuplicates?: boolean;
   ignoreErrors?: boolean;
@@ -79,7 +79,7 @@ export type SqlSelect = string[];
 export type SqlOrderBy = Array<[string, 'ASC' | 'DESC']>;
 
 export interface QueryOptions {
-  db?: Database.Database;
+  db?: Database;
   bounding_box_side_m?: number;
 }
 

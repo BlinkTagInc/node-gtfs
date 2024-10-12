@@ -76,3 +76,5 @@ export { getDeadheadTimes } from './lib/ods/deadhead-times.ts';
 export { getOpsLocations } from './lib/ods/ops-locations.ts';
 export { getRunEvents } from './lib/ods/run-events.ts';
 export { getRunsPieces } from './lib/ods/runs-pieces.ts';
+
+export * from './types/global_interfaces.ts';
