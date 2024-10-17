@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added new method getServiceIdsByDate
+- Added support for `date`, `start_time` and `end_time` in getStoptimes method
 
 ## [4.15.2] - 2024-10-12
 

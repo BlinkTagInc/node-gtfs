@@ -59,4 +59,76 @@ describe('getStoptimes():', () => {
       lastStopSequence = result.stop_sequence;
     }
   });
+
+  it('should return array of stoptimes for a given date and stop_id', () => {
+    const date = 20160704;
+
+    const results = getStoptimes(
+      {
+        date,
+        stop_id: '777403',
+      },
+      [],
+      [['arrival_timestamp', 'ASC']],
+    );
+
+    expect(results).toHaveLength(29);
+
+    expect(results[0].trip_id).toEqual('23u');
+  });
+
+  it('should return array of stoptimes for a given date, start_time and stop_id', () => {
+    const date = 20160704;
+
+    const results = getStoptimes(
+      {
+        date,
+        stop_id: '777403',
+        start_time: '15:30:00',
+      },
+      [],
+      [['arrival_timestamp', 'ASC']],
+    );
+
+    expect(results).toHaveLength(14);
+
+    expect(results[0].trip_id).toEqual('39u');
+  });
+
+  it('should return array of stoptimes for a given date, end_time and stop_id', () => {
+    const date = 20160704;
+
+    const results = getStoptimes(
+      {
+        date,
+        stop_id: '777403',
+        end_time: '09:30:00',
+      },
+      [],
+      [['arrival_timestamp', 'ASC']],
+    );
+
+    expect(results).toHaveLength(2);
+
+    expect(results[0].trip_id).toEqual('23u');
+  });
+
+  it('should return array of stoptimes for a given date, start_time, end_time and stop_id', () => {
+    const date = 20160704;
+
+    const results = getStoptimes(
+      {
+        date,
+        stop_id: '777403',
+        start_time: '17:30:00',
+        end_time: '18:30:00',
+      },
+      [],
+      [['arrival_timestamp', 'ASC']],
+    );
+
+    expect(results).toHaveLength(2);
+
+    expect(results[0].trip_id).toEqual('43u');
+  });
 });
