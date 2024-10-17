@@ -970,8 +970,8 @@ const stoptimes = getStoptimes({
 const stoptimes = getStoptimes({
   stop_id: '70011',
   date: 20160704,
-  start_time: 11:30:00,
-  end_time: 11:45:00
+  start_time: '11:30:00',
+  end_time: '11:45:00'
 });
 ```
 
