@@ -198,3 +198,21 @@ export function formatOrderByClause(orderBy: SqlOrderBy) {
 
   return orderByClause;
 }
+
+export function getDayOfWeekFromDate(date: number) {
+  const daysOfWeek = [
+    'sunday',
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+  ];
+  const dateString = date
+    .toString()
+    .replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+  const [year, month, day] = dateString.split('-').map(Number);
+  const dayOfWeek = new Date(year, month - 1, day).getDay();
+  return daysOfWeek[dayOfWeek];
+}

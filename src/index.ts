@@ -18,6 +18,7 @@ export { getAttributions } from './lib/gtfs/attributions.ts';
 export { getBookingRules } from './lib/gtfs/booking-rules.ts';
 export { getCalendarDates } from './lib/gtfs/calendar-dates.ts';
 export { getCalendars } from './lib/gtfs/calendars.ts';
+export { getServiceIdsByDate } from './lib/gtfs/calendars.ts';
 export { getFareAttributes } from './lib/gtfs/fare-attributes.ts';
 export { getFareLegRules } from './lib/gtfs/fare-leg-rules.ts';
 export { getFareMedia } from './lib/gtfs/fare-media.ts';

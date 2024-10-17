@@ -1,5 +1,11 @@
 import config from './test-config.ts';
-import { openDb, closeDb, importGtfs, getCalendars } from '../index.ts';
+import {
+  openDb,
+  closeDb,
+  importGtfs,
+  getCalendars,
+  getServiceIdsByDate,
+} from '../index.ts';
 
 beforeAll(async () => {
   openDb();
@@ -81,5 +87,38 @@ describe('getCalendars():', () => {
 
     expect(results).toHaveLength(2);
     expect(results).toEqual(expectedResult);
+  });
+});
+
+describe('getServiceIdsByDate():', () => {
+  it('should return correct service_ids for a given date', () => {
+    const testDate = 20160413;
+    const results = getServiceIdsByDate(testDate);
+
+    const expectedServiceIds = ['CT-16APR-Caltrain-Weekday-01'];
+
+    expect(results).toHaveLength(expectedServiceIds.length);
+    expect(results.sort()).toEqual(expectedServiceIds.sort());
+  });
+
+  it('should throw an error if date is not provided', () => {
+    expect(() => {
+      // @ts-ignore
+      getServiceIdsByDate();
+    }).toThrow('`date` is a required query parameter');
+  });
+
+  it('should handle exception types correctly', () => {
+    const testDate = 20160704;
+    const results = getServiceIdsByDate(testDate);
+
+    const expectedServiceIds = ['CT-16APR-Caltrain-Sunday-02'];
+
+    expect(results).toHaveLength(expectedServiceIds.length);
+    expect(results.sort()).toEqual(expectedServiceIds.sort());
+
+    // Verify that excluded service_ids are not present
+    const excludedServiceId = 'CT-16APR-Caltrain-Weekday-01'; // Assuming this is excluded via exception_type 1
+    expect(results).not.toContain(excludedServiceId);
   });
 });

@@ -1066,6 +1066,17 @@ const calendars = getCalendars({
 });
 ```
 
+#### getServiceIdsByDate(date, options)
+
+Returns an array of service_ids for a specified date. It queries both calendars.txt and calendar_dates.txt to calculate which service_ids are effective for that date, including exceptions. The `date` field is an integer in yyyymmdd format.
+
+```js
+import { getServiceIdsByDate } from 'gtfs';
+
+// Get service_ids for a specifc date
+const serviceIds = getServiceIdsByDate(20240704);
+```
+
 #### getCalendarDates(query, fields, sortBy, options)
 
 Returns an array of calendar_dates that match query parameters. [Details on calendar_dates.txt](https://gtfs.org/schedule/reference/#calendar_datestxt)
