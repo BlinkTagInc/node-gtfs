@@ -15,11 +15,7 @@ import { openDb } from './db.ts';
 import { unzip } from './file-utils.ts';
 import { isValidJSON } from './geojson-utils.ts';
 import { updateGtfsRealtimeData } from './import-gtfs-realtime.ts';
-import {
-  log as _log,
-  logError as _logError,
-  logWarning as _logWarning,
-} from './log-utils.ts';
+import { log, logError, logWarning } from './log-utils.ts';
 import {
   calculateSecondsFromMidnight,
   setDefaultConfig,
@@ -504,15 +500,12 @@ export async function importGtfs(initialConfig: Config): Promise<void> {
 
   const config = setDefaultConfig(initialConfig);
   validateConfigForImport(config);
-  const log = _log(config);
-  const logError = _logError(config);
-  const logWarning = _logWarning(config);
 
   try {
     const db = openDb(config);
     const agencyCount = config.agencies.length;
 
-    log(
+    log(config)(
       `Starting GTFS import for ${pluralize('file', agencyCount, true)} using SQLite database at ${config.sqlitePath}`,
     );
 
@@ -539,9 +532,9 @@ export async function importGtfs(initialConfig: Config): Promise<void> {
           sqlitePath: config.sqlitePath,
           prefix: agency.prefix,
           currentTimestamp: Math.floor(Date.now() / 1000),
-          log,
-          logWarning,
-          logError,
+          log: log(config),
+          logWarning: logWarning(config),
+          logError: logError(config),
         };
 
         if (task.url) {
@@ -554,45 +547,29 @@ export async function importGtfs(initialConfig: Config): Promise<void> {
 
         await rm(tempPath, { recursive: true });
       } catch (error: any) {
-        handleImportError(error, config, logError);
+        if (config.ignoreErrors) {
+          logError(config)(error.message);
+        } else {
+          throw error;
+        }
       }
     });
 
-    log(`Creating DB indexes`);
+    log(config)(`Creating DB indexes`);
     createGtfsIndexes(db);
 
     const seconds = Math.round(timer.time() / 1000);
     timer.stop();
 
-    log(
+    log(config)(
       `Completed GTFS import for ${pluralize('agency', agencyCount, true)} in ${seconds} seconds\n`,
     );
   } catch (error: any) {
-    handleDatabaseError(error, config, logError);
-  }
-}
-
-function handleImportError(
-  error: any,
-  config: Config,
-  logError: (message: string) => void,
-): void {
-  if (config.ignoreErrors) {
-    logError(error.message);
-  } else {
+    if (error?.code === 'SQLITE_CANTOPEN') {
+      logError(config)(
+        `Unable to open sqlite database "${config.sqlitePath}" defined as \`sqlitePath\` config.json. Ensure the parent directory exists or remove \`sqlitePath\` from config.json.`,
+      );
+    }
     throw error;
   }
-}
-
-function handleDatabaseError(
-  error: any,
-  config: Config,
-  logError: (message: string) => void,
-): void {
-  if (error?.code === 'SQLITE_CANTOPEN') {
-    logError(
-      `Unable to open sqlite database "${config.sqlitePath}" defined as \`sqlitePath\` config.json. Ensure the parent directory exists or remove \`sqlitePath\` from config.json.`,
-    );
-  }
-  throw error;
 }

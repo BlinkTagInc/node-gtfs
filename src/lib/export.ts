@@ -12,7 +12,7 @@ import untildify from 'untildify';
 import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
 import { prepDirectory, generateFolderName } from './file-utils.ts';
-import { log as _log, logWarning as _logWarning } from './log-utils.ts';
+import { log, logWarning } from './log-utils.ts';
 import { setDefaultConfig } from './utils.ts';
 
 import { Config, Model, SqlResults } from '../types/global_interfaces.ts';
@@ -37,8 +37,6 @@ const getAgencies = (db: Database.Database, config: Config) => {
 
 export const exportGtfs = async (initialConfig: Config) => {
   const config = setDefaultConfig(initialConfig);
-  const log = _log(config);
-  const logWarning = _logWarning(config);
   const db = openDb(config);
 
   // Get agency name for export folder from first line of agency.txt
@@ -50,12 +48,12 @@ export const exportGtfs = async (initialConfig: Config) => {
       'No agencies found in SQLite. Be sure to first import data into SQLite using `gtfs-import` or `importGtfs(config);`',
     );
   } else if (agencyCount > 1) {
-    logWarning(
+    logWarning(config)(
       'More than one agency is defined in config.json. Export will merge all into one GTFS file.',
     );
   }
 
-  log(
+  log(config)(
     `Starting GTFS export for ${pluralize(
       'agency',
       agencyCount,
@@ -87,7 +85,7 @@ export const exportGtfs = async (initialConfig: Config) => {
 
       if (!lines || lines.length === 0) {
         if (!model.nonstandard) {
-          log(
+          log(config)(
             `Skipping (no data) - ${model.filenameBase}.${model.filenameExtension}\r`,
           );
         }
@@ -137,18 +135,24 @@ export const exportGtfs = async (initialConfig: Config) => {
         );
       }
 
-      log(`Exporting - ${model.filenameBase}.${model.filenameExtension}\r`);
+      log(config)(
+        `Exporting - ${model.filenameBase}.${model.filenameExtension}\r`,
+      );
 
       return `${model.filenameBase}.${model.filenameExtension}`;
     },
   );
 
   if (compact(exportedFiles).length === 0) {
-    log('No GTFS data exported. Be sure to first import data into SQLite.');
+    log(config)(
+      'No GTFS data exported. Be sure to first import data into SQLite.',
+    );
     return;
   }
 
-  log(`Completed GTFS export to ${exportPath}`);
+  log(config)(`Completed GTFS export to ${exportPath}`);
 
-  log(`Completed GTFS export for ${pluralize('agency', agencyCount, true)}\n`);
+  log(config)(
+    `Completed GTFS export for ${pluralize('agency', agencyCount, true)}\n`,
+  );
 };

@@ -5,11 +5,7 @@ import mapSeries from 'promise-map-series';
 
 import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
-import {
-  log as _log,
-  logError as _logError,
-  logWarning as _logWarning,
-} from './log-utils.ts';
+import { log, logError, logWarning } from './log-utils.ts';
 import {
   convertLongTimeToDate,
   setDefaultConfig,
@@ -120,10 +116,9 @@ async function fetchGtfsRealtimeData(
 }
 
 function removeExpiredRealtimeData(config: Config) {
-  const log = _log(config);
   const db = openDb(config);
 
-  log(`Removing expired GTFS-Realtime data`);
+  log(config)(`Removing expired GTFS-Realtime data`);
   db.prepare(
     `DELETE FROM vehicle_positions WHERE expiration_timestamp <= strftime('%s','now')`,
   ).run();
@@ -139,7 +134,7 @@ function removeExpiredRealtimeData(config: Config) {
   db.prepare(
     `DELETE FROM service_alert_targets WHERE expiration_timestamp <= strftime('%s','now')`,
   ).run();
-  log(`Removed expired GTFS-Realtime data\r`, true);
+  log(config)(`Removed expired GTFS-Realtime data\r`, true);
 }
 
 function prepareRealtimeFieldValue(
@@ -355,15 +350,12 @@ export async function updateGtfsRealtimeData(task: GtfsRealtimeTask) {
 export async function updateGtfsRealtime(initialConfig: Config) {
   const config = setDefaultConfig(initialConfig);
   validateConfigForImport(config);
-  const log = _log(config);
-  const logError = _logError(config);
-  const logWarning = _logWarning(config);
 
   try {
     openDb(config);
 
     const agencyCount = config.agencies.length;
-    log(
+    log(config)(
       `Starting GTFS-Realtime refresh for ${pluralize(
         'agencies',
         agencyCount,
@@ -384,22 +376,22 @@ export async function updateGtfsRealtime(initialConfig: Config) {
           ignoreErrors: config.ignoreErrors,
           sqlitePath: config.sqlitePath,
           currentTimestamp: Math.floor(Date.now() / 1000),
-          log,
-          logWarning,
-          logError,
+          log: log(config),
+          logWarning: logWarning(config),
+          logError: logError(config),
         };
 
         await updateGtfsRealtimeData(task);
       } catch (error: any) {
         if (config.ignoreErrors) {
-          logError(error.message);
+          logError(config)(error.message);
         } else {
           throw error;
         }
       }
     });
 
-    log(
+    log(config)(
       `Completed GTFS-Realtime refresh for ${pluralize(
         'agencies',
         agencyCount,
@@ -407,19 +399,11 @@ export async function updateGtfsRealtime(initialConfig: Config) {
       )}\n`,
     );
   } catch (error: any) {
-    handleDatabaseError(error, config, logError);
+    if (error?.code === 'SQLITE_CANTOPEN') {
+      logError(config)(
+        `Unable to open sqlite database "${config.sqlitePath}" defined as \`sqlitePath\` config.json. Ensure the parent directory exists or remove \`sqlitePath\` from config.json.`,
+      );
+    }
+    throw error;
   }
-}
-
-function handleDatabaseError(
-  error: any,
-  config: Config,
-  logError: (message: string) => void,
-): void {
-  if (error?.code === 'SQLITE_CANTOPEN') {
-    logError(
-      `Unable to open sqlite database "${config.sqlitePath}" defined as \`sqlitePath\` config.json. Ensure the parent directory exists or remove \`sqlitePath\` from config.json.`,
-    );
-  }
-  throw error;
 }
