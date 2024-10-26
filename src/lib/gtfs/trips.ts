@@ -1,7 +1,7 @@
-import {
+import type {
   QueryOptions,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
   Trip,
 } from '../../types/global_interfaces.ts';
@@ -15,9 +15,9 @@ import {
 /*
  * Returns an array of all trips that match the query parameters.
  */
-export function getTrips(
+export function getTrips<Fields extends keyof Trip>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -31,5 +31,5 @@ export function getTrips(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as Trip[];
+    .all() as QueryResult<Trip, Fields>[];
 }

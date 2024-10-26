@@ -1,8 +1,8 @@
-import {
+import type {
   Area,
   QueryOptions,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
@@ -15,9 +15,9 @@ import {
 /*
  * Returns an array of all areas that match the query parameters.
  */
-export function getAreas(
+export function getAreas<Fields extends keyof Area>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -31,5 +31,5 @@ export function getAreas(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as Area[];
+    .all() as QueryResult<Area, Fields>[];
 }

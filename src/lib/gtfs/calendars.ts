@@ -1,8 +1,8 @@
-import {
+import type {
   Calendar,
   QueryOptions,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
@@ -16,9 +16,9 @@ import {
 /*
  * Returns an array of calendars that match the query parameters.
  */
-export function getCalendars(
+export function getCalendars<Fields extends keyof Calendar>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -32,7 +32,7 @@ export function getCalendars(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as Calendar[];
+    .all() as QueryResult<Calendar, Fields>[];
 }
 
 /*

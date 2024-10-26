@@ -1,8 +1,8 @@
-import {
+import type {
   FareProduct,
   QueryOptions,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
@@ -15,9 +15,9 @@ import {
 /*
  * Returns an array of all fare products that match the query parameters.
  */
-export function getFareProducts(
+export function getFareProducts<Fields extends keyof FareProduct>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -31,5 +31,5 @@ export function getFareProducts(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as FareProduct[];
+    .all() as QueryResult<FareProduct, Fields>[];
 }

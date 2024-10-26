@@ -1,7 +1,7 @@
-import {
+import type {
   QueryOptions,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
   Timeframe,
 } from '../../types/global_interfaces.ts';
@@ -15,9 +15,9 @@ import {
 /*
  * Returns an array of all timeframes that match the query parameters.
  */
-export function getTimeframes(
+export function getTimeframes<Fields extends keyof Timeframe>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -31,5 +31,5 @@ export function getTimeframes(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as Timeframe[];
+    .all() as QueryResult<Timeframe, Fields>[];
 }

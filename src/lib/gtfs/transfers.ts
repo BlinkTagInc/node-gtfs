@@ -1,7 +1,7 @@
-import {
+import type {
   QueryOptions,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
   Transfer,
 } from '../../types/global_interfaces.ts';
@@ -15,9 +15,9 @@ import {
 /*
  * Returns an array of all transfers that match the query parameters.
  */
-export function getTransfers(
+export function getTransfers<Fields extends keyof Transfer>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -31,5 +31,5 @@ export function getTransfers(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as Transfer[];
+    .all() as QueryResult<Transfer, Fields>[];
 }

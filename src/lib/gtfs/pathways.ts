@@ -1,8 +1,8 @@
-import {
+import type {
   Pathway,
   QueryOptions,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
@@ -15,9 +15,9 @@ import {
 /*
  * Returns an array of all pathways that match the query parameters.
  */
-export function getPathways(
+export function getPathways<Fields extends keyof Pathway>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -31,5 +31,5 @@ export function getPathways(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as Pathway[];
+    .all() as QueryResult<Pathway, Fields>[];
 }

@@ -1,8 +1,8 @@
-import {
+import type {
   Frequency,
   QueryOptions,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
@@ -15,9 +15,9 @@ import {
 /*
  * Returns an array of all frequencies that match the query parameters.
  */
-export function getFrequencies(
+export function getFrequencies<Fields extends keyof Frequency>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -31,5 +31,5 @@ export function getFrequencies(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as Frequency[];
+    .all() as QueryResult<Frequency, Fields>[];
 }

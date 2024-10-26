@@ -1,7 +1,7 @@
-import {
+import type {
   QueryOptions,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
   Translation,
 } from '../../types/global_interfaces.ts';
@@ -15,9 +15,9 @@ import {
 /*
  * Returns an array of all translations that match the query parameters.
  */
-export function getTranslations(
+export function getTranslations<Fields extends keyof Translation>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -31,5 +31,5 @@ export function getTranslations(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as Translation[];
+    .all() as QueryResult<Translation, Fields>[];
 }
