@@ -366,6 +366,12 @@ const importGtfsFiles = (
 
         const columns = model.schema.filter((column) => column.name !== 'id');
         const placeholder = columns.map(({ name }) => `@${name}`).join(', ');
+
+        // Create a map of which columns need prefixing
+        const prefixedColumns = new Set(
+          columns.filter((col) => col.prefix).map((col) => col.name),
+        );
+
         const prepareStatement = `INSERT ${task.ignoreDuplicates ? 'OR IGNORE' : ''} INTO ${
           model.filenameBase
         } (${columns
@@ -385,7 +391,7 @@ const importGtfsFiles = (
                     line as { [x: string]: any; geojson?: string },
                   ).map(([columnName, value]) => [
                     columnName,
-                    columns.find((col) => col.name === columnName)?.prefix
+                    prefixedColumns.has(columnName) && value !== null
                       ? `${task.prefix}${value}`
                       : value,
                   ]),
