@@ -1,7 +1,6 @@
 import config from './test-config.ts';
 import { openDb, closeDb, importGtfs, getStops } from '../index.ts';
 import { sortBy } from 'lodash-es';
-import exp from 'constants';
 
 beforeAll(async () => {
   openDb();

@@ -8,8 +8,11 @@ import {
   SqlOrderBy,
 } from '../types/global_interfaces.ts';
 
-/*
- * Validate configuration.
+/**
+ * Validates the configuration object for GTFS import
+ * @param config The configuration object to validate
+ * @throws Error if agencies are missing or if agency lacks both url and path
+ * @returns The validated config object
  */
 export function validateConfigForImport(config: Config) {
   if (!config.agencies || config.agencies.length === 0) {
@@ -27,8 +30,10 @@ export function validateConfigForImport(config: Config) {
   return config;
 }
 
-/*
- * Initialize configuration with defaults.
+/**
+ * Initializes configuration with default values
+ * @param initialConfig The user-provided configuration
+ * @returns Merged configuration with defaults
  */
 export function setDefaultConfig(initialConfig: Config) {
   const defaults = {
@@ -44,29 +49,48 @@ export function setDefaultConfig(initialConfig: Config) {
   };
 }
 
+/**
+ * Converts a Long timestamp to ISO date string
+ * @param longDate Object containing high, low, and unsigned values
+ * @returns ISO formatted date string
+ */
 export function convertLongTimeToDate(longDate: {
-  high: any;
-  low: any;
-  unsigned: any;
+  high: number;
+  low: number;
+  unsigned: boolean;
 }) {
   const { high, low, unsigned } = longDate;
-  return new Date(new Long(low, high, unsigned).toInt() * 1000).toISOString();
+  return new Date(
+    Long.fromBits(low, high, unsigned).toNumber() * 1000,
+  ).toISOString();
 }
 
-/*
- * Calculate seconds from midnight for HH:mm:ss
+/**
+ * Converts time string in HH:mm:ss format to seconds since midnight
+ * @param time Time string in HH:mm:ss format
+ * @returns Number of seconds since midnight, or null if invalid format
  */
-export function calculateSecondsFromMidnight(time: string) {
-  const split = time.split(':').map((d) => Number.parseInt(d, 10));
-  if (split.length !== 3) {
+export function calculateSecondsFromMidnight(time: string): number | null {
+  if (!time || typeof time !== 'string') return null;
+
+  const [hours, minutes, seconds] = time.split(':').map(Number);
+
+  if (
+    [hours, minutes, seconds].some(isNaN) ||
+    hours >= 24 ||
+    minutes >= 60 ||
+    seconds >= 60
+  ) {
     return null;
   }
 
-  return split[0] * 3600 + split[1] * 60 + split[2];
+  return hours * 3600 + minutes * 60 + seconds;
 }
 
-/*
- * Adds leading zeros to HH:mm:ss timestamps
+/**
+ * Ensures time components have leading zeros (e.g., "9:5:1" -> "09:05:01")
+ * @param time Time string in HH:mm:ss format
+ * @returns Formatted time string with leading zeros, or null if invalid format
  */
 export function padLeadingZeros(time: string) {
   const split = time.split(':').map((d) => String(Number(d)).padStart(2, '0'));
@@ -77,6 +101,11 @@ export function padLeadingZeros(time: string) {
   return split.join(':');
 }
 
+/**
+ * Formats SQL SELECT clause from array of field names or field mapping object
+ * @param fields Array of field names or object mapping source to alias
+ * @returns Formatted SELECT clause
+ */
 export function formatSelectClause(fields: string[]) {
   if (Array.isArray(fields)) {
     const selectItem =
@@ -94,6 +123,11 @@ export function formatSelectClause(fields: string[]) {
   return `SELECT ${selectItem}`;
 }
 
+/**
+ * Formats SQL JOIN clause from array of join configurations
+ * @param joinObject Array of join options
+ * @returns Formatted JOIN clause
+ */
 export function formatJoinClause(joinObject: JoinOptions[]) {
   return joinObject
     .map(
@@ -105,48 +139,71 @@ export function formatJoinClause(joinObject: JoinOptions[]) {
     .join(' ');
 }
 
+/**
+ * Converts degrees to radians
+ * @param angle Angle in degrees
+ * @returns Angle in radians
+ */
 function degree2radian(angle: number) {
   return (angle * Math.PI) / 180;
 }
 
+/**
+ * Converts radians to degrees
+ * @param angle Angle in radians
+ * @returns Angle in degrees
+ */
 function radian2degree(angle: number) {
   return (angle / Math.PI) * 180;
 }
 
-/*
- * Search inside GPS coordinates boundary box
- * Distance unit: meters
- * */
+const EARTH_RADIUS_METERS = 6371000;
+
+/**
+ * Creates SQL WHERE clause for geographic bounding box search
+ * @param latitudeDegree Center latitude in degrees
+ * @param longitudeDegree Center longitude in degrees
+ * @param boundingBoxSideMeters Size of bounding box in meters
+ * @returns SQL WHERE clause for bounding box search
+ */
 export function formatWhereClauseBoundingBox(
-  latitudeDegree: string | number,
-  longitudeDegree: string | number,
+  latitudeDegree: number | string,
+  longitudeDegree: number | string,
   boundingBoxSideMeters: number,
-) {
-  const earthRadius = 6371000;
-  latitudeDegree =
-    typeof latitudeDegree === 'string'
-      ? parseFloat(latitudeDegree)
-      : latitudeDegree;
-  longitudeDegree =
-    typeof longitudeDegree === 'string'
-      ? parseFloat(longitudeDegree)
-      : longitudeDegree;
+): string {
+  const lat = Number(latitudeDegree);
+  const lon = Number(longitudeDegree);
 
-  const latitudeRadian = degree2radian(latitudeDegree);
-  const radiusFromLatitude = Math.cos(latitudeRadian) * earthRadius;
+  if (
+    isNaN(lat) ||
+    isNaN(lon) ||
+    lat < -90 ||
+    lat > 90 ||
+    lon < -180 ||
+    lon > 180
+  ) {
+    throw new Error('Invalid latitude or longitude values');
+  }
 
-  // `boundingBoxSideMeters` is divided by 2 we are centering the coordinates in the middle of this square
-  const deltaLatitude = radian2degree(boundingBoxSideMeters / 2 / earthRadius);
-  const deltaLongitude = radian2degree(
-    boundingBoxSideMeters / 2 / radiusFromLatitude,
-  );
+  const latitudeRadian = degree2radian(lat);
+  const radiusFromLatitude = Math.cos(latitudeRadian) * EARTH_RADIUS_METERS;
 
-  let query = `stop_lat BETWEEN ${latitudeDegree - deltaLatitude} AND ${latitudeDegree + deltaLatitude}`;
-  query += ` AND stop_lon BETWEEN ${longitudeDegree - deltaLongitude} AND ${longitudeDegree + deltaLongitude}`;
+  const halfSide = boundingBoxSideMeters / 2;
+  const deltaLatitude = radian2degree(halfSide / EARTH_RADIUS_METERS);
+  const deltaLongitude = radian2degree(halfSide / radiusFromLatitude);
 
-  return query;
+  return [
+    `stop_lat BETWEEN ${lat - deltaLatitude} AND ${lat + deltaLatitude}`,
+    `stop_lon BETWEEN ${lon - deltaLongitude} AND ${lon + deltaLongitude}`,
+  ].join(' AND ');
 }
 
+/**
+ * Formats SQL WHERE clause for a single key-value pair
+ * @param key Column name
+ * @param value Single value, array of values, or null
+ * @returns Formatted WHERE clause condition
+ */
 export function formatWhereClause(
   key: string,
   value: null | SqlValue | SqlValue[],
@@ -171,6 +228,11 @@ export function formatWhereClause(
   return `${sqlString.escapeId(key)} = ${sqlString.escape(value)}`;
 }
 
+/**
+ * Formats complete SQL WHERE clause from query object
+ * @param query Object containing column-value pairs
+ * @returns Formatted WHERE clause or empty string if no conditions
+ */
 export function formatWhereClauses(query: SqlWhere) {
   if (Object.keys(query).length === 0) {
     return '';
@@ -182,6 +244,11 @@ export function formatWhereClauses(query: SqlWhere) {
   return `WHERE ${whereClauses.join(' AND ')}`;
 }
 
+/**
+ * Formats SQL ORDER BY clause from array of sorting criteria
+ * @param orderBy Array of [column, direction] tuples
+ * @returns Formatted ORDER BY clause
+ */
 export function formatOrderByClause(orderBy: SqlOrderBy) {
   let orderByClause = '';
 
@@ -199,8 +266,13 @@ export function formatOrderByClause(orderBy: SqlOrderBy) {
   return orderByClause;
 }
 
-export function getDayOfWeekFromDate(date: number) {
-  const daysOfWeek = [
+/**
+ * Gets day of week name from YYYYMMDD date number
+ * @param date Date in YYYYMMDD format
+ * @returns Lowercase day name (sunday-saturday)
+ */
+export function getDayOfWeekFromDate(date: number): string {
+  const DAYS_OF_WEEK = [
     'sunday',
     'monday',
     'tuesday',
@@ -208,11 +280,21 @@ export function getDayOfWeekFromDate(date: number) {
     'thursday',
     'friday',
     'saturday',
-  ];
-  const dateString = date
-    .toString()
-    .replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
-  const [year, month, day] = dateString.split('-').map(Number);
-  const dayOfWeek = new Date(year, month - 1, day).getDay();
-  return daysOfWeek[dayOfWeek];
+  ] as const;
+
+  if (!Number.isInteger(date) || date.toString().length !== 8) {
+    throw new Error('Date must be in YYYYMMDD format');
+  }
+
+  const year = Math.floor(date / 10000);
+  const month = Math.floor((date % 10000) / 100);
+  const day = date % 100;
+
+  const dateObj = new Date(year, month - 1, day);
+
+  if (dateObj.toString() === 'Invalid Date') {
+    throw new Error('Invalid date');
+  }
+
+  return DAYS_OF_WEEK[dateObj.getDay()];
 }
