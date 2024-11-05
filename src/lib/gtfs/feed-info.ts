@@ -1,8 +1,8 @@
-import {
+import type {
   FeedInfo,
   QueryOptions,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
@@ -15,9 +15,9 @@ import {
 /*
  * Returns an array of all feed info that match the query parameters.
  */
-export function getFeedInfo(
+export function getFeedInfo<Fields extends keyof FeedInfo>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -31,5 +31,5 @@ export function getFeedInfo(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as FeedInfo[];
+    .all() as QueryResult<FeedInfo, Fields>[];
 }

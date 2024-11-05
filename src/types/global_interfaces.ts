@@ -76,6 +76,12 @@ export type SqlWhere = Record<string, null | SqlValue | SqlValue[]>;
 
 export type SqlSelect = string[];
 
+export type QueryResult<Base extends object, Select extends keyof Base> = [
+  Select,
+] extends [never]
+  ? Base
+  : Pick<Base, Select>;
+
 export type SqlOrderBy = Array<[string, 'ASC' | 'DESC']>;
 
 export interface QueryOptions {

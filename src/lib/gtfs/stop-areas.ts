@@ -1,7 +1,7 @@
-import {
+import type {
   QueryOptions,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
   StopArea,
 } from '../../types/global_interfaces.ts';
@@ -15,9 +15,9 @@ import {
 /*
  * Returns an array of all stop areas that match the query parameters.
  */
-export function getStopAreas(
+export function getStopAreas<Fields extends keyof StopArea>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -31,5 +31,5 @@ export function getStopAreas(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as StopArea[];
+    .all() as QueryResult<StopArea, Fields>[];
 }

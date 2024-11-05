@@ -1,8 +1,8 @@
-import {
+import type {
   BookingRule,
   QueryOptions,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
@@ -15,9 +15,9 @@ import {
 /*
  * Returns an array of all booking rules that match the query parameters.
  */
-export function getBookingRules(
+export function getBookingRules<Fields extends keyof BookingRule>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -31,5 +31,5 @@ export function getBookingRules(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as BookingRule[];
+    .all() as QueryResult<BookingRule, Fields>[];
 }

@@ -1,8 +1,8 @@
-import {
+import type {
   QueryOptions,
   RouteNetwork,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
@@ -15,9 +15,9 @@ import {
 /*
  * Returns an array of all route_networks that match the query parameters.
  */
-export function getRouteNetworks(
+export function getRouteNetworks<Fields extends keyof RouteNetwork>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -31,5 +31,5 @@ export function getRouteNetworks(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as RouteNetwork[];
+    .all() as QueryResult<RouteNetwork, Fields>[];
 }

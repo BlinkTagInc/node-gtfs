@@ -2,11 +2,11 @@ import { compact, omit, pick } from 'lodash-es';
 import { FeatureCollection } from 'geojson';
 import { featureCollection } from '@turf/helpers';
 
-import {
+import type {
   QueryOptions,
   Shape,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
@@ -32,9 +32,9 @@ function buildTripSubquery(query: { [key: string]: string }) {
  * parameter may be passed to find all shapes for a trip. A `direction_id`
  * query parameter may be passed to find all shapes for a direction.
  */
-export function getShapes(
+export function getShapes<Fields extends keyof Shape>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -73,7 +73,7 @@ export function getShapes(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as Shape[];
+    .all() as QueryResult<Shape, Fields>[];
 }
 
 /*

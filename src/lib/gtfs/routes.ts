@@ -1,10 +1,10 @@
 import { omit, pick } from 'lodash-es';
 
-import {
+import type {
   QueryOptions,
   Route,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
@@ -46,9 +46,9 @@ function buildTripSubquery(query: { service_id?: string; stop_id?: string }) {
  * A `service_id` query parameter may be passed to limit routes to specific
  * calendars.
  */
-export function getRoutes(
+export function getRoutes<Fields extends keyof Route>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -80,5 +80,5 @@ export function getRoutes(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as Route[];
+    .all() as QueryResult<Route, Fields>[];
 }

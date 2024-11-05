@@ -1,8 +1,8 @@
-import {
+import type {
   FareLegRule,
   QueryOptions,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
@@ -15,9 +15,9 @@ import {
 /*
  * Returns an array of all fare leg rules that match the query parameters.
  */
-export function getFareLegRules(
+export function getFareLegRules<Fields extends keyof FareLegRule>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -31,5 +31,5 @@ export function getFareLegRules(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as FareLegRule[];
+    .all() as QueryResult<FareLegRule, Fields>[];
 }

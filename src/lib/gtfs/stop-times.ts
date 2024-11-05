@@ -1,9 +1,9 @@
 import { omit } from 'lodash-es';
 import sqlString from 'sqlstring-sqlite';
-import {
+import type {
   QueryOptions,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
   StopTime,
 } from '../../types/global_interfaces.ts';
@@ -19,9 +19,9 @@ import { getServiceIdsByDate } from './calendars.ts';
 /*
  * Returns an array of stoptimes that match the query parameters.
  */
-export function getStoptimes(
+export function getStoptimes<Fields extends keyof StopTime>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -79,5 +79,5 @@ export function getStoptimes(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as StopTime[];
+    .all() as QueryResult<StopTime, Fields>[];
 }

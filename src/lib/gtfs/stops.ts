@@ -1,10 +1,10 @@
 import { omit, orderBy, pick } from 'lodash-es';
 import { FeatureCollection } from 'geojson';
 
-import {
+import type {
   QueryOptions,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
   Stop,
 } from '../../types/global_interfaces.ts';
@@ -38,9 +38,9 @@ function buildStoptimeSubquery(query: { [key: string]: string }) {
  * `direction_id` query parameter may be passed to find all shapes for a
  * direction.
  */
-export function getStops(
+export function getStops<Fields extends keyof Stop>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -109,7 +109,7 @@ export function getStops(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as Stop[];
+    .all() as QueryResult<Stop, Fields>[];
 }
 
 /*

@@ -1,8 +1,8 @@
-import {
+import type {
   LocationGroupStop,
   QueryOptions,
   SqlOrderBy,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
@@ -15,9 +15,9 @@ import {
 /*
  * Returns an array of all location group stops that match the query parameters.
  */
-export function getLocationGroupStops(
+export function getLocationGroupStops<Fields extends keyof LocationGroupStop>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
@@ -31,5 +31,5 @@ export function getLocationGroupStops(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as LocationGroupStop[];
+    .all() as QueryResult<LocationGroupStop, Fields>[];
 }
