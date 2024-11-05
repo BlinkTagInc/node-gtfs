@@ -10,12 +10,10 @@ import {
   formatJoinClause,
 } from './utils.ts';
 
-import {
+import type {
   JoinOptions,
   QueryOptions,
   SqlOrderBy,
-  SqlResults,
-  SqlSelect,
   SqlWhere,
 } from '../types/global_interfaces.ts';
 
@@ -27,15 +25,15 @@ export function advancedQuery(
   advancedQueryOptions: {
     db?: Database.Database;
     query?: SqlWhere;
-    fields?: SqlSelect;
+    fields?: string[];
     orderBy?: SqlOrderBy;
     join?: JoinOptions[];
     options?: QueryOptions;
   },
-): Array<Record<string, any>> {
+) {
   const defaultOptions: {
     query: SqlWhere;
-    fields: SqlSelect;
+    fields: string[];
     orderBy: SqlOrderBy;
     join: JoinOptions[];
     options: QueryOptions;
@@ -58,5 +56,5 @@ export function advancedQuery(
     .prepare(
       `${selectClause} FROM ${tableName} ${joinClause} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as Array<Record<string, any>>;
 }

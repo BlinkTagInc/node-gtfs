@@ -1,9 +1,9 @@
-import {
+import type {
   QueryOptions,
   SqlOrderBy,
-  SqlResults,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
+  TripsDatedVehicleJourney,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
 import {
@@ -15,12 +15,14 @@ import {
 /*
  * Returns an array of all trips dated vehicle journeys that match the query parameters.
  */
-export function getTripsDatedVehicleJourneys(
+export function getTripsDatedVehicleJourneys<
+  Fields extends keyof TripsDatedVehicleJourney,
+>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'trips_dated_vehicle_journey';
   const selectClause = formatSelectClause(fields);
@@ -31,5 +33,5 @@ export function getTripsDatedVehicleJourneys(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as QueryResult<TripsDatedVehicleJourney, Fields>[];
 }

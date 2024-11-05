@@ -1,9 +1,9 @@
-import {
+import type {
   QueryOptions,
   SqlOrderBy,
-  SqlResults,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
+  VehiclePosition,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
 import {
@@ -15,12 +15,12 @@ import {
 /*
  * Returns an array of all vehicle positions that match the query parameters.
  */
-export function getVehiclePositions(
+export function getVehiclePositions<Fields extends keyof VehiclePosition>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'vehicle_positions';
   const selectClause = formatSelectClause(fields);
@@ -31,5 +31,5 @@ export function getVehiclePositions(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as QueryResult<VehiclePosition, Fields>[];
 }

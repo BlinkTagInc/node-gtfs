@@ -1,9 +1,9 @@
-import {
+import type {
   QueryOptions,
   SqlOrderBy,
-  SqlResults,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
+  Timetable,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
 import {
@@ -14,12 +14,12 @@ import {
 /*
  * Returns an array of all timetables that match the query parameters.
  */
-export function getTimetables(
+export function getTimetables<Fields extends keyof Timetable>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'timetables';
   const selectClause = formatSelectClause(fields);
@@ -30,5 +30,5 @@ export function getTimetables(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as QueryResult<Timetable, Fields>[];
 }

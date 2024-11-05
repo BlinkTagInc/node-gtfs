@@ -1,9 +1,9 @@
-import {
+import type {
   QueryOptions,
   SqlOrderBy,
-  SqlResults,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
+  DeadheadTime,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
 import {
@@ -15,12 +15,12 @@ import {
 /*
  * Returns an array of all deadhead_times that match the query parameters.
  */
-export function getDeadheadTimes(
+export function getDeadheadTimes<Fields extends keyof DeadheadTime>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'deadhead_times';
   const selectClause = formatSelectClause(fields);
@@ -31,5 +31,5 @@ export function getDeadheadTimes(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as QueryResult<DeadheadTime, Fields>[];
 }

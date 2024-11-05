@@ -1,9 +1,9 @@
-import {
+import type {
   QueryOptions,
   SqlOrderBy,
-  SqlResults,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
+  TimetableNotesReference,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
 import {
@@ -15,12 +15,14 @@ import {
 /*
  * Returns an array of all timetable notes references that match the query parameters.
  */
-export function getTimetableNotesReferences(
+export function getTimetableNotesReferences<
+  Fields extends keyof TimetableNotesReference,
+>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'timetable_notes_references';
   const selectClause = formatSelectClause(fields);
@@ -31,5 +33,5 @@ export function getTimetableNotesReferences(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as QueryResult<TimetableNotesReference, Fields>[];
 }

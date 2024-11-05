@@ -1,9 +1,9 @@
-import {
+import type {
   QueryOptions,
   SqlOrderBy,
-  SqlResults,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
+  Ridership,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
 import {
@@ -15,12 +15,12 @@ import {
 /*
  * Returns an array of all ridership that match the query parameters.
  */
-export function getRidership(
+export function getRidership<Fields extends keyof Ridership>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'ridership';
   const selectClause = formatSelectClause(fields);
@@ -31,5 +31,5 @@ export function getRidership(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as QueryResult<Ridership, Fields>[];
 }

@@ -1,9 +1,9 @@
-import {
+import type {
   QueryOptions,
   SqlOrderBy,
-  SqlResults,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
+  ServiceAlert,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
 import {
@@ -15,12 +15,12 @@ import {
 /*
  * Returns an array of all service alerts that match the query parameters.
  */
-export function getServiceAlerts(
+export function getServiceAlerts<Fields extends keyof ServiceAlert>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'service_alerts';
   const joinTableName = 'service_alert_targets';
@@ -32,5 +32,5 @@ export function getServiceAlerts(
     .prepare(
       `${selectClause} FROM ${tableName} INNER JOIN ${joinTableName} ON ${tableName}.id=${joinTableName}.alert_id ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as QueryResult<ServiceAlert, Fields>[];
 }

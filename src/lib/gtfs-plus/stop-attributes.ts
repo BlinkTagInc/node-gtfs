@@ -1,9 +1,9 @@
-import {
+import type {
   QueryOptions,
   SqlOrderBy,
-  SqlResults,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
+  StopAttribute,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
 import {
@@ -15,12 +15,12 @@ import {
 /*
  * Returns an array of all stop attributes that match the query parameters.
  */
-export function getStopAttributes(
+export function getStopAttributes<Fields extends keyof StopAttribute>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'stop_attributes';
   const selectClause = formatSelectClause(fields);
@@ -31,5 +31,5 @@ export function getStopAttributes(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as QueryResult<StopAttribute, Fields>[];
 }

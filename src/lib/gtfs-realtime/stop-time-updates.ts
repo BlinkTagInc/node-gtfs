@@ -1,9 +1,9 @@
-import {
+import type {
   QueryOptions,
   SqlOrderBy,
-  SqlResults,
-  SqlSelect,
+  QueryResult,
   SqlWhere,
+  StopTimeUpdate,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
 import {
@@ -15,12 +15,12 @@ import {
 /*
  * Returns an array of all stop time updates that match the query parameters.
  */
-export function getStopTimeUpdates(
+export function getStopTimeUpdates<Fields extends keyof StopTimeUpdate>(
   query: SqlWhere = {},
-  fields: SqlSelect = [],
+  fields: Fields[] = [],
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
-): SqlResults {
+) {
   const db = options.db ?? openDb();
   const tableName = 'stop_time_updates';
   const selectClause = formatSelectClause(fields);
@@ -31,5 +31,5 @@ export function getStopTimeUpdates(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as SqlResults;
+    .all() as QueryResult<StopTimeUpdate, Fields>[];
 }

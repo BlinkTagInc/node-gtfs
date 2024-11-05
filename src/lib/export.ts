@@ -15,7 +15,7 @@ import { prepDirectory, generateFolderName } from './file-utils.ts';
 import { log, logWarning } from './log-utils.ts';
 import { setDefaultConfig } from './utils.ts';
 
-import { Config, Model, SqlResults } from '../types/global_interfaces.ts';
+import { Config, Model } from '../types/global_interfaces.ts';
 
 const getAgencies = (db: Database.Database, config: Config) => {
   try {
@@ -79,9 +79,9 @@ export const exportGtfs = async (initialConfig: Config) => {
         `${model.filenameBase}.${model.filenameExtension}`,
       );
       const tableName = sqlString.escapeId(model.filenameBase);
-      const lines = db
-        .prepare(`SELECT * FROM ${tableName};`)
-        .all() as SqlResults;
+      const lines = db.prepare(`SELECT * FROM ${tableName};`).all() as Array<
+        Record<string, any>
+      >;
 
       if (!lines || lines.length === 0) {
         if (!model.nonstandard) {
