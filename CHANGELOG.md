@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Updated
 - Improve typescript support for results of each query method
+- Dependency Updates
 
 ## [4.15.5] - 2024-10-30
 
