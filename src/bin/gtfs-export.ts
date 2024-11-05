@@ -7,6 +7,7 @@ import PrettyError from 'pretty-error';
 import { getConfig } from '../lib/file-utils.ts';
 import { formatError } from '../lib/log-utils.ts';
 import { exportGtfs } from '../index.ts';
+import type { Config } from '../types/global_interfaces.ts';
 
 const pe = new PrettyError();
 
@@ -32,7 +33,7 @@ const handleError = (error = 'Unknown Error') => {
 
 const setupExport = async () => {
   const config = await getConfig(argv);
-  await exportGtfs(config);
+  await exportGtfs(config as Config);
   process.exit();
 };
 

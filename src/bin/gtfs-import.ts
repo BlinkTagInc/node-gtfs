@@ -7,6 +7,7 @@ import PrettyError from 'pretty-error';
 import { getConfig } from '../lib/file-utils.ts';
 import { formatError } from '../lib/log-utils.ts';
 import { closeDb, importGtfs, openDb } from '../index.ts';
+import type { Config } from '../types/global_interfaces.ts';
 
 const pe = new PrettyError();
 
@@ -40,7 +41,7 @@ const handleError = (error = 'Unknown Error') => {
 
 const setupImport = async () => {
   const config = await getConfig(argv);
-  await importGtfs(config);
+  await importGtfs(config as Config);
 
   const db = openDb(config);
   if (db.name !== ':memory:') {
