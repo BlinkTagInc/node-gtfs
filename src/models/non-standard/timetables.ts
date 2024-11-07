@@ -4,20 +4,18 @@ export const timetables = {
   nonstandard: true,
   schema: [
     {
-      name: 'id',
-      type: 'integer',
-      primary: true,
-      prefix: true,
-    },
-    {
       name: 'timetable_id',
       type: 'text',
       prefix: true,
+      required: true,
+      primary: true,
     },
     {
       name: 'route_id',
       type: 'text',
       prefix: true,
+      required: true,
+      primary: true,
     },
     {
       name: 'direction_id',

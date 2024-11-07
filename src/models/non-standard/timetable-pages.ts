@@ -7,6 +7,7 @@ export const timetablePages = {
       name: 'timetable_page_id',
       type: 'text',
       primary: true,
+      required: true,
       prefix: true,
     },
     {

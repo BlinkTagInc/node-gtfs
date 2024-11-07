@@ -8,6 +8,7 @@ export const timetableNotes = {
       type: 'text',
       primary: true,
       prefix: true,
+      required: true,
     },
     {
       name: 'symbol',
@@ -17,6 +18,7 @@ export const timetableNotes = {
       name: 'note',
       type: 'text',
       nocase: true,
+      required: true,
     },
   ],
 };

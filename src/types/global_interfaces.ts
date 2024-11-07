@@ -389,18 +389,18 @@ export interface Trip {
 }
 
 export interface Timetable {
-  timetable_id?: string;
-  route_id?: string;
+  timetable_id: string;
+  route_id: string;
   direction_id?: 0 | 1;
   start_date?: number;
   end_date?: number;
-  monday?: 0 | 1;
-  tuesday?: 0 | 1;
-  wednesday?: 0 | 1;
-  thursday?: 0 | 1;
-  friday?: 0 | 1;
-  saturday?: 0 | 1;
-  sunday?: 0 | 1;
+  monday: 0 | 1;
+  tuesday: 0 | 1;
+  wednesday: 0 | 1;
+  thursday: 0 | 1;
+  friday: 0 | 1;
+  saturday: 0 | 1;
+  sunday: 0 | 1;
   start_time?: string;
   start_timestamp?: number;
   end_time?: string;
@@ -415,6 +415,12 @@ export interface Timetable {
   show_trip_continuation?: 0 | 1;
 }
 
+export interface TimetablePage {
+  timetable_page_id: string;
+  timetable_page_label?: string;
+  filename?: string;
+}
+
 export interface TimetableStopOrder {
   timetable_id: string;
   stop_id: string;
@@ -423,7 +429,7 @@ export interface TimetableStopOrder {
 
 export interface TimetableNote {
   note_id: string;
-  symbol: string;
+  symbol?: string;
   note: string;
 }
 
@@ -434,12 +440,6 @@ export interface TimetableNotesReference {
   stop_id?: string;
   stop_sequence?: number;
   show_on_stoptime?: 0 | 1;
-}
-
-export interface TimetablePage {
-  timetable_page_id: string;
-  timetable_page_label: string;
-  filename: string;
 }
 
 export interface TripsDatedVehicleJourney {

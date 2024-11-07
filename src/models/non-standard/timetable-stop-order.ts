@@ -4,27 +4,27 @@ export const timetableStopOrder = {
   nonstandard: true,
   schema: [
     {
-      name: 'id',
-      type: 'integer',
-      primary: true,
-      prefix: true,
-    },
-    {
       name: 'timetable_id',
       type: 'text',
       index: true,
       prefix: true,
+      required: true,
+      primary: true,
     },
     {
       name: 'stop_id',
       type: 'text',
       prefix: true,
+      required: true,
+      primary: true,
     },
     {
       name: 'stop_sequence',
       type: 'integer',
       min: 0,
       index: true,
+      required: true,
+      primary: true,
     },
   ],
 };
