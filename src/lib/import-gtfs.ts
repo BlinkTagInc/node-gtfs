@@ -61,18 +61,18 @@ interface Dictionary<T> {
 }
 type Tuple = [seconds: number | null, date: string | null];
 
-const dateCache: Dictionary<Tuple> = {};
+const timeCache: Dictionary<Tuple> = {};
 
-const calculateAndCacheDate = (value: string): Tuple => {
-  const cached = dateCache[value];
-  if (cached != null) {
+const formatAndCacheTime = (value: string): Tuple => {
+  const cached = timeCache[value];
+  if (cached !== undefined) {
     return cached;
   }
 
-  const seconds = calculateSecondsFromMidnight(value);
-  const date = padLeadingZeros(value);
-  const computed: Tuple = [seconds, date];
-  dateCache[value] = computed;
+  const timeAsSecondsFromMidnight = calculateSecondsFromMidnight(value);
+  const timeAsString = padLeadingZeros(value);
+  const computed: Tuple = [timeAsSecondsFromMidnight, timeAsString];
+  timeCache[value] = computed;
   return computed;
 };
 
@@ -304,9 +304,10 @@ const formatGtfsLine = (
   for (const [timeColumnName, timestampColumnName] of TIME_COLUMN_PAIRS) {
     const value = formattedLine[timeColumnName];
     if (value) {
-      const [seconds, date] = calculateAndCacheDate(value);
-      formattedLine[timestampColumnName] = seconds;
-      formattedLine[timeColumnName] = date;
+      const [timeAsSecondsFromMidnight, timeAsString] =
+        formatAndCacheTime(value);
+      formattedLine[timestampColumnName] = timeAsSecondsFromMidnight;
+      formattedLine[timeColumnName] = timeAsString;
     }
   }
 
