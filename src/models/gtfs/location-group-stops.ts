@@ -8,6 +8,7 @@ export const locationGroupStops = {
       prefix: true,
       index: true,
       required: true,
+      primary: true,
     },
     {
       name: 'stop_id',
@@ -15,6 +16,7 @@ export const locationGroupStops = {
       required: true,
       prefix: true,
       index: true,
+      primary: true,
     },
   ],
 };

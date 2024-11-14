@@ -6,6 +6,7 @@ export const attributions = {
       name: 'attribution_id',
       type: 'text',
       prefix: true,
+      primary: true,
     },
     {
       name: 'agency_id',

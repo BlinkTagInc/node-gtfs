@@ -11,15 +11,18 @@ export const timeframes = {
     {
       name: 'start_time',
       type: 'text',
+      primary: true,
     },
     {
       name: 'end_time',
       type: 'text',
+      primary: true,
     },
     {
       name: 'service_id',
       type: 'text',
       required: true,
+      primary: true,
       index: true,
       prefix: true,
     },

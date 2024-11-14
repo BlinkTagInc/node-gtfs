@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Updated
 - Types for gtfs-to-html files
+- Added primary key info for attributions.txt, fare_rules.txt, location_group_stops.txt, stop_areas.txt and timeframes.txt
 
 ## [4.15.6] - 2024-11-05
 
