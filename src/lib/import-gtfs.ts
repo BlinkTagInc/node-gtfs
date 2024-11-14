@@ -197,19 +197,35 @@ const createGtfsTables = (db: Database.Database): void => {
     }
 
     const columns = model.schema.map((column) => {
-      let check = '';
+      const checks = [];
       if (column.min !== undefined && column.max) {
-        check = `CHECK( ${column.name} >= ${column.min} AND ${column.name} <= ${column.max} )`;
+        checks.push(
+          `${column.name} >= ${column.min} AND ${column.name} <= ${column.max}`,
+        );
       } else if (column.min) {
-        check = `CHECK( ${column.name} >= ${column.min} )`;
+        checks.push(`${column.name} >= ${column.min}`);
       } else if (column.max) {
-        check = `CHECK( ${column.name} <= ${column.max} )`;
+        checks.push(`${column.name} <= ${column.max}`);
+      }
+
+      if (column.type === 'integer') {
+        checks.push(
+          `(TYPEOF(${column.name}) = 'integer' OR ${column.name} IS NULL)`,
+        );
+      }
+
+      if (column.type === 'real') {
+        checks.push(
+          `(TYPEOF(${column.name}) = 'real' OR ${column.name} IS NULL)`,
+        );
       }
 
       const required = column.required ? 'NOT NULL' : '';
       const columnDefault = column.default ? 'DEFAULT ' + column.default : '';
       const columnCollation = column.nocase ? 'COLLATE NOCASE' : '';
-      return `${column.name} ${column.type} ${check} ${required} ${columnDefault} ${columnCollation}`;
+      const checkClause =
+        checks.length > 0 ? `CHECK(${checks.join(' AND ')})` : '';
+      return `${column.name} ${column.type} ${checkClause} ${required} ${columnDefault} ${columnCollation}`;
     });
 
     // Find Primary Key fields
@@ -271,44 +287,17 @@ const formatGtfsLine = (
       continue;
     }
 
-    // Type conversion
-    switch (type) {
-      case 'date':
-        value = value.replace(/-/g, '');
-        if (value.length !== 8) {
-          throw new Error(
-            `Invalid date in ${filenameBase}.${filenameExtension} for ${name} on line ${lineNumber}.`,
-          );
-        }
-        value = parseInt(value, 10);
-        break;
-      case 'integer':
-        value = parseInt(value, 10);
-        break;
-      case 'real':
-        value = parseFloat(value);
-        break;
-    }
-
-    // Check for NaN after conversion
-    if (Number.isNaN(value)) {
-      formattedLine[name] = null;
-      continue;
+    if (type === 'date') {
+      // Handle YYYY-MM-DD format
+      value = value.replace(/-/g, '');
+      if (value.length !== 8) {
+        throw new Error(
+          `Invalid date in ${filenameBase}.${filenameExtension} for ${name} on line ${lineNumber}.`,
+        );
+      }
     }
 
     formattedLine[name] = value;
-
-    // Validate min/max
-    if (min !== undefined && value < min) {
-      throw new Error(
-        `Invalid value in ${filenameBase}.${filenameExtension} for ${name} on line ${lineNumber}: below minimum value of ${min}.`,
-      );
-    }
-    if (max !== undefined && value > max) {
-      throw new Error(
-        `Invalid value in ${filenameBase}.${filenameExtension} for ${name} on line ${lineNumber}: above maximum value of ${max}.`,
-      );
-    }
   }
 
   // Process time columns
@@ -409,7 +398,7 @@ const importGtfsFiles = (
               }
 
               task.logWarning(
-                `Check ${filename} for invalid data on row ${rowNumber}.`,
+                `Check ${filename} for invalid data on line ${rowNumber + 1}.`,
               );
               throw error;
             }
