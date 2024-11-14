@@ -123,7 +123,7 @@ export const exportGtfs = async (initialConfig: Config) => {
           }
         } else if (model.filenameBase === 'fare_products') {
           for (const line of lines) {
-            line.price = formatCurrency(line.amount, line.currency);
+            line.amount = formatCurrency(line.amount, line.currency);
           }
         }
 
