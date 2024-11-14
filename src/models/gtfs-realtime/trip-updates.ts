@@ -3,7 +3,7 @@ export const tripUpdates = {
   extension: 'gtfs-realtime',
   schema: [
     {
-      name: 'update_id',
+      name: 'id',
       type: 'text',
       required: true,
       primary: true,

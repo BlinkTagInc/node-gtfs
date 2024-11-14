@@ -5,16 +5,11 @@ export const deadheadTimes = {
   extension: 'ods',
   schema: [
     {
-      name: 'id',
-      type: 'integer',
-      primary: true,
-      prefix: true,
-    },
-    {
       name: 'deadhead_id',
       type: 'text',
       required: true,
       index: true,
+      primary: true,
       prefix: true,
     },
     {
@@ -51,6 +46,7 @@ export const deadheadTimes = {
       name: 'location_sequence',
       type: 'integer',
       required: true,
+      primary: true,
       min: 0,
       index: true,
     },

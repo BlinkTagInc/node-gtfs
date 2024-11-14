@@ -95,7 +95,6 @@ export const exportGtfs = async (initialConfig: Config) => {
 
       if (model.filenameExtension === 'txt') {
         const excludeColumns = [
-          'id',
           'arrival_timestamp',
           'departure_timestamp',
           'start_timestamp',

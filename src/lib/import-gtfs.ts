@@ -353,17 +353,20 @@ const importGtfsFiles = (
 
         task.log(`Importing - ${filename}\r`);
 
-        const columns = model.schema.filter((column) => column.name !== 'id');
-        const placeholder = columns.map(({ name }) => `@${name}`).join(', ');
+        const placeholder = model.schema
+          .map(({ name }) => `@${name}`)
+          .join(', ');
 
         // Create a map of which columns need prefixing
         const prefixedColumns = new Set(
-          columns.filter((col) => col.prefix).map((col) => col.name),
+          model.schema
+            .filter((column) => column.prefix)
+            .map((column) => column.name),
         );
 
         const prepareStatement = `INSERT ${task.ignoreDuplicates ? 'OR IGNORE' : ''} INTO ${
           model.filenameBase
-        } (${columns
+        } (${model.schema
           .map((column) => column.name)
           .join(', ')}) VALUES (${placeholder})`;
 

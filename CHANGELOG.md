@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Types for gtfs-to-html files
 - Added primary key info for attributions.txt, fare_rules.txt, location_group_stops.txt, stop_areas.txt and timeframes.txt
 - Better column checks on imports
+- Don't exclude 'id' column from export
 
 ### Fixed
 - Default logging verbose = true
