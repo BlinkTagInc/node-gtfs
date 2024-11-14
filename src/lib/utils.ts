@@ -299,3 +299,28 @@ export function getDayOfWeekFromDate(date: number): string {
 
   return DAYS_OF_WEEK[dateObj.getDay()];
 }
+
+/**
+ * Formats a numeric value according to the decimal precision rules of the specified currency,
+ * without any currency symbols or separators.
+ * @param value The numeric value to format (e.g., 10.5)
+ * @param currency The ISO 4217 currency code (e.g., 'USD', 'JPY', 'EUR')
+ * @returns The formatted string with appropriate decimal places
+ *          Examples:
+ *          - formatCurrency(10.5, 'USD') => '10.50'    // USD uses 2 decimal places
+ *          - formatCurrency(10.5, 'JPY') => '10'       // JPY uses 0 decimal places
+ *          - formatCurrency(10.523, 'BHD') => '10.523' // BHD uses 3 decimal places
+ */
+export function formatCurrency(value: number, currency: string) {
+  const parts = new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency,
+  }).formatToParts(value);
+
+  const integerPart =
+    parts.find((part) => part.type === 'integer')?.value ?? '0';
+  const fractionPart =
+    parts.find((part) => part.type === 'fraction')?.value ?? '';
+
+  return `${integerPart}${fractionPart !== '' ? `.${fractionPart}` : ''}`;
+}

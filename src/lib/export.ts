@@ -13,7 +13,7 @@ import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
 import { prepDirectory, generateFolderName } from './file-utils.ts';
 import { log, logWarning } from './log-utils.ts';
-import { setDefaultConfig } from './utils.ts';
+import { formatCurrency, setDefaultConfig } from './utils.ts';
 
 import { Config, Model } from '../types/global_interfaces.ts';
 
@@ -116,6 +116,14 @@ export const exportGtfs = async (initialConfig: Config) => {
             .all();
           if (!routesWithAgencyId || routesWithAgencyId.length === 0) {
             excludeColumns.push('agency_id');
+          }
+        } else if (model.filenameBase === 'fare_attributes') {
+          for (const line of lines) {
+            line.price = formatCurrency(line.price, line.currency_type);
+          }
+        } else if (model.filenameBase === 'fare_products') {
+          for (const line of lines) {
+            line.price = formatCurrency(line.amount, line.currency);
           }
         }
 
