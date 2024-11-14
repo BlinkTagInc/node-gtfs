@@ -16,7 +16,7 @@ type LogFunction = (text: string, overwrite?: boolean) => void;
  * logger('Done!'); // Writes on new line
  */
 export function log(config: Config): LogFunction {
-  if (!config.verbose) {
+  if (config.verbose === false) {
     return noop;
   }
 

@@ -6,6 +6,8 @@ import sanitize from 'sanitize-filename';
 import untildify from 'untildify';
 import StreamZip from 'node-stream-zip';
 
+import { log } from './log-utils.ts';
+
 /** Configuration command line arguments interface */
 interface ConfigArgs {
   configPath?: string;
@@ -47,7 +49,7 @@ export async function getConfig(
     } else if (existsSync(path.resolve('./config.json'))) {
       data = await readFile(path.resolve('./config.json'), 'utf8');
       config = Object.assign(JSON.parse(data), argv);
-      console.log('Using configuration from ./config.json');
+      log(config)('Using configuration from ./config.json');
     } else {
       throw new Error(
         'Cannot find configuration file. Use config-sample.json as a starting point, pass --configPath option.',

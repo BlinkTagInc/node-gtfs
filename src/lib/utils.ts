@@ -41,6 +41,7 @@ export function setDefaultConfig(initialConfig: Config) {
     ignoreDuplicates: false,
     ignoreErrors: false,
     gtfsRealtimeExpirationSeconds: 0,
+    verbose: true,
   };
 
   return {
