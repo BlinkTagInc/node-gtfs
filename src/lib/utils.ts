@@ -324,3 +324,14 @@ export function formatCurrency(value: number, currency: string) {
 
   return `${integerPart}${fractionPart !== '' ? `.${fractionPart}` : ''}`;
 }
+
+/**
+ * Gets the timestamp column name for a given column name
+ * @param columnName The column name
+ * @returns The timestamp column name
+ */
+export function getTimestampColumnName(columnName: string) {
+  return columnName.endsWith('time')
+    ? `${columnName}stamp`
+    : `${columnName}_timestamp`;
+}

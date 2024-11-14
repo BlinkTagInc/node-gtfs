@@ -14,23 +14,13 @@ export const deadheadTimes = {
     },
     {
       name: 'arrival_time',
-      type: 'text',
+      type: 'time',
       required: true,
-    },
-    {
-      name: 'arrival_timestamp',
-      type: 'integer',
-      index: true,
     },
     {
       name: 'departure_time',
-      type: 'text',
+      type: 'time',
       required: true,
-    },
-    {
-      name: 'departure_timestamp',
-      type: 'integer',
-      index: true,
     },
     {
       name: 'ops_location_id',

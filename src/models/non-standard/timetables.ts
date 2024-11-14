@@ -82,19 +82,11 @@ export const timetables = {
     },
     {
       name: 'start_time',
-      type: 'text',
-    },
-    {
-      name: 'start_timestamp',
-      type: 'integer',
+      type: 'time',
     },
     {
       name: 'end_time',
-      type: 'text',
-    },
-    {
-      name: 'end_timestamp',
-      type: 'integer',
+      type: 'time',
     },
     {
       name: 'timetable_label',

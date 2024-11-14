@@ -18,9 +18,10 @@ import { updateGtfsRealtimeData } from './import-gtfs-realtime.ts';
 import { log, logError, logWarning } from './log-utils.ts';
 import {
   calculateSecondsFromMidnight,
+  getTimestampColumnName,
+  padLeadingZeros,
   setDefaultConfig,
   validateConfigForImport,
-  padLeadingZeros,
 } from './utils.ts';
 
 import { Config, ConfigAgency, Model } from '../types/global_interfaces.ts';
@@ -80,21 +81,6 @@ const getTextFiles = async (folderPath: string): Promise<string[]> => {
   const files = await readdir(folderPath);
   return files.filter((filename) => filename.slice(-3) === 'txt');
 };
-
-const TIME_COLUMN_NAMES = [
-  'start_time',
-  'end_time',
-  'arrival_time',
-  'departure_time',
-  'prior_notice_last_time',
-  'prior_notice_start_time',
-  'start_pickup_drop_off_window',
-];
-
-const TIME_COLUMN_PAIRS = TIME_COLUMN_NAMES.map((name) => [
-  name,
-  name.endsWith('time') ? `${name}stamp` : `${name}_timestamp`,
-]);
 
 const downloadGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
   if (!task.url) {
@@ -196,7 +182,9 @@ const createGtfsTables = (db: Database.Database): void => {
       return;
     }
 
-    const columns = model.schema.map((column) => {
+    const sqlColumnCreateStatements = [];
+
+    for (const column of model.schema) {
       const checks = [];
       if (column.min !== undefined && column.max) {
         checks.push(
@@ -212,9 +200,7 @@ const createGtfsTables = (db: Database.Database): void => {
         checks.push(
           `(TYPEOF(${column.name}) = 'integer' OR ${column.name} IS NULL)`,
         );
-      }
-
-      if (column.type === 'real') {
+      } else if (column.type === 'real') {
         checks.push(
           `(TYPEOF(${column.name}) = 'real' OR ${column.name} IS NULL)`,
         );
@@ -225,24 +211,32 @@ const createGtfsTables = (db: Database.Database): void => {
       const columnCollation = column.nocase ? 'COLLATE NOCASE' : '';
       const checkClause =
         checks.length > 0 ? `CHECK(${checks.join(' AND ')})` : '';
-      return `${column.name} ${column.type} ${checkClause} ${required} ${columnDefault} ${columnCollation}`;
-    });
+
+      sqlColumnCreateStatements.push(
+        `${column.name} ${column.type} ${checkClause} ${required} ${columnDefault} ${columnCollation}`,
+      );
+
+      // Add an additional timestamp column for time columns
+      if (column.type === 'time') {
+        sqlColumnCreateStatements.push(
+          `${getTimestampColumnName(column.name)} INTEGER`,
+        );
+      }
+    }
 
     // Find Primary Key fields
     const primaryColumns = model.schema.filter((column) => column.primary);
 
     if (primaryColumns.length > 0) {
-      columns.push(
-        `PRIMARY KEY (${primaryColumns
-          .map((column) => column.name)
-          .join(', ')})`,
+      sqlColumnCreateStatements.push(
+        `PRIMARY KEY (${primaryColumns.map(({ name }) => name).join(', ')})`,
       );
     }
 
     db.prepare(`DROP TABLE IF EXISTS ${model.filenameBase};`).run();
 
     db.prepare(
-      `CREATE TABLE ${model.filenameBase} (${columns.join(', ')});`,
+      `CREATE TABLE ${model.filenameBase} (${sqlColumnCreateStatements.join(', ')});`,
     ).run();
   }
 };
@@ -252,10 +246,20 @@ const createGtfsIndexes = (db: Database.Database): void => {
     if (!model.schema) {
       return;
     }
-    for (const column of model.schema.filter((column) => column.index)) {
-      db.prepare(
-        `CREATE INDEX idx_${model.filenameBase}_${column.name} ON ${model.filenameBase} (${column.name});`,
-      ).run();
+    for (const column of model.schema) {
+      if (column.index) {
+        db.prepare(
+          `CREATE INDEX idx_${model.filenameBase}_${column.name} ON ${model.filenameBase} (${column.name});`,
+        ).run();
+      }
+
+      if (column.type === 'time') {
+        // Index all timestamp columns
+        const timestampColumnName = getTimestampColumnName(column.name);
+        db.prepare(
+          `CREATE INDEX idx_${model.filenameBase}_${timestampColumnName} ON ${model.filenameBase} (${timestampColumnName});`,
+        ).run();
+      }
     }
   }
 };
@@ -272,13 +276,17 @@ const formatGtfsLine = (
   const filenameBase = model.filenameBase;
   const filenameExtension = model.filenameExtension;
 
-  for (const columnSchema of model.schema) {
-    const { name, type, required, min, max } = columnSchema;
+  for (const { name, type, required } of model.schema) {
     let value = line[name];
 
     // Early null check
     if (value === '' || value === undefined || value === null) {
       formattedLine[name] = null;
+
+      if (type === 'time') {
+        formattedLine[getTimestampColumnName(name)] = null;
+      }
+
       if (required) {
         throw new Error(
           `Missing required value in ${filenameBase}.${filenameExtension} for ${name} on line ${lineNumber}.`,
@@ -295,20 +303,18 @@ const formatGtfsLine = (
           `Invalid date in ${filenameBase}.${filenameExtension} for ${name} on line ${lineNumber}.`,
         );
       }
+    } else if (type === 'time') {
+      // Add an additional timestamp column for time columns
+      const [timeAsSecondsFromMidnight, timeAsString] =
+        formatAndCacheTime(value);
+
+      value = timeAsString;
+
+      formattedLine[getTimestampColumnName(name)] =
+        timeAsSecondsFromMidnight ?? null;
     }
 
     formattedLine[name] = value;
-  }
-
-  // Process time columns
-  for (const [timeColumnName, timestampColumnName] of TIME_COLUMN_PAIRS) {
-    const value = formattedLine[timeColumnName];
-    if (value) {
-      const [timeAsSecondsFromMidnight, timeAsString] =
-        formatAndCacheTime(value);
-      formattedLine[timestampColumnName] = timeAsSecondsFromMidnight;
-      formattedLine[timeColumnName] = timeAsString;
-    }
   }
 
   return formattedLine;
@@ -354,22 +360,34 @@ const importGtfsFiles = (
 
         task.log(`Importing - ${filename}\r`);
 
-        const placeholder = model.schema
-          .map(({ name }) => `@${name}`)
-          .join(', ');
+        // Create a list of all columns
+        const columns = model.schema.flatMap((column) => {
+          if (column.type === 'time') {
+            // Add an additional timestamp column for time columns
+            return [
+              column,
+              {
+                name: getTimestampColumnName(column.name),
+                type: 'integer',
+                index: true,
+              },
+            ];
+          }
+          return column;
+        });
 
         // Create a map of which columns need prefixing
         const prefixedColumns = new Set(
-          model.schema
+          columns
             .filter((column) => column.prefix)
             .map((column) => column.name),
         );
 
         const prepareStatement = `INSERT ${task.ignoreDuplicates ? 'OR IGNORE' : ''} INTO ${
           model.filenameBase
-        } (${model.schema
-          .map((column) => column.name)
-          .join(', ')}) VALUES (${placeholder})`;
+        } (${columns.map(({ name }) => name).join(', ')}) VALUES (${columns
+          .map(({ name }) => `@${name}`)
+          .join(', ')})`;
 
         const insert = db.prepare(prepareStatement);
 
@@ -393,7 +411,7 @@ const importGtfsFiles = (
               }
             } catch (error: any) {
               if (error.code === 'SQLITE_CONSTRAINT_PRIMARYKEY') {
-                const primaryColumns = model.schema.filter(
+                const primaryColumns = columns.filter(
                   (column) => column.primary,
                 );
                 task.logWarning(

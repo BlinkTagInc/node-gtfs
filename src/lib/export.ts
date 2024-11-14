@@ -94,18 +94,7 @@ export const exportGtfs = async (initialConfig: Config) => {
       }
 
       if (model.filenameExtension === 'txt') {
-        const excludeColumns = [
-          'arrival_timestamp',
-          'departure_timestamp',
-          'start_timestamp',
-          'end_timestamp',
-          'service_arrival_timestamp',
-          'service_departure_timestamp',
-          'boarding_timestamp',
-          'alighting_timestamp',
-          'ridership_start_timestamp',
-          'ridership_end_timestamp',
-        ];
+        const excludeColumns = [];
 
         // If no routes have values for agency_id, add it to the excludeColumns list
         if (model.filenameBase === 'routes') {

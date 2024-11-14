@@ -28,21 +28,11 @@ export const ridership = {
     },
     {
       name: 'ridership_start_time',
-      type: 'text',
-    },
-    {
-      name: 'ridership_start_timestamp',
-      type: 'integer',
-      index: true,
+      type: 'time',
     },
     {
       name: 'ridership_end_time',
-      type: 'text',
-    },
-    {
-      name: 'ridership_end_timestamp',
-      type: 'integer',
-      index: true,
+      type: 'time',
     },
     {
       name: 'service_id',

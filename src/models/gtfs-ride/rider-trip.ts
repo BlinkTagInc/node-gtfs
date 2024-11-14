@@ -53,21 +53,11 @@ export const riderTrip = {
     },
     {
       name: 'boarding_time',
-      type: 'text',
-    },
-    {
-      name: 'boarding_timestamp',
-      type: 'integer',
-      index: true,
+      type: 'time',
     },
     {
       name: 'alighting_time',
-      type: 'text',
-    },
-    {
-      name: 'alighting_timestamp',
-      type: 'integer',
-      index: true,
+      type: 'time',
     },
     {
       name: 'rider_type',

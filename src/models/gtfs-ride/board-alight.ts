@@ -104,21 +104,11 @@ export const boardAlight = {
     },
     {
       name: 'service_arrival_time',
-      type: 'text',
-    },
-    {
-      name: 'service_arrival_timestamp',
-      type: 'integer',
-      index: true,
+      type: 'time',
     },
     {
       name: 'service_departure_time',
-      type: 'text',
-    },
-    {
-      name: 'service_departure_timestamp',
-      type: 'integer',
-      index: true,
+      type: 'time',
     },
     {
       name: 'source',

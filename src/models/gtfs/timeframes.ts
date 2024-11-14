@@ -10,12 +10,12 @@ export const timeframes = {
     },
     {
       name: 'start_time',
-      type: 'text',
+      type: 'time',
       primary: true,
     },
     {
       name: 'end_time',
-      type: 'text',
+      type: 'time',
       primary: true,
     },
     {

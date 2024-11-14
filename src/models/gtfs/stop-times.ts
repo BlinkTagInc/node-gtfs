@@ -11,21 +11,11 @@ export const stopTimes = {
     },
     {
       name: 'arrival_time',
-      type: 'text',
-    },
-    {
-      name: 'arrival_timestamp',
-      type: 'integer',
-      index: true,
+      type: 'time',
     },
     {
       name: 'departure_time',
-      type: 'text',
-    },
-    {
-      name: 'departure_timestamp',
-      type: 'integer',
-      index: true,
+      type: 'time',
     },
     {
       name: 'location_group_id',
@@ -60,12 +50,7 @@ export const stopTimes = {
     },
     {
       name: 'start_pickup_drop_off_window',
-      type: 'text',
-    },
-    {
-      name: 'start_pickup_drop_off_window_timestamp',
-      type: 'integer',
-      index: true,
+      type: 'time',
     },
     {
       name: 'pickup_type',

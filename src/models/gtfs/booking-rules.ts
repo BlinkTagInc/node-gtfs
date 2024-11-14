@@ -32,12 +32,7 @@ export const bookingRules = {
     },
     {
       name: 'prior_notice_last_time',
-      type: 'text',
-    },
-    {
-      name: 'prior_notice_last_timestamp',
-      type: 'integer',
-      index: true,
+      type: 'time',
     },
     {
       name: 'prior_notice_start_day',
@@ -46,12 +41,7 @@ export const bookingRules = {
     },
     {
       name: 'prior_notice_start_time',
-      type: 'text',
-    },
-    {
-      name: 'prior_notice_start_timestamp',
-      type: 'integer',
-      index: true,
+      type: 'time',
     },
     {
       name: 'prior_notice_service_id',
