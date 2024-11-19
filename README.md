@@ -167,8 +167,6 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 
 For GTFS files that contain more than one agency, you only need to list each GTFS file once in the `agencies` array, not once per agency that it contains.
 
-To find an agency's GTFS file, visit [transitfeeds.com](http://transitfeeds.com).
-
 #### agencies options
 
 | option                     | type   | description                                                                                                                                                         |
@@ -188,7 +186,7 @@ To find an agency's GTFS file, visit [transitfeeds.com](http://transitfeeds.com)
 {
   "agencies": [
     {
-      "url": "https://opendata.somewhere.com/gtfs.zip"
+      "url": "https://www.bart.gov/dev/schedules/google_transit.zip"
     }
   ]
 }
@@ -200,7 +198,7 @@ To find an agency's GTFS file, visit [transitfeeds.com](http://transitfeeds.com)
 {
   "agencies": [
     {
-      "url": "https://opendata.somewhere.com/gtfs.zip",
+      "url": "https://www.bart.gov/dev/schedules/google_transit.zip",
       "headers": {
         "Content-Type": "application/json",
         "Authorization": "bearer 1234567890"
@@ -253,21 +251,21 @@ To find an agency's GTFS file, visit [transitfeeds.com](http://transitfeeds.com)
 {
   "agencies": [
     {
-      "url": "https://opendata.somewhere.com/gtfs.zip",
+      "url": "https://www.bart.gov/dev/schedules/google_transit.zip",
       "realtimeAlerts": {
-        "url": "https://opendata.somewhere.com/gtfs-rt/alerts",
+        "url": "https://api.bart.gov/gtfsrt/alerts.aspx",
         "headers": {
           "Authorization": "bearer 123456789"
         }
       },
       "realtimeTripUpdates": {
-        "url": "https://opendata.somewhere.com/gtfs-rt/tripupdates",
+        "url": "https://api.bart.gov/gtfsrt/tripupdate.aspx",
         "headers": {
           "Authorization": "bearer 123456789"
         }
       },
       "realtimeVehiclePositions": {
-        "url": "https://opendata.somewhere.com/gtfs-rt/vehiclepositions",
+        "url": "https://api.bart.gov/gtfsrt/vehiclepositions.aspx",
         "headers": {
           "Authorization": "bearer 123456789"
         }
@@ -400,15 +398,15 @@ importGtfs({
 {
   "agencies": [
     {
-      "url": "https://agency.com/gtfs.zip",
+      "url": "https://www.bart.gov/dev/schedules/google_transit.zip",
       "realtimeAlerts": {
-        "url": "https://opendata.somewhere.com/gtfs-rt/alerts"
+        "url": "https://api.bart.gov/gtfsrt/alerts.aspx"
       },
       "realtimeTripUpdates": {
-        "url": "https://opendata.somewhere.com/gtfs-rt/tripupdates"
+        "url": "https://api.bart.gov/gtfsrt/tripupdate.aspx"
       },
       "realtimeVehiclePositions": {
-        "url": "https://opendata.somewhere.com/gtfs-rt/vehiclepositions"
+        "url": "https://api.bart.gov/gtfsrt/vehiclepositions.aspx"
       }
     }
   ],
@@ -477,7 +475,7 @@ import { importGtfs } from 'gtfs';
 const config = {
   agencies: [
     {
-      url: 'https://opendata.somewhere.com/gtfs.zip',
+      url: 'https://www.bart.gov/dev/schedules/google_transit.zip',
       exclude: ['shapes'],
     },
   ],
@@ -527,7 +525,7 @@ const config = {
   sqlitePath: '/dev/sqlite/gtfs',
   agencies: [
     {
-      url: 'https://opendata.somewhere.com/gtfs.zip',
+      url: 'https://www.bart.gov/dev/schedules/google_transit.zip',
       exclude: ['shapes'],
     },
   ],
@@ -607,7 +605,7 @@ const config = {
   sqlitePath: '/dev/sqlite/gtfs',
   agencies: [
     {
-      url: 'https://opendata.somewhere.com/gtfs.zip',
+      url: 'https://www.bart.gov/dev/schedules/google_transit.zip',
       exclude: ['shapes'],
     },
   ],
