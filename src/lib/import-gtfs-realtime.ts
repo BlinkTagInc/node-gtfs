@@ -72,7 +72,7 @@ function getNestedProperty(obj: any, defaultValue: any, path?: string) {
     }
   }
 
-  if (obj.__isLong__) return convertLongTimeToDate(obj);
+  if (obj?.__isLong__) return convertLongTimeToDate(obj);
 
   return obj;
 }
@@ -177,27 +177,36 @@ async function processRealtimeAlerts(
           .join(', ')}) VALUES (${fieldValues.join(', ')})`,
       ).run();
     } catch (error: any) {
-      task.logWarning('Import error: ' + error.message);
+      task.logWarning(`Import error: ${error.message}`);
     }
 
-    const alertTargetArray = [];
-    for (const informedEntity of entity.alert.informedEntity) {
-      informedEntity.parent = entity;
-      const subValues = models.serviceAlertTargets.schema.map((column) =>
-        prepareRealtimeFieldValue(informedEntity, column, task),
+    if (
+      !entity.alert.informedEntity ||
+      entity.alert.informedEntity.length === 0
+    ) {
+      task.logWarning(
+        `Import error: No informed entities found for alert id=${entity.id}`,
       );
-      alertTargetArray.push(`(${subValues.join(', ')})`);
-      totalLineCount++;
-    }
+    } else {
+      const alertTargetArray = [];
+      for (const informedEntity of entity.alert.informedEntity) {
+        informedEntity.parent = entity;
+        const subValues = models.serviceAlertTargets.schema.map((column) =>
+          prepareRealtimeFieldValue(informedEntity, column, task),
+        );
+        alertTargetArray.push(`(${subValues.join(', ')})`);
+        totalLineCount++;
+      }
 
-    try {
-      db.prepare(
-        `REPLACE INTO ${models.serviceAlertTargets.filenameBase} (${models.serviceAlertTargets.schema
-          .map((column) => column.name)
-          .join(', ')}) VALUES ${alertTargetArray.join(', ')}`,
-      ).run();
-    } catch (error: any) {
-      task.logWarning('Import error: ' + error.message);
+      try {
+        db.prepare(
+          `REPLACE INTO ${models.serviceAlertTargets.filenameBase} (${models.serviceAlertTargets.schema
+            .map((column) => column.name)
+            .join(', ')}) VALUES ${alertTargetArray.join(', ')}`,
+        ).run();
+      } catch (error: any) {
+        task.logWarning(`Import error: ${error.message}`);
+      }
     }
 
     task.log(`Importing - ${totalLineCount++} entries imported\r`, true);
@@ -226,7 +235,7 @@ async function processRealtimeTripUpdates(
           .join(', ')}) VALUES (${fieldValues.join(', ')})`,
       ).run();
     } catch (error: any) {
-      task.logWarning('Import error: ' + error.message);
+      task.logWarning(`Import error: ${error.message}`);
     }
 
     const stopTimeUpdateArray = [];
@@ -246,7 +255,7 @@ async function processRealtimeTripUpdates(
           .join(', ')}) VALUES ${stopTimeUpdateArray.join(', ')}`,
       ).run();
     } catch (error: any) {
-      task.logWarning('Import error: ' + error.message);
+      task.logWarning(`Import error: ${error.message}`);
     }
 
     task.log(`Importing - ${totalLineCount++} entries imported\r`, true);
@@ -275,7 +284,7 @@ async function processRealtimeVehiclePositions(
           .join(', ')}) VALUES (${fieldValues.join(', ')})`,
       ).run();
     } catch (error: any) {
-      task.logWarning('Import error: ' + error.message);
+      task.logWarning(`Import error: ${error.message}`);
     }
 
     task.log(`Importing - ${totalLineCount++} entries imported\r`, true);

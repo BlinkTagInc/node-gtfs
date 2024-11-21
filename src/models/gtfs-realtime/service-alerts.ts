@@ -12,11 +12,19 @@ export const serviceAlerts = {
     },
     {
       name: 'cause',
-      type: 'integer',
-      required: true,
-      min: 0,
+      type: 'text',
       source: 'alert.cause',
-      default: 0,
+    },
+    {
+      name: 'effect',
+      type: 'text',
+      source: 'alert.effect',
+    },
+    {
+      name: 'url',
+      type: 'text',
+      source: 'alert.url',
+      default: '',
     },
     {
       name: 'start_time',
@@ -33,18 +41,33 @@ export const serviceAlerts = {
       default: '',
     },
     {
-      name: 'headline',
+      name: 'headerText',
       type: 'text',
       required: true,
       source: 'alert.headerText.translation[0].text',
       default: '',
     },
     {
-      name: 'description',
+      name: 'descriptionText',
       type: 'text',
       required: true,
       source: 'alert.descriptionText.translation[0].text',
       default: '',
+    },
+    {
+      name: 'ttsHeaderText',
+      type: 'text',
+      source: 'alert.ttsHeaderText.translation[0].text',
+    },
+    {
+      name: 'ttsDescriptionText',
+      type: 'text',
+      source: 'alert.ttsDescriptionText.translation[0].text',
+    },
+    {
+      name: 'severityLevel',
+      type: 'text',
+      source: 'alert.severityLevel',
     },
     {
       name: 'created_timestamp',
