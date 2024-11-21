@@ -115,7 +115,7 @@
     "yoctocolors": "^2.1.1"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.11",
+    "@types/better-sqlite3": "^7.6.12",
     "@types/geojson": "^7946.0.14",
     "@types/jest": "^29.5.14",
     "@types/lodash-es": "^4.17.12",
