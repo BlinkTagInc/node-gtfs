@@ -72,16 +72,13 @@ export function convertLongTimeToDate(longDate: {
  * @returns Number of seconds since midnight, or null if invalid format
  */
 export function calculateSecondsFromMidnight(time: string): number | null {
-  if (!time || typeof time !== 'string') return null;
+  if (!time || typeof time !== 'string') {
+    return null;
+  }
 
   const [hours, minutes, seconds] = time.split(':').map(Number);
 
-  if (
-    [hours, minutes, seconds].some(isNaN) ||
-    hours >= 24 ||
-    minutes >= 60 ||
-    seconds >= 60
-  ) {
+  if ([hours, minutes, seconds].some(isNaN) || minutes >= 60 || seconds >= 60) {
     return null;
   }
 
