@@ -11,6 +11,11 @@ export const serviceAlerts = {
       source: 'id',
     },
     {
+      name: 'active_period',
+      type: 'json',
+      source: 'alert.activePeriod',
+    },
+    {
       name: 'cause',
       type: 'text',
       source: 'alert.cause',
@@ -23,7 +28,7 @@ export const serviceAlerts = {
     {
       name: 'url',
       type: 'text',
-      source: 'alert.url',
+      source: 'alert.url.translation[0].text',
       default: '',
     },
     {
@@ -41,31 +46,31 @@ export const serviceAlerts = {
       default: '',
     },
     {
-      name: 'headerText',
+      name: 'header_text',
       type: 'text',
       required: true,
       source: 'alert.headerText.translation[0].text',
       default: '',
     },
     {
-      name: 'descriptionText',
+      name: 'description_text',
       type: 'text',
       required: true,
       source: 'alert.descriptionText.translation[0].text',
       default: '',
     },
     {
-      name: 'ttsHeaderText',
+      name: 'tts_header_text',
       type: 'text',
       source: 'alert.ttsHeaderText.translation[0].text',
     },
     {
-      name: 'ttsDescriptionText',
+      name: 'tts_description_text',
       type: 'text',
       source: 'alert.ttsDescriptionText.translation[0].text',
     },
     {
-      name: 'severityLevel',
+      name: 'severity_level',
       type: 'text',
       source: 'alert.severityLevel',
     },
