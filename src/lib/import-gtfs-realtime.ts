@@ -150,9 +150,13 @@ function prepareRealtimeFieldValue(
     return task.currentTimestamp + task.gtfsRealtimeExpirationSeconds;
   }
 
-  return sqlString.escape(
-    getNestedProperty(entity, column.default, column.source),
-  );
+  const value = getNestedProperty(entity, column.default, column.source);
+
+  if (column.type === 'json') {
+    return sqlString.escape(JSON.stringify(value));
+  }
+
+  return sqlString.escape(value);
 }
 
 async function processRealtimeAlerts(
@@ -166,8 +170,8 @@ async function processRealtimeAlerts(
 
   for (const entity of gtfsRealtimeData.entity) {
     // Do base processing
-    const fieldValues = models.serviceAlerts.schema.map((column: ModelColumn) =>
-      prepareRealtimeFieldValue(entity, column, task),
+    const fieldValues = (models.serviceAlerts.schema as ModelColumn[]).map(
+      (column) => prepareRealtimeFieldValue(entity, column, task),
     );
 
     try {
@@ -191,7 +195,9 @@ async function processRealtimeAlerts(
       const alertTargetArray = [];
       for (const informedEntity of entity.alert.informedEntity) {
         informedEntity.parent = entity;
-        const subValues = models.serviceAlertTargets.schema.map((column) =>
+        const subValues = (
+          models.serviceAlertTargets.schema as ModelColumn[]
+        ).map((column) =>
           prepareRealtimeFieldValue(informedEntity, column, task),
         );
         alertTargetArray.push(`(${subValues.join(', ')})`);
@@ -224,8 +230,8 @@ async function processRealtimeTripUpdates(
 
   for (const entity of gtfsRealtimeData.entity) {
     // Do base processing
-    const fieldValues = models.tripUpdates.schema.map((column: ModelColumn) =>
-      prepareRealtimeFieldValue(entity, column, task),
+    const fieldValues = (models.tripUpdates.schema as ModelColumn[]).map(
+      (column) => prepareRealtimeFieldValue(entity, column, task),
     );
 
     try {
@@ -241,8 +247,8 @@ async function processRealtimeTripUpdates(
     const stopTimeUpdateArray = [];
     for (const stopTimeUpdate of entity.tripUpdate.stopTimeUpdate) {
       stopTimeUpdate.parent = entity;
-      const subValues = models.stopTimeUpdates.schema.map((column) =>
-        prepareRealtimeFieldValue(stopTimeUpdate, column, task),
+      const subValues = (models.stopTimeUpdates.schema as ModelColumn[]).map(
+        (column) => prepareRealtimeFieldValue(stopTimeUpdate, column, task),
       );
       stopTimeUpdateArray.push(`(${subValues.join(', ')})`);
       totalLineCount++;
@@ -273,8 +279,8 @@ async function processRealtimeVehiclePositions(
 
   for (const entity of gtfsRealtimeData.entity) {
     // Do base processing
-    const fieldValues = models.vehiclePositions.schema.map(
-      (column: ModelColumn) => prepareRealtimeFieldValue(entity, column, task),
+    const fieldValues = (models.vehiclePositions.schema as ModelColumn[]).map(
+      (column) => prepareRealtimeFieldValue(entity, column, task),
     );
 
     try {

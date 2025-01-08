@@ -68,8 +68,8 @@ export const exportGtfs = async (initialConfig: Config) => {
   await prepDirectory(exportPath);
 
   // Loop through each GTFS file
-  const modelsToExport = Object.values(models).filter(
-    (model: Model) => model.extension !== 'gtfs-realtime',
+  const modelsToExport = (Object.values(models) as Model[]).filter(
+    (model) => model.extension !== 'gtfs-realtime',
   );
   const exportedFiles = await mapSeries(
     modelsToExport,

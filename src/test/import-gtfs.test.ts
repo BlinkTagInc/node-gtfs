@@ -114,7 +114,7 @@ describe('importGtfs():', function () {
       await unzip(agenciesFixturesLocal[0].path, temporaryDir);
 
       await Promise.all(
-        Object.values(models).map((model: Model) => {
+        (Object.values(models) as Model[]).map((model) => {
           const filePath = path.join(
             temporaryDir,
             `${model.filenameBase}.${model.filenameExtension}`,
@@ -158,8 +158,8 @@ describe('importGtfs():', function () {
       await rm(temporaryDir, { recursive: true, force: true });
     });
 
-    const modelsToValidate: Model[] = Object.values(models).filter(
-      (model: Model) => model.extension !== 'gtfs-realtime',
+    const modelsToValidate = (Object.values(models) as Model[]).filter(
+      (model) => model.extension !== 'gtfs-realtime',
     );
 
     for (const model of modelsToValidate) {

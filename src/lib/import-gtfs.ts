@@ -24,7 +24,12 @@ import {
   validateConfigForImport,
 } from './utils.ts';
 
-import { Config, ConfigAgency, Model } from '../types/global_interfaces.ts';
+import {
+  Config,
+  ConfigAgency,
+  Model,
+  ModelColumn,
+} from '../types/global_interfaces.ts';
 
 interface GtfsImportTask {
   exclude?: string[];
@@ -271,8 +276,6 @@ const formatGtfsLine = (
 ): Record<string, any> => {
   const lineNumber = totalLineCount + 1;
   const formattedLine: Record<string, any> = {};
-
-  // Pre-compute these values
   const filenameBase = model.filenameBase;
   const filenameExtension = model.filenameExtension;
 
@@ -312,6 +315,10 @@ const formatGtfsLine = (
 
       formattedLine[getTimestampColumnName(name)] =
         timeAsSecondsFromMidnight ?? null;
+    }
+
+    if (type === 'json') {
+      value = JSON.stringify(value);
     }
 
     formattedLine[name] = value;
@@ -370,7 +377,7 @@ const importGtfsFiles = (
                 name: getTimestampColumnName(column.name),
                 type: 'integer',
                 index: true,
-              },
+              } as ModelColumn,
             ];
           }
           return column;

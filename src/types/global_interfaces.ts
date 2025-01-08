@@ -37,7 +37,7 @@ export interface Config {
 
 export interface ModelColumn {
   name: string;
-  type: string;
+  type: 'text' | 'integer' | 'real' | 'json' | 'date' | 'time';
   min?: number;
   max?: number;
   required?: boolean;
