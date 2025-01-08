@@ -93,6 +93,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Optimze formatGtfsLine function
 - Batch import into chunks
 
+## [4.15.0] - 2024-10-03
+
+### Updated
+- Faster GTFS Import (thanks to Mael)
+- Avoid array creation and string interpolation at each formatLine run
+- Add a new build-watch script
+- Memoize the calculate seconds from midnight and date functions
+- Create indexes after importing all the GTFS files
+- Avoid creating a new db connection for each importLines batch
+- Use sqlite's transaction method rather than batching prepare().run()
+- Fix getStops with bounding box test : order is not important
+- Move gtfs-realtime functions to new file
+- Dependency updates
+
 ## [4.14.5] - 2024-09-23
 
 ### Updated
@@ -272,20 +286,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for [networks.txt](https://gtfs.org/schedule/reference/#networkstxt)
 - Support for [route_networks.txt](https://gtfs.org/schedule/reference/#route_networkstxt)
 - Support for [timeframes.txt](https://gtfs.org/schedule/reference/#timeframestxt)
-
-## [4.15.0] - 2024-10-03
-
-### Updated
-- Faster GTFS Import (thanks to Mael)
-- Avoid array creation and string interpolation at each formatLine run
-- Add a new build-watch script
-- Memoize the calculate seconds from midnight and date functions
-- Create indexes after importing all the GTFS files
-- Avoid creating a new db connection for each importLines batch
-- Use sqlite's transaction method rather than batching prepare().run()
-- Fix getStops with bounding box test : order is not important
-- Move gtfs-realtime functions to new file
-- Dependency updates
 
 ## [4.9.0] - 2024-03-12
 
