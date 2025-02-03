@@ -1,6 +1,8 @@
 import { Options } from 'csv-parse';
 import { Database } from 'better-sqlite3';
 
+export type UnixTimestamp = number;
+
 export interface ConfigAgency {
   exclude?: string[];
   url?: string;
@@ -124,10 +126,10 @@ export interface BookingRule {
   prior_notice_duration_max?: number;
   prior_notice_last_day?: number;
   prior_notice_last_time?: string;
-  prior_notice_last_timestamp?: number;
+  prior_notice_last_timestamp?: UnixTimestamp;
   prior_notice_start_day?: number;
   prior_notice_start_time?: string;
-  prior_notice_start_timestamp?: number;
+  prior_notice_start_timestamp?: UnixTimestamp;
   prior_notice_service_id?: string;
   message?: string;
   pickup_message?: string;
@@ -225,9 +227,9 @@ export interface FeedInfo {
 export interface Frequency {
   trip_id: string;
   start_time: string;
-  start_timestamp: number;
+  start_timestamp: UnixTimestamp;
   end_time: string;
-  end_timestamp: number;
+  end_timestamp: UnixTimestamp;
   headway_secs: number;
   exact_times?: 0 | 1;
 }
@@ -309,16 +311,16 @@ export interface StopArea {
 export interface StopTime {
   trip_id: string;
   arrival_time?: string;
-  arrival_timestamp?: number;
+  arrival_timestamp?: UnixTimestamp;
   departure_time?: string;
-  departure_timestamp?: number;
+  departure_timestamp?: UnixTimestamp;
   location_group_id?: string;
   location_id?: string;
   stop_id?: string;
   stop_sequence: number;
   stop_headsign?: string;
   start_pickup_drop_off_window?: string;
-  start_pickup_drop_off_window_timestamp?: number;
+  start_pickup_drop_off_window_timestamp?: UnixTimestamp;
   pickup_type?: 0 | 1 | 2 | 3;
   drop_off_type?: 0 | 1 | 2 | 3;
   continuous_pickup?: 0 | 1 | 2 | 3;
@@ -402,9 +404,9 @@ export interface Timetable {
   saturday: 0 | 1;
   sunday: 0 | 1;
   start_time?: string;
-  start_timestamp?: number;
+  start_timestamp?: UnixTimestamp;
   end_time?: string;
-  end_timestamp?: number;
+  end_timestamp?: UnixTimestamp;
   timetable_label?: string;
   service_notes?: string;
   orientation?: string;
@@ -434,6 +436,7 @@ export interface TimetableNote {
 }
 
 export interface TimetableNotesReference {
+  note_id: string;
   timetable_id: string;
   route_id?: string;
   trip_id?: string;
@@ -452,9 +455,9 @@ export interface TripsDatedVehicleJourney {
 export interface DeadheadTime {
   deadhead_id: string;
   arrival_time: string;
-  arrival_timestamp: number;
+  arrival_timestamp: UnixTimestamp;
   departure_time: string;
-  departure_timestamp: number;
+  departure_timestamp: UnixTimestamp;
   ops_location_id?: string;
   stop_id?: string;
   location_sequence: number;
@@ -511,8 +514,8 @@ export interface ServiceAlert {
   end_time: string;
   headline: string;
   description: string;
-  created_timestamp: number;
-  expiration_timestamp: number;
+  created_timestamp: UnixTimestamp;
+  expiration_timestamp: UnixTimestamp;
 }
 
 export interface StopTimeUpdate {
@@ -524,11 +527,11 @@ export interface StopTimeUpdate {
   stop_sequence?: number;
   arrival_delay?: number;
   departure_delay?: number;
-  departure_timestamp?: string;
-  arrival_timestamp?: string;
+  departure_timestamp?: UnixTimestamp;
+  arrival_timestamp?: UnixTimestamp;
   schedule_relationship?: string;
-  created_timestamp: number;
-  expiration_timestamp: number;
+  created_timestamp: UnixTimestamp;
+  expiration_timestamp: UnixTimestamp;
 }
 
 export interface TripUpdate {
@@ -539,10 +542,10 @@ export interface TripUpdate {
   direction_id?: 0 | 1;
   route_id?: string;
   start_date?: number;
-  timestamp?: string;
+  timestamp?: UnixTimestamp;
   schedule_relationship?: string;
-  created_timestamp: number;
-  expiration_timestamp: number;
+  created_timestamp: UnixTimestamp;
+  expiration_timestamp: UnixTimestamp;
 }
 
 export interface VehiclePosition {
@@ -563,9 +566,9 @@ export interface VehiclePosition {
   vehicle_label?: string;
   vehicle_license_plate?: string;
   vehicle_wheelchair_accessible?: number;
-  timestamp?: string;
-  created_timestamp: number;
-  expiration_timestamp: number;
+  timestamp?: UnixTimestamp;
+  created_timestamp: UnixTimestamp;
+  expiration_timestamp: UnixTimestamp;
 }
 
 export interface BoardAlight {
@@ -587,9 +590,9 @@ export interface BoardAlight {
   ramp_alightings?: number;
   service_date?: number;
   service_arrival_time?: string;
-  service_arrival_timestamp?: number;
+  service_arrival_timestamp?: UnixTimestamp;
   service_departure_time?: string;
-  service_departure_timestamp?: number;
+  service_departure_timestamp?: UnixTimestamp;
   source?: 0 | 1 | 2 | 3 | 4;
 }
 
@@ -612,9 +615,9 @@ export interface RiderTrip {
   alighting_stop_sequence?: number;
   service_date?: number;
   boarding_time?: string;
-  boarding_timestamp?: number;
+  boarding_timestamp?: UnixTimestamp;
   alighting_time?: string;
-  alighting_timestamp?: number;
+  alighting_timestamp?: UnixTimestamp;
   rider_type?: number;
   rider_type_description?: string;
   fare_paid?: number;
@@ -630,9 +633,9 @@ export interface Ridership {
   ridership_start_date?: number;
   ridership_end_date?: number;
   ridership_start_time?: string;
-  ridership_start_timestamp?: number;
+  ridership_start_timestamp?: UnixTimestamp;
   ridership_end_time?: string;
-  ridership_end_timestamp?: number;
+  ridership_end_timestamp?: UnixTimestamp;
   service_id?: string;
   monday?: 0 | 1;
   tuesday?: 0 | 1;
