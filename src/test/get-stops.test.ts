@@ -263,6 +263,23 @@ describe('getStops():', () => {
 
     const expectedResult = [
       {
+        stop_id: '70031',
+        stop_code: '70031',
+        stop_name: 'Bayshore Caltrain',
+        tts_stop_name: null,
+        stop_desc: null,
+        stop_lat: 37.709537,
+        stop_lon: -122.401586,
+        zone_id: '1',
+        stop_url: 'http://www.caltrain.com/stations/bayshorestation.html',
+        location_type: 0,
+        parent_station: 'ctba',
+        stop_timezone: null,
+        wheelchair_boarding: 1,
+        level_id: null,
+        platform_code: 'NB',
+      },
+      {
         stop_id: 'ctba',
         stop_code: null,
         stop_name: 'Bayshore Caltrain',
@@ -296,30 +313,9 @@ describe('getStops():', () => {
         level_id: null,
         platform_code: 'SB',
       },
-      {
-        stop_id: '70031',
-        stop_code: '70031',
-        stop_name: 'Bayshore Caltrain',
-        tts_stop_name: null,
-        stop_desc: null,
-        stop_lat: 37.709537,
-        stop_lon: -122.401586,
-        zone_id: '1',
-        stop_url: 'http://www.caltrain.com/stations/bayshorestation.html',
-        location_type: 0,
-        parent_station: 'ctba',
-        stop_timezone: null,
-        wheelchair_boarding: 1,
-        level_id: null,
-        platform_code: 'NB',
-      },
     ];
 
-    expect(results).toHaveLength(3);
-
-    // Results aren't sorted by distance, so the DB insert statement can influence the result order
-    expect(sortBy(results, 'stop_id')).toEqual(
-      sortBy(expectedResult, 'stop_id'),
-    );
+    // Ensure results are sorted by distance
+    expect(results).toEqual(expectedResult);
   });
 });

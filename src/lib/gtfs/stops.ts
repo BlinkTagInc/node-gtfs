@@ -48,7 +48,7 @@ export function getStops<Fields extends keyof Stop>(
   const tableName = 'stops';
   const selectClause = formatSelectClause(fields);
   let whereClause = '';
-  const orderByClause = formatOrderByClause(orderBy);
+  let orderByClause = formatOrderByClause(orderBy);
 
   const stopQueryOmitKeys = [
     'route_id',
@@ -95,6 +95,11 @@ export function getStops<Fields extends keyof Stop>(
         options.bounding_box_side_m,
       ),
     );
+
+    // Add distance-based sorting if bounding_box_side_m is set and no other orderBy is set
+    if (orderBy.length === 0) {
+      orderByClause = `ORDER BY (((stop_lat - ${query.stop_lat}) * (stop_lat - ${query.stop_lat})) + ((stop_lon - ${query.stop_lon}) * (stop_lon - ${query.stop_lon}))) ASC`;
+    }
   }
 
   if (Object.values(tripQuery).length > 0) {
