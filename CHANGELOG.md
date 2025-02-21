@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Updated
 - Return stops sorted by distance in getStops if bounding_box_side_m option present
+- Dependency Updates
 
 ## [4.15.12] - 2025-01-08
 
