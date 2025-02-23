@@ -446,25 +446,25 @@ const importGtfsFiles = (
           let lines: { [x: string]: any; geojson?: string }[] = [];
 
           parser.on('readable', () => {
-            let record;
+            try {
+              let record;
 
-            while ((record = parser.read())) {
-              totalLineCount += 1;
-              lines.push(formatGtfsLine(record, model, totalLineCount));
+              while ((record = parser.read())) {
+                totalLineCount += 1;
+                lines.push(formatGtfsLine(record, model, totalLineCount));
 
-              if (lines.length >= BATCH_SIZE) {
-                try {
+                if (lines.length >= BATCH_SIZE) {
                   insertLines(lines);
                   lines = [];
-                } catch (error) {
-                  reject(error);
-                }
 
-                task.log(
-                  `Importing - ${filename} - ${totalLineCount} lines imported\r`,
-                  true,
-                );
+                  task.log(
+                    `Importing - ${filename} - ${totalLineCount} lines imported\r`,
+                    true,
+                  );
+                }
               }
+            } catch (error) {
+              reject(error);
             }
           });
 
