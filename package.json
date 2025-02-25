@@ -128,9 +128,9 @@
     "jest": "^29.7.0",
     "lint-staged": "^15.4.3",
     "prettier": "^3.5.2",
-    "ts-jest": "^29.2.5",
+    "ts-jest": "^29.2.6",
     "ts-node": "^10.9.2",
-    "tsup": "^8.3.6",
+    "tsup": "^8.4.0",
     "typescript": "~5.7.3"
   },
   "engines": {
