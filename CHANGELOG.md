@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Support for rider_categories.txt
 
+### Updated
+- Dependency Updates
+
 ## [4.15.15] - 2025-02-25
 
 ### Updated
