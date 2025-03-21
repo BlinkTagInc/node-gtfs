@@ -33,6 +33,7 @@ export { getLocationGroupStops } from './lib/gtfs/location-group-stops.ts';
 export { getLocations } from './lib/gtfs/locations.ts';
 export { getNetworks } from './lib/gtfs/networks.ts';
 export { getPathways } from './lib/gtfs/pathways.ts';
+export { getRiderCategories } from './lib/gtfs/rider-categories.ts';
 export { getRouteNetworks } from './lib/gtfs/route-networks.ts';
 export { getRoutes } from './lib/gtfs/routes.ts';
 export { getShapes, getShapesAsGeoJSON } from './lib/gtfs/shapes.ts';

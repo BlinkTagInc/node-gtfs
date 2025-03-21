@@ -605,6 +605,13 @@ export interface RideFeedInfo {
   ride_feed_version?: string;
 }
 
+export interface RiderCategory {
+  rider_category_id: string;
+  rider_category_name: string;
+  is_default_fare_category?: 0 | 1;
+  eligibility_url?: string;
+}
+
 export interface RiderTrip {
   rider_id: string;
   agency_id?: string;

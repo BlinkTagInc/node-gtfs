@@ -18,6 +18,7 @@ export { locationGroupStops } from './gtfs/location-group-stops.ts';
 export { locations } from './gtfs/locations.ts';
 export { networks } from './gtfs/networks.ts';
 export { pathways } from './gtfs/pathways.ts';
+export { riderCategories } from './gtfs/rider-categories.ts';
 export { routeNetworks } from './gtfs/route-networks.ts';
 export { routes } from './gtfs/routes.ts';
 export { shapes } from './gtfs/shapes.ts';

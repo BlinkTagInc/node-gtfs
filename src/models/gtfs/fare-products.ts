@@ -10,6 +10,11 @@ export const fareProducts = {
       prefix: true,
     },
     {
+      name: 'rider_category_id',
+      type: 'text',
+      prefix: true,
+    },
+    {
       name: 'fare_product_name',
       type: 'text',
     },
