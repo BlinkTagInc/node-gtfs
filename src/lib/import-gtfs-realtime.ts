@@ -108,7 +108,7 @@ async function fetchGtfsRealtimeData(
     enums: String,
     longs: String,
     bytes: String,
-    defaults: true,
+    defaults: false,
     arrays: true,
     objects: true,
     oneofs: true,
