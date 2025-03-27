@@ -132,7 +132,7 @@ function removeExpiredRealtimeData(config: Config) {
     `DELETE FROM service_alerts WHERE expiration_timestamp <= strftime('%s','now')`,
   ).run();
   db.prepare(
-    `DELETE FROM service_alert_targets WHERE expiration_timestamp <= strftime('%s','now')`,
+    `DELETE FROM service_alert_informed_entities WHERE expiration_timestamp <= strftime('%s','now')`,
   ).run();
   log(config)(`Removed expired GTFS-Realtime data\r`, true);
 }
@@ -192,23 +192,23 @@ async function processRealtimeAlerts(
         `Import error: No informed entities found for alert id=${entity.id}`,
       );
     } else {
-      const alertTargetArray = [];
+      const informedEntities = [];
       for (const informedEntity of entity.alert.informedEntity) {
         informedEntity.parent = entity;
         const subValues = (
-          models.serviceAlertTargets.schema as ModelColumn[]
+          models.serviceAlertInformedEntities.schema as ModelColumn[]
         ).map((column) =>
           prepareRealtimeFieldValue(informedEntity, column, task),
         );
-        alertTargetArray.push(`(${subValues.join(', ')})`);
+        informedEntities.push(`(${subValues.join(', ')})`);
         totalLineCount++;
       }
 
       try {
         db.prepare(
-          `REPLACE INTO ${models.serviceAlertTargets.filenameBase} (${models.serviceAlertTargets.schema
+          `REPLACE INTO ${models.serviceAlertInformedEntities.filenameBase} (${models.serviceAlertInformedEntities.schema
             .map((column) => column.name)
-            .join(', ')}) VALUES ${alertTargetArray.join(', ')}`,
+            .join(', ')}) VALUES ${informedEntities.join(', ')}`,
         ).run();
       } catch (error: any) {
         task.logWarning(`Import error: ${error.message}`);

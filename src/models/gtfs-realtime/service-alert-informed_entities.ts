@@ -1,5 +1,5 @@
-export const serviceAlertTargets = {
-  filenameBase: 'service_alert_targets',
+export const serviceAlertInformedEntities = {
+  filenameBase: 'service_alert_informed_entities',
   extension: 'gtfs-realtime',
   schema: [
     {
@@ -24,10 +24,24 @@ export const serviceAlertTargets = {
       default: null,
     },
     {
+      name: 'route_type',
+      type: 'integer',
+      index: true,
+      source: 'routeType',
+      default: null,
+    },
+    {
       name: 'trip_id',
       type: 'text',
       index: true,
       source: 'trip.tripId',
+      default: null,
+    },
+    {
+      name: 'direction_id',
+      type: 'integer',
+      index: true,
+      source: 'directionId',
       default: null,
     },
     {

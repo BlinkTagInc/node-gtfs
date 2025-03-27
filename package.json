@@ -1,6 +1,6 @@
 {
   "name": "gtfs",
-  "version": "4.15.15",
+  "version": "4.16.0",
   "description": "Import GTFS transit data into SQLite and query routes, stops, times, fares and more",
   "keywords": [
     "transit",
@@ -65,7 +65,8 @@
     "Emma K Alexandra <emma@emma.sh>",
     "Mael <laem@kont.me>",
     "b-e-b-o-o",
-    "Ben Standaert"
+    "Ben Standaert",
+    "mattkinnia"
   ],
   "type": "module",
   "main": "./dist/index.js",

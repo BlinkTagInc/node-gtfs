@@ -52,7 +52,7 @@ export { tripUpdates } from './gtfs-realtime/trip-updates.ts';
 export { stopTimeUpdates } from './gtfs-realtime/stop-time-updates.ts';
 export { vehiclePositions } from './gtfs-realtime/vehicle-positions.ts';
 export { serviceAlerts } from './gtfs-realtime/service-alerts.ts';
-export { serviceAlertTargets } from './gtfs-realtime/service-alert-targets.ts';
+export { serviceAlertInformedEntities } from './gtfs-realtime/service-alert-informed_entities.ts';
 
 export { deadheadTimes } from './ods/deadhead-times.ts';
 export { deadheads } from './ods/deadheads.ts';

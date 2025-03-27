@@ -7,10 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### BREAKING CHANGES
+- **GTFS-Realtime Informed Entities**: 
+  - Renamed table from `service_alert_targets` to `service_alert_informed_entities`
+  - Changed GTFS-Realtime parsing `defaults` to `false`
+
 ### Updated
 - Dependency Updates
 - Remove package-lock.json
-- update to tsconfig.json
+- Update to tsconfig.json
+
+### Fixed
+- Update Service Alert informed entities to add trip_id, direction_id and route_type fields
+- Updated GTFS-Realtime parsing to defaults=false to avoid 0 for empty int fields
 
 ## [4.16.0] - 2025-03-21
 

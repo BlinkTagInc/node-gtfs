@@ -23,7 +23,7 @@ export function getServiceAlerts<Fields extends keyof ServiceAlert>(
 ) {
   const db = options.db ?? openDb();
   const tableName = 'service_alerts';
-  const joinTableName = 'service_alert_targets';
+  const joinTableName = 'service_alert_informed_entities';
   const selectClause = formatSelectClause(fields);
   const whereClause = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
