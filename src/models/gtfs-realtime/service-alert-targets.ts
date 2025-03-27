@@ -24,6 +24,13 @@ export const serviceAlertTargets = {
       default: null,
     },
     {
+      name: 'trip_id',
+      type: 'text',
+      index: true,
+      source: 'trip.tripId',
+      default: null,
+    },
+    {
       name: 'created_timestamp',
       type: 'integer',
       required: true,
