@@ -59,6 +59,7 @@ export const stops = {
       name: 'parent_station',
       type: 'text',
       index: true,
+      prefix: true,
     },
     {
       name: 'stop_timezone',
