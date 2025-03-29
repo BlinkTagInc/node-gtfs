@@ -9,6 +9,7 @@ export const vehiclePositions = {
       primary: true,
       index: true,
       source: 'id',
+      prefix: true,
     },
     {
       name: 'bearing',
@@ -51,6 +52,7 @@ export const vehiclePositions = {
       index: true,
       source: 'vehicle.trip.tripId',
       default: null,
+      prefix: true,
     },
     {
       name: 'trip_start_date',
@@ -96,6 +98,7 @@ export const vehiclePositions = {
       index: true,
       source: 'vehicle.vehicle.id',
       default: null,
+      prefix: true,
     },
     {
       name: 'vehicle_label',
