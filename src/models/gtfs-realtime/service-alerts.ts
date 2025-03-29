@@ -9,6 +9,7 @@ export const serviceAlerts = {
       primary: true,
       index: true,
       source: 'id',
+      prefix: true,
     },
     {
       name: 'active_period',

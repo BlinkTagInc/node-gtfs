@@ -8,6 +8,7 @@ export const stopTimeUpdates = {
       index: true,
       source: 'parent.tripUpdate.trip.tripId',
       default: null,
+      prefix: true,
     },
     {
       name: 'trip_start_time',
@@ -27,6 +28,7 @@ export const stopTimeUpdates = {
       index: true,
       source: 'parent.tripUpdate.trip.routeId',
       default: null,
+      prefix: true,
     },
     {
       name: 'stop_id',
@@ -34,6 +36,7 @@ export const stopTimeUpdates = {
       index: true,
       source: 'stopId',
       default: null,
+      prefix: true,
     },
     {
       name: 'stop_sequence',

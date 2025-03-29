@@ -8,6 +8,7 @@ export const serviceAlertInformedEntities = {
       required: true,
       primary: true,
       source: 'parent.id',
+      prefix: true,
     },
     {
       name: 'stop_id',
@@ -15,6 +16,7 @@ export const serviceAlertInformedEntities = {
       index: true,
       source: 'stopId',
       default: null,
+      prefix: true,
     },
     {
       name: 'route_id',
@@ -22,6 +24,7 @@ export const serviceAlertInformedEntities = {
       index: true,
       source: 'routeId',
       default: null,
+      prefix: true,
     },
     {
       name: 'route_type',
@@ -36,6 +39,7 @@ export const serviceAlertInformedEntities = {
       index: true,
       source: 'trip.tripId',
       default: null,
+      prefix: true,
     },
     {
       name: 'direction_id',

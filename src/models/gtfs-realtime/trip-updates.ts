@@ -9,6 +9,7 @@ export const tripUpdates = {
       primary: true,
       index: true,
       source: 'id',
+      prefix: true,
     },
     {
       name: 'vehicle_id',
@@ -16,6 +17,7 @@ export const tripUpdates = {
       index: true,
       source: 'tripUpdate.vehicle.id',
       default: null,
+      prefix: true,
     },
     {
       name: 'trip_id',
@@ -23,6 +25,7 @@ export const tripUpdates = {
       index: true,
       source: 'tripUpdate.trip.tripId',
       default: null,
+      prefix: true,
     },
     {
       name: 'trip_start_time',
@@ -42,6 +45,7 @@ export const tripUpdates = {
       index: true,
       source: 'tripUpdate.trip.routeId',
       default: null,
+      prefix: true,
     },
     {
       name: 'start_date',

@@ -35,6 +35,7 @@ interface GtfsRealtimeTask {
   gtfsRealtimeExpirationSeconds: number;
   ignoreErrors: boolean;
   sqlitePath: string;
+  prefix: string | undefined;
   currentTimestamp: number;
   log: (message: string, newLine?: boolean) => void;
   logWarning: (message: string) => void;
@@ -150,7 +151,11 @@ function prepareRealtimeFieldValue(
     return task.currentTimestamp + task.gtfsRealtimeExpirationSeconds;
   }
 
-  const value = getNestedProperty(entity, column.default, column.source);
+  let value = getNestedProperty(entity, column.default, column.source);
+
+  if (column.prefix && task.prefix && value !== null) {
+    value = `${task.prefix}${value}`;
+  }
 
   if (column.type === 'json') {
     return sqlString.escape(JSON.stringify(value));
@@ -390,6 +395,7 @@ export async function updateGtfsRealtime(initialConfig: Config) {
           gtfsRealtimeExpirationSeconds: config.gtfsRealtimeExpirationSeconds,
           ignoreErrors: config.ignoreErrors,
           sqlitePath: config.sqlitePath,
+          prefix: agency.prefix,
           currentTimestamp: Math.floor(Date.now() / 1000),
           log: log(config),
           logWarning: logWarning(config),
