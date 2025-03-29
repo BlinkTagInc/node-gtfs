@@ -20,6 +20,7 @@ import {
   calculateSecondsFromMidnight,
   getTimestampColumnName,
   padLeadingZeros,
+  applyPrefixToValue,
   setDefaultConfig,
   validateConfigForImport,
 } from './utils.ts';
@@ -409,9 +410,11 @@ const importGtfsFiles = (
                     line as { [x: string]: any; geojson?: string },
                   ).map(([columnName, value]) => [
                     columnName,
-                    prefixedColumns.has(columnName) && value !== null
-                      ? `${task.prefix}${value}`
-                      : value,
+                    applyPrefixToValue(
+                      value,
+                      prefixedColumns.has(columnName),
+                      task.prefix,
+                    ),
                   ]),
                 );
                 insert.run(prefixedLine);

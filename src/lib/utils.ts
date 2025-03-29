@@ -332,3 +332,22 @@ export function getTimestampColumnName(columnName: string) {
     ? `${columnName}stamp`
     : `${columnName}_timestamp`;
 }
+
+/**
+ * Applies a prefix to a value if the column should be prefixed and the value is not null
+ * @param value The value to prefix
+ * @param columnShouldBePrefixed Whether the column should be prefixed
+ * @param prefix The prefix to apply
+ * @returns The value with the prefix applied if the column should be prefixed and the value is not null
+ */
+export function applyPrefixToValue(
+  value: string,
+  columnShouldBePrefixed?: boolean,
+  prefix?: string,
+) {
+  if (!columnShouldBePrefixed || prefix === undefined || value === null) {
+    return value;
+  }
+
+  return `${prefix}${value}`;
+}

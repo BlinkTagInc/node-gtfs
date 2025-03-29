@@ -1,13 +1,14 @@
 import pluralize from 'pluralize';
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
-import sqlString from 'sqlstring-sqlite';
 import mapSeries from 'promise-map-series';
+import { get } from 'lodash-es';
 
 import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
 import { log, logError, logWarning } from './log-utils.ts';
 import {
   convertLongTimeToDate,
+  applyPrefixToValue,
   setDefaultConfig,
   validateConfigForImport,
 } from './utils.ts';
@@ -35,47 +36,11 @@ interface GtfsRealtimeTask {
   gtfsRealtimeExpirationSeconds: number;
   ignoreErrors: boolean;
   sqlitePath: string;
-  prefix: string | undefined;
+  prefix?: string;
   currentTimestamp: number;
   log: (message: string, newLine?: boolean) => void;
   logWarning: (message: string) => void;
   logError: (message: string) => void;
-}
-
-function getNestedProperty(obj: any, defaultValue: any, path?: string) {
-  if (path === undefined) return defaultValue;
-  const arr = path.split('.');
-  while (arr.length) {
-    const nextKey = arr.shift();
-    if (nextKey === undefined) {
-      return defaultValue;
-    } else if (obj == null) {
-      return defaultValue;
-    } else if (nextKey?.includes('[')) {
-      const arrayKey = nextKey.match(/(\w*)\[(\d+)\]/);
-      if (arrayKey === null) {
-        return defaultValue;
-      }
-      if (obj[arrayKey[1]] === undefined) {
-        return defaultValue;
-      }
-
-      if (obj[arrayKey[1]][arrayKey[2]] === undefined) {
-        return defaultValue;
-      }
-
-      obj = obj[arrayKey[1]][arrayKey[2]];
-    } else {
-      if (obj[nextKey] === undefined) {
-        return defaultValue;
-      }
-      obj = obj[nextKey];
-    }
-  }
-
-  if (obj?.__isLong__) return convertLongTimeToDate(obj);
-
-  return obj;
 }
 
 async function fetchGtfsRealtimeData(
@@ -151,17 +116,22 @@ function prepareRealtimeFieldValue(
     return task.currentTimestamp + task.gtfsRealtimeExpirationSeconds;
   }
 
-  let value = getNestedProperty(entity, column.default, column.source);
+  const baseValue =
+    column.source === undefined
+      ? column.default
+      : get(entity, column.source, column.default);
 
-  if (column.prefix && task.prefix && value !== null) {
-    value = `${task.prefix}${value}`;
-  }
+  const timeAdjustedValue = baseValue?.__isLong__
+    ? convertLongTimeToDate(baseValue)
+    : baseValue;
 
-  if (column.type === 'json') {
-    return sqlString.escape(JSON.stringify(value));
-  }
+  const prefixedValue = applyPrefixToValue(
+    timeAdjustedValue,
+    column.prefix,
+    task.prefix,
+  );
 
-  return sqlString.escape(value);
+  return column.type === 'json' ? JSON.stringify(prefixedValue) : prefixedValue;
 }
 
 async function processRealtimeAlerts(
@@ -169,59 +139,69 @@ async function processRealtimeAlerts(
   gtfsRealtimeData: any,
   task: GtfsRealtimeTask,
 ) {
-  task.log(`Download successful`);
+  const alertStmt = db.prepare(
+    `REPLACE INTO ${models.serviceAlerts.filenameBase} (${models.serviceAlerts.schema
+      .map((column) => column.name)
+      .join(
+        ', ',
+      )}) VALUES (${models.serviceAlerts.schema.map(() => '?').join(', ')})`,
+  );
+
+  const informedEntityStmt = db.prepare(
+    `REPLACE INTO ${models.serviceAlertInformedEntities.filenameBase} (${models.serviceAlertInformedEntities.schema
+      .map((column) => column.name)
+      .join(
+        ', ',
+      )}) VALUES (${models.serviceAlertInformedEntities.schema.map(() => '?').join(', ')})`,
+  );
 
   let totalLineCount = 0;
 
-  for (const entity of gtfsRealtimeData.entity) {
-    // Do base processing
-    const fieldValues = (models.serviceAlerts.schema as ModelColumn[]).map(
-      (column) => prepareRealtimeFieldValue(entity, column, task),
-    );
-
-    try {
-      db.prepare(
-        `REPLACE INTO ${models.serviceAlerts.filenameBase} (${models.serviceAlerts.schema
-          .map((column) => column.name)
-          .join(', ')}) VALUES (${fieldValues.join(', ')})`,
-      ).run();
-    } catch (error: any) {
-      task.logWarning(`Import error: ${error.message}`);
-    }
-
-    if (
-      !entity.alert.informedEntity ||
-      entity.alert.informedEntity.length === 0
-    ) {
-      task.logWarning(
-        `Import error: No informed entities found for alert id=${entity.id}`,
+  db.transaction(() => {
+    for (const entity of gtfsRealtimeData.entity) {
+      const fieldValues = (models.serviceAlerts.schema as ModelColumn[]).map(
+        (column) => prepareRealtimeFieldValue(entity, column, task),
       );
-    } else {
-      const informedEntities = [];
-      for (const informedEntity of entity.alert.informedEntity) {
-        informedEntity.parent = entity;
-        const subValues = (
-          models.serviceAlertInformedEntities.schema as ModelColumn[]
-        ).map((column) =>
-          prepareRealtimeFieldValue(informedEntity, column, task),
-        );
-        informedEntities.push(`(${subValues.join(', ')})`);
-        totalLineCount++;
-      }
 
       try {
-        db.prepare(
-          `REPLACE INTO ${models.serviceAlertInformedEntities.filenameBase} (${models.serviceAlertInformedEntities.schema
-            .map((column) => column.name)
-            .join(', ')}) VALUES ${informedEntities.join(', ')}`,
-        ).run();
+        alertStmt.run(fieldValues);
+
+        if (entity.alert.informedEntity?.length) {
+          const informedEntities = entity.alert.informedEntity.map(
+            (informedEntity: {
+              directionId?: number;
+              routeId?: string;
+              routeType?: number;
+              stopId?: string;
+              trip?: {
+                tripId?: string;
+              };
+              parent?: any;
+            }) => {
+              informedEntity.parent = entity;
+              return (
+                models.serviceAlertInformedEntities.schema as ModelColumn[]
+              ).map((column) =>
+                prepareRealtimeFieldValue(informedEntity, column, task),
+              );
+            },
+          );
+
+          for (const values of informedEntities) {
+            informedEntityStmt.run(values);
+          }
+        }
+        totalLineCount++;
       } catch (error: any) {
         task.logWarning(`Import error: ${error.message}`);
       }
     }
 
-    task.log(`Importing - ${totalLineCount++} entries imported\r`, true);
-  }
+    task.log(
+      `Importing - GTFS-Realtime service alerts - ${totalLineCount} entries imported\r`,
+      true,
+    );
+  })();
 }
 
 async function processRealtimeTripUpdates(
@@ -229,48 +209,51 @@ async function processRealtimeTripUpdates(
   gtfsRealtimeData: any,
   task: GtfsRealtimeTask,
 ) {
-  task.log(`Download successful`);
-
   let totalLineCount = 0;
 
-  for (const entity of gtfsRealtimeData.entity) {
-    // Do base processing
-    const fieldValues = (models.tripUpdates.schema as ModelColumn[]).map(
-      (column) => prepareRealtimeFieldValue(entity, column, task),
+  const tripUpdateStmt = db.prepare(
+    `REPLACE INTO ${models.tripUpdates.filenameBase} (${models.tripUpdates.schema
+      .map((column) => column.name)
+      .join(
+        ', ',
+      )}) VALUES (${models.tripUpdates.schema.map(() => '?').join(', ')})`,
+  );
+
+  const stopTimeStmt = db.prepare(
+    `REPLACE INTO ${models.stopTimeUpdates.filenameBase} (${models.stopTimeUpdates.schema
+      .map((column) => column.name)
+      .join(
+        ', ',
+      )}) VALUES (${models.stopTimeUpdates.schema.map(() => '?').join(', ')})`,
+  );
+
+  db.transaction(() => {
+    for (const entity of gtfsRealtimeData.entity) {
+      try {
+        const fieldValues = (models.tripUpdates.schema as ModelColumn[]).map(
+          (column) => prepareRealtimeFieldValue(entity, column, task),
+        );
+        tripUpdateStmt.run(fieldValues);
+
+        for (const stopTimeUpdate of entity.tripUpdate.stopTimeUpdate) {
+          stopTimeUpdate.parent = entity;
+          const values = (models.stopTimeUpdates.schema as ModelColumn[]).map(
+            (column) => prepareRealtimeFieldValue(stopTimeUpdate, column, task),
+          );
+          stopTimeStmt.run(values);
+        }
+
+        totalLineCount++;
+      } catch (error: any) {
+        task.logWarning(`Import error: ${error.message}`);
+      }
+    }
+
+    task.log(
+      `Importing - GTFS-Realtime trip updates - ${totalLineCount} entries imported\r`,
+      true,
     );
-
-    try {
-      db.prepare(
-        `REPLACE INTO ${models.tripUpdates.filenameBase} (${models.tripUpdates.schema
-          .map((column) => column.name)
-          .join(', ')}) VALUES (${fieldValues.join(', ')})`,
-      ).run();
-    } catch (error: any) {
-      task.logWarning(`Import error: ${error.message}`);
-    }
-
-    const stopTimeUpdateArray = [];
-    for (const stopTimeUpdate of entity.tripUpdate.stopTimeUpdate) {
-      stopTimeUpdate.parent = entity;
-      const subValues = (models.stopTimeUpdates.schema as ModelColumn[]).map(
-        (column) => prepareRealtimeFieldValue(stopTimeUpdate, column, task),
-      );
-      stopTimeUpdateArray.push(`(${subValues.join(', ')})`);
-      totalLineCount++;
-    }
-
-    try {
-      db.prepare(
-        `REPLACE INTO ${models.stopTimeUpdates.filenameBase} (${models.stopTimeUpdates.schema
-          .map((column) => column.name)
-          .join(', ')}) VALUES ${stopTimeUpdateArray.join(', ')}`,
-      ).run();
-    } catch (error: any) {
-      task.logWarning(`Import error: ${error.message}`);
-    }
-
-    task.log(`Importing - ${totalLineCount++} entries imported\r`, true);
-  }
+  })();
 }
 
 async function processRealtimeVehiclePositions(
@@ -278,28 +261,36 @@ async function processRealtimeVehiclePositions(
   gtfsRealtimeData: any,
   task: GtfsRealtimeTask,
 ) {
-  task.log(`Download successful`);
-
   let totalLineCount = 0;
 
-  for (const entity of gtfsRealtimeData.entity) {
-    // Do base processing
-    const fieldValues = (models.vehiclePositions.schema as ModelColumn[]).map(
-      (column) => prepareRealtimeFieldValue(entity, column, task),
-    );
+  const vehiclePositionStmt = db.prepare(
+    `REPLACE INTO ${models.vehiclePositions.filenameBase} (${models.vehiclePositions.schema
+      .map((column) => column.name)
+      .join(
+        ', ',
+      )}) VALUES (${models.vehiclePositions.schema.map(() => '?').join(', ')})`,
+  );
 
-    try {
-      db.prepare(
-        `REPLACE INTO ${models.vehiclePositions.filenameBase} (${models.vehiclePositions.schema
-          .map((column) => column.name)
-          .join(', ')}) VALUES (${fieldValues.join(', ')})`,
-      ).run();
-    } catch (error: any) {
-      task.logWarning(`Import error: ${error.message}`);
+  db.transaction(() => {
+    for (const entity of gtfsRealtimeData.entity) {
+      try {
+        const fieldValues = (
+          models.vehiclePositions.schema as ModelColumn[]
+        ).map((column) => prepareRealtimeFieldValue(entity, column, task));
+
+        vehiclePositionStmt.run(fieldValues);
+
+        totalLineCount++;
+      } catch (error: any) {
+        task.logWarning(`Import error: ${error.message}`);
+      }
     }
 
-    task.log(`Importing - ${totalLineCount++} entries imported\r`, true);
-  }
+    task.log(
+      `Importing - GTFS-Realtime vehicle positions - ${totalLineCount} entries imported\r`,
+      true,
+    );
+  })();
 }
 
 export async function updateGtfsRealtimeData(task: GtfsRealtimeTask) {
