@@ -17,7 +17,6 @@ export const riderCategories = {
     {
       name: 'is_default_fare_category',
       type: 'integer',
-      required: true,
       min: 0,
       max: 1,
     },
