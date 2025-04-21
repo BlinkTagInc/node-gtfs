@@ -17,7 +17,6 @@ import { isValidJSON } from './geojson-utils.ts';
 import { updateGtfsRealtimeData } from './import-gtfs-realtime.ts';
 import { log, logError, logWarning } from './log-utils.ts';
 import {
-  calculateSecondsFromMidnight,
   getTimestampColumnName,
   padLeadingZeros,
   applyPrefixToValue,
@@ -25,12 +24,7 @@ import {
   validateConfigForImport,
 } from './utils.ts';
 
-import {
-  Config,
-  ConfigAgency,
-  Model,
-  ModelColumn,
-} from '../types/global_interfaces.ts';
+import { Config, ConfigAgency, Model } from '../types/global_interfaces.ts';
 
 interface GtfsImportTask {
   exclude?: string[];
@@ -62,26 +56,6 @@ interface GtfsImportTask {
   logWarning: (message: string) => void;
   logError: (message: string) => void;
 }
-
-interface Dictionary<T> {
-  [key: string]: T;
-}
-type Tuple = [seconds: number | null, date: string | null];
-
-const timeCache: Dictionary<Tuple> = {};
-
-const formatAndCacheTime = (value: string): Tuple => {
-  const cached = timeCache[value];
-  if (cached !== undefined) {
-    return cached;
-  }
-
-  const timeAsSecondsFromMidnight = calculateSecondsFromMidnight(value);
-  const timeAsString = padLeadingZeros(value);
-  const computed: Tuple = [timeAsSecondsFromMidnight, timeAsString];
-  timeCache[value] = computed;
-  return computed;
-};
 
 const getTextFiles = async (folderPath: string): Promise<string[]> => {
   const files = await readdir(folderPath);
@@ -225,7 +199,16 @@ const createGtfsTables = (db: Database.Database): void => {
       // Add an additional timestamp column for time columns
       if (column.type === 'time') {
         sqlColumnCreateStatements.push(
-          `${getTimestampColumnName(column.name)} INTEGER`,
+          `${getTimestampColumnName(column.name)} INTEGER GENERATED ALWAYS AS (
+            CASE 
+              WHEN ${column.name} IS NULL OR ${column.name} = '' THEN NULL 
+              ELSE CAST(
+                substr(${column.name}, 1, instr(${column.name}, ':') - 1) * 3600 + 
+                substr(${column.name}, instr(${column.name}, ':') + 1, 2) * 60 + 
+                substr(${column.name}, -2) AS INTEGER
+              )
+            END
+          ) STORED`,
         );
       }
     }
@@ -287,10 +270,6 @@ const formatGtfsLine = (
     if (value === '' || value === undefined || value === null) {
       formattedLine[name] = null;
 
-      if (type === 'time') {
-        formattedLine[getTimestampColumnName(name)] = null;
-      }
-
       if (required) {
         throw new Error(
           `Missing required value in ${filenameBase}.${filenameExtension} for ${name} on line ${lineNumber}.`,
@@ -308,14 +287,7 @@ const formatGtfsLine = (
         );
       }
     } else if (type === 'time') {
-      // Add an additional timestamp column for time columns
-      const [timeAsSecondsFromMidnight, timeAsString] =
-        formatAndCacheTime(value);
-
-      value = timeAsString;
-
-      formattedLine[getTimestampColumnName(name)] =
-        timeAsSecondsFromMidnight ?? null;
+      value = padLeadingZeros(value);
     }
 
     if (type === 'json') {
@@ -369,20 +341,7 @@ const importGtfsFiles = (
         task.log(`Importing - ${filename}\r`);
 
         // Create a list of all columns
-        const columns = model.schema.flatMap((column) => {
-          if (column.type === 'time') {
-            // Add an additional timestamp column for time columns
-            return [
-              column,
-              {
-                name: getTimestampColumnName(column.name),
-                type: 'integer',
-                index: true,
-              } as ModelColumn,
-            ];
-          }
-          return column;
-        });
+        const columns = model.schema;
 
         // Create a map of which columns need prefixing
         const prefixedColumns = new Set(
