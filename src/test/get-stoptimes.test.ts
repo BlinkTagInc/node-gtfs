@@ -131,4 +131,26 @@ describe('getStoptimes():', () => {
 
     expect(results[0].trip_id).toEqual('43u');
   });
+
+  it('should return generated timestamp columns', () => {
+    const date = 20160704;
+
+    const results = getStoptimes(
+      {
+        date,
+        stop_id: '777403',
+        start_time: '17:30:00',
+        end_time: '18:30:00',
+      },
+      [],
+      [['arrival_timestamp', 'ASC']],
+    );
+
+    expect(results).toHaveLength(2);
+
+    expect(results[0].arrival_timestamp).toEqual(63180);
+    expect(results[0].departure_timestamp).toEqual(63180);
+    expect(results[1].arrival_timestamp).toEqual(65400);
+    expect(results[1].departure_timestamp).toEqual(65400);
+  });
 });
