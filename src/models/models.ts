@@ -59,3 +59,15 @@ export { deadheads } from './ods/deadheads.ts';
 export { opsLocations } from './ods/ops-locations.ts';
 export { runEvents } from './ods/run-events.ts';
 export { runsPieces } from './ods/runs-pieces.ts';
+
+export { devices } from './tides/devices.ts';
+export { fareTransactions } from './tides/fare-transactions.ts';
+export { operators } from './tides/operators.ts';
+export { passengerEvents } from './tides/passenger-events.ts';
+export { stationActivities } from './tides/station-activities.ts';
+export { stopVisits } from './tides/stop-visits.ts';
+export { trainCars } from './tides/train-cars.ts';
+export { tripsPerformed } from './tides/trips-performed.ts';
+export { vehicleTrainCars } from './tides/vehicle-train-cars.ts';
+export { vehicleLocations } from './tides/vehicle-locations.ts';
+export { vehicles } from './tides/vehicles.ts';
