@@ -12,6 +12,7 @@ export const fareProducts = {
     {
       name: 'rider_category_id',
       type: 'text',
+      primary: true,
       prefix: true,
     },
     {
