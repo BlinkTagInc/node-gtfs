@@ -97,7 +97,7 @@
   },
   "dependencies": {
     "@turf/helpers": "^7.2.0",
-    "better-sqlite3": "^11.9.1",
+    "better-sqlite3": "^11.10.0",
     "csv-parse": "^5.6.0",
     "csv-stringify": "^6.5.2",
     "gtfs-realtime-bindings": "^1.1.1",
@@ -113,7 +113,7 @@
     "tempy": "^3.1.0",
     "timer-machine": "^1.1.0",
     "untildify": "^5.0.0",
-    "yargs": "^17.7.2",
+    "yargs": "^18.0.0",
     "yoctocolors": "^2.1.1"
   },
   "devDependencies": {
@@ -127,11 +127,11 @@
     "@types/yargs": "^17.0.33",
     "husky": "^9.1.7",
     "jest": "^29.7.0",
-    "lint-staged": "^15.5.1",
+    "lint-staged": "^16.1.0",
     "prettier": "^3.5.3",
-    "ts-jest": "^29.3.2",
+    "ts-jest": "^29.3.4",
     "ts-node": "^10.9.2",
-    "tsup": "^8.4.0",
+    "tsup": "^8.5.0",
     "typescript": "~5.8.3"
   },
   "engines": {

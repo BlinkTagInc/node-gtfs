@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Correct Primary Key for fare_products.txt
 
+### Added
+- Add TIDES support
+
+### Updated
+- Dependency Updates
+
 ## [4.17.3] - 2025-04-23
 
 ### Updated
