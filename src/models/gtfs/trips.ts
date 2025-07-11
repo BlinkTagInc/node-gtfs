@@ -64,5 +64,11 @@ export const trips = {
       min: 0,
       max: 2,
     },
+    {
+      name: 'cars_allowed',
+      type: 'integer',
+      min: 0,
+      max: 2,
+    },
   ],
 };

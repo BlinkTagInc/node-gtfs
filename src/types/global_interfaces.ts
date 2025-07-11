@@ -388,6 +388,7 @@ export interface Trip {
   shape_id?: string;
   wheelchair_accessible?: 0 | 1 | 2;
   bikes_allowed?: 0 | 1 | 2;
+  cars_allowed?: 0 | 1 | 2;
 }
 
 export interface Timetable {

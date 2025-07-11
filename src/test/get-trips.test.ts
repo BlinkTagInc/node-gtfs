@@ -40,6 +40,7 @@ describe('getTrips():', () => {
       shape_id: 'cal_tam_sf',
       wheelchair_accessible: 1,
       bikes_allowed: 1,
+      cars_allowed: null,
     };
 
     expect(results).toHaveLength(30);

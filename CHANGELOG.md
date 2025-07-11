@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Add cars_allowed to trips.txt https://github.com/google/transit/pull/547
+
 ### Updated
 - Dependency Updates
 
