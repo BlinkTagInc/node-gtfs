@@ -151,14 +151,14 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 | option                                                            | type              | description                                                                                                                                                         |
 | ----------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`agencies`](#agencies)                                           | array             | An array of GTFS files to be imported, and which files to exclude.                                                                                                  |
-| [`csvOptions`](#csvOptions)                                       | object            | Options passed to `csv-parse` for parsing GTFS CSV files. Optional.                                                                                                 |
+| [`csvOptions`](#csvoptions)                                       | object            | Options passed to `csv-parse` for parsing GTFS CSV files. Optional.                                                                                                 |
 | [`db`](#db)                                                       | database instance | An existing database instance to use instead of relying on node-gtfs to connect. Optional.                                                                          |
 | [`downloadTimeout`](#downloadtimeout)                             | integer           | The number of milliseconds to wait before throwing an error when downloading GTFS. Optional.                                                                        |
-| [`exportPath`](#exportPath)                                       | string            | A path to a directory to put exported GTFS files. Optional, defaults to `gtfs-export/<agency_name>`.                                                                |
+| [`exportPath`](#exportpath)                                       | string            | A path to a directory to put exported GTFS files. Optional, defaults to `gtfs-export/<agency_name>`.                                                                |
 | [`gtfsRealtimeExpirationSeconds`](#gtfsrealtimeexpirationseconds) | integer           | Amount of time in seconds to allow GTFS-Realtime data to be stored in database before allowing to be deleted. Optional, defaults to 0.                              |
 | [`ignoreDuplicates`](#ignoreduplicates)                           | boolean           | Whether or not to ignore unique constraints on ids when importing GTFS, such as `trip_id`, `calendar_id`. Optional, defaults to false.                              |
 | [`ignoreErrors`](#ignoreerrors)                                   | boolean           | Whether or not to ignore errors during the import process. If true, when importing multiple agencies, failed agencies will be skipped. Optional, defaults to false. |
-| [`sqlitePath`](#sqlitePath)                                       | string            | A path to an SQLite database. Optional, defaults to using an in-memory database.                                                                                    |
+| [`sqlitePath`](#sqlitepath)                                       | string            | A path to an SQLite database. Optional, defaults to using an in-memory database.                                                                                    |
 | [`verbose`](#verbose)                                             | boolean           | Whether or not to print output to the console. Optional, defaults to true.                                                                                          |
 
 ### agencies
@@ -951,8 +951,8 @@ const stoptimes = getStoptimes({
 });
 
 /*
- * `getStoptimes` allows passing a `date` in the query to return
- * only stoptimes for a specific day.
+ * `getStoptimes` allows passing a `date` in the query to return only
+ * stoptimes for a specific service date.
  */
 const stoptimes = getStoptimes({
   stop_id: '70011',
@@ -963,7 +963,7 @@ const stoptimes = getStoptimes({
  * `getStoptimes` allows passing a `start_time` and/or and 
  * `end_time` in the query to return only stoptimes after 
  * start_time and before end_time. This can be combined with the 
- * `date` parameter to get upcoming stoptimes
+ * `date` parameter to get upcoming stoptimes.
  */
 const stoptimes = getStoptimes({
   stop_id: '70011',
@@ -971,6 +971,32 @@ const stoptimes = getStoptimes({
   start_time: '11:30:00',
   end_time: '11:45:00'
 });
+
+/*
+ * ⚠️ By default, when using the `date` parameter in a query, it will NOT
+ * include stoptimes for trips whose service date is the previous day but
+ * whose stoptimes occur after midnight (i.e., times greater than 24:00:00
+ * in GTFS, such as 25:15:00 for 1:15 AM the next day).
+ *
+ * To retrieve all stoptimes for a calendar date including those from 
+ * trips assigned to the previous service date but occurring after 
+ * midnight:
+ *   1. Call `getStoptimes` with the target date:
+ *   2. Call `getStoptimes` with the previous date and `start_time: '24:00:00'`:
+ *   3. Combine both results for a complete set of stoptimes for July 5th.
+ *
+ * This approach ensures you include:
+ *   - All stoptimes for trips whose service date is July 4th but whose 
+ * stoptimes occur after midnight (i.e., in the early hours of July 5th)
+ *   - All stoptimes for trips whose service date is July 5th (which can 
+ * include trips with stoptimes that occur on July 6th after midnight )
+ */
+const stoptimesToday = getStoptimes({ date: 20240705 });
+const stoptimesYesterdayAfterMidnight = getStoptimes({ date: 20240704, start_time: '24:00:00' })
+const mergedStoptimes = [
+  ...stoptimesToday,
+  ...stoptimesYesterdayAfterMidnight
+];
 ```
 
 #### getTrips(query, fields, sortBy, options)
