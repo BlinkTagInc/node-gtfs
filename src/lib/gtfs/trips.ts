@@ -1,3 +1,5 @@
+import { omit } from 'lodash-es';
+import sqlString from 'sqlstring-sqlite';
 import type {
   QueryOptions,
   SqlOrderBy,
@@ -9,8 +11,9 @@ import { openDb } from '../db.ts';
 import {
   formatOrderByClause,
   formatSelectClause,
-  formatWhereClauses,
+  formatWhereClause,
 } from '../utils.ts';
+import { getServiceIdsByDate } from './calendars.ts';
 
 /*
  * Returns an array of all trips that match the query parameters.
@@ -24,8 +27,32 @@ export function getTrips<Fields extends keyof Trip>(
   const db = options.db ?? openDb();
   const tableName = 'trips';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  let whereClause = '';
   const orderByClause = formatOrderByClause(orderBy);
+
+  const tripQueryOmitKeys = ['date'];
+
+  let tripQuery = omit(query, tripQueryOmitKeys);
+
+  const whereClauses = Object.entries(tripQuery).map(
+    ([key, value]: [string, any]) => formatWhereClause(key, value),
+  );
+
+  if (query.date) {
+    if (typeof query.date !== 'number') {
+      throw new Error('`date` must be a number in yyyymmdd format');
+    }
+
+    const serviceIds = getServiceIdsByDate(query.date);
+
+    whereClauses.push(
+      `service_id IN (${serviceIds.map((id) => sqlString.escape(id)).join(',')})`,
+    );
+  }
+
+  if (whereClauses.length > 0) {
+    whereClause = `WHERE ${whereClauses.join(' AND ')}`;
+  }
 
   return db
     .prepare(
