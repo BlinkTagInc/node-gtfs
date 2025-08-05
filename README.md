@@ -1027,6 +1027,15 @@ const trips = getTrips({
   direction_id: 0,
   service_id: '
 });
+
+/*
+ * `getTrips` allows passing a `date` in the query to return only trips 
+ * for a specific service date.
+ */
+const trips = getTrips({
+  route_id: 'Bu-16APR',
+  date: 20170416
+});
 ```
 
 #### getShapes(query, fields, sortBy, options)

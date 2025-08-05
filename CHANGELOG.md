@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Updated
 - getStoptimes documentation for trips after midnight
+- Dependency Updates
+
+### Added
+- Add date filtering to getTrips function
 
 ## [4.17.5] - 2025-07-11
 
