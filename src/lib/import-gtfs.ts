@@ -4,7 +4,6 @@ import { cp, readdir, rename, readFile, rm, writeFile } from 'node:fs/promises';
 import { parse } from 'csv-parse';
 import stripBomStream from 'strip-bom-stream';
 import { temporaryDirectory } from 'tempy';
-import Timer from 'timer-machine';
 import mapSeries from 'promise-map-series';
 import Database from 'better-sqlite3';
 
@@ -538,8 +537,8 @@ const importGtfsFiles = (
   );
 
 export async function importGtfs(initialConfig: Config): Promise<void> {
-  const timer = new Timer();
-  timer.start();
+  // Start timer
+  const startTime = process.hrtime.bigint();
 
   const config = setDefaultConfig(initialConfig);
   validateConfigForImport(config);
@@ -601,10 +600,12 @@ export async function importGtfs(initialConfig: Config): Promise<void> {
     log(config)(`Creating DB indexes`);
     createGtfsIndexes(db);
 
-    const seconds = Math.round(timer.time() / 1000);
-    timer.stop();
+    const endTime = process.hrtime.bigint();
+    const elapsedSeconds = Number(endTime - startTime) / 1_000_000_000;
 
-    log(config)(`Completed GTFS import in ${seconds} seconds\n`);
+    log(config)(
+      `Completed GTFS import in ${elapsedSeconds.toFixed(1)} seconds\n`,
+    );
   } catch (error: any) {
     if (error?.code === 'SQLITE_CANTOPEN') {
       logError(config)(

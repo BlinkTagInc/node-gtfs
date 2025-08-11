@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Make ignoreErrors config option work on a file-by-file basis
 - Remove pluralize package
 - Remove untildify package
+- Remove timer-machine package
 
 ## [4.17.6] - 2025-08-04
 
