@@ -1,7 +1,8 @@
 import fs from 'fs';
 
 import Database from 'better-sqlite3';
-import untildify from 'untildify';
+
+import { untildify } from './file-utils.ts';
 
 const dbs: { [key: string]: Database.Database } = {};
 

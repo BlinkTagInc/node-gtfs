@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Updated
 - Make ignoreErrors config option work on a file-by-file basis
 - Remove pluralize package
+- Remove untildify package
 
 ## [4.17.6] - 2025-08-04
 

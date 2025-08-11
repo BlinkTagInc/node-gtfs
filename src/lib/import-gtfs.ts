@@ -5,13 +5,12 @@ import { parse } from 'csv-parse';
 import stripBomStream from 'strip-bom-stream';
 import { temporaryDirectory } from 'tempy';
 import Timer from 'timer-machine';
-import untildify from 'untildify';
 import mapSeries from 'promise-map-series';
 import Database from 'better-sqlite3';
 
 import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
-import { unzip } from './file-utils.ts';
+import { untildify, unzip } from './file-utils.ts';
 import { isValidJSON } from './geojson-utils.ts';
 import { updateGtfsRealtimeData } from './import-gtfs-realtime.ts';
 import { log, logError, logWarning } from './log-utils.ts';

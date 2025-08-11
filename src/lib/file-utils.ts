@@ -1,12 +1,14 @@
 import path from 'node:path';
 import { existsSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { mkdir, readFile, rm } from 'node:fs/promises';
 import { omit, snakeCase } from 'lodash-es';
 import sanitize from 'sanitize-filename';
-import untildify from 'untildify';
 import StreamZip from 'node-stream-zip';
 
 import { log } from './log-utils.ts';
+
+const homeDirectory = homedir();
 
 /** Configuration command line arguments interface */
 interface ConfigArgs {
@@ -116,4 +118,15 @@ export function generateFolderName(folderName: string): string {
     throw new Error('Folder name must be a non-empty string');
   }
   return snakeCase(sanitize(folderName));
+}
+
+/**
+ * Converts a tilde path to a full path
+ * @param pathWithTilde The path to convert
+ * @returns The full path
+ */
+export function untildify(pathWithTilde: string): string {
+  return homeDirectory
+    ? pathWithTilde.replace(/^~(?=$|\/|\\)/, homeDirectory)
+    : pathWithTilde;
 }
