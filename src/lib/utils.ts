@@ -351,3 +351,18 @@ export function applyPrefixToValue(
 
   return `${prefix}${value}`;
 }
+
+/**
+ * Pluralizes a word based on the count
+ * @param singularWord The singular word
+ * @param pluralWord The plural word
+ * @param count The count of the word
+ * @returns The pluralized word
+ */
+export function pluralize(
+  singularWord: string,
+  pluralWord: string,
+  count: number,
+) {
+  return count === 1 ? singularWord : pluralWord;
+}

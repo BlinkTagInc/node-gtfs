@@ -2,7 +2,6 @@ import path from 'node:path';
 import { writeFile } from 'node:fs/promises';
 
 import { without, compact } from 'lodash-es';
-import pluralize from 'pluralize';
 import { stringify } from 'csv-stringify';
 import sqlString from 'sqlstring-sqlite';
 import Database from 'better-sqlite3';
@@ -13,7 +12,7 @@ import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
 import { prepDirectory, generateFolderName } from './file-utils.ts';
 import { log, logWarning } from './log-utils.ts';
-import { formatCurrency, setDefaultConfig } from './utils.ts';
+import { formatCurrency, pluralize, setDefaultConfig } from './utils.ts';
 
 import { Config, Model } from '../types/global_interfaces.ts';
 
@@ -56,8 +55,8 @@ export const exportGtfs = async (initialConfig: Config) => {
   log(config)(
     `Starting GTFS export for ${pluralize(
       'agency',
+      'agencies',
       agencyCount,
-      true,
     )} using SQLite database at ${config.sqlitePath}`,
   );
 
@@ -149,6 +148,6 @@ export const exportGtfs = async (initialConfig: Config) => {
   log(config)(`Completed GTFS export to ${exportPath}`);
 
   log(config)(
-    `Completed GTFS export for ${pluralize('agency', agencyCount, true)}\n`,
+    `Completed GTFS export for ${pluralize('agency', 'agencies', agencyCount)}\n`,
   );
 };

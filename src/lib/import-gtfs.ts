@@ -2,7 +2,6 @@ import path from 'node:path';
 import { createReadStream, existsSync, lstatSync } from 'node:fs';
 import { cp, readdir, rename, readFile, rm, writeFile } from 'node:fs/promises';
 import { parse } from 'csv-parse';
-import pluralize from 'pluralize';
 import stripBomStream from 'strip-bom-stream';
 import { temporaryDirectory } from 'tempy';
 import Timer from 'timer-machine';
@@ -20,6 +19,7 @@ import {
   getTimestampColumnName,
   padLeadingZeros,
   applyPrefixToValue,
+  pluralize,
   setDefaultConfig,
   validateConfigForImport,
 } from './utils.ts';
@@ -550,7 +550,7 @@ export async function importGtfs(initialConfig: Config): Promise<void> {
     const agencyCount = config.agencies.length;
 
     log(config)(
-      `Starting GTFS import for ${pluralize('file', agencyCount, true)} using SQLite database at ${config.sqlitePath}`,
+      `Starting GTFS import for ${pluralize('file', 'files', agencyCount)} using SQLite database at ${config.sqlitePath}`,
     );
 
     createGtfsTables(db);
@@ -605,9 +605,7 @@ export async function importGtfs(initialConfig: Config): Promise<void> {
     const seconds = Math.round(timer.time() / 1000);
     timer.stop();
 
-    log(config)(
-      `Completed GTFS import for ${pluralize('agency', agencyCount, true)} in ${seconds} seconds\n`,
-    );
+    log(config)(`Completed GTFS import in ${seconds} seconds\n`);
   } catch (error: any) {
     if (error?.code === 'SQLITE_CANTOPEN') {
       logError(config)(

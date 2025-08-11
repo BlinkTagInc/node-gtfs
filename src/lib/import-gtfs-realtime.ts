@@ -1,4 +1,3 @@
-import pluralize from 'pluralize';
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 import mapSeries from 'promise-map-series';
 import { get } from 'lodash-es';
@@ -9,6 +8,7 @@ import { log, logError, logWarning } from './log-utils.ts';
 import {
   convertLongTimeToDate,
   applyPrefixToValue,
+  pluralize,
   setDefaultConfig,
   validateConfigForImport,
 } from './utils.ts';
@@ -368,9 +368,9 @@ export async function updateGtfsRealtime(initialConfig: Config) {
     const agencyCount = config.agencies.length;
     log(config)(
       `Starting GTFS-Realtime refresh for ${pluralize(
+        'agency',
         'agencies',
         agencyCount,
-        true,
       )} using SQLite database at ${config.sqlitePath}`,
     );
 
@@ -405,9 +405,9 @@ export async function updateGtfsRealtime(initialConfig: Config) {
 
     log(config)(
       `Completed GTFS-Realtime refresh for ${pluralize(
+        'agency',
         'agencies',
         agencyCount,
-        true,
       )}\n`,
     );
   } catch (error: any) {
