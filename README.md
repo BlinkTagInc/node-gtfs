@@ -157,7 +157,7 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 | [`exportPath`](#exportpath)                                       | string            | A path to a directory to put exported GTFS files. Optional, defaults to `gtfs-export/<agency_name>`.                                                                |
 | [`gtfsRealtimeExpirationSeconds`](#gtfsrealtimeexpirationseconds) | integer           | Amount of time in seconds to allow GTFS-Realtime data to be stored in database before allowing to be deleted. Optional, defaults to 0.                              |
 | [`ignoreDuplicates`](#ignoreduplicates)                           | boolean           | Whether or not to ignore unique constraints on ids when importing GTFS, such as `trip_id`, `calendar_id`. Optional, defaults to false.                              |
-| [`ignoreErrors`](#ignoreerrors)                                   | boolean           | Whether or not to ignore errors during the import process. If true, when importing multiple agencies, failed agencies will be skipped. Optional, defaults to false. |
+| [`ignoreErrors`](#ignoreerrors)                                   | boolean           | Whether or not to ignore errors during the import process. If true, failed files will be skipped while the rest are processed. Optional, defaults to false. |
 | [`sqlitePath`](#sqlitepath)                                       | string            | A path to an SQLite database. Optional, defaults to using an in-memory database.                                                                                    |
 | [`verbose`](#verbose)                                             | boolean           | Whether or not to print output to the console. Optional, defaults to true.                                                                                          |
 
@@ -431,7 +431,28 @@ importGtfs({
 
 ### ignoreErrors
 
-{Boolean} When importing GTFS from multiple agencies, if you don't want node-GTFS to throw an error and instead skip failed GTFS importants proceed to the next agency. Defaults to `false`.
+{Boolean} Controls error handling behavior during GTFS import. When `true`, the import process will continue even when encountering errors, logging them instead of stopping execution. Defaults to `false`.
+
+**When enabled, `ignoreErrors` will:**
+- Continue processing other GTFS files when one file fails
+- Log error messages instead of throwing exceptions
+- Skip problematic records within files while importing valid ones
+- Handle various error types including:
+  - Invalid CSV data or malformed records
+  - JSON parsing errors (for GeoJSON files)
+  - Database constraint violations
+  - File read/write errors
+  - GTFS-Realtime API failures
+
+**Use cases:**
+- Importing from multiple GTFS sources where some may have data quality issues
+- Processing large datasets where minor errors shouldn't halt the entire import
+- Development/testing scenarios where you want to see all errors at once
+
+**⚠️ Important considerations:**
+- Errors are logged but not thrown, so you may miss critical data issues
+- Partial imports may result in incomplete or inconsistent data
+- Consider using the `exclude` config option to skip problematic files entirely instead of ignoring errors
 
 ```json
 {

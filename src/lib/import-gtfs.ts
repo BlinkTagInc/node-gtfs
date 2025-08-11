@@ -313,14 +313,14 @@ const importGtfsFiles = (
         let totalLineCount = 0;
         const filename = `${model.filenameBase}.${model.filenameExtension}`;
 
-        // Filter out excluded files from config
+        // Skip any models that are excluded by config
         if (task.exclude && task.exclude.includes(model.filenameBase)) {
           task.log(`Skipping - ${filename}\r`);
           resolve();
           return;
         }
 
-        // If the model is a database/gtfs-realtime model then skip silently
+        // Skip gtfs-realtime models not present in static GTFS
         if (model.extension === 'gtfs-realtime') {
           resolve();
           return;
@@ -425,8 +425,13 @@ const importGtfsFiles = (
                   );
                 }
               }
-            } catch (error) {
-              reject(error);
+            } catch (error: any) {
+              if (task.ignoreErrors) {
+                task.logError(`Error processing ${filename}: ${error.message}`);
+                resolve();
+              } else {
+                reject(error);
+              }
             }
           });
 
@@ -435,8 +440,17 @@ const importGtfsFiles = (
               if (lines.length > 0) {
                 try {
                   insertLines(lines);
-                } catch (error) {
-                  reject(error);
+                } catch (error: any) {
+                  if (task.ignoreErrors) {
+                    task.logError(
+                      `Error inserting data for ${filename}: ${error.message}`,
+                    );
+                    resolve();
+                    return;
+                  } else {
+                    reject(error);
+                    return;
+                  }
                 }
               }
               task.log(
@@ -444,19 +458,38 @@ const importGtfsFiles = (
                 true,
               );
               resolve();
-            } catch (error) {
-              reject(error);
+            } catch (error: any) {
+              if (task.ignoreErrors) {
+                task.logError(`Error finalizing ${filename}: ${error.message}`);
+                resolve();
+              } else {
+                reject(error);
+              }
             }
           });
 
-          parser.on('error', reject);
+          parser.on('error', (error) => {
+            if (task.ignoreErrors) {
+              task.logError(`Parser error for ${filename}: ${error.message}`);
+              resolve();
+            } else {
+              reject(error);
+            }
+          });
 
           createReadStream(filepath).pipe(stripBomStream()).pipe(parser);
         } else if (model.filenameExtension === 'geojson') {
           readFile(filepath, 'utf8')
             .then((data) => {
               if (isValidJSON(data) === false) {
-                reject(new Error(`Invalid JSON in ${filename}`));
+                if (task.ignoreErrors) {
+                  task.logError(`Invalid JSON in ${filename}`);
+                  resolve();
+                  return;
+                } else {
+                  reject(new Error(`Invalid JSON in ${filename}`));
+                  return;
+                }
               }
               totalLineCount += 1;
               const line = formatGtfsLine(
@@ -464,18 +497,43 @@ const importGtfsFiles = (
                 model,
                 totalLineCount,
               );
-              insertLines([line]);
-              task.log(
-                `Importing - ${filename} - ${totalLineCount} lines imported\r`,
-                true,
-              );
-              resolve();
+              try {
+                insertLines([line]);
+                task.log(
+                  `Importing - ${filename} - ${totalLineCount} lines imported\r`,
+                  true,
+                );
+                resolve();
+              } catch (error: any) {
+                if (task.ignoreErrors) {
+                  task.logError(
+                    `Error inserting data for ${filename}: ${error.message}`,
+                  );
+                  resolve();
+                } else {
+                  reject(error);
+                }
+              }
             })
-            .catch(reject);
+            .catch((error: any) => {
+              if (task.ignoreErrors) {
+                task.logError(`Error reading ${filename}: ${error.message}`);
+                resolve();
+              } else {
+                reject(error);
+              }
+            });
         } else {
-          reject(
-            new Error(`Unsupported file type: ${model.filenameExtension}`),
-          );
+          if (task.ignoreErrors) {
+            task.logError(
+              `Unsupported file type: ${model.filenameExtension} for ${filename}`,
+            );
+            resolve();
+          } else {
+            reject(
+              new Error(`Unsupported file type: ${model.filenameExtension}`),
+            );
+          }
         }
       }),
   );
