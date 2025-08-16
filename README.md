@@ -69,7 +69,7 @@ import { readFile } from 'fs/promises';
 import path from 'node:path';
 
 const config = JSON.parse(
-  await readFile(path.join(import.meta.dirname, 'config.json'))
+  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8')
 );
 
 try {
@@ -531,7 +531,7 @@ import { readFile } from 'fs/promises';
 import path from 'node:path';
 
 const config = JSON.parse(
-  await readFile(path.join(import.meta.dirname, 'config.json'))
+  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8')
 );
 
 await importGtfs(config);
@@ -577,7 +577,7 @@ import { readFile } from 'fs/promises';
 import path from 'node:path';
 
 const config = JSON.parse(
-  await readFile(path.join(import.meta.dirname, 'config.json'))
+  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8')
 );
 
 await updateGtfsRealtime(config);
@@ -660,7 +660,7 @@ import { readFile } from 'fs/promises';
 import path from 'node:path';
 
 const config = JSON.parse(
-  await readFile(path.join(import.meta.dirname, 'config.json'))
+  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8')
 );
 
 const db = openDb(config);
@@ -702,7 +702,7 @@ import { readFile } from 'fs/promises';
 import path from 'node:path';
 
 const config = JSON.parse(
-  await readFile(path.join(import.meta.dirname, 'config.json'))
+  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8')
 );
 
 const db = openDb(config);
@@ -724,7 +724,7 @@ import { readFile } from 'fs/promises';
 import path from 'node:path';
 
 const config = JSON.parse(
-  await readFile(path.join(import.meta.dirname, 'config.json'))
+  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8')
 );
 
 const db = openDb(config);
@@ -746,7 +746,7 @@ import { readFile } from 'fs/promises';
 import path from 'node:path';
 
 const config = JSON.parse(
-  await readFile(path.join(import.meta.dirname, 'config.json'))
+  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8')
 );
 const db = openDb(config);
 const stops = getStops(
