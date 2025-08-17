@@ -11,6 +11,14 @@ export { deleteDb, openDb, closeDb } from './lib/db.ts';
 // Advanced Query
 export { advancedQuery } from './lib/advancedQuery.ts';
 
+// Utility functions
+export {
+  prepDirectory,
+  unzip,
+  generateFolderName,
+  untildify,
+} from './lib/file-utils.ts';
+
 // Standard GTFS
 export { getAgencies } from './lib/gtfs/agencies.ts';
 export { getAreas } from './lib/gtfs/areas.ts';
@@ -80,3 +88,4 @@ export { getRunEvents } from './lib/ods/run-events.ts';
 export { getRunsPieces } from './lib/ods/runs-pieces.ts';
 
 export * from './types/global_interfaces.ts';
+export type { Model } from './types/global_interfaces.ts';

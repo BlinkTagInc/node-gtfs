@@ -1,5 +1,5 @@
-import { Options } from 'csv-parse';
-import { Database } from 'better-sqlite3';
+import type { Options } from 'csv-parse';
+import type { Database } from 'better-sqlite3';
 
 export type UnixTimestamp = number;
 

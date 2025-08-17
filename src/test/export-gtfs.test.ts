@@ -1,10 +1,19 @@
+import {
+  describe,
+  it,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+  expect,
+} from './test-utils.ts';
 import path from 'node:path';
 import { createReadStream, existsSync } from 'node:fs';
 import { rm } from 'node:fs/promises';
 import { parse } from 'csv-parse';
 import { temporaryDirectory } from 'tempy';
 
-import { unzip, generateFolderName, prepDirectory } from '../lib/file-utils.ts';
+import { unzip, generateFolderName, prepDirectory } from '../../dist/index.js';
 import config from './test-config.ts';
 import {
   openDb,
@@ -12,9 +21,9 @@ import {
   importGtfs,
   exportGtfs,
   getAgencies,
-} from '../index.ts';
-import * as models from '../models/models.ts';
-import { Model } from '../types/global_interfaces.ts';
+} from '../../dist/index.js';
+import * as models from '../../dist/models/models.js';
+// Model type is not needed at runtime
 
 describe('exportGtfs():', function () {
   describe('Export GTFS', () => {

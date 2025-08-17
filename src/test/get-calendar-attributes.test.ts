@@ -1,10 +1,19 @@
+import {
+  describe,
+  it,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+  expect,
+} from './test-utils.ts';
 import config from './test-config.ts';
 import {
   openDb,
   closeDb,
   importGtfs,
   getCalendarAttributes,
-} from '../index.ts';
+} from '../../dist/index.js';
 
 beforeAll(async () => {
   openDb();

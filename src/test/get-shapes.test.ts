@@ -1,5 +1,14 @@
+import {
+  describe,
+  it,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+  expect,
+} from './test-utils.ts';
 import config from './test-config.ts';
-import { openDb, closeDb, importGtfs, getShapes } from '../index.ts';
+import { openDb, closeDb, importGtfs, getShapes } from '../../dist/index.js';
 
 beforeAll(async () => {
   openDb();

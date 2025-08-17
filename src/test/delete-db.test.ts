@@ -1,8 +1,17 @@
+import {
+  describe,
+  it,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+  expect,
+} from './test-utils.ts';
 import { rm } from 'fs/promises';
 import { existsSync } from 'fs';
 
 import config from './test-config.ts';
-import { deleteDb, openDb, importGtfs } from '../index.ts';
+import { deleteDb, openDb, importGtfs } from '../../dist/index.js';
 
 const db4Config = {
   agencies: [

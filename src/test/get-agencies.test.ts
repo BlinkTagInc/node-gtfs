@@ -1,5 +1,6 @@
+import { describe, it, beforeAll, afterAll, expect } from './test-utils.ts';
 import config from './test-config.ts';
-import { openDb, closeDb, importGtfs, getAgencies } from '../index.ts';
+import { openDb, closeDb, importGtfs, getAgencies } from '../../dist/index.js';
 
 beforeAll(async () => {
   openDb();

@@ -1,4 +1,13 @@
-import { closeDb, getTrips, importGtfs, openDb } from '../index.ts';
+import {
+  describe,
+  it,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+  expect,
+} from './test-utils.ts';
+import { closeDb, getTrips, importGtfs, openDb } from '../../dist/index.js';
 import config from './test-config.ts';
 
 beforeAll(async () => {
@@ -72,6 +81,6 @@ describe('getTrips():', () => {
       cars_allowed: null,
     };
 
-    expect(sundayResults).not.toContainEqual(weekdayResult);
+    expect(sundayResults).toNotContainEqual(weekdayResult);
   });
 });

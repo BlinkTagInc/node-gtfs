@@ -1,5 +1,14 @@
+import {
+  describe,
+  it,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+  expect,
+} from './test-utils.ts';
 import config from './test-config.ts';
-import { openDb, closeDb, importGtfs, getStops } from '../index.ts';
+import { openDb, closeDb, importGtfs, getStops } from '../../dist/index.js';
 import { sortBy } from 'lodash-es';
 
 beforeAll(async () => {

@@ -1,3 +1,12 @@
+import {
+  describe,
+  it,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+  expect,
+} from './test-utils.ts';
 import config from './test-config.ts';
 import {
   openDb,
@@ -5,7 +14,7 @@ import {
   importGtfs,
   getCalendars,
   getServiceIdsByDate,
-} from '../index.ts';
+} from '../../dist/index.js';
 
 beforeAll(async () => {
   openDb();
@@ -119,6 +128,6 @@ describe('getServiceIdsByDate():', () => {
 
     // Verify that excluded service_ids are not present
     const excludedServiceId = 'CT-16APR-Caltrain-Weekday-01'; // Assuming this is excluded via exception_type 1
-    expect(results).not.toContain(excludedServiceId);
+    expect(results).toNotContain(excludedServiceId);
   });
 });

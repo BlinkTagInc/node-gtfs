@@ -1,14 +1,29 @@
+import {
+  describe,
+  it,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+  expect,
+} from './test-utils.ts';
 import { createReadStream, existsSync } from 'node:fs';
 import { rm } from 'node:fs/promises';
 import path from 'node:path';
 import { parse } from 'csv-parse';
 import { temporaryDirectory } from 'tempy';
 
-import { prepDirectory, unzip } from '../lib/file-utils.ts';
+import { prepDirectory, unzip } from '../../dist/index.js';
 import config from './test-config.ts';
-import { openDb, closeDb, importGtfs, getRoutes, getStops } from '../index.ts';
-import * as models from '../models/models.ts';
-import { Model } from '../types/global_interfaces.ts';
+import {
+  openDb,
+  closeDb,
+  importGtfs,
+  getRoutes,
+  getStops,
+} from '../../dist/index.js';
+import * as models from '../../dist/models/models.js';
+// Model type is not needed at runtime
 
 const agenciesFixturesRemote = [
   {
