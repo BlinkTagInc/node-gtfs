@@ -22,10 +22,15 @@ import {
   validateConfigForImport,
 } from './utils.ts';
 
-import { Config, ConfigAgency, Model } from '../types/global_interfaces.ts';
+import {
+  Config,
+  ConfigAgency,
+  Model,
+  TableNames,
+} from '../types/global_interfaces.ts';
 
 interface GtfsImportTask {
-  exclude?: string[];
+  exclude?: TableNames[];
   url?: string;
   headers?: Record<string, string>;
   realtimeAlerts?: {
@@ -198,11 +203,11 @@ const createGtfsTables = (db: Database.Database): void => {
       if (column.type === 'time') {
         sqlColumnCreateStatements.push(
           `${getTimestampColumnName(column.name)} INTEGER GENERATED ALWAYS AS (
-            CASE 
-              WHEN ${column.name} IS NULL OR ${column.name} = '' THEN NULL 
+            CASE
+              WHEN ${column.name} IS NULL OR ${column.name} = '' THEN NULL
               ELSE CAST(
-                substr(${column.name}, 1, instr(${column.name}, ':') - 1) * 3600 + 
-                substr(${column.name}, instr(${column.name}, ':') + 1, 2) * 60 + 
+                substr(${column.name}, 1, instr(${column.name}, ':') - 1) * 3600 +
+                substr(${column.name}, instr(${column.name}, ':') + 1, 2) * 60 +
                 substr(${column.name}, -2) AS INTEGER
               )
             END
@@ -536,6 +541,11 @@ const importGtfsFiles = (
       }),
   );
 
+/**
+ * Function to import GTFS files into the database
+ *
+ * @param initialConfig
+ */
 export async function importGtfs(initialConfig: Config): Promise<void> {
   // Start timer
   const startTime = process.hrtime.bigint();
@@ -559,7 +569,6 @@ export async function importGtfs(initialConfig: Config): Promise<void> {
 
         const task = {
           exclude: agency.exclude,
-          url: agency.url,
           headers: agency.headers,
           realtimeAlerts: agency.realtimeAlerts,
           realtimeTripUpdates: agency.realtimeTripUpdates,
@@ -567,7 +576,6 @@ export async function importGtfs(initialConfig: Config): Promise<void> {
           downloadDir: tempPath,
           downloadTimeout: config.downloadTimeout,
           gtfsRealtimeExpirationSeconds: config.gtfsRealtimeExpirationSeconds,
-          path: agency.path,
           csvOptions: config.csvOptions || {},
           ignoreDuplicates: config.ignoreDuplicates,
           ignoreErrors: config.ignoreErrors,
@@ -579,8 +587,14 @@ export async function importGtfs(initialConfig: Config): Promise<void> {
           logError: logError(config),
         };
 
-        if (task.url) {
+        if ('url' in agency) {
+          Object.assign(task, { url: agency.url });
+
           await downloadGtfsFiles(task);
+        } else {
+          Object.assign(task, {
+            path: agency.path,
+          });
         }
 
         await extractGtfsFiles(task);

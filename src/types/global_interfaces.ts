@@ -3,37 +3,171 @@ import type { Database } from 'better-sqlite3';
 
 export type UnixTimestamp = number;
 
-export interface ConfigAgency {
-  exclude?: string[];
-  url?: string;
-  path?: string;
+export type TableNames =
+  | 'agency'
+  | 'stops'
+  | 'routes'
+  | 'trips'
+  | 'stop_times'
+  | 'calendar'
+  | 'calendar_dates'
+  | 'fare_attributes'
+  | 'fare_rules'
+  | 'timeframes'
+  | 'rider_categories'
+  | 'fare_media'
+  | 'fare_products'
+  | 'fare_leg_rules'
+  | 'fare_leg_join_rules'
+  | 'fare_transfer_rules'
+  | 'areas'
+  | 'stop_areas'
+  | 'networks'
+  | 'route_networks'
+  | 'shapes'
+  | 'frequencies'
+  | 'transfers'
+  | 'pathways'
+  | 'levels'
+  | 'location_groups'
+  | 'location_group_stops'
+  | 'locations'
+  | 'booking_rules'
+  | 'translations'
+  | 'feed_info'
+  | 'attributions';
+
+interface BaseConfigAgency {
+  /**
+   * An array of GTFS file names (without .txt) to exclude when importing
+   */
+  exclude?: TableNames[];
+  /**
+   * An object of HTTP headers in key:value format to use when fetching GTFS from the url specified
+   */
   headers?: Record<string, string>;
+  /**
+   * Settings for fetching GTFS-Realtime alerts
+   */
   realtimeAlerts?: {
+    /**
+     * URL for fetching GTFS-Realtime alerts
+     */
     url: string;
+    /**
+     * Headers to use when fetching GTFS-Realtime alerts
+     */
     headers?: Record<string, string>;
   };
+  /**
+   * Settings for fetching GTFS-Realtime trip updates
+   */
   realtimeTripUpdates?: {
+    /**
+     * URL for fetching GTFS-Realtime trip updates
+     */
     url: string;
+    /**
+     * Headers to use when fetching GTFS-Realtime trip updates
+     */
     headers?: Record<string, string>;
   };
+  /**
+   * Settings for fetching GTFS-Realtime vehicle positions
+   */
   realtimeVehiclePositions?: {
+    /**
+     * URL for fetching GTFS-Realtime vehicle positions
+     */
     url: string;
+    /**
+     * Headers to use when fetching GTFS-Realtime vehicle positions
+     */
     headers?: Record<string, string>;
   };
+  /**
+   * A prefix to be added to every ID field maintain uniqueness when importing multiple GTFS from multiple agencies
+   */
   prefix?: string;
 }
 
+export type ConfigAgency = BaseConfigAgency &
+  (
+    | {
+        /**
+         * The URL to a zipped GTFS file. Required if path not present
+         */
+        url: string;
+      }
+    | {
+        /**
+         * A path to a zipped GTFS file or a directory of unzipped .txt files. Required if url is not present
+         */
+        path: string;
+      }
+  );
+
 export interface Config {
+  /**
+   * An existing database instance to use instead of relying on node-gtfs to connect.
+   */
   db?: Database;
+  /**
+   * A path to an SQLite database. Defaults to using an in-memory database.
+   */
   sqlitePath?: string;
+  /**
+   * Amount of time in seconds to allow GTFS-Realtime data to be stored in database before allowing to be deleted.
+   *
+   * Note: is an integer
+   *
+   * @defaultValue 0
+   */
   gtfsRealtimeExpirationSeconds?: number;
+  /**
+   * The number of milliseconds to wait before throwing an error when downloading GTFS.
+   *
+   * Note: is an integer
+   */
   downloadTimeout?: number;
+  /**
+   * Options passed to `csv-parse` for parsing GTFS CSV files.
+   */
   csvOptions?: Options;
+  /**
+   * A path to a directory to put exported GTFS files.
+   *
+   * @defaultValue `gtfs-export/<agency_name>`
+   */
   exportPath?: string;
+  /**
+   * Whether or not to ignore unique constraints on ids when importing GTFS, such as `trip_id`, `calendar_id`.
+   *
+   * @defaultValue false
+   */
   ignoreDuplicates?: boolean;
+  /**
+   * Whether or not to ignore errors during the import process. If true, failed files will be skipped while the rest are processed.
+   *
+   * @defaultValue false
+   */
   ignoreErrors?: boolean;
+  /**
+   * An array of GTFS files to be imported, and which files to exclude.
+   */
   agencies: ConfigAgency[];
+  /**
+   * Whether or not to print output to the console.
+   *
+   * @defaulValue true
+   */
   verbose?: boolean;
+  /**
+   * An optional custom logger instead of the build in console.log
+   *
+   * @param message
+   * @returns
+   */
   logFunction?: (message: string) => void;
 }
 
@@ -52,7 +186,7 @@ export interface ModelColumn {
 }
 
 export interface Model {
-  filenameBase: string;
+  filenameBase: TableNames;
   filenameExtension?: string;
   extension?: string;
   nonstandard?: boolean;
