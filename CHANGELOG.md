@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Updated
 - Move tests to node.js test from Jest
+- Dependency Updates
+
+### Fixed
+- Pass options param to getServiceIdsByDate (#195)
 
 ## [4.17.7] - 2025-08-11
 
