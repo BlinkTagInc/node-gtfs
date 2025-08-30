@@ -43,7 +43,7 @@ export function getTrips<Fields extends keyof Trip>(
       throw new Error('`date` must be a number in yyyymmdd format');
     }
 
-    const serviceIds = getServiceIdsByDate(query.date);
+    const serviceIds = getServiceIdsByDate(query.date, options);
 
     whereClauses.push(
       `service_id IN (${serviceIds.map((id) => sqlString.escape(id)).join(',')})`,

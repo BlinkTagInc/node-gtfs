@@ -44,7 +44,7 @@ export function getStoptimes<Fields extends keyof StopTime>(
       throw new Error('`date` must be a number in yyyymmdd format');
     }
 
-    const serviceIds = getServiceIdsByDate(query.date);
+    const serviceIds = getServiceIdsByDate(query.date, options);
 
     const tripSubquery = `SELECT DISTINCT trip_id FROM trips WHERE service_id IN (${serviceIds.map((id) => sqlString.escape(id)).join(',')})`;
 
