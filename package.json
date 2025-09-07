@@ -68,7 +68,8 @@
     "Ben Standaert",
     "mattkinnia",
     "Théophile Helleboid <theophile.helleboid@transdev.com>",
-    "mishamaliga"
+    "mishamaliga",
+    "Magnus Petersen-Paaske"
   ],
   "type": "module",
   "main": "./dist/index.js",
