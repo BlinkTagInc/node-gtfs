@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Move tests to node.js test from Jest
 - Dependency Updates
 - Set a default downloadTimeout
+- Fetch GTFS-realtime in parallel
+- Better GTFS-realtime logging
+- Retry failed GTFS-realtime requests
+- Batch database writes for GTFS-realtime
 
 ### Fixed
 - Pass options param to getServiceIdsByDate (#195)

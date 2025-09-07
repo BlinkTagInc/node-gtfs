@@ -19,19 +19,15 @@ import {
   ModelColumn,
 } from '../types/global_interfaces.ts';
 
+interface RealtimeUrlConfig {
+  url: string;
+  headers?: Record<string, string>;
+}
+
 interface GtfsRealtimeTask {
-  realtimeAlerts?: {
-    url: string;
-    headers?: Record<string, string>;
-  };
-  realtimeTripUpdates?: {
-    url: string;
-    headers?: Record<string, string>;
-  };
-  realtimeVehiclePositions?: {
-    url: string;
-    headers?: Record<string, string>;
-  };
+  realtimeAlerts?: RealtimeUrlConfig;
+  realtimeTripUpdates?: RealtimeUrlConfig;
+  realtimeVehiclePositions?: RealtimeUrlConfig;
   downloadTimeout?: number;
   gtfsRealtimeExpirationSeconds: number;
   ignoreErrors: boolean;
@@ -43,71 +39,38 @@ interface GtfsRealtimeTask {
   logError: (message: string) => void;
 }
 
-async function fetchGtfsRealtimeData(
-  urlConfig: { url: string; headers?: Record<string, string> },
-  task: GtfsRealtimeTask,
-) {
-  task.log(`Downloading GTFS-Realtime from ${urlConfig.url}`);
-  const response = await fetch(urlConfig.url, {
-    method: 'GET',
-    headers: {
-      ...(urlConfig.headers ?? {}),
-      'Accept-Encoding': 'gzip',
-    },
-    signal: task.downloadTimeout
-      ? AbortSignal.timeout(task.downloadTimeout)
-      : undefined,
-  });
-
-  if (response.status !== 200) {
-    task.logWarning(
-      `Unable to download GTFS-Realtime from ${urlConfig.url}. Got status ${response.status}.`,
-    );
-    return null;
-  }
-
-  const buffer = await response.arrayBuffer();
-  const message = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
-    new Uint8Array(buffer),
-  );
-  return GtfsRealtimeBindings.transit_realtime.FeedMessage.toObject(message, {
-    enums: String,
-    longs: String,
-    bytes: String,
-    defaults: false,
-    arrays: true,
-    objects: true,
-    oneofs: true,
-  });
+interface ProcessedEntity {
+  id: string;
+  alert?: any;
+  tripUpdate?: any;
+  vehicle?: any;
 }
 
-function removeExpiredRealtimeData(config: Config) {
-  const db = openDb(config);
-
-  log(config)(`Removing expired GTFS-Realtime data`);
-  db.prepare(
-    `DELETE FROM vehicle_positions WHERE expiration_timestamp <= strftime('%s','now')`,
-  ).run();
-  db.prepare(
-    `DELETE FROM trip_updates WHERE expiration_timestamp <= strftime('%s','now')`,
-  ).run();
-  db.prepare(
-    `DELETE FROM stop_time_updates WHERE expiration_timestamp <= strftime('%s','now')`,
-  ).run();
-  db.prepare(
-    `DELETE FROM service_alerts WHERE expiration_timestamp <= strftime('%s','now')`,
-  ).run();
-  db.prepare(
-    `DELETE FROM service_alert_informed_entities WHERE expiration_timestamp <= strftime('%s','now')`,
-  ).run();
-  log(config)(`Removed expired GTFS-Realtime data\r`, true);
+interface RealtimeData {
+  entity: ProcessedEntity[];
 }
 
+interface ProcessingResult {
+  recordCount: number;
+  errorCount: number;
+}
+
+interface BatchProcessor<T> {
+  (batch: T[]): Promise<ProcessingResult>;
+}
+
+const BATCH_SIZE = 1000;
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000;
+
+/**
+ * Prepares a field value for database insertion
+ */
 function prepareRealtimeFieldValue(
   entity: any,
   column: ModelColumn,
   task: GtfsRealtimeTask,
-) {
+): any {
   if (column.name === 'created_timestamp') {
     return task.currentTimestamp;
   }
@@ -134,231 +97,384 @@ function prepareRealtimeFieldValue(
   return column.type === 'json' ? JSON.stringify(prefixedValue) : prefixedValue;
 }
 
-async function processRealtimeAlerts(
-  db: any,
-  gtfsRealtimeData: any,
+/**
+ * Creates a prepared statement for a model
+ */
+function createPreparedStatement(db: any, model: any): any {
+  const columns = model.schema.map((column: ModelColumn) => column.name);
+  const placeholders = model.schema.map(() => '?').join(', ');
+
+  return db.prepare(
+    `REPLACE INTO ${model.filenameBase} (${columns.join(', ')}) VALUES (${placeholders})`,
+  );
+}
+
+/**
+ * Processes entities in batches
+ */
+async function processBatch<T>(
+  items: T[],
+  batchSize: number,
+  processor: BatchProcessor<T>,
+): Promise<ProcessingResult> {
+  let totalRecordCount = 0;
+  let totalErrorCount = 0;
+
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    try {
+      const result = await processor(batch);
+      totalRecordCount += result.recordCount;
+      totalErrorCount += result.errorCount;
+    } catch (error: any) {
+      totalErrorCount += batch.length;
+      console.error(`Batch processing error: ${error.message}`);
+    }
+  }
+
+  return { recordCount: totalRecordCount, errorCount: totalErrorCount };
+}
+
+/**
+ * Fetches GTFS Realtime data
+ */
+async function fetchGtfsRealtimeData(
+  type: 'alerts' | 'tripupdates' | 'vehiclepositions',
   task: GtfsRealtimeTask,
-) {
-  const alertStmt = db.prepare(
-    `REPLACE INTO ${models.serviceAlerts.filenameBase} (${models.serviceAlerts.schema
-      .map((column) => column.name)
-      .join(
-        ', ',
-      )}) VALUES (${models.serviceAlerts.schema.map(() => '?').join(', ')})`,
-  );
+): Promise<RealtimeData | null> {
+  const urlConfig = getUrlConfig(type, task);
 
-  const informedEntityStmt = db.prepare(
-    `REPLACE INTO ${models.serviceAlertInformedEntities.filenameBase} (${models.serviceAlertInformedEntities.schema
-      .map((column) => column.name)
-      .join(
-        ', ',
-      )}) VALUES (${models.serviceAlertInformedEntities.schema.map(() => '?').join(', ')})`,
-  );
+  if (!urlConfig) {
+    return null;
+  }
 
-  let totalLineCount = 0;
+  task.log(`Importing - GTFS-Realtime from ${urlConfig.url}`);
 
-  db.transaction(() => {
-    for (const entity of gtfsRealtimeData.entity) {
-      const fieldValues = (models.serviceAlerts.schema as ModelColumn[]).map(
-        (column) => prepareRealtimeFieldValue(entity, column, task),
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const response = await fetch(urlConfig.url, {
+        method: 'GET',
+        headers: {
+          ...(urlConfig.headers ?? {}),
+          'Accept-Encoding': 'gzip',
+        },
+        signal: task.downloadTimeout
+          ? AbortSignal.timeout(task.downloadTimeout)
+          : undefined,
+      });
+
+      if (response.status !== 200) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const buffer = await response.arrayBuffer();
+      const message = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
+        new Uint8Array(buffer),
       );
 
-      try {
-        alertStmt.run(fieldValues);
+      const feedMessage =
+        GtfsRealtimeBindings.transit_realtime.FeedMessage.toObject(message, {
+          enums: String,
+          longs: String,
+          bytes: String,
+          defaults: false,
+          arrays: true,
+          objects: true,
+          oneofs: true,
+        }) as RealtimeData;
 
-        if (entity.alert.informedEntity?.length) {
-          const informedEntities = entity.alert.informedEntity.map(
-            (informedEntity: {
-              directionId?: number;
-              routeId?: string;
-              routeType?: number;
-              stopId?: string;
-              trip?: {
-                tripId?: string;
-              };
-              parent?: any;
-            }) => {
+      return feedMessage;
+    } catch (error: any) {
+      if (attempt === MAX_RETRIES) {
+        if (task.ignoreErrors) {
+          task.logError(
+            `Failed to fetch ${type} after ${MAX_RETRIES} attempts: ${error.message}`,
+          );
+          return null;
+        }
+        throw error;
+      }
+
+      task.logWarning(
+        `Attempt ${attempt} failed for ${type}: ${error.message}`,
+      );
+      await new Promise((resolve) =>
+        setTimeout(resolve, RETRY_DELAY * attempt),
+      );
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Gets URL configuration for a specific realtime type
+ */
+function getUrlConfig(
+  type: 'alerts' | 'tripupdates' | 'vehiclepositions',
+  task: GtfsRealtimeTask,
+): RealtimeUrlConfig | undefined {
+  switch (type) {
+    case 'alerts':
+      return task.realtimeAlerts;
+    case 'tripupdates':
+      return task.realtimeTripUpdates;
+    case 'vehiclepositions':
+      return task.realtimeVehiclePositions;
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Creates a processor for service alerts
+ */
+function createServiceAlertsProcessor(
+  db: any,
+  task: GtfsRealtimeTask,
+): BatchProcessor<ProcessedEntity> {
+  const alertStmt = createPreparedStatement(db, models.serviceAlerts);
+  const informedEntityStmt = createPreparedStatement(
+    db,
+    models.serviceAlertInformedEntities,
+  );
+
+  return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
+    let recordCount = 0;
+    let errorCount = 0;
+
+    db.transaction(() => {
+      for (const entity of batch) {
+        try {
+          // Process main alert
+          const alertValues = (
+            models.serviceAlerts.schema as ModelColumn[]
+          ).map((column) => prepareRealtimeFieldValue(entity, column, task));
+          alertStmt.run(alertValues);
+          recordCount++;
+
+          // Process informed entities
+          if (entity.alert?.informedEntity?.length) {
+            for (const informedEntity of entity.alert.informedEntity) {
               informedEntity.parent = entity;
-              return (
+              const entityValues = (
                 models.serviceAlertInformedEntities.schema as ModelColumn[]
               ).map((column) =>
                 prepareRealtimeFieldValue(informedEntity, column, task),
               );
-            },
-          );
-
-          for (const values of informedEntities) {
-            informedEntityStmt.run(values);
+              informedEntityStmt.run(entityValues);
+              recordCount++;
+            }
           }
+        } catch (error: any) {
+          errorCount++;
+          task.logWarning(`Alert processing error: ${error.message}`);
         }
-        totalLineCount++;
-      } catch (error: any) {
-        task.logWarning(`Import error: ${error.message}`);
       }
-    }
+    })();
 
-    task.log(
-      `Importing - GTFS-Realtime service alerts - ${totalLineCount} entries imported\r`,
-      true,
-    );
-  })();
+    return { recordCount, errorCount };
+  };
 }
 
-async function processRealtimeTripUpdates(
+/**
+ * Creates a processor for trip updates
+ */
+function createTripUpdatesProcessor(
   db: any,
-  gtfsRealtimeData: any,
   task: GtfsRealtimeTask,
-) {
-  let totalLineCount = 0;
+): BatchProcessor<ProcessedEntity> {
+  const tripUpdateStmt = createPreparedStatement(db, models.tripUpdates);
+  const stopTimeStmt = createPreparedStatement(db, models.stopTimeUpdates);
 
-  const tripUpdateStmt = db.prepare(
-    `REPLACE INTO ${models.tripUpdates.filenameBase} (${models.tripUpdates.schema
-      .map((column) => column.name)
-      .join(
-        ', ',
-      )}) VALUES (${models.tripUpdates.schema.map(() => '?').join(', ')})`,
+  return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
+    let recordCount = 0;
+    let errorCount = 0;
+
+    db.transaction(() => {
+      for (const entity of batch) {
+        try {
+          // Process main trip update
+          const tripUpdateValues = (
+            models.tripUpdates.schema as ModelColumn[]
+          ).map((column) => prepareRealtimeFieldValue(entity, column, task));
+          tripUpdateStmt.run(tripUpdateValues);
+          recordCount++;
+
+          // Process stop time updates
+          if (entity.tripUpdate?.stopTimeUpdate?.length) {
+            for (const stopTimeUpdate of entity.tripUpdate.stopTimeUpdate) {
+              stopTimeUpdate.parent = entity;
+              const stopTimeValues = (
+                models.stopTimeUpdates.schema as ModelColumn[]
+              ).map((column) =>
+                prepareRealtimeFieldValue(stopTimeUpdate, column, task),
+              );
+              stopTimeStmt.run(stopTimeValues);
+              recordCount++;
+            }
+          }
+        } catch (error: any) {
+          errorCount++;
+          task.logWarning(`Trip update processing error: ${error.message}`);
+        }
+      }
+    })();
+
+    return { recordCount, errorCount };
+  };
+}
+
+/**
+ * Creates a processor for vehicle positions
+ */
+function createVehiclePositionsProcessor(
+  db: any,
+  task: GtfsRealtimeTask,
+): BatchProcessor<ProcessedEntity> {
+  const vehiclePositionStmt = createPreparedStatement(
+    db,
+    models.vehiclePositions,
   );
 
-  const stopTimeStmt = db.prepare(
-    `REPLACE INTO ${models.stopTimeUpdates.filenameBase} (${models.stopTimeUpdates.schema
-      .map((column) => column.name)
-      .join(
-        ', ',
-      )}) VALUES (${models.stopTimeUpdates.schema.map(() => '?').join(', ')})`,
-  );
+  return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
+    let recordCount = 0;
+    let errorCount = 0;
 
-  db.transaction(() => {
-    for (const entity of gtfsRealtimeData.entity) {
-      try {
-        const fieldValues = (models.tripUpdates.schema as ModelColumn[]).map(
-          (column) => prepareRealtimeFieldValue(entity, column, task),
-        );
-        tripUpdateStmt.run(fieldValues);
-
-        for (const stopTimeUpdate of entity.tripUpdate.stopTimeUpdate) {
-          stopTimeUpdate.parent = entity;
-          const values = (models.stopTimeUpdates.schema as ModelColumn[]).map(
-            (column) => prepareRealtimeFieldValue(stopTimeUpdate, column, task),
+    db.transaction(() => {
+      for (const entity of batch) {
+        try {
+          const fieldValues = (
+            models.vehiclePositions.schema as ModelColumn[]
+          ).map((column) => prepareRealtimeFieldValue(entity, column, task));
+          vehiclePositionStmt.run(fieldValues);
+          recordCount++;
+        } catch (error: any) {
+          errorCount++;
+          task.logWarning(
+            `Vehicle position processing error: ${error.message}`,
           );
-          stopTimeStmt.run(values);
         }
-
-        totalLineCount++;
-      } catch (error: any) {
-        task.logWarning(`Import error: ${error.message}`);
       }
-    }
+    })();
 
-    task.log(
-      `Importing - GTFS-Realtime trip updates - ${totalLineCount} entries imported\r`,
-      true,
-    );
-  })();
+    return { recordCount, errorCount };
+  };
 }
 
-async function processRealtimeVehiclePositions(
-  db: any,
-  gtfsRealtimeData: any,
-  task: GtfsRealtimeTask,
-) {
-  let totalLineCount = 0;
+/**
+ * Removes expired GTFS-Realtime data
+ */
+function removeExpiredRealtimeData(config: Config): void {
+  const db = openDb(config);
 
-  const vehiclePositionStmt = db.prepare(
-    `REPLACE INTO ${models.vehiclePositions.filenameBase} (${models.vehiclePositions.schema
-      .map((column) => column.name)
-      .join(
-        ', ',
-      )}) VALUES (${models.vehiclePositions.schema.map(() => '?').join(', ')})`,
-  );
+  log(config)(`Removing expired GTFS-Realtime data`);
 
   db.transaction(() => {
-    for (const entity of gtfsRealtimeData.entity) {
-      try {
-        const fieldValues = (
-          models.vehiclePositions.schema as ModelColumn[]
-        ).map((column) => prepareRealtimeFieldValue(entity, column, task));
+    const tables = [
+      'vehicle_positions',
+      'trip_updates',
+      'stop_time_updates',
+      'service_alerts',
+      'service_alert_informed_entities',
+    ];
 
-        vehiclePositionStmt.run(fieldValues);
-
-        totalLineCount++;
-      } catch (error: any) {
-        task.logWarning(`Import error: ${error.message}`);
-      }
+    for (const table of tables) {
+      db.prepare(
+        `DELETE FROM ${table} WHERE expiration_timestamp <= strftime('%s','now')`,
+      ).run();
     }
-
-    task.log(
-      `Importing - GTFS-Realtime vehicle positions - ${totalLineCount} entries imported\r`,
-      true,
-    );
   })();
+
+  log(config)(`Removed expired GTFS-Realtime data\r`, true);
 }
 
-export async function updateGtfsRealtimeData(task: GtfsRealtimeTask) {
+/**
+ * Updates GTFS Realtime data
+ */
+export async function updateGtfsRealtimeData(
+  task: GtfsRealtimeTask,
+): Promise<void> {
   if (
-    task.realtimeAlerts === undefined &&
-    task.realtimeTripUpdates === undefined &&
-    task.realtimeVehiclePositions === undefined
+    !task.realtimeAlerts &&
+    !task.realtimeTripUpdates &&
+    !task.realtimeVehiclePositions
   ) {
     return;
   }
 
+  // Download all data types in parallel
+  const [alertsData, tripUpdatesData, vehiclePositionsData] = await Promise.all(
+    [
+      task.realtimeAlerts?.url ? fetchGtfsRealtimeData('alerts', task) : null,
+      task.realtimeTripUpdates?.url
+        ? fetchGtfsRealtimeData('tripupdates', task)
+        : null,
+      task.realtimeVehiclePositions?.url
+        ? fetchGtfsRealtimeData('vehiclepositions', task)
+        : null,
+    ],
+  );
+
   const db = openDb({ sqlitePath: task.sqlitePath });
 
-  if (task.realtimeAlerts?.url) {
-    try {
-      const alertsData = await fetchGtfsRealtimeData(task.realtimeAlerts, task);
-      if (alertsData?.entity) {
-        await processRealtimeAlerts(db, alertsData, task);
-      }
-    } catch (error: any) {
-      if (task.ignoreErrors) {
-        task.logError(error.message);
-      } else {
-        throw error;
-      }
-    }
+  const recordCounts = {
+    alerts: 0,
+    tripupdates: 0,
+    vehiclepositions: 0,
+  };
+
+  // Process each data type with batching
+  const processingPromises: Promise<void>[] = [];
+
+  if (alertsData?.entity?.length) {
+    processingPromises.push(
+      processBatch(
+        alertsData.entity,
+        BATCH_SIZE,
+        createServiceAlertsProcessor(db, task),
+      ).then((result) => {
+        recordCounts.alerts = result.recordCount;
+      }),
+    );
   }
 
-  if (task.realtimeTripUpdates?.url) {
-    try {
-      const tripUpdatesData = await fetchGtfsRealtimeData(
-        task.realtimeTripUpdates,
-        task,
-      );
-      if (tripUpdatesData?.entity) {
-        await processRealtimeTripUpdates(db, tripUpdatesData, task);
-      }
-    } catch (error: any) {
-      if (task.ignoreErrors) {
-        task.logError(error.message);
-      } else {
-        throw error;
-      }
-    }
+  if (tripUpdatesData?.entity?.length) {
+    processingPromises.push(
+      processBatch(
+        tripUpdatesData.entity,
+        BATCH_SIZE,
+        createTripUpdatesProcessor(db, task),
+      ).then((result) => {
+        recordCounts.tripupdates = result.recordCount;
+      }),
+    );
   }
 
-  if (task.realtimeVehiclePositions?.url) {
-    try {
-      const vehiclePositionsData = await fetchGtfsRealtimeData(
-        task.realtimeVehiclePositions,
-        task,
-      );
-      if (vehiclePositionsData?.entity) {
-        await processRealtimeVehiclePositions(db, vehiclePositionsData, task);
-      }
-    } catch (error: any) {
-      if (task.ignoreErrors) {
-        task.logError(error.message);
-      } else {
-        throw error;
-      }
-    }
+  if (vehiclePositionsData?.entity?.length) {
+    processingPromises.push(
+      processBatch(
+        vehiclePositionsData.entity,
+        BATCH_SIZE,
+        createVehiclePositionsProcessor(db, task),
+      ).then((result) => {
+        recordCounts.vehiclepositions = result.recordCount;
+      }),
+    );
   }
 
-  task.log(`GTFS-Realtime data import complete`);
+  // Wait for all processing to complete
+  await Promise.all(processingPromises);
+
+  task.log(
+    `GTFS-Realtime import complete: ${recordCounts.alerts} alerts, ${recordCounts.tripupdates} trip updates, ${recordCounts.vehiclepositions} vehicle positions`,
+  );
 }
 
-export async function updateGtfsRealtime(initialConfig: Config) {
+/**
+ * Main function to update GTFS Realtime data
+ */
+export async function updateGtfsRealtime(initialConfig: Config): Promise<void> {
   const config = setDefaultConfig(initialConfig);
   validateConfigForImport(config);
 
@@ -378,7 +494,7 @@ export async function updateGtfsRealtime(initialConfig: Config) {
 
     await mapSeries(config.agencies, async (agency: ConfigAgency) => {
       try {
-        const task = {
+        const task: GtfsRealtimeTask = {
           realtimeAlerts: agency.realtimeAlerts,
           realtimeTripUpdates: agency.realtimeTripUpdates,
           realtimeVehiclePositions: agency.realtimeVehiclePositions,

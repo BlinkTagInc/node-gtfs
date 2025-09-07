@@ -100,7 +100,7 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
   }
 
   const gtfsPath = untildify(task.path);
-  task.log(`Importing GTFS from ${task.path}\r`);
+  task.log(`Importing static GTFS from ${task.path}\r`);
   if (path.extname(gtfsPath) === '.zip') {
     try {
       await unzip(gtfsPath, task.downloadDir);
@@ -305,11 +305,11 @@ const formatGtfsLine = (
 
 const BATCH_SIZE = 100_000;
 
-const importGtfsFiles = (
+const importGtfsFiles = async (
   db: Database.Database,
   task: GtfsImportTask,
-): Promise<void[]> =>
-  mapSeries(
+): Promise<void> => {
+  await mapSeries(
     Object.values(models),
     (model: Model) =>
       new Promise<void>((resolve, reject) => {
@@ -540,6 +540,8 @@ const importGtfsFiles = (
         }
       }),
   );
+  task.log(`Static GTFS import complete`);
+};
 
 /**
  * Function to import GTFS files into the database
