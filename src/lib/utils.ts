@@ -42,6 +42,7 @@ export function setDefaultConfig(initialConfig: Config) {
     ignoreErrors: false,
     gtfsRealtimeExpirationSeconds: 0,
     verbose: true,
+    downloadTimeout: 30000,
   };
 
   return {

@@ -362,7 +362,7 @@ importGtfs({
 
 ### downloadTimeout
 
-{Integer} A number of milliseconds to wait when downloading GTFS before throwing an error. Optional.
+{Integer} A number of milliseconds to wait when downloading GTFS before throwing an error. Optional, defaults to `30000` (30 seconds).
 
 ```json
 {
@@ -371,7 +371,7 @@ importGtfs({
       "path": "/path/to/the/unzipped/gtfs/"
     }
   ],
-  "downloadTimeout": 5000
+  "downloadTimeout": 30000
 }
 ```
 

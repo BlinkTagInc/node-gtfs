@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Updated
 - Move tests to node.js test from Jest
 - Dependency Updates
+- Set a default downloadTimeout
 
 ### Fixed
 - Pass options param to getServiceIdsByDate (#195)
