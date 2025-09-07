@@ -1,18 +1,16 @@
-import {
-  describe,
-  it,
-  beforeAll,
-  afterAll,
-  beforeEach,
-  afterEach,
-  expect,
-} from './test-utils.ts';
+import { describe, it, beforeAll, afterAll, expect } from './test-utils.ts';
 import path from 'node:path';
 import { rm, writeFile } from 'node:fs/promises';
 
 import config from './test-config.ts';
-import { openDb, closeDb, importGtfs, getLocations } from '../../dist/index.js';
-import { unzip, prepDirectory } from '../../dist/index.js';
+import {
+  openDb,
+  closeDb,
+  importGtfs,
+  getLocations,
+  unzip,
+  prepDirectory,
+} from '../../dist/index.js';
 import { temporaryDirectory } from 'tempy';
 
 const temporaryDir = temporaryDirectory();

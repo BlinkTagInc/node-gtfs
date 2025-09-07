@@ -57,12 +57,11 @@ export function getRoutes<Fields extends keyof Route>(
   const selectClause = formatSelectClause(fields);
   let whereClause = '';
   const orderByClause = formatOrderByClause(orderBy);
-
   const routeQuery = omit(query, ['stop_id', 'service_id']);
-  const tripQuery: { stop_id?: any; service_id?: any } = pick(query, [
-    'stop_id',
-    'service_id',
-  ]);
+  const tripQuery = pick(query, ['stop_id', 'service_id']) as {
+    stop_id?: string;
+    service_id?: string;
+  };
 
   const whereClauses = Object.entries(routeQuery).map(([key, value]) =>
     formatWhereClause(key, value),

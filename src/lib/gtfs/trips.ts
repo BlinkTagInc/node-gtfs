@@ -6,6 +6,7 @@ import type {
   QueryResult,
   SqlWhere,
   Trip,
+  SqlValue,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
 import {
@@ -32,10 +33,10 @@ export function getTrips<Fields extends keyof Trip>(
 
   const tripQueryOmitKeys = ['date'];
 
-  let tripQuery = omit(query, tripQueryOmitKeys);
+  const tripQuery = omit(query, tripQueryOmitKeys);
 
-  const whereClauses = Object.entries(tripQuery).map(
-    ([key, value]: [string, any]) => formatWhereClause(key, value),
+  const whereClauses = Object.entries(tripQuery).map(([key, value]) =>
+    formatWhereClause(key, value as SqlValue),
   );
 
   if (query.date) {

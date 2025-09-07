@@ -1,15 +1,6 @@
-import {
-  describe,
-  it,
-  beforeAll,
-  afterAll,
-  beforeEach,
-  afterEach,
-  expect,
-} from './test-utils.ts';
+import { describe, it, beforeAll, afterAll, expect } from './test-utils.ts';
 import config from './test-config.ts';
 import { openDb, closeDb, importGtfs, getStops } from '../../dist/index.js';
-import { sortBy } from 'lodash-es';
 
 beforeAll(async () => {
   openDb();

@@ -26,6 +26,7 @@ import {
   Config,
   ConfigAgency,
   Model,
+  SqlValue,
   TableNames,
 } from '../types/global_interfaces.ts';
 
@@ -49,7 +50,7 @@ interface GtfsImportTask {
   downloadTimeout?: number;
   gtfsRealtimeExpirationSeconds: number;
   path?: string;
-  csvOptions: {};
+  csvOptions: object;
   ignoreDuplicates: boolean;
   ignoreErrors: boolean;
   sqlitePath: string;
@@ -143,8 +144,8 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
           ),
         );
       }
-    } catch (error: any) {
-      task.logError(error);
+    } catch (error: unknown) {
+      task.logError(error as string);
       throw new Error(`Unable to unzip file ${task.path}`);
     }
   } else {
@@ -257,17 +258,17 @@ const createGtfsIndexes = (db: Database.Database): void => {
 };
 
 const formatGtfsLine = (
-  line: { [x: string]: any; geojson?: string },
+  line: { [x: string]: string | null },
   model: Model,
   totalLineCount: number,
-): Record<string, any> => {
+): Record<string, string | null> => {
   const lineNumber = totalLineCount + 1;
-  const formattedLine: Record<string, any> = {};
+  const formattedLine: Record<string, string | null> = {};
   const filenameBase = model.filenameBase;
   const filenameExtension = model.filenameExtension;
 
   for (const { name, type, required } of model.schema) {
-    let value = line[name];
+    let value: string | null = line[name];
 
     // Early null check
     if (value === '' || value === undefined || value === null) {
@@ -283,7 +284,7 @@ const formatGtfsLine = (
 
     if (type === 'date') {
       // Handle YYYY-MM-DD format
-      value = value.replace(/-/g, '');
+      value = value?.toString().replace(/-/g, '');
       if (value.length !== 8) {
         throw new Error(
           `Invalid date in ${filenameBase}.${filenameExtension} for ${name} on line ${lineNumber}.`,
@@ -369,11 +370,11 @@ const importGtfsFiles = async (
               } else {
                 const prefixedLine = Object.fromEntries(
                   Object.entries(
-                    line as { [x: string]: any; geojson?: string },
+                    line as { [x: string]: unknown; geojson?: string },
                   ).map(([columnName, value]) => [
                     columnName,
                     applyPrefixToValue(
-                      value,
+                      value as string,
                       prefixedColumns.has(columnName),
                       task.prefix,
                     ),
@@ -381,8 +382,11 @@ const importGtfsFiles = async (
                 );
                 insert.run(prefixedLine);
               }
-            } catch (error: any) {
-              if (error.code === 'SQLITE_CONSTRAINT_PRIMARYKEY') {
+            } catch (error: unknown) {
+              if (
+                (error as Error & { code?: string }).code ===
+                'SQLITE_CONSTRAINT_PRIMARYKEY'
+              ) {
                 const primaryColumns = columns.filter(
                   (column) => column.primary,
                 );
@@ -408,7 +412,7 @@ const importGtfsFiles = async (
             ...task.csvOptions,
           });
 
-          let lines: { [x: string]: any; geojson?: string }[] = [];
+          let lines: { [x: string]: SqlValue; geojson?: string }[] = [];
 
           parser.on('readable', () => {
             try {
@@ -428,9 +432,11 @@ const importGtfsFiles = async (
                   );
                 }
               }
-            } catch (error: any) {
+            } catch (error: unknown) {
               if (task.ignoreErrors) {
-                task.logError(`Error processing ${filename}: ${error.message}`);
+                const errorMessage =
+                  error instanceof Error ? error.message : String(error);
+                task.logError(`Error processing ${filename}: ${errorMessage}`);
                 resolve();
               } else {
                 reject(error);
@@ -443,10 +449,12 @@ const importGtfsFiles = async (
               if (lines.length > 0) {
                 try {
                   insertLines(lines);
-                } catch (error: any) {
+                } catch (error: unknown) {
                   if (task.ignoreErrors) {
+                    const errorMessage =
+                      error instanceof Error ? error.message : String(error);
                     task.logError(
-                      `Error inserting data for ${filename}: ${error.message}`,
+                      `Error inserting data for ${filename}: ${errorMessage}`,
                     );
                     resolve();
                     return;
@@ -461,9 +469,11 @@ const importGtfsFiles = async (
                 true,
               );
               resolve();
-            } catch (error: any) {
+            } catch (error: unknown) {
               if (task.ignoreErrors) {
-                task.logError(`Error finalizing ${filename}: ${error.message}`);
+                const errorMessage =
+                  error instanceof Error ? error.message : String(error);
+                task.logError(`Error finalizing ${filename}: ${errorMessage}`);
                 resolve();
               } else {
                 reject(error);
@@ -471,9 +481,11 @@ const importGtfsFiles = async (
             }
           });
 
-          parser.on('error', (error) => {
+          parser.on('error', (error: unknown) => {
             if (task.ignoreErrors) {
-              task.logError(`Parser error for ${filename}: ${error.message}`);
+              const errorMessage =
+                error instanceof Error ? error.message : String(error);
+              task.logError(`Parser error for ${filename}: ${errorMessage}`);
               resolve();
             } else {
               reject(error);
@@ -507,10 +519,12 @@ const importGtfsFiles = async (
                   true,
                 );
                 resolve();
-              } catch (error: any) {
+              } catch (error: unknown) {
                 if (task.ignoreErrors) {
+                  const errorMessage =
+                    error instanceof Error ? error.message : String(error);
                   task.logError(
-                    `Error inserting data for ${filename}: ${error.message}`,
+                    `Error inserting data for ${filename}: ${errorMessage}`,
                   );
                   resolve();
                 } else {
@@ -518,9 +532,11 @@ const importGtfsFiles = async (
                 }
               }
             })
-            .catch((error: any) => {
+            .catch((error: unknown) => {
               if (task.ignoreErrors) {
-                task.logError(`Error reading ${filename}: ${error.message}`);
+                const errorMessage =
+                  error instanceof Error ? error.message : String(error);
+                task.logError(`Error reading ${filename}: ${errorMessage}`);
                 resolve();
               } else {
                 reject(error);
@@ -604,9 +620,11 @@ export async function importGtfs(initialConfig: Config): Promise<void> {
         await updateGtfsRealtimeData(task);
 
         await rm(tempPath, { recursive: true });
-      } catch (error: any) {
+      } catch (error: unknown) {
         if (config.ignoreErrors) {
-          logError(config)(error.message);
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
+          logError(config)(errorMessage);
         } else {
           throw error;
         }
@@ -622,8 +640,8 @@ export async function importGtfs(initialConfig: Config): Promise<void> {
     log(config)(
       `Completed GTFS import in ${elapsedSeconds.toFixed(1)} seconds\n`,
     );
-  } catch (error: any) {
-    if (error?.code === 'SQLITE_CANTOPEN') {
+  } catch (error: unknown) {
+    if ((error as Error & { code?: string }).code === 'SQLITE_CANTOPEN') {
       logError(config)(
         `Unable to open sqlite database "${config.sqlitePath}" defined as \`sqlitePath\` config.json. Ensure the parent directory exists or remove \`sqlitePath\` from config.json.`,
       );

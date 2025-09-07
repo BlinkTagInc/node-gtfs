@@ -1,6 +1,7 @@
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 import mapSeries from 'promise-map-series';
 import { get } from 'lodash-es';
+import Database from 'better-sqlite3';
 
 import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
@@ -17,6 +18,7 @@ import {
   Config,
   ConfigAgency,
   ModelColumn,
+  Model,
 } from '../types/global_interfaces.ts';
 
 interface RealtimeUrlConfig {
@@ -41,9 +43,9 @@ interface GtfsRealtimeTask {
 
 interface ProcessedEntity {
   id: string;
-  alert?: any;
-  tripUpdate?: any;
-  vehicle?: any;
+  alert?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  tripUpdate?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  vehicle?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 interface RealtimeData {
@@ -67,10 +69,10 @@ const RETRY_DELAY = 1000;
  * Prepares a field value for database insertion
  */
 function prepareRealtimeFieldValue(
-  entity: any,
+  entity: any, // eslint-disable-line @typescript-eslint/no-explicit-any
   column: ModelColumn,
   task: GtfsRealtimeTask,
-): any {
+) {
   if (column.name === 'created_timestamp') {
     return task.currentTimestamp;
   }
@@ -100,7 +102,7 @@ function prepareRealtimeFieldValue(
 /**
  * Creates a prepared statement for a model
  */
-function createPreparedStatement(db: any, model: any): any {
+function createPreparedStatement(db: Database.Database, model: Model) {
   const columns = model.schema.map((column: ModelColumn) => column.name);
   const placeholders = model.schema.map(() => '?').join(', ');
 
@@ -126,9 +128,11 @@ async function processBatch<T>(
       const result = await processor(batch);
       totalRecordCount += result.recordCount;
       totalErrorCount += result.errorCount;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       totalErrorCount += batch.length;
-      console.error(`Batch processing error: ${error.message}`);
+      console.error(`Batch processing error: ${errorMessage}`);
     }
   }
 
@@ -184,20 +188,20 @@ async function fetchGtfsRealtimeData(
         }) as RealtimeData;
 
       return feedMessage;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       if (attempt === MAX_RETRIES) {
         if (task.ignoreErrors) {
           task.logError(
-            `Failed to fetch ${type} after ${MAX_RETRIES} attempts: ${error.message}`,
+            `Failed to fetch ${type} after ${MAX_RETRIES} attempts: ${errorMessage}`,
           );
           return null;
         }
         throw error;
       }
 
-      task.logWarning(
-        `Attempt ${attempt} failed for ${type}: ${error.message}`,
-      );
+      task.logWarning(`Attempt ${attempt} failed for ${type}: ${errorMessage}`);
       await new Promise((resolve) =>
         setTimeout(resolve, RETRY_DELAY * attempt),
       );
@@ -230,13 +234,13 @@ function getUrlConfig(
  * Creates a processor for service alerts
  */
 function createServiceAlertsProcessor(
-  db: any,
+  db: Database.Database,
   task: GtfsRealtimeTask,
 ): BatchProcessor<ProcessedEntity> {
-  const alertStmt = createPreparedStatement(db, models.serviceAlerts);
+  const alertStmt = createPreparedStatement(db, models.serviceAlerts as Model);
   const informedEntityStmt = createPreparedStatement(
     db,
-    models.serviceAlertInformedEntities,
+    models.serviceAlertInformedEntities as Model,
   );
 
   return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
@@ -266,9 +270,11 @@ function createServiceAlertsProcessor(
               recordCount++;
             }
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
           errorCount++;
-          task.logWarning(`Alert processing error: ${error.message}`);
+          task.logWarning(`Alert processing error: ${errorMessage}`);
         }
       }
     })();
@@ -281,11 +287,17 @@ function createServiceAlertsProcessor(
  * Creates a processor for trip updates
  */
 function createTripUpdatesProcessor(
-  db: any,
+  db: Database.Database,
   task: GtfsRealtimeTask,
 ): BatchProcessor<ProcessedEntity> {
-  const tripUpdateStmt = createPreparedStatement(db, models.tripUpdates);
-  const stopTimeStmt = createPreparedStatement(db, models.stopTimeUpdates);
+  const tripUpdateStmt = createPreparedStatement(
+    db,
+    models.tripUpdates as Model,
+  );
+  const stopTimeStmt = createPreparedStatement(
+    db,
+    models.stopTimeUpdates as Model,
+  );
 
   return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
     let recordCount = 0;
@@ -314,9 +326,11 @@ function createTripUpdatesProcessor(
               recordCount++;
             }
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
           errorCount++;
-          task.logWarning(`Trip update processing error: ${error.message}`);
+          task.logWarning(`Trip update processing error: ${errorMessage}`);
         }
       }
     })();
@@ -329,12 +343,12 @@ function createTripUpdatesProcessor(
  * Creates a processor for vehicle positions
  */
 function createVehiclePositionsProcessor(
-  db: any,
+  db: Database.Database,
   task: GtfsRealtimeTask,
 ): BatchProcessor<ProcessedEntity> {
   const vehiclePositionStmt = createPreparedStatement(
     db,
-    models.vehiclePositions,
+    models.vehiclePositions as Model,
   );
 
   return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
@@ -349,11 +363,11 @@ function createVehiclePositionsProcessor(
           ).map((column) => prepareRealtimeFieldValue(entity, column, task));
           vehiclePositionStmt.run(fieldValues);
           recordCount++;
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
           errorCount++;
-          task.logWarning(
-            `Vehicle position processing error: ${error.message}`,
-          );
+          task.logWarning(`Vehicle position processing error: ${errorMessage}`);
         }
       }
     })();
@@ -510,9 +524,11 @@ export async function updateGtfsRealtime(initialConfig: Config): Promise<void> {
         };
 
         await updateGtfsRealtimeData(task);
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         if (config.ignoreErrors) {
-          logError(config)(error.message);
+          logError(config)(errorMessage);
         } else {
           throw error;
         }
@@ -526,8 +542,8 @@ export async function updateGtfsRealtime(initialConfig: Config): Promise<void> {
         agencyCount,
       )}\n`,
     );
-  } catch (error: any) {
-    if (error?.code === 'SQLITE_CANTOPEN') {
+  } catch (error: unknown) {
+    if ((error as Error & { code?: string }).code === 'SQLITE_CANTOPEN') {
       logError(config)(
         `Unable to open sqlite database "${config.sqlitePath}" defined as \`sqlitePath\` config.json. Ensure the parent directory exists or remove \`sqlitePath\` from config.json.`,
       );

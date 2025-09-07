@@ -21,7 +21,7 @@ import { getAgencies } from './agencies.ts';
 import { getRoutes } from './routes.ts';
 import { getRouteAttributes } from '../gtfs-plus/route-attributes.ts';
 
-function buildTripSubquery(query: { [key: string]: string }) {
+function buildTripSubquery(query: { [key: string]: string | number }) {
   const whereClause = formatWhereClauses(query);
   return `SELECT DISTINCT shape_id FROM trips ${whereClause}`;
 }
@@ -50,12 +50,17 @@ export function getShapes<Fields extends keyof Shape>(
     'service_id',
     'direction_id',
   ]);
-  const tripQuery: {
-    route_id?: any;
-    trip_id?: any;
-    service_id?: any;
-    direction_id?: any;
-  } = pick(query, ['route_id', 'trip_id', 'service_id', 'direction_id']);
+  const tripQuery = pick(query, [
+    'route_id',
+    'trip_id',
+    'service_id',
+    'direction_id',
+  ]) as {
+    route_id?: string;
+    trip_id?: string;
+    service_id?: string;
+    direction_id?: number;
+  };
 
   const whereClauses = Object.entries(shapeQuery).map(([key, value]) =>
     formatWhereClause(key, value),

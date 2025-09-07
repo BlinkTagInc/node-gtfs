@@ -13,7 +13,6 @@ import { rm } from 'node:fs/promises';
 import { parse } from 'csv-parse';
 import { temporaryDirectory } from 'tempy';
 
-import { unzip, generateFolderName, prepDirectory } from '../../dist/index.js';
 import config from './test-config.ts';
 import {
   openDb,
@@ -21,9 +20,12 @@ import {
   importGtfs,
   exportGtfs,
   getAgencies,
+  unzip,
+  generateFolderName,
+  prepDirectory,
 } from '../../dist/index.js';
 import * as models from '../../dist/models/models.js';
-// Model type is not needed at runtime
+import type { Model } from '../../dist/types/global_interfaces.js';
 
 describe('exportGtfs():', function () {
   describe('Export GTFS', () => {
@@ -44,7 +46,7 @@ describe('exportGtfs():', function () {
 
   describe('Verify data exported', () => {
     const countData: {
-      [key: string]: any;
+      [key: string]: number;
     } = {};
     const temporaryDir = temporaryDirectory();
 

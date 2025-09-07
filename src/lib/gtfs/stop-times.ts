@@ -6,6 +6,7 @@ import type {
   QueryResult,
   SqlWhere,
   StopTime,
+  SqlValue,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
 import {
@@ -33,10 +34,9 @@ export function getStoptimes<Fields extends keyof StopTime>(
 
   const stoptimeQueryOmitKeys = ['date', 'start_time', 'end_time'];
 
-  let stoptimeQuery = omit(query, stoptimeQueryOmitKeys);
-
-  const whereClauses = Object.entries(stoptimeQuery).map(
-    ([key, value]: [string, any]) => formatWhereClause(key, value),
+  const stoptimeQuery = omit(query, stoptimeQueryOmitKeys);
+  const whereClauses = Object.entries(stoptimeQuery).map(([key, value]) =>
+    formatWhereClause(key, value as SqlValue),
   );
 
   if (query.date) {

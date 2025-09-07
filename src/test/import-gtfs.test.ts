@@ -13,7 +13,6 @@ import path from 'node:path';
 import { parse } from 'csv-parse';
 import { temporaryDirectory } from 'tempy';
 
-import { prepDirectory, unzip } from '../../dist/index.js';
 import config from './test-config.ts';
 import {
   openDb,
@@ -21,9 +20,11 @@ import {
   importGtfs,
   getRoutes,
   getStops,
+  prepDirectory,
+  unzip,
 } from '../../dist/index.js';
 import * as models from '../../dist/models/models.js';
-// Model type is not needed at runtime
+import type { Model } from '../../dist/types/global_interfaces.js';
 
 const agenciesFixturesRemote = [
   {
@@ -63,8 +64,8 @@ describe('importGtfs():', function () {
           agencies: agenciesFixturesRemote,
           downloadTimeout: 1,
         });
-      } catch (error: any) {
-        expect(error.name).toEqual('TimeoutError');
+      } catch (error: unknown) {
+        expect((error as Error).name).toEqual('TimeoutError');
       }
     });
 
@@ -89,8 +90,10 @@ describe('importGtfs():', function () {
             },
           ],
         });
-      } catch (error: any) {
-        expect(error.message).toMatch(/Unable to load files from path/);
+      } catch (error: unknown) {
+        expect((error as Error).message).toMatch(
+          /Unable to load files from path/,
+        );
       }
     });
 
@@ -120,7 +123,7 @@ describe('importGtfs():', function () {
 
   describe('Verify data imported into database', () => {
     const countData: {
-      [key: string]: any;
+      [key: string]: number;
     } = {};
     const temporaryDir = temporaryDirectory();
 

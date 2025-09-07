@@ -126,7 +126,6 @@
     "@types/node": "22",
     "@types/yargs": "17.0.33",
     "eslint": "9.34.0",
-    "eslint-plugin-react": "7.37.5",
     "globals": "16.3.0",
     "husky": "9.1.7",
     "lint-staged": "16.1.5",

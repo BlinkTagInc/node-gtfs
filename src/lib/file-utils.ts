@@ -5,6 +5,7 @@ import { mkdir, readFile, rm } from 'node:fs/promises';
 import { omit, snakeCase } from 'lodash-es';
 import sanitize from 'sanitize-filename';
 import StreamZip from 'node-stream-zip';
+import type { Config } from '../types/global_interfaces.ts';
 
 import { log } from './log-utils.ts';
 
@@ -27,9 +28,7 @@ interface ConfigArgs {
  * @example
  * const config = await getConfig({ configPath: './my-config.json' });
  */
-export async function getConfig(
-  argv: ConfigArgs,
-): Promise<Record<string, any>> {
+export async function getConfig(argv: ConfigArgs): Promise<Config> {
   let config;
   let data;
 

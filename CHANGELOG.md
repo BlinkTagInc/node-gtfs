@@ -15,9 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Better GTFS-realtime logging
 - Retry failed GTFS-realtime requests
 - Batch database writes for GTFS-realtime
+- Update ESlint config
 
 ### Fixed
 - Pass options param to getServiceIdsByDate (#195)
+- Lints
 
 ## [4.17.7] - 2025-08-11
 

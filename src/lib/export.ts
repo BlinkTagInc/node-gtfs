@@ -13,14 +13,14 @@ import { prepDirectory, generateFolderName, untildify } from './file-utils.ts';
 import { log, logWarning } from './log-utils.ts';
 import { formatCurrency, pluralize, setDefaultConfig } from './utils.ts';
 
-import { Config, Model } from '../types/global_interfaces.ts';
+import { Config, Model, SqlValue } from '../types/global_interfaces.ts';
 
 const getAgencies = (db: Database.Database, config: Config) => {
   try {
     return db.prepare('SELECT agency_name FROM agency;').all() as {
       agency_name: string;
     }[];
-  } catch (error) {
+  } catch {
     if (config.sqlitePath === ':memory:') {
       throw new Error(
         'No agencies found in SQLite. You are using an in-memory database - if running this from command line be sure to specify a value for `sqlitePath` in config.json other than ":memory:".',
@@ -78,7 +78,7 @@ export const exportGtfs = async (initialConfig: Config) => {
       );
       const tableName = sqlString.escapeId(model.filenameBase);
       const lines = db.prepare(`SELECT * FROM ${tableName};`).all() as Array<
-        Record<string, any>
+        Record<string, SqlValue>
       >;
 
       if (!lines || lines.length === 0) {
@@ -106,11 +106,17 @@ export const exportGtfs = async (initialConfig: Config) => {
           }
         } else if (model.filenameBase === 'fare_attributes') {
           for (const line of lines) {
-            line.price = formatCurrency(line.price, line.currency_type);
+            line.price = formatCurrency(
+              line.price as number,
+              line.currency_type as string,
+            );
           }
         } else if (model.filenameBase === 'fare_products') {
           for (const line of lines) {
-            line.amount = formatCurrency(line.amount, line.currency);
+            line.amount = formatCurrency(
+              line.amount as number,
+              line.currency as string,
+            );
           }
         }
 
@@ -122,7 +128,7 @@ export const exportGtfs = async (initialConfig: Config) => {
         await writeFile(filePath, fileText);
       } else if (model.filenameExtension === 'geojson') {
         const fileText = lines?.[0].geojson ?? '';
-        await writeFile(filePath, fileText);
+        await writeFile(filePath, fileText as string);
       } else {
         throw new Error(
           `Unexpected filename extension: ${model.filenameExtension}`,

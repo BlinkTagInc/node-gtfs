@@ -15,6 +15,7 @@ import type {
   QueryOptions,
   SqlOrderBy,
   SqlWhere,
+  SqlValue,
 } from '../types/global_interfaces.ts';
 
 /*
@@ -56,5 +57,5 @@ export function advancedQuery(
     .prepare(
       `${selectClause} FROM ${tableName} ${joinClause} ${whereClause} ${orderByClause};`,
     )
-    .all() as Array<Record<string, any>>;
+    .all() as Array<Record<string, SqlValue>>;
 }

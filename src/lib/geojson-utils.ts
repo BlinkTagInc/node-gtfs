@@ -26,7 +26,7 @@ export function isValidJSON(string: string): boolean {
   try {
     JSON.parse(string);
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 }
@@ -111,12 +111,12 @@ function formatHexColor(color: string | null | undefined): string | undefined {
 
 /**
  * Formats properties object by cleaning null values and formatting colors
- * @param {Record<string, any>} properties - Properties object to format
- * @returns {Record<string, any>} Formatted properties object
+ * @param {Record<string, unknown>} properties - Properties object to format
+ * @returns {Record<string, unknown>} Formatted properties object
  */
 function formatProperties(
-  properties: Record<string, any>,
-): Record<string, any> {
+  properties: Record<string, unknown>,
+): Record<string, unknown> {
   const formattedProperties = cloneDeep(
     omitBy(properties, (value) => value == null),
   );
@@ -132,9 +132,9 @@ function formatProperties(
     formattedProperties.route_text_color = formattedRouteTextColor;
   }
 
-  if (properties.routes) {
+  if (properties.routes && Array.isArray(properties.routes)) {
     formattedProperties.routes = properties.routes.map(
-      (route: Record<string, any>) => formatProperties(route),
+      (route: Record<string, unknown>) => formatProperties(route),
     );
   }
 
@@ -149,7 +149,7 @@ function formatProperties(
  */
 export function shapesToGeoJSONFeature(
   shapes: Shape[],
-  properties: Record<string, any> = {},
+  properties: Record<string, unknown> = {},
 ) {
   const shapeGroups = Object.values(groupBy(shapes, 'shape_id')).map(
     (shapeGroup) => sortBy(shapeGroup, 'shape_pt_sequence'),

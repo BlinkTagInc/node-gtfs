@@ -7,6 +7,7 @@ import type {
   QueryResult,
   SqlWhere,
   Stop,
+  SqlValue,
 } from '../../types/global_interfaces.ts';
 import { openDb } from '../db.ts';
 import {
@@ -20,12 +21,12 @@ import { stopsToGeoJSONFeatureCollection } from '../geojson-utils.ts';
 import { getAgencies } from './agencies.ts';
 import { getStopAttributes } from '../gtfs-plus/stop-attributes.ts';
 
-function buildTripSubquery(query: { [key: string]: string }) {
+function buildTripSubquery(query: { [key: string]: SqlValue }) {
   const whereClause = formatWhereClauses(query);
   return `SELECT trip_id FROM trips ${whereClause}`;
 }
 
-function buildStoptimeSubquery(query: { [key: string]: string }) {
+function buildStoptimeSubquery(query: { [key: string]: SqlValue }) {
   return `SELECT DISTINCT stop_id FROM stop_times WHERE trip_id IN (${buildTripSubquery(
     query,
   )})`;
@@ -63,24 +64,24 @@ export function getStops<Fields extends keyof Stop>(
     stopQueryOmitKeys.push('stop_lat', 'stop_lon');
   }
 
-  let stopQuery = omit(query, stopQueryOmitKeys);
+  const stopQuery = omit(query, stopQueryOmitKeys);
 
-  const tripQuery: {
-    route_id?: any;
-    trip_id?: any;
-    service_id?: any;
-    direction_id?: any;
-    shape_id?: any;
-  } = pick(query, [
+  const tripQuery = pick(query, [
     'route_id',
     'trip_id',
     'service_id',
     'direction_id',
     'shape_id',
-  ]);
+  ]) as {
+    route_id?: string;
+    trip_id?: string;
+    service_id?: string;
+    direction_id?: number;
+    shape_id?: string;
+  };
 
-  const whereClauses = Object.entries(stopQuery).map(
-    ([key, value]: [string, any]) => formatWhereClause(key, value),
+  const whereClauses = Object.entries(stopQuery).map(([key, value]) =>
+    formatWhereClause(key, value as SqlValue),
   );
 
   if (

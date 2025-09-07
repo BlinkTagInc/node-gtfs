@@ -1,12 +1,4 @@
-import {
-  describe,
-  it,
-  beforeAll,
-  afterAll,
-  beforeEach,
-  afterEach,
-  expect,
-} from './test-utils.ts';
+import { describe, it, beforeAll, afterAll, expect } from './test-utils.ts';
 import config from './test-config.ts';
 import {
   openDb,
@@ -112,7 +104,6 @@ describe('getServiceIdsByDate():', () => {
 
   it('should throw an error if date is not provided', () => {
     expect(() => {
-      // @ts-ignore
       getServiceIdsByDate();
     }).toThrow('`date` is a required query parameter');
   });
