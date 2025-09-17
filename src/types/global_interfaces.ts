@@ -224,53 +224,53 @@ export interface QueryOptions {
 }
 
 export interface Agency {
-  agency_id?: string;
+  agency_id: string | null;
   agency_name: string;
   agency_url: string;
   agency_timezone: string;
-  agency_lang?: string;
-  agency_phone?: string;
-  agency_fare_url?: string;
-  agency_email?: string;
+  agency_lang: string | null;
+  agency_phone: string | null;
+  agency_fare_url: string | null;
+  agency_email: string | null;
 }
 
 export interface Area {
   area_id: string;
-  area_name?: string;
+  area_name: string | null;
 }
 
 export interface Attribution {
-  attribution_id?: string;
-  agency_id?: string;
-  route_id?: string;
-  trip_id?: string;
+  attribution_id: string | null;
+  agency_id: string | null;
+  route_id: string | null;
+  trip_id: string | null;
   organization_name: string;
-  is_producer?: 0 | 1;
-  is_operator?: 0 | 1;
-  is_authority?: 0 | 1;
-  attribution_url?: string;
-  attribution_email?: string;
-  attribution_phone?: string;
+  is_producer: 0 | 1 | null;
+  is_operator: 0 | 1 | null;
+  is_authority: 0 | 1 | null;
+  attribution_url: string | null;
+  attribution_email: string | null;
+  attribution_phone: string | null;
 }
 
 export interface BookingRule {
   booking_rule_id: string;
   booking_type: 0 | 1 | 2;
-  prior_notice_duration_min?: number;
-  prior_notice_duration_max?: number;
-  prior_notice_last_day?: number;
-  prior_notice_last_time?: string;
-  prior_notice_last_timestamp?: UnixTimestamp;
-  prior_notice_start_day?: number;
-  prior_notice_start_time?: string;
-  prior_notice_start_timestamp?: UnixTimestamp;
-  prior_notice_service_id?: string;
-  message?: string;
-  pickup_message?: string;
-  drop_off_message?: string;
-  phone_number?: string;
-  info_url?: string;
-  booking_url?: string;
+  prior_notice_duration_min: number | null;
+  prior_notice_duration_max: number | null;
+  prior_notice_last_day: number | null;
+  prior_notice_last_time: string | null;
+  prior_notice_last_timestamp: UnixTimestamp | null;
+  prior_notice_start_day: number | null;
+  prior_notice_start_time: string | null;
+  prior_notice_start_timestamp: UnixTimestamp | null;
+  prior_notice_service_id: string | null;
+  message: string | null;
+  pickup_message: string | null;
+  drop_off_message: string | null;
+  phone_number: string | null;
+  info_url: string | null;
+  booking_url: string | null;
 }
 
 export interface Calendar {
@@ -290,7 +290,7 @@ export interface CalendarDate {
   service_id: string;
   date: number;
   exception_type: 1 | 2;
-  holiday_name?: string;
+  holiday_name: string | null;
 }
 
 export interface FareAttribute {
@@ -299,63 +299,63 @@ export interface FareAttribute {
   currency_type: string;
   payment_method: 0 | 1;
   transfers: 0 | 1 | 2;
-  agency_id?: string;
-  transfer_duration?: number;
+  agency_id: string | null;
+  transfer_duration: number | null;
 }
 
 export interface FareLegRule {
-  leg_group_id?: string;
-  network_id?: string;
-  from_area_id?: string;
-  to_area_id?: string;
-  from_timeframe_group_id?: string;
-  to_timeframe_group_id?: string;
+  leg_group_id: string | null;
+  network_id: string | null;
+  from_area_id: string | null;
+  to_area_id: string | null;
+  from_timeframe_group_id: string | null;
+  to_timeframe_group_id: string | null;
   fare_product_id: string;
-  rule_priority?: number;
+  rule_priority: number | null;
 }
 
 export interface FareMedia {
   fare_media_id: string;
-  fare_media_name?: string;
+  fare_media_name: string | null;
   fare_media_type: 0 | 1 | 2 | 3 | 4;
 }
 
 export interface FareProduct {
   fare_product_id: string;
-  fare_product_name?: string;
-  fare_media_id?: string;
+  fare_product_name: string | null;
+  fare_media_id: string | null;
   amount: number;
   currency: string;
 }
 
 export interface FareRule {
   fare_id: string;
-  route_id?: string;
-  origin_id?: string;
-  destination_id?: string;
-  contains_id?: string;
+  route_id: string | null;
+  origin_id: string | null;
+  destination_id: string | null;
+  contains_id: string | null;
 }
 
 export interface FareTransferRule {
-  from_leg_group_id?: string;
-  to_leg_group_id?: string;
-  transfer_count?: number;
+  from_leg_group_id: string | null;
+  to_leg_group_id: string | null;
+  transfer_count: number | null;
   duration_limit: number;
-  duration_limit_type?: 0 | 1 | 2 | 3;
+  duration_limit_type: 0 | 1 | 2 | 3 | null;
   fare_transfer_type: 0 | 1 | 2;
-  fare_product_id?: string;
+  fare_product_id: string | null;
 }
 
 export interface FeedInfo {
   feed_publisher_name: string;
   feed_publisher_url: string;
   feed_lang: string;
-  default_lang?: string;
-  feed_start_date?: number;
-  feed_end_date?: number;
-  feed_version?: string;
-  feed_contact_email?: string;
-  feed_contact_url?: string;
+  default_lang: string | null;
+  feed_start_date: number | null;
+  feed_end_date: number | null;
+  feed_version: string | null;
+  feed_contact_email: string | null;
+  feed_contact_url: string | null;
 }
 
 export interface Frequency {
@@ -365,13 +365,13 @@ export interface Frequency {
   end_time: string;
   end_timestamp: UnixTimestamp;
   headway_secs: number;
-  exact_times?: 0 | 1;
+  exact_times: 0 | 1 | null;
 }
 
 export interface Level {
   level_id: string;
   level_index: number;
-  level_name?: string;
+  level_name: string | null;
 }
 
 export interface LocationGroupStop {
@@ -381,7 +381,7 @@ export interface LocationGroupStop {
 
 export interface LocationGroup {
   location_group_id: string;
-  location_group_name?: string;
+  location_group_name: string | null;
 }
 
 export interface Location {
@@ -390,7 +390,7 @@ export interface Location {
 
 export interface Network {
   network_id: string;
-  network_name?: string;
+  network_name: string | null;
 }
 
 export interface Pathway {
@@ -399,13 +399,13 @@ export interface Pathway {
   to_stop_id: string;
   pathway_mode: 1 | 2 | 3 | 4 | 5 | 6 | 7;
   is_bidirectional: 0 | 1;
-  length?: number;
-  traversal_time?: number;
-  stair_count?: number;
-  max_slope?: number;
-  min_width?: number;
-  signposted_as?: string;
-  reversed_signposted_as?: string;
+  length: number | null;
+  traversal_time: number | null;
+  stair_count: number | null;
+  max_slope: number | null;
+  min_width: number | null;
+  signposted_as: string | null;
+  reversed_signposted_as: string | null;
 }
 
 export interface RouteNetwork {
@@ -415,18 +415,18 @@ export interface RouteNetwork {
 
 export interface Route {
   route_id: string;
-  agency_id?: string;
-  route_short_name?: string;
-  route_long_name?: string;
-  route_desc?: string;
+  agency_id: string | null;
+  route_short_name: string | null;
+  route_long_name: string | null;
+  route_desc: string | null;
   route_type: number;
-  route_url?: string;
-  route_color?: string;
-  route_text_color?: string;
-  route_sort_order?: number;
-  continuous_pickup?: 0 | 1 | 2 | 3;
-  continuous_drop_off?: 0 | 1 | 2 | 3;
-  network_id?: string;
+  route_url: string | null;
+  route_color: string | null;
+  route_text_color: string | null;
+  route_sort_order: number | null;
+  continuous_pickup: 0 | 1 | 2 | 3 | null;
+  continuous_drop_off: 0 | 1 | 2 | 3 | null;
+  network_id: string | null;
 }
 
 export interface Shape {
@@ -434,7 +434,7 @@ export interface Shape {
   shape_pt_lat: number;
   shape_pt_lon: number;
   shape_pt_sequence: number;
-  shape_dist_traveled?: number;
+  shape_dist_traveled: number | null;
 }
 
 export interface StopArea {
@@ -444,61 +444,61 @@ export interface StopArea {
 
 export interface StopTime {
   trip_id: string;
-  arrival_time?: string;
-  arrival_timestamp?: UnixTimestamp;
-  departure_time?: string;
-  departure_timestamp?: UnixTimestamp;
-  location_group_id?: string;
-  location_id?: string;
-  stop_id?: string;
+  arrival_time: string | null;
+  arrival_timestamp: UnixTimestamp | null;
+  departure_time: string | null;
+  departure_timestamp: UnixTimestamp | null;
+  location_group_id: string | null;
+  location_id: string | null;
+  stop_id: string | null;
   stop_sequence: number;
-  stop_headsign?: string;
-  start_pickup_drop_off_window?: string;
-  start_pickup_drop_off_window_timestamp?: UnixTimestamp;
-  pickup_type?: 0 | 1 | 2 | 3;
-  drop_off_type?: 0 | 1 | 2 | 3;
-  continuous_pickup?: 0 | 1 | 2 | 3;
-  continuous_drop_off?: 0 | 1 | 2 | 3;
-  shape_dist_traveled?: number;
-  timepoint?: 0 | 1;
-  pickup_booking_rule_id?: string;
-  drop_off_booking_rule_id?: string;
+  stop_headsign: string | null;
+  start_pickup_drop_off_window: string | null;
+  start_pickup_drop_off_window_timestamp: UnixTimestamp | null;
+  pickup_type: 0 | 1 | 2 | 3 | null;
+  drop_off_type: 0 | 1 | 2 | 3 | null;
+  continuous_pickup: 0 | 1 | 2 | 3 | null;
+  continuous_drop_off: 0 | 1 | 2 | 3 | null;
+  shape_dist_traveled: number | null;
+  timepoint: 0 | 1 | null;
+  pickup_booking_rule_id: string | null;
+  drop_off_booking_rule_id: string | null;
 }
 
 export interface Stop {
   stop_id: string;
-  stop_code?: string;
-  stop_name?: string;
-  tts_stop_name?: string;
-  stop_desc?: string;
-  stop_lat?: number;
-  stop_lon?: number;
-  zone_id?: string;
-  stop_url?: string;
-  location_type?: 0 | 1 | 2 | 3 | 4;
-  parent_station?: string;
-  stop_timezone?: string;
-  wheelchair_boarding?: 0 | 1 | 2;
-  level_id?: string;
-  platform_code?: string;
+  stop_code: string | null;
+  stop_name: string | null;
+  tts_stop_name: string | null;
+  stop_desc: string | null;
+  stop_lat: number | null;
+  stop_lon: number | null;
+  zone_id: string | null;
+  stop_url: string | null;
+  location_type: 0 | 1 | 2 | 3 | 4 | null;
+  parent_station: string | null;
+  stop_timezone: string | null;
+  wheelchair_boarding: 0 | 1 | 2 | null;
+  level_id: string | null;
+  platform_code: string | null;
 }
 
 export interface Timeframe {
   timeframe_group_id: string;
-  start_time?: string;
-  end_time?: string;
+  start_time: string | null;
+  end_time: string | null;
   service_id: string;
 }
 
 export interface Transfer {
-  from_stop_id?: string;
-  to_stop_id?: string;
-  from_route_id?: string;
-  to_route_id?: string;
-  from_trip_id?: string;
-  to_trip_id?: string;
+  from_stop_id: string | null;
+  to_stop_id: string | null;
+  from_route_id: string | null;
+  to_route_id: string | null;
+  from_trip_id: string | null;
+  to_trip_id: string | null;
   transfer_type: 0 | 1 | 2 | 3 | 4 | 5;
-  min_transfer_time?: number;
+  min_transfer_time: number | null;
 }
 
 export interface Translation {
@@ -506,31 +506,31 @@ export interface Translation {
   field_name: string;
   language: string;
   translation: string;
-  record_id?: string;
-  record_sub_id?: string;
-  field_value?: string;
+  record_id: string | null;
+  record_sub_id: string | null;
+  field_value: string | null;
 }
 
 export interface Trip {
   route_id: string;
   service_id: string;
   trip_id: string;
-  trip_headsign?: string;
-  trip_short_name?: string;
-  direction_id?: 0 | 1;
-  block_id?: string;
-  shape_id?: string;
-  wheelchair_accessible?: 0 | 1 | 2;
-  bikes_allowed?: 0 | 1 | 2;
-  cars_allowed?: 0 | 1 | 2;
+  trip_headsign: string | null;
+  trip_short_name: string | null;
+  direction_id: 0 | 1 | null;
+  block_id: string | null;
+  shape_id: string | null;
+  wheelchair_accessible: 0 | 1 | 2 | null;
+  bikes_allowed: 0 | 1 | 2 | null;
+  cars_allowed: 0 | 1 | 2 | null;
 }
 
 export interface Timetable {
   timetable_id: string;
   route_id: string;
-  direction_id?: 0 | 1;
-  start_date?: number;
-  end_date?: number;
+  direction_id: 0 | 1 | null;
+  start_date: number | null;
+  end_date: number | null;
   monday: 0 | 1;
   tuesday: 0 | 1;
   wednesday: 0 | 1;
@@ -538,24 +538,24 @@ export interface Timetable {
   friday: 0 | 1;
   saturday: 0 | 1;
   sunday: 0 | 1;
-  start_time?: string;
-  start_timestamp?: UnixTimestamp;
-  end_time?: string;
-  end_timestamp?: UnixTimestamp;
-  timetable_label?: string;
-  service_notes?: string;
-  orientation?: string;
-  timetable_page_id?: string;
-  timetable_sequence?: number;
-  direction_name?: string;
-  include_exceptions?: 0 | 1;
-  show_trip_continuation?: 0 | 1;
+  start_time: string | null;
+  start_timestamp: UnixTimestamp | null;
+  end_time: string | null;
+  end_timestamp: UnixTimestamp | null;
+  timetable_label: string | null;
+  service_notes: string | null;
+  orientation: string | null;
+  timetable_page_id: string | null;
+  timetable_sequence: number | null;
+  direction_name: string | null;
+  include_exceptions: 0 | 1 | null;
+  show_trip_continuation: 0 | 1 | null;
 }
 
 export interface TimetablePage {
   timetable_page_id: string;
-  timetable_page_label?: string;
-  filename?: string;
+  timetable_page_label: string | null;
+  filename: string | null;
 }
 
 export interface TimetableStopOrder {
@@ -566,18 +566,18 @@ export interface TimetableStopOrder {
 
 export interface TimetableNote {
   note_id: string;
-  symbol?: string;
+  symbol: string | null;
   note: string;
 }
 
 export interface TimetableNotesReference {
   note_id: string;
   timetable_id: string;
-  route_id?: string;
-  trip_id?: string;
-  stop_id?: string;
-  stop_sequence?: number;
-  show_on_stoptime?: 0 | 1;
+  route_id: string | null;
+  trip_id: string | null;
+  stop_id: string | null;
+  stop_sequence: number | null;
+  show_on_stoptime: 0 | 1 | null;
 }
 
 export interface TripsDatedVehicleJourney {
@@ -593,28 +593,28 @@ export interface DeadheadTime {
   arrival_timestamp: UnixTimestamp;
   departure_time: string;
   departure_timestamp: UnixTimestamp;
-  ops_location_id?: string;
-  stop_id?: string;
+  ops_location_id: string | null;
+  stop_id: string | null;
   location_sequence: number;
-  shape_dist_traveled?: number;
+  shape_dist_traveled: number | null;
 }
 
 export interface Deadhead {
   deadhead_id: string;
   service_id: string;
   block_id: string;
-  shape_id?: string;
-  to_trip_id?: string;
-  from_trip_id?: string;
-  to_deadhead_id?: string;
-  from_deadhead_id?: string;
+  shape_id: string | null;
+  to_trip_id: string | null;
+  from_trip_id: string | null;
+  to_deadhead_id: string | null;
+  from_deadhead_id: string | null;
 }
 
 export interface OpsLocation {
   ops_location_id: string;
-  ops_location_code?: string;
+  ops_location_code: string | null;
   ops_location_name: string;
-  ops_location_desc?: string;
+  ops_location_desc: string | null;
   ops_location_lat: number;
   ops_location_lon: number;
 }
@@ -623,13 +623,13 @@ export interface RunEvent {
   run_event_id: string;
   piece_id: string;
   event_type: number;
-  event_name?: string;
+  event_name: string | null;
   event_time: string;
   event_duration: number;
   event_from_location_type: 0 | 1;
-  event_from_location_id?: string;
+  event_from_location_id: string | null;
   event_to_location_type: 0 | 1;
-  event_to_location_id?: string;
+  event_to_location_id: string | null;
 }
 
 export interface RunPiece {
@@ -637,10 +637,10 @@ export interface RunPiece {
   piece_id: string;
   start_type: 0 | 1 | 2;
   start_trip_id: string;
-  start_trip_position?: number;
+  start_trip_position: number | null;
   end_type: 0 | 1 | 2;
   end_trip_id: string;
-  end_trip_position?: number;
+  end_trip_position: number | null;
 }
 
 export interface ServiceAlert {
@@ -654,54 +654,54 @@ export interface ServiceAlert {
 }
 
 export interface StopTimeUpdate {
-  trip_id?: string;
-  trip_start_time?: string;
-  direction_id?: 0 | 1;
-  route_id?: string;
-  stop_id?: string;
-  stop_sequence?: number;
-  arrival_delay?: number;
-  departure_delay?: number;
-  departure_timestamp?: UnixTimestamp;
-  arrival_timestamp?: UnixTimestamp;
-  schedule_relationship?: string;
+  trip_id: string | null;
+  trip_start_time: string | null;
+  direction_id: 0 | 1 | null;
+  route_id: string | null;
+  stop_id: string | null;
+  stop_sequence: number | null;
+  arrival_delay: number | null;
+  departure_delay: number | null;
+  departure_timestamp: UnixTimestamp | null;
+  arrival_timestamp: UnixTimestamp | null;
+  schedule_relationship: string | null;
   created_timestamp: UnixTimestamp;
   expiration_timestamp: UnixTimestamp;
 }
 
 export interface TripUpdate {
   update_id: string;
-  vehicle_id?: string;
-  trip_id?: string;
-  trip_start_time?: string;
-  direction_id?: 0 | 1;
-  route_id?: string;
-  start_date?: number;
-  timestamp?: UnixTimestamp;
-  schedule_relationship?: string;
+  vehicle_id: string | null;
+  trip_id: string | null;
+  trip_start_time: string | null;
+  direction_id: 0 | 1 | null;
+  route_id: string | null;
+  start_date: number | null;
+  timestamp: UnixTimestamp | null;
+  schedule_relationship: string | null;
   created_timestamp: UnixTimestamp;
   expiration_timestamp: UnixTimestamp;
 }
 
 export interface VehiclePosition {
   update_id: string;
-  bearing?: number;
-  latitude?: number;
-  longitude?: number;
-  speed?: number;
-  current_stop_sequence?: number;
-  trip_id?: string;
-  trip_start_date?: number;
-  trip_start_time?: string;
-  congestion_level?: string;
-  occupancy_status?: string;
-  occupancy_percentage?: number;
-  vehicle_stop_status?: string;
-  vehicle_id?: string;
-  vehicle_label?: string;
-  vehicle_license_plate?: string;
-  vehicle_wheelchair_accessible?: number;
-  timestamp?: UnixTimestamp;
+  bearing: number | null;
+  latitude: number | null;
+  longitude: number | null;
+  speed: number | null;
+  current_stop_sequence: number | null;
+  trip_id: string | null;
+  trip_start_date: number | null;
+  trip_start_time: string | null;
+  congestion_level: string | null;
+  occupancy_status: string | null;
+  occupancy_percentage: number | null;
+  vehicle_stop_status: string | null;
+  vehicle_id: string | null;
+  vehicle_label: string | null;
+  vehicle_license_plate: string | null;
+  vehicle_wheelchair_accessible: number | null;
+  timestamp: UnixTimestamp | null;
   created_timestamp: UnixTimestamp;
   expiration_timestamp: UnixTimestamp;
 }
@@ -711,97 +711,97 @@ export interface BoardAlight {
   stop_id: string;
   stop_sequence: number;
   record_use: 0 | 1;
-  schedule_relationship?: number;
-  boardings?: number;
-  alightings?: number;
-  current_load?: number;
-  load_count?: number;
-  load_type?: number;
-  rack_down?: number;
-  bike_boardings?: number;
-  bike_alightings?: number;
-  ramp_used?: number;
-  ramp_boardings?: number;
-  ramp_alightings?: number;
-  service_date?: number;
-  service_arrival_time?: string;
-  service_arrival_timestamp?: UnixTimestamp;
-  service_departure_time?: string;
-  service_departure_timestamp?: UnixTimestamp;
-  source?: 0 | 1 | 2 | 3 | 4;
+  schedule_relationship: number | null;
+  boardings: number | null;
+  alightings: number | null;
+  current_load: number | null;
+  load_count: number | null;
+  load_type: number | null;
+  rack_down: number | null;
+  bike_boardings: number | null;
+  bike_alightings: number | null;
+  ramp_used: number | null;
+  ramp_boardings: number | null;
+  ramp_alightings: number | null;
+  service_date: number | null;
+  service_arrival_time: string | null;
+  service_arrival_timestamp: UnixTimestamp | null;
+  service_departure_time: string | null;
+  service_departure_timestamp: UnixTimestamp | null;
+  source: 0 | 1 | 2 | 3 | 4 | null;
 }
 
 export interface RideFeedInfo {
   ride_files: number;
-  ride_start_date?: number;
-  ride_end_date?: number;
-  gtfs_feed_date?: number;
-  default_currency_type?: string;
-  ride_feed_version?: string;
+  ride_start_date: number | null;
+  ride_end_date: number | null;
+  gtfs_feed_date: number | null;
+  default_currency_type: string | null;
+  ride_feed_version: string | null;
 }
 
 export interface RiderCategory {
   rider_category_id: string;
   rider_category_name: string;
-  is_default_fare_category?: 0 | 1;
-  eligibility_url?: string;
+  is_default_fare_category: 0 | 1 | null;
+  eligibility_url: string | null;
 }
 
 export interface RiderTrip {
   rider_id: string;
-  agency_id?: string;
-  trip_id?: string;
-  boarding_stop_id?: string;
-  boarding_stop_sequence?: number;
-  alighting_stop_id?: string;
-  alighting_stop_sequence?: number;
-  service_date?: number;
-  boarding_time?: string;
-  boarding_timestamp?: UnixTimestamp;
-  alighting_time?: string;
-  alighting_timestamp?: UnixTimestamp;
-  rider_type?: number;
-  rider_type_description?: string;
-  fare_paid?: number;
-  transaction_type?: number;
-  fare_media?: number;
-  accompanying_device?: number;
-  transfer_status?: number;
+  agency_id: string | null;
+  trip_id: string | null;
+  boarding_stop_id: string | null;
+  boarding_stop_sequence: number | null;
+  alighting_stop_id: string | null;
+  alighting_stop_sequence: number | null;
+  service_date: number | null;
+  boarding_time: string | null;
+  boarding_timestamp: UnixTimestamp | null;
+  alighting_time: string | null;
+  alighting_timestamp: UnixTimestamp | null;
+  rider_type: number | null;
+  rider_type_description: string | null;
+  fare_paid: number | null;
+  transaction_type: number | null;
+  fare_media: number | null;
+  accompanying_device: number | null;
+  transfer_status: number | null;
 }
 
 export interface Ridership {
   total_boardings: number;
   total_alightings: number;
-  ridership_start_date?: number;
-  ridership_end_date?: number;
-  ridership_start_time?: string;
-  ridership_start_timestamp?: UnixTimestamp;
-  ridership_end_time?: string;
-  ridership_end_timestamp?: UnixTimestamp;
-  service_id?: string;
-  monday?: 0 | 1;
-  tuesday?: 0 | 1;
-  wednesday?: 0 | 1;
-  thursday?: 0 | 1;
-  friday?: 0 | 1;
-  saturday?: 0 | 1;
-  sunday?: 0 | 1;
-  agency_id?: string;
-  route_id?: string;
-  direction_id?: 0 | 1;
-  trip_id?: string;
-  stop_id?: string;
+  ridership_start_date: number | null;
+  ridership_end_date: number | null;
+  ridership_start_time: string | null;
+  ridership_start_timestamp: UnixTimestamp | null;
+  ridership_end_time: string | null;
+  ridership_end_timestamp: UnixTimestamp | null;
+  service_id: string | null;
+  monday: 0 | 1 | null;
+  tuesday: 0 | 1 | null;
+  wednesday: 0 | 1 | null;
+  thursday: 0 | 1 | null;
+  friday: 0 | 1 | null;
+  saturday: 0 | 1 | null;
+  sunday: 0 | 1 | null;
+  agency_id: string | null;
+  route_id: string | null;
+  direction_id: 0 | 1 | null;
+  trip_id: string | null;
+  stop_id: string | null;
 }
 
 export interface TripCapacity {
-  agency_id?: string;
-  trip_id?: string;
-  service_date?: number;
-  vehicle_description?: string;
-  seated_capacity?: number;
-  standing_capacity?: number;
-  wheelchair_capacity?: number;
-  bike_capacity?: number;
+  agency_id: string | null;
+  trip_id: string | null;
+  service_date: number | null;
+  vehicle_description: string | null;
+  seated_capacity: number | null;
+  standing_capacity: number | null;
+  wheelchair_capacity: number | null;
+  bike_capacity: number | null;
 }
 
 export interface CalendarAttribute {
@@ -811,7 +811,7 @@ export interface CalendarAttribute {
 
 export interface Direction {
   route_id: string;
-  direction_id?: 0 | 1;
+  direction_id: 0 | 1 | null;
   direction: string;
 }
 
@@ -824,8 +824,8 @@ export interface RouteAttribute {
 
 export interface StopAttribute {
   stop_id: string;
-  accessibility_id?: number;
-  cardinal_direction?: string;
-  relative_position?: string;
-  stop_city?: string;
+  accessibility_id: number | null;
+  cardinal_direction: string | null;
+  relative_position: string | null;
+  stop_city: string | null;
 }

@@ -100,12 +100,7 @@ export function getShapesAsGeoJSON(
         route_id: route.route_id,
         ...omit(query, 'route_id'),
       };
-      const shapes = getShapes(
-        shapeQuery,
-        ['shape_id', 'shape_pt_sequence', 'shape_pt_lon', 'shape_pt_lat'],
-        [],
-        options,
-      );
+      const shapes = getShapes(shapeQuery, [], [], options);
 
       if (shapes.length === 0) {
         return;

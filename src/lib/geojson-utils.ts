@@ -144,7 +144,7 @@ function formatProperties(
 /**
  * Converts GTFS shapes to GeoJSON Feature
  * @param {Shape[]} shapes - Array of GTFS shapes
- * @param {Record<string, any>} [properties={}] - Properties to add to the feature
+ * @param {Record<string, unknown>} [properties={}] - Properties to add to the feature
  * @returns {Feature} GeoJSON Feature with MultiLineString geometry
  */
 export function shapesToGeoJSONFeature(
