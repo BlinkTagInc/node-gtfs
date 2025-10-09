@@ -158,7 +158,7 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 | [`gtfsRealtimeExpirationSeconds`](#gtfsrealtimeexpirationseconds) | integer           | Amount of time in seconds to allow GTFS-Realtime data to be stored in database before allowing to be deleted. Optional, defaults to 0.                              |
 | [`ignoreDuplicates`](#ignoreduplicates)                           | boolean           | Whether or not to ignore unique constraints on ids when importing GTFS, such as `trip_id`, `calendar_id`. Optional, defaults to false.                              |
 | [`ignoreErrors`](#ignoreerrors)                                   | boolean           | Whether or not to ignore errors during the import process. If true, failed files will be skipped while the rest are processed. Optional, defaults to false. |
-| [`sqlitePath`](#sqlitepath)                                       | string            | A path to an SQLite database. Optional, defaults to using an in-memory database.                                                                                    |
+| [`sqlitePath`](#sqlitepath)                                       | string            | A path to a SQLite database. Optional, defaults to using an in-memory database.                                                                                    |
 | [`verbose`](#verbose)                                             | boolean           | Whether or not to print output to the console. Optional, defaults to true.                                                                                          |
 
 ### agencies
@@ -467,10 +467,10 @@ importGtfs({
 
 ### sqlitePath
 
-{String} A path to an SQLite database. Optional, defaults to using an in-memory database with a value of `:memory:`.
+{String} A path to a SQLite database. Optional, defaults to using an in-memory database with a value of `:memory:`.
 
 ```json
-    "sqlitePath": "/dev/sqlite/gtfs"
+    "sqlitePath": "/tmp/gtfs.sqlite"
 ```
 
 ### verbose
@@ -543,7 +543,7 @@ Configuration can be a JSON object in your code
 import { importGtfs } from 'gtfs';
 
 const config = {
-  sqlitePath: '/dev/sqlite/gtfs',
+  sqlitePath: '/tmp/gtfs.sqlite',
   agencies: [
     {
       url: 'https://www.bart.gov/dev/schedules/google_transit.zip',
@@ -623,7 +623,7 @@ Use `exportGtfs()` in your code to run an export of a GTFS file specified in a c
 import { exportGtfs } from 'gtfs';
 
 const config = {
-  sqlitePath: '/dev/sqlite/gtfs',
+  sqlitePath: '/tmp/gtfs.sqlite',
   agencies: [
     {
       url: 'https://www.bart.gov/dev/schedules/google_transit.zip',

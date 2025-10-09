@@ -15,6 +15,6 @@
   "downloadTimeout": 5000,
   "ignoreDuplicates": false,
   "ignoreErrors": false,
-  "sqlitePath": "/tmp/gtfs",
+  "sqlitePath": "/tmp/gtfs.sqlite",
   "exportPath": "~/path/to/export/gtfs"
 }
