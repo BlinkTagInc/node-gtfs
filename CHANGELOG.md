@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Updated
 - Update types - use null instead of undefined
+- Dependency Updates
 
 ## [4.18.0] - 2025-09-06
 
