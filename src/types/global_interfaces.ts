@@ -232,6 +232,7 @@ export interface Agency {
   agency_phone: string | null;
   agency_fare_url: string | null;
   agency_email: string | null;
+  cemv_support: 0 | 1 | 2 | null;
 }
 
 export interface Area {
@@ -427,6 +428,7 @@ export interface Route {
   continuous_pickup: 0 | 1 | 2 | 3 | null;
   continuous_drop_off: 0 | 1 | 2 | 3 | null;
   network_id: string | null;
+  cemv_support: 0 | 1 | 2 | null;
 }
 
 export interface Shape {
@@ -481,6 +483,7 @@ export interface Stop {
   wheelchair_boarding: 0 | 1 | 2 | null;
   level_id: string | null;
   platform_code: string | null;
+  stop_access: 0 | 1 | null;
 }
 
 export interface Timeframe {

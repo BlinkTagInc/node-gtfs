@@ -73,5 +73,11 @@ export const routes = {
       type: 'text',
       prefix: true,
     },
+    {
+      name: 'cemv_support',
+      type: 'integer',
+      min: 0,
+      max: 2,
+    },
   ],
 };

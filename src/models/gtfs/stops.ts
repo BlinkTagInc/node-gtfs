@@ -80,5 +80,11 @@ export const stops = {
       name: 'platform_code',
       type: 'text',
     },
+    {
+      name: 'stop_access',
+      type: 'integer',
+      min: 0,
+      max: 1,
+    },
   ],
 };

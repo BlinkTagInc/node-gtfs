@@ -34,6 +34,7 @@ describe('getAgencies():', () => {
       agency_phone: '800-660-4287',
       agency_fare_url: null,
       agency_email: null,
+      cemv_support: null,
     };
 
     expect(results).toHaveLength(1);
@@ -58,6 +59,7 @@ describe('getAgencies():', () => {
       agency_phone: '800-660-4287',
       agency_fare_url: null,
       agency_email: null,
+      cemv_support: null,
     };
 
     expect(results).toHaveLength(1);

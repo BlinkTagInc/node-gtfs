@@ -41,6 +41,7 @@ describe('getRoutes():', () => {
         continuous_pickup: null,
         continuous_drop_off: null,
         network_id: null,
+        cemv_support: null,
       },
       {
         route_id: 'Li-16APR',
@@ -56,6 +57,7 @@ describe('getRoutes():', () => {
         continuous_pickup: null,
         continuous_drop_off: null,
         network_id: null,
+        cemv_support: null,
       },
       {
         route_id: 'Lo-16APR',
@@ -71,6 +73,7 @@ describe('getRoutes():', () => {
         continuous_pickup: null,
         continuous_drop_off: null,
         network_id: null,
+        cemv_support: null,
       },
       {
         route_id: 'TaSj-16APR',
@@ -86,6 +89,7 @@ describe('getRoutes():', () => {
         continuous_pickup: null,
         continuous_drop_off: null,
         network_id: null,
+        cemv_support: null,
       },
     ];
 
@@ -115,6 +119,7 @@ describe('getRoutes():', () => {
         continuous_pickup: null,
         continuous_drop_off: null,
         network_id: null,
+        cemv_support: null,
       },
     ];
 

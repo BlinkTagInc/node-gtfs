@@ -43,5 +43,11 @@ export const agency = {
       type: 'text',
       nocase: true,
     },
+    {
+      name: 'cemv_support',
+      type: 'integer',
+      min: 0,
+      max: 2,
+    },
   ],
 };

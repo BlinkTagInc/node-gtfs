@@ -42,6 +42,7 @@ describe('getStops():', () => {
       wheelchair_boarding: 1,
       level_id: null,
       platform_code: null,
+      stop_access: null,
     };
 
     expect(results).toHaveLength(95);
@@ -72,6 +73,7 @@ describe('getStops():', () => {
         wheelchair_boarding: 1,
         level_id: null,
         platform_code: 'NB',
+        stop_access: null,
       },
     ];
 
@@ -278,6 +280,7 @@ describe('getStops():', () => {
         wheelchair_boarding: 1,
         level_id: null,
         platform_code: 'NB',
+        stop_access: null,
       },
       {
         stop_id: 'ctba',
@@ -295,6 +298,7 @@ describe('getStops():', () => {
         wheelchair_boarding: 1,
         level_id: null,
         platform_code: null,
+        stop_access: null,
       },
       {
         stop_id: '70032',
@@ -312,6 +316,7 @@ describe('getStops():', () => {
         wheelchair_boarding: 1,
         level_id: null,
         platform_code: 'SB',
+        stop_access: null,
       },
     ];
 
