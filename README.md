@@ -91,7 +91,7 @@ try {
     <td><a href="https://github.com/blinktaginc/gtfs-to-geojson">GTFS-to-geojson</a> creates geoJSON files for transit routes for use in mapping. It uses `node-gtfs` for downloading, importing and querying GTFS data. It provides a good example of how to use this library.</td>
   </tr>
   <tr>
-    <td><img src="https://github.com/BlinkTagInc/gtfs-to-chart/raw/master/docs/images/gtfs-to-chart-logo.svg" alt="GTFS-to-Chart" width="200"></td>
+    <td><img src="https://github.com/BlinkTagInc/gtfs-to-chart/raw/main/docs/images/gtfs-to-chart-logo.svg" alt="GTFS-to-Chart" width="200"></td>
     <td><a href="https://github.com/blinktaginc/gtfs-to-chart">GTFS-to-chart</a> generates a stringline chart in D3 for all trips for a specific route using data from an agency's GTFS. It uses `node-gtfs` for downloading, importing and querying GTFS data.</td>
   </tr>
   <tr>
@@ -105,6 +105,10 @@ try {
   <tr>
     <td><img src="https://raw.githubusercontent.com/BlinkTagInc/transit-departures-widget/main/docs/images/transit-departures-widget-logo.svg" alt="Transit Departures Widget" width="200"></td>
     <td><a href="https://github.com/BlinkTagInc/transit-departures-widget">Transit Departures Widget</a> creates a realtime transit departures widget from GTFS and GTFS-Realtime data.</td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/BlinkTagInc/gtfs-to-blocks/blob/main/docs/images/gtfs-to-blocks-logo.svg" alt="GTFS-to-Blocks" width="200"></td>
+    <td><a href="https://github.com/BlinkTagInc/gtfs-to-blocks">GTFS-to-Blocks</a> reads transit data from GTFS and exports all trip segments sorted by block_id and their departure times in CSV format.</td>
   </tr>
 </table>
 
