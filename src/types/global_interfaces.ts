@@ -647,11 +647,17 @@ export interface RunPiece {
 }
 
 export interface ServiceAlert {
-  cause: number;
+  id: string;
+  cause: string | null;
+  effect: string | null;
+  url: string | null;
   start_time: string;
   end_time: string;
-  headline: string;
-  description: string;
+  header_text: string;
+  description_text: string;
+  tts_header_text: string | null;
+  tts_description_text: string | null;
+  severity_level: string | null;
   created_timestamp: UnixTimestamp;
   expiration_timestamp: UnixTimestamp;
 }
@@ -673,7 +679,7 @@ export interface StopTimeUpdate {
 }
 
 export interface TripUpdate {
-  update_id: string;
+  id: string;
   vehicle_id: string | null;
   trip_id: string | null;
   trip_start_time: string | null;
@@ -687,7 +693,7 @@ export interface TripUpdate {
 }
 
 export interface VehiclePosition {
-  update_id: string;
+  id: string;
   bearing: number | null;
   latitude: number | null;
   longitude: number | null;
