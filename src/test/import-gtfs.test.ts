@@ -28,7 +28,7 @@ import type { Model } from '../../dist/types/global_interfaces.js';
 
 const agenciesFixturesRemote = [
   {
-    url: 'http://transitfeeds.com/p/caltrain/122/20160406/download',
+    url: 'https://openmobilitydata-data.s3.us-west-1.amazonaws.com/public/feeds/caltrain/122/20160406/gtfs.zip',
   },
 ];
 
