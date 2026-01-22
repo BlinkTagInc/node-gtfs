@@ -100,12 +100,12 @@
     }
   },
   "dependencies": {
-    "@turf/helpers": "7.3.1",
-    "better-sqlite3": "12.5.0",
+    "@turf/helpers": "7.3.2",
+    "better-sqlite3": "12.6.2",
     "csv-parse": "6.1.0",
     "csv-stringify": "6.6.0",
     "gtfs-realtime-bindings": "1.1.1",
-    "lodash-es": "4.17.21",
+    "lodash-es": "4.17.23",
     "long": "5.3.2",
     "node-stream-zip": "1.15.0",
     "pretty-error": "4.0.0",
@@ -113,29 +113,29 @@
     "sanitize-filename": "1.6.3",
     "sqlstring-sqlite": "0.1.1",
     "strip-bom-stream": "5.0.0",
-    "tempy": "3.1.0",
+    "tempy": "3.1.1",
     "yargs": "18.0.0",
     "yoctocolors": "2.1.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.3.3",
-    "@eslint/js": "9.39.1",
+    "@eslint/js": "9.39.2",
     "@types/better-sqlite3": "7.6.13",
     "@types/geojson": "7946.0.16",
     "@types/lodash-es": "4.17.12",
-    "@types/node": "24",
+    "@types/node": "25",
     "@types/yargs": "17.0.35",
-    "eslint": "9.39.1",
-    "globals": "16.5.0",
+    "eslint": "9.39.2",
+    "globals": "17.0.0",
     "husky": "9.1.7",
     "lint-staged": "16.2.7",
-    "prettier": "3.7.4",
+    "prettier": "3.8.1",
     "tsup": "8.5.1",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.48.1"
+    "typescript-eslint": "8.53.1"
   },
   "engines": {
-    "node": ">= 20.11.0"
+    "node": ">= 22"
   },
   "release-it": {
     "github": {
