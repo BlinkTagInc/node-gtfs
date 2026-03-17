@@ -18,6 +18,16 @@ export {
   generateFolderName,
   untildify,
 } from './lib/file-utils.ts';
+export {
+  GtfsError,
+  GtfsErrorCategory,
+  GtfsErrorCode,
+  GtfsWarningCode,
+  isGtfsError,
+  isGtfsValidationError,
+  formatGtfsError,
+} from './lib/errors.ts';
+export type { GtfsWarning, ImportReport } from './lib/errors.ts';
 
 // Standard GTFS
 export { getAgencies } from './lib/gtfs/agencies.ts';

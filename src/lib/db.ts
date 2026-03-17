@@ -3,6 +3,7 @@ import fs from 'fs';
 import Database from 'better-sqlite3';
 
 import { untildify } from './file-utils.ts';
+import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from './errors.ts';
 
 const dbs: { [key: string]: Database.Database } = {};
 
@@ -49,25 +50,42 @@ export function openDb(
   }
 
   if (Object.keys(dbs).length > 1) {
-    throw new Error(
+    throw new GtfsError(
       'Multiple databases open, please specify which one to use.',
+      {
+        code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
+        category: GtfsErrorCategory.DATABASE,
+        details: { openDatabaseCount: Object.keys(dbs).length },
+      },
     );
   }
 
-  throw new Error('Unable to find database connection.');
+  throw new GtfsError('Unable to find database connection.', {
+    code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
+    category: GtfsErrorCategory.DATABASE,
+  });
 }
 
 export function closeDb(db: Database.Database | null = null): void {
   if (Object.keys(dbs).length === 0) {
-    throw new Error(
+    throw new GtfsError(
       'No database connection. Call `openDb(config)` before using any methods.',
+      {
+        code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
+        category: GtfsErrorCategory.DATABASE,
+      },
     );
   }
 
   if (!db) {
     if (Object.keys(dbs).length > 1) {
-      throw new Error(
+      throw new GtfsError(
         'Multiple database connections. Pass the db you want to close as a parameter to `closeDb`.',
+        {
+          code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
+          category: GtfsErrorCategory.DATABASE,
+          details: { openDatabaseCount: Object.keys(dbs).length },
+        },
       );
     }
 
@@ -80,15 +98,24 @@ export function closeDb(db: Database.Database | null = null): void {
 
 export function deleteDb(db: Database.Database | null = null): void {
   if (Object.keys(dbs).length === 0) {
-    throw new Error(
+    throw new GtfsError(
       'No database connection. Call `openDb(config)` before using any methods.',
+      {
+        code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
+        category: GtfsErrorCategory.DATABASE,
+      },
     );
   }
 
   if (!db) {
     if (Object.keys(dbs).length > 1) {
-      throw new Error(
+      throw new GtfsError(
         'Multiple database connections. Pass the db you want to delete as a parameter to `deleteDb`.',
+        {
+          code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
+          category: GtfsErrorCategory.DATABASE,
+          details: { openDatabaseCount: Object.keys(dbs).length },
+        },
       );
     }
 

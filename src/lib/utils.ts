@@ -7,6 +7,7 @@ import {
   SqlValue,
   SqlOrderBy,
 } from '../types/global_interfaces.ts';
+import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from './errors.ts';
 
 /**
  * Validates the configuration object for GTFS import
@@ -16,13 +17,22 @@ import {
  */
 export function validateConfigForImport(config: Config) {
   if (!config.agencies || config.agencies.length === 0) {
-    throw new Error('No `agencies` specified in config');
+    throw new GtfsError('No `agencies` specified in config', {
+      code: GtfsErrorCode.GTFS_CONFIG_INVALID,
+      category: GtfsErrorCategory.CONFIG,
+      details: { field: 'agencies' },
+    });
   }
 
   for (const [index, agency] of config.agencies.entries()) {
     if (!agency.path && !agency.url) {
-      throw new Error(
+      throw new GtfsError(
         `No Agency \`url\` or \`path\` specified in config for agency index ${index}.`,
+        {
+          code: GtfsErrorCode.GTFS_CONFIG_INVALID,
+          category: GtfsErrorCategory.CONFIG,
+          details: { agencyIndex: index },
+        },
       );
     }
   }
@@ -181,7 +191,11 @@ export function formatWhereClauseBoundingBox(
     lon < -180 ||
     lon > 180
   ) {
-    throw new Error('Invalid latitude or longitude values');
+    throw new GtfsError('Invalid latitude or longitude values', {
+      code: GtfsErrorCode.GTFS_QUERY_INVALID,
+      category: GtfsErrorCategory.QUERY,
+      details: { latitudeDegree, longitudeDegree, boundingBoxSideMeters },
+    });
   }
 
   const latitudeRadian = degree2radian(lat);
@@ -282,7 +296,11 @@ export function getDayOfWeekFromDate(date: number): string {
   ] as const;
 
   if (!Number.isInteger(date) || date.toString().length !== 8) {
-    throw new Error('Date must be in YYYYMMDD format');
+    throw new GtfsError('Date must be in YYYYMMDD format', {
+      code: GtfsErrorCode.GTFS_INVALID_DATE,
+      category: GtfsErrorCategory.VALIDATION,
+      details: { value: date },
+    });
   }
 
   const year = Math.floor(date / 10000);
@@ -292,7 +310,11 @@ export function getDayOfWeekFromDate(date: number): string {
   const dateObj = new Date(year, month - 1, day);
 
   if (dateObj.toString() === 'Invalid Date') {
-    throw new Error('Invalid date');
+    throw new GtfsError('Invalid date', {
+      code: GtfsErrorCode.GTFS_INVALID_DATE,
+      category: GtfsErrorCategory.VALIDATION,
+      details: { value: date },
+    });
   }
 
   return DAYS_OF_WEEK[dateObj.getDay()];

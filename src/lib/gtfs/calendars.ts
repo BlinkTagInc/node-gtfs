@@ -12,6 +12,7 @@ import {
   formatWhereClauses,
   getDayOfWeekFromDate,
 } from '../utils.ts';
+import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from '../errors.ts';
 
 /*
  * Returns an array of calendars that match the query parameters.
@@ -42,7 +43,11 @@ export function getServiceIdsByDate(date: number, options: QueryOptions = {}) {
   const db = options.db ?? openDb();
 
   if (!date) {
-    throw new Error('`date` is a required query parameter');
+    throw new GtfsError('`date` is a required query parameter', {
+      code: GtfsErrorCode.GTFS_QUERY_INVALID,
+      category: GtfsErrorCategory.QUERY,
+      details: { field: 'date' },
+    });
   }
 
   const dayOfWeek = getDayOfWeekFromDate(date as number);

@@ -15,6 +15,7 @@ import {
   formatSelectClause,
   formatWhereClause,
 } from '../utils.ts';
+import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from '../errors.ts';
 import { getServiceIdsByDate } from './calendars.ts';
 
 /*
@@ -41,7 +42,11 @@ export function getStoptimes<Fields extends keyof StopTime>(
 
   if (query.date) {
     if (typeof query.date !== 'number') {
-      throw new Error('`date` must be a number in yyyymmdd format');
+      throw new GtfsError('`date` must be a number in yyyymmdd format', {
+        code: GtfsErrorCode.GTFS_QUERY_INVALID,
+        category: GtfsErrorCategory.QUERY,
+        details: { field: 'date', value: query.date },
+      });
     }
 
     const serviceIds = getServiceIdsByDate(query.date, options);
@@ -53,7 +58,11 @@ export function getStoptimes<Fields extends keyof StopTime>(
 
   if (query.start_time) {
     if (typeof query.start_time !== 'string') {
-      throw new Error('`start_time` must be a string in HH:mm:ss format');
+      throw new GtfsError('`start_time` must be a string in HH:mm:ss format', {
+        code: GtfsErrorCode.GTFS_QUERY_INVALID,
+        category: GtfsErrorCategory.QUERY,
+        details: { field: 'start_time', value: query.start_time },
+      });
     }
 
     whereClauses.push(
@@ -63,7 +72,11 @@ export function getStoptimes<Fields extends keyof StopTime>(
 
   if (query.end_time) {
     if (typeof query.end_time !== 'string') {
-      throw new Error('`end_time` must be a string in HH:mm:ss format');
+      throw new GtfsError('`end_time` must be a string in HH:mm:ss format', {
+        code: GtfsErrorCode.GTFS_QUERY_INVALID,
+        category: GtfsErrorCategory.QUERY,
+        details: { field: 'end_time', value: query.end_time },
+      });
     }
 
     whereClauses.push(

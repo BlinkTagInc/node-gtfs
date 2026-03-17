@@ -14,6 +14,7 @@ import {
   formatSelectClause,
   formatWhereClause,
 } from '../utils.ts';
+import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from '../errors.ts';
 import { getServiceIdsByDate } from './calendars.ts';
 
 /*
@@ -41,7 +42,11 @@ export function getTrips<Fields extends keyof Trip>(
 
   if (query.date) {
     if (typeof query.date !== 'number') {
-      throw new Error('`date` must be a number in yyyymmdd format');
+      throw new GtfsError('`date` must be a number in yyyymmdd format', {
+        code: GtfsErrorCode.GTFS_QUERY_INVALID,
+        category: GtfsErrorCategory.QUERY,
+        details: { field: 'date', value: query.date },
+      });
     }
 
     const serviceIds = getServiceIdsByDate(query.date, options);

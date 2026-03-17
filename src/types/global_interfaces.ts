@@ -153,6 +153,13 @@ export interface Config {
    */
   ignoreErrors?: boolean;
   /**
+   * Whether or not to return a structured import report from `importGtfs`.
+   * Useful when `ignoreErrors` is enabled and you want to inspect collected errors/warnings.
+   *
+   * @defaultValue false
+   */
+  includeImportReport?: boolean;
+  /**
    * An array of GTFS files to be imported, and which files to exclude.
    */
   agencies: ConfigAgency[];

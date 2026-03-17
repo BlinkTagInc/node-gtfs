@@ -22,6 +22,8 @@ import {
   getStops,
   prepDirectory,
   unzip,
+  isGtfsError,
+  GtfsErrorCode,
 } from '../../dist/index.js';
 import * as models from '../../dist/models/models.js';
 import type { Model } from '../../dist/types/global_interfaces.js';
@@ -58,6 +60,8 @@ describe('importGtfs():', function () {
     });
 
     it('should be able to download and import from HTTP with a downloadTimeout', async () => {
+      let didThrow = false;
+
       try {
         await importGtfs({
           ...config,
@@ -65,8 +69,14 @@ describe('importGtfs():', function () {
           downloadTimeout: 1,
         });
       } catch (error: unknown) {
-        expect((error as Error).name).toEqual('TimeoutError');
+        didThrow = true;
+        expect(isGtfsError(error)).toBeTruthy();
+        expect((error as { code?: unknown }).code).toEqual(
+          GtfsErrorCode.GTFS_DOWNLOAD_FAILED,
+        );
       }
+
+      expect(didThrow).toBeTruthy();
     });
 
     it('should be able to download and import from local filesystem', async () => {

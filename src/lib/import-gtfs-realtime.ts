@@ -13,6 +13,15 @@ import {
   setDefaultConfig,
   validateConfigForImport,
 } from './utils.ts';
+import {
+  addImportError,
+  formatGtfsError,
+  GtfsError,
+  GtfsErrorCategory,
+  GtfsErrorCode,
+  ImportReport,
+  toGtfsError,
+} from './errors.ts';
 
 import {
   Config,
@@ -39,6 +48,7 @@ interface GtfsRealtimeTask {
   log: (message: string, newLine?: boolean) => void;
   logWarning: (message: string) => void;
   logError: (message: string) => void;
+  report?: ImportReport;
 }
 
 interface ProcessedEntity {
@@ -168,7 +178,16 @@ async function fetchGtfsRealtimeData(
       });
 
       if (response.status !== 200) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        throw new GtfsError(`HTTP ${response.status}: ${response.statusText}`, {
+          code: GtfsErrorCode.GTFS_DOWNLOAD_HTTP,
+          category: GtfsErrorCategory.DOWNLOAD,
+          statusCode: response.status,
+          details: {
+            url: urlConfig.url,
+            status: response.status,
+            statusText: response.statusText,
+          },
+        });
       }
 
       const buffer = await response.arrayBuffer();
@@ -189,19 +208,28 @@ async function fetchGtfsRealtimeData(
 
       return feedMessage;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const gtfsError = toGtfsError(error, {
+        message: error instanceof Error ? error.message : String(error),
+        code: GtfsErrorCode.GTFS_DOWNLOAD_FAILED,
+        category: GtfsErrorCategory.DOWNLOAD,
+        details: { type, url: urlConfig.url },
+      });
       if (attempt === MAX_RETRIES) {
         if (task.ignoreErrors) {
           task.logError(
-            `Failed to fetch ${type} after ${MAX_RETRIES} attempts: ${errorMessage}`,
+            `Failed to fetch ${type} after ${MAX_RETRIES} attempts: ${gtfsError.message}`,
           );
+          if (task.report) {
+            addImportError(task.report, gtfsError);
+          }
           return null;
         }
-        throw error;
+        throw gtfsError;
       }
 
-      task.logWarning(`Attempt ${attempt} failed for ${type}: ${errorMessage}`);
+      task.logWarning(
+        `Attempt ${attempt} failed for ${type}: ${gtfsError.message}`,
+      );
       await new Promise((resolve) =>
         setTimeout(resolve, RETRY_DELAY * attempt),
       );
@@ -507,8 +535,9 @@ export async function updateGtfsRealtime(initialConfig: Config): Promise<void> {
     removeExpiredRealtimeData(config);
 
     await mapSeries(config.agencies, async (agency: ConfigAgency) => {
+      let task: GtfsRealtimeTask | undefined;
       try {
-        const task: GtfsRealtimeTask = {
+        task = {
           realtimeAlerts: agency.realtimeAlerts,
           realtimeTripUpdates: agency.realtimeTripUpdates,
           realtimeVehiclePositions: agency.realtimeVehiclePositions,
@@ -525,12 +554,19 @@ export async function updateGtfsRealtime(initialConfig: Config): Promise<void> {
 
         await updateGtfsRealtimeData(task);
       } catch (error: unknown) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
+        const gtfsError = toGtfsError(error, {
+          message: error instanceof Error ? error.message : String(error),
+          code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
+          category: GtfsErrorCategory.DATABASE,
+          details: { sqlitePath: task?.sqlitePath ?? config.sqlitePath },
+        });
         if (config.ignoreErrors) {
-          logError(config)(errorMessage);
+          logError(config)(formatGtfsError(gtfsError));
+          if (task?.report) {
+            addImportError(task.report, gtfsError);
+          }
         } else {
-          throw error;
+          throw gtfsError;
         }
       }
     });
@@ -544,10 +580,25 @@ export async function updateGtfsRealtime(initialConfig: Config): Promise<void> {
     );
   } catch (error: unknown) {
     if ((error as Error & { code?: string }).code === 'SQLITE_CANTOPEN') {
-      logError(config)(
+      const dbOpenError = new GtfsError(
         `Unable to open sqlite database "${config.sqlitePath}" defined as \`sqlitePath\` config.json. Ensure the parent directory exists or remove \`sqlitePath\` from config.json.`,
+        {
+          code: GtfsErrorCode.DB_OPEN_FAILED,
+          category: GtfsErrorCategory.DATABASE,
+          details: {
+            sqlitePath: config.sqlitePath,
+            dbCode: (error as Error & { code?: string }).code,
+          },
+          cause: error,
+        },
       );
+      logError(config)(dbOpenError.message);
+      throw dbOpenError;
     }
-    throw error;
+    throw toGtfsError(error, {
+      message: error instanceof Error ? error.message : String(error),
+      code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
+      category: GtfsErrorCategory.DATABASE,
+    });
   }
 }

@@ -21,6 +21,18 @@ import {
   setDefaultConfig,
   validateConfigForImport,
 } from './utils.ts';
+import {
+  addImportError,
+  addImportWarning,
+  createImportReport,
+  formatGtfsError,
+  GtfsError,
+  GtfsErrorCategory,
+  GtfsErrorCode,
+  GtfsWarningCode,
+  ImportReport,
+  toGtfsError,
+} from './errors.ts';
 
 import {
   Config,
@@ -59,6 +71,13 @@ interface GtfsImportTask {
   log: (message: string, newLine?: boolean) => void;
   logWarning: (message: string) => void;
   logError: (message: string) => void;
+  report?: ImportReport;
+}
+
+function reportTaskError(task: GtfsImportTask, error: GtfsError): void {
+  if (task.report) {
+    addImportError(task.report, error);
+  }
 }
 
 const getTextFiles = async (folderPath: string): Promise<string[]> => {
@@ -68,36 +87,61 @@ const getTextFiles = async (folderPath: string): Promise<string[]> => {
 
 const downloadGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
   if (!task.url) {
-    throw new Error('No `url` specified in config');
+    throw new GtfsError('No `url` specified in config', {
+      code: GtfsErrorCode.GTFS_CONFIG_INVALID,
+      category: GtfsErrorCategory.CONFIG,
+    });
   }
 
   task.log(`Downloading GTFS from ${task.url}`);
 
   task.path = `${task.downloadDir}/gtfs.zip`;
 
-  const response = await fetch(task.url, {
-    method: 'GET',
-    headers: task.headers || {},
-    signal: task.downloadTimeout
-      ? AbortSignal.timeout(task.downloadTimeout)
-      : undefined,
-  });
+  try {
+    const response = await fetch(task.url, {
+      method: 'GET',
+      headers: task.headers || {},
+      signal: task.downloadTimeout
+        ? AbortSignal.timeout(task.downloadTimeout)
+        : undefined,
+    });
 
-  if (response.status !== 200) {
-    throw new Error(
-      `Unable to download GTFS from ${task.url}. Got status ${response.status}.`,
-    );
+    if (response.status !== 200) {
+      throw new GtfsError(
+        `Unable to download GTFS from ${task.url}. Got status ${response.status}.`,
+        {
+          code: GtfsErrorCode.GTFS_DOWNLOAD_HTTP,
+          category: GtfsErrorCategory.DOWNLOAD,
+          statusCode: response.status,
+          details: {
+            url: task.url,
+            status: response.status,
+            statusText: response.statusText,
+          },
+        },
+      );
+    }
+
+    const buffer = await response.arrayBuffer();
+    await writeFile(task.path, Buffer.from(buffer));
+    task.log('Download successful');
+  } catch (error: unknown) {
+    throw toGtfsError(error, {
+      message: `Unable to download GTFS from ${task.url}.`,
+      code: GtfsErrorCode.GTFS_DOWNLOAD_FAILED,
+      category: GtfsErrorCategory.DOWNLOAD,
+      details: { url: task.url },
+    });
   }
-
-  const buffer = await response.arrayBuffer();
-
-  await writeFile(task.path, Buffer.from(buffer));
-  task.log('Download successful');
 };
 
 const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
   if (!task.path) {
-    throw new Error('No `path` specified in config');
+    throw new GtfsError('No `path` specified in config', {
+      code: GtfsErrorCode.GTFS_CONFIG_INVALID,
+      category: GtfsErrorCategory.CONFIG,
+      details: { field: 'path' },
+    });
   }
 
   const gtfsPath = untildify(task.path);
@@ -117,12 +161,22 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
           .filter((source) => lstatSync(source).isDirectory());
 
         if (folders.length > 1) {
-          throw new Error(
+          throw new GtfsError(
             `More than one subfolder found in zip file at \`${task.path}\`. Ensure that .txt files are in the top level of the zip file, or in a single subdirectory.`,
+            {
+              code: GtfsErrorCode.GTFS_ZIP_INVALID,
+              category: GtfsErrorCategory.ZIP,
+              details: { path: task.path, folderCount: folders.length },
+            },
           );
         } else if (folders.length === 0) {
-          throw new Error(
+          throw new GtfsError(
             `No .txt files found in \`${task.path}\`. Ensure that .txt files are in the top level of the zip file, or in a single subdirectory.`,
+            {
+              code: GtfsErrorCode.GTFS_ZIP_INVALID,
+              category: GtfsErrorCategory.ZIP,
+              details: { path: task.path },
+            },
           );
         }
 
@@ -130,8 +184,13 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
         const directoryTextFiles = await getTextFiles(subfolderName);
 
         if (directoryTextFiles.length === 0) {
-          throw new Error(
+          throw new GtfsError(
             `No .txt files found in \`${task.path}\`. Ensure that .txt files are in the top level of the zip file, or in a single subdirectory.`,
+            {
+              code: GtfsErrorCode.GTFS_ZIP_INVALID,
+              category: GtfsErrorCategory.ZIP,
+              details: { path: task.path, subfolderName },
+            },
           );
         }
 
@@ -145,16 +204,28 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
         );
       }
     } catch (error: unknown) {
-      task.logError(error as string);
-      throw new Error(`Unable to unzip file ${task.path}`);
+      const wrappedError = toGtfsError(error, {
+        message: `Unable to unzip file ${task.path}`,
+        code: GtfsErrorCode.GTFS_ZIP_INVALID,
+        category: GtfsErrorCategory.ZIP,
+        details: { path: task.path },
+      });
+      task.logError(formatGtfsError(wrappedError));
+      throw wrappedError;
     }
   } else {
     // Local file is unzipped, just copy it from there.
     try {
       await cp(gtfsPath, task.downloadDir, { recursive: true });
-    } catch {
-      throw new Error(
+    } catch (error: unknown) {
+      throw new GtfsError(
         `Unable to load files from path \`${gtfsPath}\` defined in configuration. Verify that path exists and contains GTFS files.`,
+        {
+          code: GtfsErrorCode.GTFS_DOWNLOAD_FAILED,
+          category: GtfsErrorCategory.DOWNLOAD,
+          details: { path: gtfsPath },
+          cause: error,
+        },
       );
     }
   }
@@ -275,8 +346,17 @@ const formatGtfsLine = (
       formattedLine[name] = null;
 
       if (required) {
-        throw new Error(
+        throw new GtfsError(
           `Missing required value in ${filenameBase}.${filenameExtension} for ${name} on line ${lineNumber}.`,
+          {
+            code: GtfsErrorCode.GTFS_REQUIRED_FIELD_MISSING,
+            category: GtfsErrorCategory.VALIDATION,
+            details: {
+              file: `${filenameBase}.${filenameExtension}`,
+              line: lineNumber,
+              column: name,
+            },
+          },
         );
       }
       continue;
@@ -286,8 +366,18 @@ const formatGtfsLine = (
       // Handle YYYY-MM-DD format
       value = value?.toString().replace(/-/g, '');
       if (value.length !== 8) {
-        throw new Error(
+        throw new GtfsError(
           `Invalid date in ${filenameBase}.${filenameExtension} for ${name} on line ${lineNumber}.`,
+          {
+            code: GtfsErrorCode.GTFS_INVALID_DATE,
+            category: GtfsErrorCategory.VALIDATION,
+            details: {
+              file: `${filenameBase}.${filenameExtension}`,
+              line: lineNumber,
+              column: name,
+              value,
+            },
+          },
         );
       }
     } else if (type === 'time') {
@@ -393,12 +483,33 @@ const importGtfsFiles = async (
                 task.logWarning(
                   `Duplicate values for primary key (${primaryColumns.map((column) => column.name).join(', ')}) found in ${filename}. Set the \`ignoreDuplicates\` option to true in config.json to ignore this error`,
                 );
+                if (task.report) {
+                  addImportWarning(task.report, {
+                    code: GtfsWarningCode.GTFS_DUPLICATE_PRIMARY_KEY,
+                    message: `Duplicate values for primary key found in ${filename}.`,
+                    details: {
+                      file: filename,
+                      line: Number(rowNumber) + 1,
+                      columns: primaryColumns.map((column) => column.name),
+                    },
+                  });
+                }
               }
 
               task.logWarning(
                 `Check ${filename} for invalid data on line ${rowNumber + 1}.`,
               );
-              throw error;
+              throw toGtfsError(error, {
+                message: error instanceof Error ? error.message : String(error),
+                code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
+                category: GtfsErrorCategory.DATABASE,
+                details: {
+                  file: filename,
+                  line: Number(rowNumber) + 1,
+                  sqlitePath: task.sqlitePath,
+                  dbCode: (error as { code?: unknown }).code,
+                },
+              });
             }
           }
         });
@@ -433,13 +544,20 @@ const importGtfsFiles = async (
                 }
               }
             } catch (error: unknown) {
+              const gtfsError = toGtfsError(error, {
+                message: error instanceof Error ? error.message : String(error),
+                code: GtfsErrorCode.GTFS_CSV_PARSE_FAILED,
+                category: GtfsErrorCategory.PARSE,
+                details: { file: filename },
+              });
               if (task.ignoreErrors) {
-                const errorMessage =
-                  error instanceof Error ? error.message : String(error);
-                task.logError(`Error processing ${filename}: ${errorMessage}`);
+                reportTaskError(task, gtfsError);
+                task.logError(
+                  `Error processing ${filename}: ${gtfsError.message}`,
+                );
                 resolve();
               } else {
-                reject(error);
+                reject(gtfsError);
               }
             }
           });
@@ -450,16 +568,22 @@ const importGtfsFiles = async (
                 try {
                   insertLines(lines);
                 } catch (error: unknown) {
+                  const gtfsError = toGtfsError(error, {
+                    message:
+                      error instanceof Error ? error.message : String(error),
+                    code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
+                    category: GtfsErrorCategory.DATABASE,
+                    details: { file: filename, sqlitePath: task.sqlitePath },
+                  });
                   if (task.ignoreErrors) {
-                    const errorMessage =
-                      error instanceof Error ? error.message : String(error);
                     task.logError(
-                      `Error inserting data for ${filename}: ${errorMessage}`,
+                      `Error inserting data for ${filename}: ${gtfsError.message}`,
                     );
+                    reportTaskError(task, gtfsError);
                     resolve();
                     return;
                   } else {
-                    reject(error);
+                    reject(gtfsError);
                     return;
                   }
                 }
@@ -470,25 +594,39 @@ const importGtfsFiles = async (
               );
               resolve();
             } catch (error: unknown) {
+              const gtfsError = toGtfsError(error, {
+                message: error instanceof Error ? error.message : String(error),
+                code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
+                category: GtfsErrorCategory.DATABASE,
+                details: { file: filename, sqlitePath: task.sqlitePath },
+              });
               if (task.ignoreErrors) {
-                const errorMessage =
-                  error instanceof Error ? error.message : String(error);
-                task.logError(`Error finalizing ${filename}: ${errorMessage}`);
+                task.logError(
+                  `Error finalizing ${filename}: ${gtfsError.message}`,
+                );
+                reportTaskError(task, gtfsError);
                 resolve();
               } else {
-                reject(error);
+                reject(gtfsError);
               }
             }
           });
 
           parser.on('error', (error: unknown) => {
+            const gtfsError = toGtfsError(error, {
+              message: error instanceof Error ? error.message : String(error),
+              code: GtfsErrorCode.GTFS_CSV_PARSE_FAILED,
+              category: GtfsErrorCategory.PARSE,
+              details: { file: filename },
+            });
             if (task.ignoreErrors) {
-              const errorMessage =
-                error instanceof Error ? error.message : String(error);
-              task.logError(`Parser error for ${filename}: ${errorMessage}`);
+              task.logError(
+                `Parser error for ${filename}: ${gtfsError.message}`,
+              );
+              reportTaskError(task, gtfsError);
               resolve();
             } else {
-              reject(error);
+              reject(gtfsError);
             }
           });
 
@@ -499,10 +637,24 @@ const importGtfsFiles = async (
               if (isValidJSON(data) === false) {
                 if (task.ignoreErrors) {
                   task.logError(`Invalid JSON in ${filename}`);
+                  reportTaskError(
+                    task,
+                    new GtfsError(`Invalid JSON in ${filename}`, {
+                      code: GtfsErrorCode.GTFS_JSON_INVALID,
+                      category: GtfsErrorCategory.PARSE,
+                      details: { file: filename },
+                    }),
+                  );
                   resolve();
                   return;
                 } else {
-                  reject(new Error(`Invalid JSON in ${filename}`));
+                  reject(
+                    new GtfsError(`Invalid JSON in ${filename}`, {
+                      code: GtfsErrorCode.GTFS_JSON_INVALID,
+                      category: GtfsErrorCategory.PARSE,
+                      details: { file: filename },
+                    }),
+                  );
                   return;
                 }
               }
@@ -520,26 +672,39 @@ const importGtfsFiles = async (
                 );
                 resolve();
               } catch (error: unknown) {
+                const gtfsError = toGtfsError(error, {
+                  message:
+                    error instanceof Error ? error.message : String(error),
+                  code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
+                  category: GtfsErrorCategory.DATABASE,
+                  details: { file: filename, sqlitePath: task.sqlitePath },
+                });
                 if (task.ignoreErrors) {
-                  const errorMessage =
-                    error instanceof Error ? error.message : String(error);
                   task.logError(
-                    `Error inserting data for ${filename}: ${errorMessage}`,
+                    `Error inserting data for ${filename}: ${gtfsError.message}`,
                   );
+                  reportTaskError(task, gtfsError);
                   resolve();
                 } else {
-                  reject(error);
+                  reject(gtfsError);
                 }
               }
             })
             .catch((error: unknown) => {
+              const gtfsError = toGtfsError(error, {
+                message: error instanceof Error ? error.message : String(error),
+                code: GtfsErrorCode.GTFS_CSV_PARSE_FAILED,
+                category: GtfsErrorCategory.PARSE,
+                details: { file: filename },
+              });
               if (task.ignoreErrors) {
-                const errorMessage =
-                  error instanceof Error ? error.message : String(error);
-                task.logError(`Error reading ${filename}: ${errorMessage}`);
+                task.logError(
+                  `Error reading ${filename}: ${gtfsError.message}`,
+                );
+                reportTaskError(task, gtfsError);
                 resolve();
               } else {
-                reject(error);
+                reject(gtfsError);
               }
             });
         } else {
@@ -550,7 +715,17 @@ const importGtfsFiles = async (
             resolve();
           } else {
             reject(
-              new Error(`Unsupported file type: ${model.filenameExtension}`),
+              new GtfsError(
+                `Unsupported file type: ${model.filenameExtension}`,
+                {
+                  code: GtfsErrorCode.GTFS_UNSUPPORTED_FILE_TYPE,
+                  category: GtfsErrorCategory.PARSE,
+                  details: {
+                    file: filename,
+                    extension: model.filenameExtension,
+                  },
+                },
+              ),
             );
           }
         }
@@ -564,12 +739,17 @@ const importGtfsFiles = async (
  *
  * @param initialConfig
  */
-export async function importGtfs(initialConfig: Config): Promise<void> {
+export async function importGtfs(initialConfig: Config): Promise<ImportReport>;
+export async function importGtfs(initialConfig: Config): Promise<void>;
+export async function importGtfs(
+  initialConfig: Config,
+): Promise<void | ImportReport> {
   // Start timer
   const startTime = process.hrtime.bigint();
 
   const config = setDefaultConfig(initialConfig);
   validateConfigForImport(config);
+  const report = config.includeImportReport ? createImportReport() : undefined;
 
   try {
     const db = openDb(config);
@@ -603,6 +783,7 @@ export async function importGtfs(initialConfig: Config): Promise<void> {
           log: log(config),
           logWarning: logWarning(config),
           logError: logError(config),
+          report,
         };
 
         if ('url' in agency) {
@@ -621,12 +802,18 @@ export async function importGtfs(initialConfig: Config): Promise<void> {
 
         await rm(tempPath, { recursive: true });
       } catch (error: unknown) {
+        const wrappedError = toGtfsError(error, {
+          message: error instanceof Error ? error.message : String(error),
+          code: GtfsErrorCode.GTFS_CSV_PARSE_FAILED,
+          category: GtfsErrorCategory.PARSE,
+        });
         if (config.ignoreErrors) {
-          const errorMessage =
-            error instanceof Error ? error.message : String(error);
-          logError(config)(errorMessage);
+          logError(config)(formatGtfsError(wrappedError));
+          if (report) {
+            addImportError(report, wrappedError);
+          }
         } else {
-          throw error;
+          throw wrappedError;
         }
       }
     });
@@ -642,10 +829,29 @@ export async function importGtfs(initialConfig: Config): Promise<void> {
     );
   } catch (error: unknown) {
     if ((error as Error & { code?: string }).code === 'SQLITE_CANTOPEN') {
-      logError(config)(
+      const dbOpenError = new GtfsError(
         `Unable to open sqlite database "${config.sqlitePath}" defined as \`sqlitePath\` config.json. Ensure the parent directory exists or remove \`sqlitePath\` from config.json.`,
+        {
+          code: GtfsErrorCode.DB_OPEN_FAILED,
+          category: GtfsErrorCategory.DATABASE,
+          details: {
+            sqlitePath: config.sqlitePath,
+            dbCode: (error as Error & { code?: string }).code,
+          },
+          cause: error,
+        },
       );
+      logError(config)(dbOpenError.message);
+      throw dbOpenError;
     }
-    throw error;
+    throw toGtfsError(error, {
+      message: error instanceof Error ? error.message : String(error),
+      code: GtfsErrorCode.GTFS_CSV_PARSE_FAILED,
+      category: GtfsErrorCategory.PARSE,
+    });
+  }
+
+  if (report) {
+    return report;
   }
 }
