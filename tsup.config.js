@@ -8,7 +8,11 @@ export default defineConfig({
     'src/bin/gtfsrealtime-update.ts',
     'src/models/models.ts',
   ],
-  dts: true,
+  dts: {
+    compilerOptions: {
+      ignoreDeprecations: '6.0',
+    },
+  },
   clean: true,
   format: ['esm'],
   splitting: false,

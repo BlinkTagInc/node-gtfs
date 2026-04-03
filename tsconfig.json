@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    "target": "ES2023",
+    "lib": ["ES2023"],
     "module": "NodeNext",
-    "moduleResolution": "nodenext",
-    "declaration": true,
-    "outDir": "./dist",
+    "moduleResolution": "NodeNext",
+    "noEmit": true,
     "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "types": ["node"],
     "strict": true,
     "skipLibCheck": true,
     "isolatedModules": true
