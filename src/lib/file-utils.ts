@@ -62,6 +62,7 @@ export async function getConfig(argv: ConfigArgs): Promise<Config> {
     if (error instanceof SyntaxError) {
       throw new Error(
         `Cannot parse configuration file. Check to ensure that it is valid JSON. Error: ${error.message}`,
+        { cause: error },
       );
     }
     throw error;
@@ -100,6 +101,7 @@ export async function unzip(
   } catch (error) {
     throw new Error(
       `Failed to extract zip file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      { cause: error },
     );
   }
 }
