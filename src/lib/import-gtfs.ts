@@ -100,13 +100,17 @@ const downloadGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
   try {
     const response = await fetch(task.url, {
       method: 'GET',
-      headers: task.headers || {},
+      redirect: 'follow',
+      headers: {
+        'User-Agent': 'node-gtfs',
+        ...task.headers,
+      },
       signal: task.downloadTimeout
         ? AbortSignal.timeout(task.downloadTimeout)
         : undefined,
     });
 
-    if (response.status !== 200) {
+    if (!response.ok) {
       throw new GtfsError(
         `Unable to download GTFS from ${task.url}. Got status ${response.status}.`,
         {
