@@ -11,12 +11,18 @@ jobs:
     name: Use Node.js ${{ matrix.node }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-      - run: npm install
-      - run: npm run build
-      - run: npm test
+          cache: pnpm
+  
+      - run: pnpm install
+      - run: pnpm run build
+      - run: pnpm run test
         env:
           CI: true
