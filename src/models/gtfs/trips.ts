@@ -70,5 +70,13 @@ export const trips = {
       min: 0,
       max: 2,
     },
+    {
+      name: 'safe_duration_factor',
+      type: 'real',
+    },
+    {
+      name: 'safe_duration_offset',
+      type: 'real',
+    },
   ],
 };

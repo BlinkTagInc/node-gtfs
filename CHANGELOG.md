@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Updated
 - Dependency Updates
 
+### Added
+- New fields in trips.txt - `safe_duration_factor` and `safe_duration_offset`
+
 ## [4.18.6] - 2026-05-24
 
 ### Updated

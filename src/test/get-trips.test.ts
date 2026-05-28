@@ -42,6 +42,8 @@ describe('getTrips():', () => {
       wheelchair_accessible: 1,
       bikes_allowed: 1,
       cars_allowed: null,
+      safe_duration_factor: null,
+      safe_duration_offset: null,
     };
 
     expect(results).toHaveLength(30);
@@ -71,6 +73,8 @@ describe('getTrips():', () => {
       wheelchair_accessible: 1,
       bikes_allowed: 1,
       cars_allowed: null,
+      safe_duration_factor: null,
+      safe_duration_offset: null,
     };
 
     expect(sundayResults).toNotContainEqual(weekdayResult);
