@@ -132,7 +132,7 @@
     "prettier": "3.8.3",
     "tsup": "8.5.1",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.59.4"
+    "typescript-eslint": "8.60.0"
   },
   "engines": {
     "node": ">= 22"
@@ -158,5 +158,5 @@
     "*.ts": "prettier --write",
     "*.json": "prettier --write"
   },
-  "packageManager": "pnpm@11.3.0+sha512.2c403d6594527287672b1f7056343a1f7c3634036a67ffabfcc2b3d7595d843768f8787148d1b57cf7956c90606bbd192857c363af19e96d2d0ec9ec5741d215"
+  "packageManager": "pnpm@11.4.0"
 }
