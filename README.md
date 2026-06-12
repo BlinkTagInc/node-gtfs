@@ -1529,7 +1529,7 @@ In order to use GTFS-Realtime query methods, you must first run the [GTFS-Realti
 
 #### getServiceAlerts(query, fields, sortBy, options)
 
-Returns an array of GTFS Realtime service alerts that match query parameters. Note that this does not refresh the data from GTFS-Realtime feeds, it only fetches what is stored in the database. In order to fetch the latest service alerts from GTFS-Realtime feeds and store in your database, use the [GTFS-Realtime update script or function](#gtfsrealtime-update-script).
+Returns an array of GTFS Realtime service alerts that match query parameters. Each alert includes a nested `informed_entities` array containing all related informed entities (stops, routes, trips) that the alert applies to. Note that this does not refresh the data from GTFS-Realtime feeds, it only fetches what is stored in the database. In order to fetch the latest service alerts from GTFS-Realtime feeds and store in your database, use the [GTFS-Realtime update script or function](#gtfsrealtime-update-script).
 
 [More details on Service Alerts](https://gtfs.org/realtime/feed-entities/service-alerts/)
 
@@ -1538,6 +1538,22 @@ import { getServiceAlerts } from 'gtfs';
 
 // Get service alerts
 const serviceAlerts = getServiceAlerts();
+```
+
+#### getServiceAlertInformedEntities(query, fields, sortBy, options)
+
+Returns an array of GTFS Realtime service alert informed entities that match query parameters. Each row represents a single entity (stop, route, trip, etc.) that a service alert applies to, linked back to its alert via `alert_id`. Use this for direct access to the `service_alert_informed_entities` table; use `getServiceAlerts()` to get alerts with all informed entities already nested.
+
+[More details on Service Alert Informed Entities](https://gtfs.org/realtime/feed-entities/service-alerts/#entityselector)
+
+```js
+import { getServiceAlertInformedEntities } from 'gtfs';
+
+// Get all service alert informed entities
+const informedEntities = getServiceAlertInformedEntities();
+
+// Get all informed entities for a specific alert
+const informedEntities = getServiceAlertInformedEntities({ alert_id: 'some-alert-id' });
 ```
 
 #### getTripUpdates(query, fields, sortBy, options)
