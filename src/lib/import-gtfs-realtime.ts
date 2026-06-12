@@ -271,6 +271,10 @@ function createServiceAlertsProcessor(
     models.serviceAlertInformedEntities as Model,
   );
 
+  const deleteInformedEntitiesStmt = db.prepare(
+    `DELETE FROM ${models.serviceAlertInformedEntities.filenameBase} WHERE alert_id = ?`,
+  );
+
   return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
     let recordCount = 0;
     let errorCount = 0;
@@ -284,6 +288,12 @@ function createServiceAlertsProcessor(
           ).map((column) => prepareRealtimeFieldValue(entity, column, task));
           alertStmt.run(alertValues);
           recordCount++;
+
+          // Replace this alert's informed entities. Delete the existing set
+          // (matching on the same prefixed alert_id the inserts use) before
+          // re-inserting, so refreshes don't accumulate duplicate rows.
+          const alertId = applyPrefixToValue(entity.id, true, task.prefix);
+          deleteInformedEntitiesStmt.run(alertId);
 
           // Process informed entities
           if (entity.alert?.informedEntity?.length) {
