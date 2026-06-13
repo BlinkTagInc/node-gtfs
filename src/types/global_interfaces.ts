@@ -666,11 +666,12 @@ export interface ServiceAlertInformedEntity {
 
 export interface ServiceAlert {
   id: string;
+  active_period: string | null;
   cause: string | null;
   effect: string | null;
   url: string | null;
-  start_time: string;
-  end_time: string;
+  start_time: string | null;
+  end_time: string | null;
   header_text: string;
   description_text: string;
   tts_header_text: string | null;

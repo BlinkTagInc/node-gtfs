@@ -35,16 +35,14 @@ export const serviceAlerts = {
     {
       name: 'start_time',
       type: 'text',
-      required: true,
       source: 'alert.activePeriod[0].start',
-      default: '',
+      default: null,
     },
     {
       name: 'end_time',
       type: 'text',
-      required: true,
       source: 'alert.activePeriod[0].end',
-      default: '',
+      default: null,
     },
     {
       name: 'header_text',
