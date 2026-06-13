@@ -124,7 +124,9 @@ export function deleteDb(db: Database.Database | null = null): void {
 
   db.close();
 
-  fs.unlinkSync(db.name);
+  if (db.name !== ':memory:') {
+    fs.unlinkSync(db.name);
+  }
 
   delete dbs[db.name];
 }
