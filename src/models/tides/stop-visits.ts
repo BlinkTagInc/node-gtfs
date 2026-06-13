@@ -109,7 +109,8 @@ export const stopVisits = {
     },
     {
       name: 'ramp_deployed_time',
-      type: 'text',
+      type: 'real',
+      min: 0,
     },
     {
       name: 'ramp_failure',
@@ -117,12 +118,12 @@ export const stopVisits = {
     },
     {
       name: 'kneel_deployed_time',
-      type: 'integer',
+      type: 'real',
       min: 0,
     },
     {
       name: 'lift_deployed_time',
-      type: 'integer',
+      type: 'real',
       min: 0,
     },
     {

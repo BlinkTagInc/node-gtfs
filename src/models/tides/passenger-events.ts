@@ -36,6 +36,7 @@ export const passengerEvents = {
       name: 'trip_stop_sequence',
       type: 'integer',
       min: 1,
+      required: true,
     },
     {
       name: 'scheduled_stop_sequence',
