@@ -12,6 +12,7 @@ export const routes = {
     {
       name: 'agency_id',
       type: 'text',
+      index: true,
       prefix: true,
     },
     {

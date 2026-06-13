@@ -12,6 +12,7 @@ export const stops = {
     {
       name: 'stop_code',
       type: 'text',
+      index: true,
     },
     {
       name: 'stop_name',
