@@ -238,7 +238,7 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
 const createGtfsTables = (db: Database.Database): void => {
   for (const model of Object.values(models) as Model[]) {
     if (!model.schema) {
-      return;
+      continue;
     }
 
     const sqlColumnCreateStatements = [];
@@ -312,7 +312,7 @@ const createGtfsTables = (db: Database.Database): void => {
 const createGtfsIndexes = (db: Database.Database): void => {
   for (const model of Object.values(models) as Model[]) {
     if (!model.schema) {
-      return;
+      continue;
     }
     for (const column of model.schema) {
       if (column.index) {
