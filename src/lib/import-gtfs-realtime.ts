@@ -282,6 +282,12 @@ function createServiceAlertsProcessor(
     db.transaction(() => {
       for (const entity of batch) {
         try {
+          // Delete stale informed entities before upserting the alert so that
+          // if the delete fails the catch fires before the alert INSERT, leaving
+          // no partial state in the batch transaction.
+          const alertId = applyPrefixToValue(entity.id, true, task.prefix);
+          deleteInformedEntitiesStmt.run(alertId);
+
           // Process main alert
           const alertValues = (
             models.serviceAlerts.schema as ModelColumn[]
@@ -289,13 +295,7 @@ function createServiceAlertsProcessor(
           alertStmt.run(alertValues);
           recordCount++;
 
-          // Replace this alert's informed entities. Delete the existing set
-          // (matching on the same prefixed alert_id the inserts use) before
-          // re-inserting, so refreshes don't accumulate duplicate rows.
-          const alertId = applyPrefixToValue(entity.id, true, task.prefix);
-          deleteInformedEntitiesStmt.run(alertId);
-
-          // Process informed entities
+          // Insert fresh informed entities
           if (entity.alert?.informedEntity?.length) {
             for (const informedEntity of entity.alert.informedEntity) {
               informedEntity.parent = entity;
