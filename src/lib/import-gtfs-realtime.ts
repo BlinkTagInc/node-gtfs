@@ -336,6 +336,9 @@ function createTripUpdatesProcessor(
     db,
     models.stopTimeUpdates as Model,
   );
+  const deleteStopTimesByTripStmt = db.prepare(
+    'DELETE FROM stop_time_updates WHERE trip_id = ? AND trip_start_time IS ?',
+  );
 
   return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
     let recordCount = 0;
@@ -353,6 +356,26 @@ function createTripUpdatesProcessor(
 
           // Process stop time updates
           if (entity.tripUpdate?.stopTimeUpdate?.length) {
+            // Delete any existing stop_time_updates for this trip instance
+            // before inserting fresh predictions.  Without this delete, each
+            // poll appends rows rather than replacing them, causing stale /
+            // duplicate predictions to accumulate in the table.
+            //
+            // The dedup key is (trip_id, trip_start_time).  trip_start_time
+            // is NULL for ordinary scheduled trips and a clock string (e.g.
+            // '08:00:00') for frequency-based instances.  We use SQLite's IS
+            // operator (NULL-safe equality) so that NULL IS NULL is true and
+            // the delete fires correctly for both cases.
+            const tripId = applyPrefixToValue(
+              entity.tripUpdate?.trip?.tripId ?? null,
+              true,
+              task.prefix,
+            );
+            const tripStartTime = entity.tripUpdate?.trip?.startTime ?? null;
+            if (tripId !== null) {
+              deleteStopTimesByTripStmt.run(tripId, tripStartTime);
+            }
+
             for (const stopTimeUpdate of entity.tripUpdate.stopTimeUpdate) {
               stopTimeUpdate.parent = entity;
               const stopTimeValues = (
