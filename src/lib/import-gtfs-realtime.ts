@@ -337,7 +337,7 @@ function createTripUpdatesProcessor(
     models.stopTimeUpdates as Model,
   );
   const deleteStopTimesByTripStmt = db.prepare(
-    'DELETE FROM stop_time_updates WHERE trip_id = ? AND trip_start_time IS ?',
+    `DELETE FROM ${models.stopTimeUpdates.filenameBase} WHERE trip_id = ? AND trip_start_time IS ?`,
   );
 
   return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
