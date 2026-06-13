@@ -326,6 +326,9 @@ function createTripUpdatesProcessor(
     db,
     models.stopTimeUpdates as Model,
   );
+  const deleteStopTimesByTripStmt = db.prepare(
+    'DELETE FROM stop_time_updates WHERE trip_id = ?',
+  );
 
   return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
     let recordCount = 0;
@@ -343,6 +346,19 @@ function createTripUpdatesProcessor(
 
           // Process stop time updates
           if (entity.tripUpdate?.stopTimeUpdate?.length) {
+            // Delete any existing (non-expired) stop_time_updates for this
+            // trip before inserting fresh predictions. Without this delete,
+            // each poll appends rows rather than replacing them, causing
+            // stale/duplicate predictions to accumulate in the table.
+            const tripId = applyPrefixToValue(
+              entity.tripUpdate?.trip?.tripId ?? null,
+              true,
+              task.prefix,
+            );
+            if (tripId !== null) {
+              deleteStopTimesByTripStmt.run(tripId);
+            }
+
             for (const stopTimeUpdate of entity.tripUpdate.stopTimeUpdate) {
               stopTimeUpdate.parent = entity;
               const stopTimeValues = (
