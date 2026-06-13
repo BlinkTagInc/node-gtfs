@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Updated
+- Dependency Updates
+- Add node 26 to testing workflow
+
+### Changed
+- Fix rt alert `informed_entities` - allowing alert import to maintain multiple informed entities
+- Allow filtering alerts informed entity columns
+- Deduplicate RT `stop_time_updates`
+- Pass user agent when fetching GTFS and GTFS-realtime
+- Allow response.status 2xx when fetching GTFS and GTFS-realtime
+- Import gtfs realtime using sequential processing
+- Add indexes
+
+### Fixed
+- Avoid prefixing undefined values
+- Fix for deleteDb() error on in memory databases
+- Fix for column constraints set to 0 being dropped
+- FIx for getStopsAsGeoJSON crashe when no agency
+- Add active_period to ServiceAlert interface
+- Fixes for TIDES schema
+
 ## [4.18.7] - 2026-05-27
 
 ### Updated

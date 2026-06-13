@@ -168,7 +168,9 @@ async function fetchGtfsRealtimeData(
     try {
       const response = await fetch(urlConfig.url, {
         method: 'GET',
+        redirect: 'follow',
         headers: {
+          'User-Agent': 'node-gtfs',
           ...(urlConfig.headers ?? {}),
           'Accept-Encoding': 'gzip',
         },
@@ -177,7 +179,7 @@ async function fetchGtfsRealtimeData(
           : undefined,
       });
 
-      if (response.status !== 200) {
+      if (!response.ok) {
         throw new GtfsError(`HTTP ${response.status}: ${response.statusText}`, {
           code: GtfsErrorCode.GTFS_DOWNLOAD_HTTP,
           category: GtfsErrorCategory.DOWNLOAD,
