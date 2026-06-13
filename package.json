@@ -69,7 +69,9 @@
     "mattkinnia",
     "Théophile Helleboid <theophile.helleboid@transdev.com>",
     "mishamaliga",
-    "Magnus Petersen-Paaske"
+    "Magnus Petersen-Paaske",
+    "Patrick Steil",
+    "Parker Woodworth"
   ],
   "type": "module",
   "main": "./dist/index.js",
