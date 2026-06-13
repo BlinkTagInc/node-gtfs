@@ -6,7 +6,7 @@ export const serviceAlertInformedEntities = {
       name: 'alert_id',
       type: 'text',
       required: true,
-      primary: true,
+      index: true,
       source: 'parent.id',
       prefix: true,
     },

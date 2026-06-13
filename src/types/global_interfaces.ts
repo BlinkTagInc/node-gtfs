@@ -653,6 +653,17 @@ export interface RunPiece {
   end_trip_position: number | null;
 }
 
+export interface ServiceAlertInformedEntity {
+  alert_id: string;
+  stop_id: string | null;
+  route_id: string | null;
+  route_type: number | null;
+  trip_id: string | null;
+  direction_id: number | null;
+  created_timestamp: UnixTimestamp;
+  expiration_timestamp: UnixTimestamp;
+}
+
 export interface ServiceAlert {
   id: string;
   cause: string | null;
@@ -667,6 +678,7 @@ export interface ServiceAlert {
   severity_level: string | null;
   created_timestamp: UnixTimestamp;
   expiration_timestamp: UnixTimestamp;
+  informed_entities: ServiceAlertInformedEntity[];
 }
 
 export interface StopTimeUpdate {

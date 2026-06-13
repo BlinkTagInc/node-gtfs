@@ -89,6 +89,7 @@ export { getStopTimeUpdates } from './lib/gtfs-realtime/stop-time-updates.ts';
 export { getTripUpdates } from './lib/gtfs-realtime/trip-updates.ts';
 export { getVehiclePositions } from './lib/gtfs-realtime/vehicle-positions.ts';
 export { getServiceAlerts } from './lib/gtfs-realtime/service-alerts.ts';
+export { getServiceAlertInformedEntities } from './lib/gtfs-realtime/service-alert-informed-entities.ts';
 
 // ODS
 export { getDeadheads } from './lib/ods/deadheads.ts';
