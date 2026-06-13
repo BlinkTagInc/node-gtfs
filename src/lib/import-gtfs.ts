@@ -245,13 +245,13 @@ const createGtfsTables = (db: Database.Database): void => {
 
     for (const column of model.schema) {
       const checks = [];
-      if (column.min !== undefined && column.max) {
+      if (column.min !== undefined && column.max !== undefined) {
         checks.push(
           `${column.name} >= ${column.min} AND ${column.name} <= ${column.max}`,
         );
-      } else if (column.min) {
+      } else if (column.min !== undefined) {
         checks.push(`${column.name} >= ${column.min}`);
-      } else if (column.max) {
+      } else if (column.max !== undefined) {
         checks.push(`${column.name} <= ${column.max}`);
       }
 
