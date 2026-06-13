@@ -368,7 +368,12 @@ export function applyPrefixToValue(
   columnShouldBePrefixed?: boolean,
   prefix?: string,
 ) {
-  if (!columnShouldBePrefixed || prefix === undefined || value === null) {
+  if (
+    !columnShouldBePrefixed ||
+    prefix === undefined ||
+    value === null ||
+    value === undefined
+  ) {
     return value;
   }
 
