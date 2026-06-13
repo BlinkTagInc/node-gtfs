@@ -499,47 +499,35 @@ export async function updateGtfsRealtimeData(
     vehiclepositions: 0,
   };
 
-  // Process each data type with batching
-  const processingPromises: Promise<void>[] = [];
-
+  // Process each data type sequentially — all three processors share the same
+  // SQLite connection and interleaving their transactions across async batches
+  // is unsafe if processors ever touch overlapping tables.
   if (alertsData?.entity?.length) {
-    processingPromises.push(
-      processBatch(
-        alertsData.entity,
-        BATCH_SIZE,
-        createServiceAlertsProcessor(db, task),
-      ).then((result) => {
-        recordCounts.alerts = result.recordCount;
-      }),
+    const result = await processBatch(
+      alertsData.entity,
+      BATCH_SIZE,
+      createServiceAlertsProcessor(db, task),
     );
+    recordCounts.alerts = result.recordCount;
   }
 
   if (tripUpdatesData?.entity?.length) {
-    processingPromises.push(
-      processBatch(
-        tripUpdatesData.entity,
-        BATCH_SIZE,
-        createTripUpdatesProcessor(db, task),
-      ).then((result) => {
-        recordCounts.tripupdates = result.recordCount;
-      }),
+    const result = await processBatch(
+      tripUpdatesData.entity,
+      BATCH_SIZE,
+      createTripUpdatesProcessor(db, task),
     );
+    recordCounts.tripupdates = result.recordCount;
   }
 
   if (vehiclePositionsData?.entity?.length) {
-    processingPromises.push(
-      processBatch(
-        vehiclePositionsData.entity,
-        BATCH_SIZE,
-        createVehiclePositionsProcessor(db, task),
-      ).then((result) => {
-        recordCounts.vehiclepositions = result.recordCount;
-      }),
+    const result = await processBatch(
+      vehiclePositionsData.entity,
+      BATCH_SIZE,
+      createVehiclePositionsProcessor(db, task),
     );
+    recordCounts.vehiclepositions = result.recordCount;
   }
-
-  // Wait for all processing to complete
-  await Promise.all(processingPromises);
 
   task.log(
     `GTFS-Realtime import complete: ${recordCounts.alerts} alerts, ${recordCounts.tripupdates} trip updates, ${recordCounts.vehiclepositions} vehicle positions`,
