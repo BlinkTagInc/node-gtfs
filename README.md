@@ -162,6 +162,7 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 | [`gtfsRealtimeExpirationSeconds`](#gtfsrealtimeexpirationseconds) | integer           | Amount of time in seconds to allow GTFS-Realtime data to be stored in database before allowing to be deleted. Optional, defaults to 0.                              |
 | [`ignoreDuplicates`](#ignoreduplicates)                           | boolean           | Whether or not to ignore unique constraints on ids when importing GTFS, such as `trip_id`, `calendar_id`. Optional, defaults to false.                              |
 | [`ignoreErrors`](#ignoreerrors)                                   | boolean           | Whether or not to ignore errors during the import process. If true, failed files will be skipped while the rest are processed. Optional, defaults to false. |
+| [`includeImportReport`](#includeimportreport)                     | boolean           | Whether to return a report object from `importGtfs()` containing details about what was imported and any errors encountered. Optional, defaults to false. |
 | [`sqlitePath`](#sqlitepath)                                       | string            | A path to a SQLite database. Optional, defaults to using an in-memory database.                                                                                    |
 | [`verbose`](#verbose)                                             | boolean           | Whether or not to print output to the console. Optional, defaults to true.                                                                                          |
 
@@ -414,7 +415,7 @@ importGtfs({
       }
     }
   ],
-  "gtfsRealtimeExpirationSeconds": false
+  "gtfsRealtimeExpirationSeconds": 3600
 }
 ```
 
@@ -467,6 +468,22 @@ importGtfs({
   ],
   "ignoreErrors": true
 }
+```
+
+### includeImportReport
+
+{Boolean} When `true`, `importGtfs()` returns an `ImportReport` object containing details about the import (record counts, errors encountered, etc.) instead of returning `void`. Useful when combined with `ignoreErrors: true` to inspect what failed after a partial import. Defaults to `false`.
+
+```js
+import { importGtfs } from 'gtfs';
+
+const report = await importGtfs({
+  agencies: [{ path: '/path/to/gtfs' }],
+  ignoreErrors: true,
+  includeImportReport: true,
+});
+
+console.log(report.errors);
 ```
 
 ### sqlitePath
@@ -684,7 +701,7 @@ closeDb(db);
 
 ### Deleting a Database
 
-You can use `deleteDb` to delete a sqlite3 database from the filesystem.
+You can use `deleteDb` to close and delete a database. For file-backed databases the file is removed from the filesystem. For in-memory databases (the default) the connection is closed and the internal reference is removed — no filesystem operation is performed.
 
 ```js
 import { deleteDb, openDb } from 'gtfs';
@@ -1050,7 +1067,7 @@ const trips = getTrips({
 const trips = getTrips({
   route_id: 'Lo-16APR',
   direction_id: 0,
-  service_id: '
+  service_id: 'CT-16APR-Caltrain-Weekday-01',
 });
 
 /*
@@ -1533,11 +1550,19 @@ Returns an array of GTFS Realtime service alerts that match query parameters. Ea
 
 [More details on Service Alerts](https://gtfs.org/realtime/feed-entities/service-alerts/)
 
+Each alert has an `informed_entities` array containing all stops, routes, and trips the alert applies to. The `active_period` field is a JSON-serialised array of `{start, end}` Unix timestamp objects representing when the alert is active. The convenience fields `start_time` and `end_time` contain the start and end of the first active period (or `null` if none is set).
+
 ```js
 import { getServiceAlerts } from 'gtfs';
 
-// Get service alerts
+// Get all service alerts
 const serviceAlerts = getServiceAlerts();
+
+// Get alerts affecting a specific stop
+const stopAlerts = getServiceAlerts({ stop_id: 'STOP_ID' });
+
+// Get alerts affecting a specific route
+const routeAlerts = getServiceAlerts({ route_id: 'ROUTE_ID' });
 ```
 
 #### getServiceAlertInformedEntities(query, fields, sortBy, options)
@@ -1730,6 +1755,22 @@ const riderships = getRidership({
 });
 ```
 
+#### getRiderCategories(query, fields, sortBy, options)
+
+Returns an array of rider categories that match query parameters. [Details on rider_categories.txt](http://gtfsride.org/specification#rider_categoriestxt)
+
+```js
+import { getRiderCategories } from 'gtfs';
+
+// Get all rider categories
+const riderCategories = getRiderCategories();
+
+// Get a specific rider category
+const riderCategories = getRiderCategories({
+  rider_category_id: '1',
+});
+```
+
 #### getTripCapacities(query, fields, sortBy, options)
 
 Returns an array of trip_capacity that match query parameters. [Details on trip_capacity.txt](http://gtfsride.org/specification#trip_capacitytxt)
@@ -1815,10 +1856,10 @@ Returns an array of run_events that match query parameters. [Details on run_even
 import { getRunEvents } from 'gtfs';
 
 // Get all run_events
-const runEvents = runEvents();
+const runEvents = getRunEvents();
 
-// Get a run_events for a specific piece
-const runEvents = runEvents({
+// Get run_events for a specific piece
+const runEvents = getRunEvents({
   piece_id: '123',
 });
 ```
