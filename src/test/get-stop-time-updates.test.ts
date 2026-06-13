@@ -55,6 +55,53 @@ function buildFeedBuffer(
   return Buffer.from(transit_realtime.FeedMessage.encode(message).finish());
 }
 
+/*
+ * Builds an encoded GTFS-Realtime FeedMessage with multiple TripUpdate
+ * entities.  Each entry may carry an optional startTime to simulate
+ * frequency-based (concurrent) instances of the same trip_id.
+ */
+function buildMultiEntityFeedBuffer(
+  entities: {
+    tripId: string;
+    startTime?: string;
+    entityId: string;
+    stops: {
+      stopId: string;
+      stopSequence: number;
+      arrivalDelay?: number;
+      departureDelay: number;
+    }[];
+  }[],
+): Buffer {
+  const { transit_realtime } = GtfsRealtimeBindings;
+
+  const message = transit_realtime.FeedMessage.fromObject({
+    header: {
+      gtfsRealtimeVersion: '2.0',
+      timestamp: Math.floor(Date.now() / 1000),
+    },
+    entity: entities.map((e) => ({
+      id: e.entityId,
+      tripUpdate: {
+        trip: {
+          tripId: e.tripId,
+          ...(e.startTime !== undefined ? { startTime: e.startTime } : {}),
+        },
+        stopTimeUpdate: e.stops.map((s) => ({
+          stopSequence: s.stopSequence,
+          stopId: s.stopId,
+          ...(s.arrivalDelay !== undefined
+            ? { arrival: { delay: s.arrivalDelay } }
+            : {}),
+          departure: { delay: s.departureDelay },
+        })),
+      },
+    })),
+  });
+
+  return Buffer.from(transit_realtime.FeedMessage.encode(message).finish());
+}
+
 // First poll: delays 30 / 60 / 90; stop-Z has no arrival (tests NULL field)
 const POLL_1_STOPS = [
   { stopId: 'stop-X', stopSequence: 1, arrivalDelay: 30, departureDelay: 30 },
@@ -184,5 +231,228 @@ describe('getStopTimeUpdates():', () => {
     // Values must reflect the second poll, not the first
     const stopX = results.find((r) => r.stop_id === 'stop-X');
     expect(stopX?.arrival_delay).toBe(120);
+  });
+
+  /*
+   * Regression guard for the NULL-safe IS operator fix.
+   *
+   * Ordinary scheduled trips have no trip_start_time (NULL).  The delete
+   * statement uses "trip_start_time IS ?" so that NULL IS NULL evaluates to
+   * true — a naive "= ?" would never match and rows would accumulate instead
+   * of being replaced.  This test confirms the dedup still works when
+   * trip_start_time is absent.
+   */
+  it('should deduplicate rows for a scheduled trip whose start_time is NULL (IS-operator guard)', async () => {
+    const NULL_TRIP_ID = 'null-start-time-trip';
+
+    // First import: 3 stop-time-updates, no startTime on the trip
+    feedBuffer = buildMultiEntityFeedBuffer([
+      {
+        tripId: NULL_TRIP_ID,
+        entityId: 'null-st-entity-1',
+        stops: [
+          {
+            stopId: 'stop-A',
+            stopSequence: 1,
+            arrivalDelay: 10,
+            departureDelay: 10,
+          },
+          {
+            stopId: 'stop-B',
+            stopSequence: 2,
+            arrivalDelay: 20,
+            departureDelay: 20,
+          },
+          { stopId: 'stop-C', stopSequence: 3, departureDelay: 30 },
+        ],
+      },
+    ]);
+    await updateGtfsRealtime(realtimeConfig);
+    expect(getStopTimeUpdates({ trip_id: NULL_TRIP_ID })).toHaveLength(3);
+
+    // Second import: same trip, updated delays — must replace, not append
+    feedBuffer = buildMultiEntityFeedBuffer([
+      {
+        tripId: NULL_TRIP_ID,
+        entityId: 'null-st-entity-1',
+        stops: [
+          {
+            stopId: 'stop-A',
+            stopSequence: 1,
+            arrivalDelay: 40,
+            departureDelay: 40,
+          },
+          {
+            stopId: 'stop-B',
+            stopSequence: 2,
+            arrivalDelay: 50,
+            departureDelay: 50,
+          },
+          { stopId: 'stop-C', stopSequence: 3, departureDelay: 60 },
+        ],
+      },
+    ]);
+    await updateGtfsRealtime(realtimeConfig);
+
+    const results = getStopTimeUpdates({ trip_id: NULL_TRIP_ID });
+
+    // Must still be 3 rows, not 6
+    expect(results).toHaveLength(3);
+
+    // Values must reflect the second import
+    const stopA = results.find((r) => r.stop_id === 'stop-A');
+    expect(stopA?.arrival_delay).toBe(40);
+
+    // stop-C had no arrival in either feed — must remain NULL
+    const stopC = results.find((r) => r.stop_id === 'stop-C');
+    expect(stopC?.arrival_delay).toBeNull();
+  });
+
+  /*
+   * Frequency-based (concurrent-instance) coexistence test.
+   *
+   * In frequency-based feeds the same trip_id can have multiple live
+   * instances in one message, distinguished by startTime.  The dedup key must
+   * be (trip_id, trip_start_time) so that deleting one instance's old rows
+   * does not accidentally wipe another instance's just-inserted rows.
+   */
+  it('should preserve rows for concurrent frequency-based instances of the same trip_id', async () => {
+    const FREQ_TRIP_ID = 'frequency-trip-1';
+    const START_A = '08:00:00';
+    const START_B = '09:00:00';
+
+    // First import: two instances, each with 3 stops
+    feedBuffer = buildMultiEntityFeedBuffer([
+      {
+        tripId: FREQ_TRIP_ID,
+        startTime: START_A,
+        entityId: 'freq-entity-A1',
+        stops: [
+          {
+            stopId: 'stop-P',
+            stopSequence: 1,
+            arrivalDelay: 5,
+            departureDelay: 5,
+          },
+          {
+            stopId: 'stop-Q',
+            stopSequence: 2,
+            arrivalDelay: 10,
+            departureDelay: 10,
+          },
+          {
+            stopId: 'stop-R',
+            stopSequence: 3,
+            arrivalDelay: 15,
+            departureDelay: 15,
+          },
+        ],
+      },
+      {
+        tripId: FREQ_TRIP_ID,
+        startTime: START_B,
+        entityId: 'freq-entity-B1',
+        stops: [
+          {
+            stopId: 'stop-P',
+            stopSequence: 1,
+            arrivalDelay: 20,
+            departureDelay: 20,
+          },
+          {
+            stopId: 'stop-Q',
+            stopSequence: 2,
+            arrivalDelay: 25,
+            departureDelay: 25,
+          },
+          {
+            stopId: 'stop-R',
+            stopSequence: 3,
+            arrivalDelay: 30,
+            departureDelay: 30,
+          },
+        ],
+      },
+    ]);
+    await updateGtfsRealtime(realtimeConfig);
+
+    // Both instances must be present — 6 rows total, neither clobbered
+    const afterFirst = getStopTimeUpdates({ trip_id: FREQ_TRIP_ID });
+    expect(afterFirst).toHaveLength(6);
+
+    // Second import: updated delays on both instances
+    feedBuffer = buildMultiEntityFeedBuffer([
+      {
+        tripId: FREQ_TRIP_ID,
+        startTime: START_A,
+        entityId: 'freq-entity-A2',
+        stops: [
+          {
+            stopId: 'stop-P',
+            stopSequence: 1,
+            arrivalDelay: 50,
+            departureDelay: 50,
+          },
+          {
+            stopId: 'stop-Q',
+            stopSequence: 2,
+            arrivalDelay: 55,
+            departureDelay: 55,
+          },
+          {
+            stopId: 'stop-R',
+            stopSequence: 3,
+            arrivalDelay: 60,
+            departureDelay: 60,
+          },
+        ],
+      },
+      {
+        tripId: FREQ_TRIP_ID,
+        startTime: START_B,
+        entityId: 'freq-entity-B2',
+        stops: [
+          {
+            stopId: 'stop-P',
+            stopSequence: 1,
+            arrivalDelay: 70,
+            departureDelay: 70,
+          },
+          {
+            stopId: 'stop-Q',
+            stopSequence: 2,
+            arrivalDelay: 75,
+            departureDelay: 75,
+          },
+          {
+            stopId: 'stop-R',
+            stopSequence: 3,
+            arrivalDelay: 80,
+            departureDelay: 80,
+          },
+        ],
+      },
+    ]);
+    await updateGtfsRealtime(realtimeConfig);
+
+    // Still exactly 6 rows — no duplication, no cross-instance deletion
+    const afterSecond = getStopTimeUpdates({ trip_id: FREQ_TRIP_ID });
+    expect(afterSecond).toHaveLength(6);
+
+    // Instance A (start 08:00) rows must reflect second import values
+    const instanceARows = afterSecond.filter(
+      (r) => r.trip_start_time === START_A,
+    );
+    expect(instanceARows).toHaveLength(3);
+    const aPStopP = instanceARows.find((r) => r.stop_id === 'stop-P');
+    expect(aPStopP?.arrival_delay).toBe(50);
+
+    // Instance B (start 09:00) rows must reflect second import values
+    const instanceBRows = afterSecond.filter(
+      (r) => r.trip_start_time === START_B,
+    );
+    expect(instanceBRows).toHaveLength(3);
+    const bStopP = instanceBRows.find((r) => r.stop_id === 'stop-P');
+    expect(bStopP?.arrival_delay).toBe(70);
   });
 });
