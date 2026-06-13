@@ -151,7 +151,7 @@ export function getStopsAsGeoJSON(
           ? Number.parseInt(route.route_short_name, 10)
           : 0,
       ),
-      agency_name: agencies[0].agency_name,
+      agency_name: agencies[0]?.agency_name ?? null,
     };
   });
 
