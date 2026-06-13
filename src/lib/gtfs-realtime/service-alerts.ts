@@ -37,6 +37,10 @@ export function getServiceAlerts<Fields extends keyof ServiceAlert>(
     .all() as Omit<ServiceAlert, 'informed_entities'>[];
 
   const alertIds = alerts.map((alert) => alert.id);
+  if (alertIds.length === 0) {
+    return [];
+  }
+
   const placeholders = alertIds.map(() => '?').join(', ');
   const entities = db
     .prepare(
