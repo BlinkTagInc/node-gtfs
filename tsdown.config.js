@@ -1,4 +1,4 @@
-import { defineConfig } from 'tsup';
+import { defineConfig } from 'tsdown';
 
 export default defineConfig({
   entry: [
@@ -8,14 +8,20 @@ export default defineConfig({
     'src/bin/gtfsrealtime-update.ts',
     'src/models/models.ts',
   ],
-  dts: {
-    compilerOptions: {
-      ignoreDeprecations: '6.0',
-    },
-  },
   clean: true,
   format: ['esm'],
+  fixedExtension: false,
   splitting: false,
   sourcemap: true,
   minify: false,
+  target: false,
+  deps: {
+    onlyBundle: false,
+  },
+  inputOptions: {
+    onwarn(warning, warn) {
+      if (warning.code === 'SOURCEMAP_BROKEN') return;
+      warn(warning);
+    },
+  },
 });

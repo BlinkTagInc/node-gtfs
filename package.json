@@ -87,8 +87,8 @@
   "scripts": {
     "prepare": "husky && pnpm run build",
     "test": "node --test --test-reporter=spec src/test/**/*.test.ts",
-    "build": "tsup",
-    "build-watch": "tsup --watch",
+    "build": "tsdown",
+    "build-watch": "tsdown --watch",
     "lint": "eslint \"src/**/*.ts\""
   },
   "exports": {
@@ -131,10 +131,10 @@
     "globals": "17.6.0",
     "husky": "9.1.7",
     "lint-staged": "17.0.7",
-    "prettier": "3.8.3",
-    "tsup": "8.5.1",
+    "prettier": "3.8.4",
+    "tsdown": "^0.22.2",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.60.1"
+    "typescript-eslint": "8.61.0"
   },
   "engines": {
     "node": ">= 22"
@@ -160,5 +160,5 @@
     "*.ts": "prettier --write",
     "*.json": "prettier --write"
   },
-  "packageManager": "pnpm@11.5.2"
+  "packageManager": "pnpm@11.5.3"
 }
