@@ -181,6 +181,7 @@ For GTFS files that contain more than one agency, you only need to list each GTF
 | `headers`                  | object | An object of HTTP headers in key:value format to use when fetching GTFS from the `url` specified. Optional.                                                         |
 | `prefix`                   | string | A prefix to be added to every ID field maintain uniqueness when importing multiple GTFS from multiple agencies. Optional.                                           |
 | `exclude`                  | array  | An array of GTFS file names (without `.txt`) to exclude when importing. Optional.                                                                                   |
+| `fillEmptyAgencyId`        | boolean | When `true`, fills empty `agency_id` on routes, fares, and other files for single-agency feeds. Useful for shared databases. Defaults to `false`. Optional.        |
 | `realtimeAlerts`           | object | An object containing a `url` field for GTFS-Realtime alerts and a `headers` field in key:value format to use when fetching GTFS-Realtime data. Optional.            |
 | `realtimeTripUpdates`      | object | An object containing a `url` field for GTFS-Realtime trip updates and a `headers` field in key:value format to use when fetching GTFS-Realtime data. Optional.      |
 | `realtimeVehiclePositions` | object | An object containing a `url` field for GTFS-Realtime vehicle positions and a `headers` field in key:value format to use when fetching GTFS-Realtime data. Optional. |

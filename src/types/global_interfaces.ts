@@ -89,6 +89,14 @@ interface BaseConfigAgency {
    * A prefix to be added to every ID field maintain uniqueness when importing multiple GTFS from multiple agencies
    */
   prefix?: string;
+  /**
+   * When set to true and the feed contains exactly one agency, populates any empty `agency_id` fields
+   * on routes, fare_attributes, and other relevant files. Useful when merging single-agency feeds into
+   * a shared database.
+   *
+   * @defaultValue false
+   */
+  fillEmptyAgencyId?: boolean;
 }
 
 export type ConfigAgency = BaseConfigAgency &
