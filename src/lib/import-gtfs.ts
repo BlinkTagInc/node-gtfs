@@ -69,7 +69,6 @@ interface GtfsImportTask {
   prefix?: string;
   fillEmptyAgencyId: boolean;
   agencyId?: string;
-  singleAgencyId?: string;
   currentTimestamp: number;
   log: (message: string, newLine?: boolean) => void;
   logWarning: (message: string) => void;
@@ -419,7 +418,7 @@ const formatGtfsLine = (
   model: Model,
   totalLineCount: number,
   fillEmptyAgencyId: boolean,
-  singleAgencyId: string | undefined,
+  agencyId: string | undefined,
 ): Record<string, string | null> => {
   const lineNumber = totalLineCount + 1;
   const formattedLine: Record<string, string | null> = {};
@@ -481,13 +480,13 @@ const formatGtfsLine = (
 
   if (
     fillEmptyAgencyId &&
-    singleAgencyId !== undefined &&
+    agencyId !== undefined &&
     formattedLine.agency_id == null &&
     shouldBackfillAgencyId(model, formattedLine)
   ) {
     // Fill raw value — applyPrefixToValue handles prefixing at insert time
     // since agency_id is marked prefix: true in all affected models.
-    formattedLine.agency_id = singleAgencyId;
+    formattedLine.agency_id = agencyId;
   }
 
   return formattedLine;
@@ -636,7 +635,7 @@ const importGtfsFiles = async (
                     model,
                     totalLineCount,
                     task.fillEmptyAgencyId,
-                    task.singleAgencyId,
+                    task.agencyId,
                   ),
                 );
 
@@ -771,7 +770,7 @@ const importGtfsFiles = async (
                 model,
                 totalLineCount,
                 task.fillEmptyAgencyId,
-                task.singleAgencyId,
+                task.agencyId,
               );
               try {
                 insertLines([line]);
@@ -890,7 +889,6 @@ export async function importGtfs(
           prefix: agency.prefix,
           fillEmptyAgencyId: agency.fillEmptyAgencyId ?? false,
           agencyId: agency.agencyId,
-          singleAgencyId: undefined,
           currentTimestamp: Math.floor(Date.now() / 1000),
           log: log(config),
           logWarning: logWarning(config),
@@ -911,26 +909,25 @@ export async function importGtfs(
         await extractGtfsFiles(task);
 
         if (task.fillEmptyAgencyId) {
-          task.singleAgencyId = await getSingleAgencyId(
+          const agencyIdFromGtfs = await getSingleAgencyId(
             task.downloadDir,
             task.csvOptions,
             task.logWarning,
           );
 
-          if (task.singleAgencyId === undefined) {
-            if (task.agencyId !== undefined) {
-              task.singleAgencyId = task.agencyId;
-            } else {
+          if (agencyIdFromGtfs !== undefined) {
+            if (
+              task.agencyId !== undefined &&
+              task.agencyId !== agencyIdFromGtfs
+            ) {
               task.logWarning(
-                '`fillEmptyAgencyId` is set but a single `agency_id` could not be determined for this feed and no `agencyId` was provided in config. `agency_id` will not be backfilled.',
+                `\`agencyId\` "${task.agencyId}" does not match the \`agency_id\` "${agencyIdFromGtfs}" in agency.txt. Using the value from agency.txt.`,
               );
             }
-          } else if (
-            task.agencyId !== undefined &&
-            task.singleAgencyId !== task.agencyId
-          ) {
+            task.agencyId = agencyIdFromGtfs;
+          } else if (task.agencyId === undefined) {
             task.logWarning(
-              `\`agencyId\` "${task.agencyId}" does not match the \`agency_id\` "${task.singleAgencyId}" in agency.txt. Using the value from agency.txt.`,
+              '`fillEmptyAgencyId` is set but a single `agency_id` could not be determined for this feed and no `agencyId` was provided in config. `agency_id` will not be backfilled.',
             );
           }
         }
