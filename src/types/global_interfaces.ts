@@ -97,6 +97,12 @@ interface BaseConfigAgency {
    * @defaultValue false
    */
   fillEmptyAgencyId?: boolean;
+  /**
+   * Explicit `agency_id` to use when `fillEmptyAgencyId` is true and `agency.txt` does not define
+   * one. Also backfills the `agency_id` on the agency row itself. If `agency.txt` already defines
+   * an `agency_id` and it differs from this value, the value from `agency.txt` takes precedence.
+   */
+  agencyId?: string;
 }
 
 export type ConfigAgency = BaseConfigAgency &

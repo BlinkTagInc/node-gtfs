@@ -68,6 +68,7 @@ interface GtfsImportTask {
   sqlitePath: string;
   prefix?: string;
   fillEmptyAgencyId: boolean;
+  agencyId?: string;
   singleAgencyId?: string;
   currentTimestamp: number;
   log: (message: string, newLine?: boolean) => void;
@@ -388,6 +389,7 @@ const createGtfsIndexes = (db: Database.Database): void => {
 };
 
 const AGENCY_ID_BACKFILL_MODELS = new Set([
+  'agency',
   'routes',
   'fare_attributes',
   'trip_capacity',
@@ -887,6 +889,7 @@ export async function importGtfs(
           sqlitePath: config.sqlitePath,
           prefix: agency.prefix,
           fillEmptyAgencyId: agency.fillEmptyAgencyId ?? false,
+          agencyId: agency.agencyId,
           singleAgencyId: undefined,
           currentTimestamp: Math.floor(Date.now() / 1000),
           log: log(config),
@@ -915,8 +918,19 @@ export async function importGtfs(
           );
 
           if (task.singleAgencyId === undefined) {
+            if (task.agencyId !== undefined) {
+              task.singleAgencyId = task.agencyId;
+            } else {
+              task.logWarning(
+                '`fillEmptyAgencyId` is set but a single `agency_id` could not be determined for this feed and no `agencyId` was provided in config. `agency_id` will not be backfilled.',
+              );
+            }
+          } else if (
+            task.agencyId !== undefined &&
+            task.singleAgencyId !== task.agencyId
+          ) {
             task.logWarning(
-              '`fillEmptyAgencyId` is set but a single `agency_id` could not be determined for this feed. `agency_id` will not be backfilled.',
+              `\`agencyId\` "${task.agencyId}" does not match the \`agency_id\` "${task.singleAgencyId}" in agency.txt. Using the value from agency.txt.`,
             );
           }
         }
