@@ -67,6 +67,9 @@ interface GtfsImportTask {
   ignoreErrors: boolean;
   sqlitePath: string;
   prefix?: string;
+  fillEmptyAgencyId: boolean;
+  agencyId?: string;
+  singleAgencyId?: string;
   currentTimestamp: number;
   log: (message: string, newLine?: boolean) => void;
   logWarning: (message: string) => void;
@@ -235,6 +238,59 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
   }
 };
 
+/**
+ * Reads agency.txt from disk after extraction to find the single agency_id for a feed.
+ * Returns the raw agency_id string if there is exactly one agency with a non-empty
+ * agency_id, or undefined otherwise.
+ */
+const getSingleAgencyId = (
+  downloadDir: string,
+  csvOptions: object,
+  logWarning: (message: string) => void,
+): Promise<string | undefined> =>
+  new Promise((resolve) => {
+    const filepath = path.join(downloadDir, 'agency.txt');
+
+    if (!existsSync(filepath)) {
+      resolve(undefined);
+      return;
+    }
+
+    const rows: Record<string, string>[] = [];
+    const parser = parse({
+      columns: true,
+      relax_quotes: true,
+      trim: true,
+      skip_empty_lines: true,
+      ...csvOptions,
+    });
+
+    parser.on('readable', () => {
+      let record;
+      while ((record = parser.read())) {
+        rows.push(record);
+      }
+    });
+
+    parser.on('end', () => {
+      if (rows.length !== 1) {
+        resolve(undefined);
+        return;
+      }
+      const agencyId = rows[0].agency_id?.trim() || undefined;
+      resolve(agencyId);
+    });
+
+    parser.on('error', (err: Error) => {
+      logWarning(
+        `Unable to parse agency.txt for \`fillEmptyAgencyId\`: ${err.message}`,
+      );
+      resolve(undefined);
+    });
+
+    createReadStream(filepath).pipe(stripBomStream()).pipe(parser);
+  });
+
 const createGtfsTables = (db: Database.Database): void => {
   for (const model of Object.values(models) as Model[]) {
     if (!model.schema) {
@@ -332,10 +388,38 @@ const createGtfsIndexes = (db: Database.Database): void => {
   }
 };
 
+const AGENCY_ID_BACKFILL_MODELS = new Set([
+  'agency',
+  'routes',
+  'fare_attributes',
+  'trip_capacity',
+  'rider_trip',
+  'ridership',
+]);
+
+function shouldBackfillAgencyId(
+  model: Model,
+  formattedLine: Record<string, string | null>,
+): boolean {
+  if (AGENCY_ID_BACKFILL_MODELS.has(model.filenameBase)) {
+    return true;
+  }
+
+  if (model.filenameBase === 'attributions') {
+    // Per GTFS spec, agency_id, route_id, and trip_id are mutually exclusive.
+    // Only backfill when the row isn't already scoped to a route or trip.
+    return formattedLine.route_id == null && formattedLine.trip_id == null;
+  }
+
+  return false;
+}
+
 const formatGtfsLine = (
   line: { [x: string]: string | null },
   model: Model,
   totalLineCount: number,
+  fillEmptyAgencyId: boolean,
+  singleAgencyId: string | undefined,
 ): Record<string, string | null> => {
   const lineNumber = totalLineCount + 1;
   const formattedLine: Record<string, string | null> = {};
@@ -393,6 +477,17 @@ const formatGtfsLine = (
     }
 
     formattedLine[name] = value;
+  }
+
+  if (
+    fillEmptyAgencyId &&
+    singleAgencyId !== undefined &&
+    formattedLine.agency_id == null &&
+    shouldBackfillAgencyId(model, formattedLine)
+  ) {
+    // Fill raw value — applyPrefixToValue handles prefixing at insert time
+    // since agency_id is marked prefix: true in all affected models.
+    formattedLine.agency_id = singleAgencyId;
   }
 
   return formattedLine;
@@ -535,7 +630,15 @@ const importGtfsFiles = async (
 
               while ((record = parser.read())) {
                 totalLineCount += 1;
-                lines.push(formatGtfsLine(record, model, totalLineCount));
+                lines.push(
+                  formatGtfsLine(
+                    record,
+                    model,
+                    totalLineCount,
+                    task.fillEmptyAgencyId,
+                    task.singleAgencyId,
+                  ),
+                );
 
                 if (lines.length >= BATCH_SIZE) {
                   insertLines(lines);
@@ -667,6 +770,8 @@ const importGtfsFiles = async (
                 { geojson: data },
                 model,
                 totalLineCount,
+                task.fillEmptyAgencyId,
+                task.singleAgencyId,
               );
               try {
                 insertLines([line]);
@@ -769,7 +874,7 @@ export async function importGtfs(
       try {
         const tempPath = temporaryDirectory();
 
-        const task = {
+        const task: GtfsImportTask = {
           exclude: agency.exclude,
           headers: agency.headers,
           realtimeAlerts: agency.realtimeAlerts,
@@ -783,6 +888,9 @@ export async function importGtfs(
           ignoreErrors: config.ignoreErrors,
           sqlitePath: config.sqlitePath,
           prefix: agency.prefix,
+          fillEmptyAgencyId: agency.fillEmptyAgencyId ?? false,
+          agencyId: agency.agencyId,
+          singleAgencyId: undefined,
           currentTimestamp: Math.floor(Date.now() / 1000),
           log: log(config),
           logWarning: logWarning(config),
@@ -801,6 +909,32 @@ export async function importGtfs(
         }
 
         await extractGtfsFiles(task);
+
+        if (task.fillEmptyAgencyId) {
+          task.singleAgencyId = await getSingleAgencyId(
+            task.downloadDir,
+            task.csvOptions,
+            task.logWarning,
+          );
+
+          if (task.singleAgencyId === undefined) {
+            if (task.agencyId !== undefined) {
+              task.singleAgencyId = task.agencyId;
+            } else {
+              task.logWarning(
+                '`fillEmptyAgencyId` is set but a single `agency_id` could not be determined for this feed and no `agencyId` was provided in config. `agency_id` will not be backfilled.',
+              );
+            }
+          } else if (
+            task.agencyId !== undefined &&
+            task.singleAgencyId !== task.agencyId
+          ) {
+            task.logWarning(
+              `\`agencyId\` "${task.agencyId}" does not match the \`agency_id\` "${task.singleAgencyId}" in agency.txt. Using the value from agency.txt.`,
+            );
+          }
+        }
+
         await importGtfsFiles(db, task);
         await updateGtfsRealtimeData(task);
 
