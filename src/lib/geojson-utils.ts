@@ -1,5 +1,4 @@
 import {
-  cloneDeep,
   compact,
   filter,
   groupBy,
@@ -119,9 +118,7 @@ function formatHexColor(color: string | null | undefined): string | undefined {
 function formatProperties(
   properties: Record<string, unknown>,
 ): Record<string, unknown> {
-  const formattedProperties = cloneDeep(
-    omitBy(properties, (value) => value == null),
-  );
+  const formattedProperties = omitBy(properties, (value) => value == null);
 
   const formattedRouteColor = formatHexColor(properties.route_color);
   const formattedRouteTextColor = formatHexColor(properties.route_text_color);
