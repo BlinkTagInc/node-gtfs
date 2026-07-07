@@ -75,13 +75,16 @@ function consolidateShapes(shapeGroups: Shape[][]): Position[][] {
     consolidatedLineStrings.push([]);
 
     for (const segment of segments) {
-      const key1 = segment.flat().join(',');
-      // Copy before reversing: `segment` is reused below to build the line, so
-      // reversing it in place flips each point's order.
-      const key2 = [...segment].reverse().flat().join(',');
+      const [[x1, y1], [x2, y2]] = segment;
+      // Canonical key regardless of travel direction, so a segment and its
+      // reverse dedupe to the same entry without needing two lookups.
+      const key =
+        x1 < x2 || (x1 === x2 && y1 <= y2)
+          ? `${x1},${y1},${x2},${y2}`
+          : `${x2},${y2},${x1},${y1}`;
       const currentLine = last(consolidatedLineStrings);
 
-      if (!currentLine || keys.has(key1) || keys.has(key2)) {
+      if (!currentLine || keys.has(key)) {
         consolidatedLineStrings.push([]);
         continue;
       }
@@ -90,8 +93,7 @@ function consolidateShapes(shapeGroups: Shape[][]): Position[][] {
         currentLine.push(segment[0]);
       }
       currentLine.push(segment[1]);
-      keys.add(key1);
-      keys.add(key2);
+      keys.add(key);
     }
   }
 
