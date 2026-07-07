@@ -77,7 +77,9 @@ function consolidateShapes(shapeGroups: Shape[][]): Position[][] {
 
     for (const segment of segments) {
       const key1 = segment.flat().join(',');
-      const key2 = segment.reverse().flat().join(',');
+      // Copy before reversing: `segment` is reused below to build the line, so
+      // reversing it in place flips each point's order.
+      const key2 = [...segment].reverse().flat().join(',');
       const currentLine = last(consolidatedLineStrings);
 
       if (!currentLine || keys.has(key1) || keys.has(key2)) {
