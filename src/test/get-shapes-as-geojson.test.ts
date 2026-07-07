@@ -101,6 +101,11 @@ describe('getShapesAsGeoJSON():', () => {
       (geojson.features[0].geometry as GeoJSON.MultiLineString)
         .coordinates[0][0],
     ).toHaveLength(2);
+    // The line must start at the shape's first point, in order.
+    expect(
+      (geojson.features[0].geometry as GeoJSON.MultiLineString)
+        .coordinates[0][0],
+    ).toEqual([-122.39441156387329, 37.776439059278346]);
     expect(geojson.features[0].properties?.route_color).toMatch(/^#/);
   });
 });
