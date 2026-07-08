@@ -655,6 +655,7 @@ export interface RunPiece {
 
 export interface ServiceAlertInformedEntity {
   alert_id: string;
+  agency_id: string | null;
   stop_id: string | null;
   route_id: string | null;
   route_type: number | null;

@@ -1546,11 +1546,11 @@ In order to use GTFS-Realtime query methods, you must first run the [GTFS-Realti
 
 #### getServiceAlerts(query, fields, sortBy, options)
 
-Returns an array of GTFS Realtime service alerts that match query parameters. Each alert includes a nested `informed_entities` array containing all related informed entities (stops, routes, trips) that the alert applies to. Note that this does not refresh the data from GTFS-Realtime feeds, it only fetches what is stored in the database. In order to fetch the latest service alerts from GTFS-Realtime feeds and store in your database, use the [GTFS-Realtime update script or function](#gtfsrealtime-update-script).
+Returns an array of GTFS Realtime service alerts that match query parameters. Each alert includes a nested `informed_entities` array containing all related informed entities (agencies, stops, routes, trips) that the alert applies to. Note that this does not refresh the data from GTFS-Realtime feeds, it only fetches what is stored in the database. In order to fetch the latest service alerts from GTFS-Realtime feeds and store in your database, use the [GTFS-Realtime update script or function](#gtfsrealtime-update-script).
 
 [More details on Service Alerts](https://gtfs.org/realtime/feed-entities/service-alerts/)
 
-Each alert has an `informed_entities` array containing all stops, routes, and trips the alert applies to. The `active_period` field is a JSON-serialised array of `{start, end}` Unix timestamp objects representing when the alert is active. The convenience fields `start_time` and `end_time` contain the start and end of the first active period (or `null` if none is set).
+Each alert has an `informed_entities` array containing all agencies, stops, routes, and trips the alert applies to. The `active_period` field is a JSON-serialised array of `{start, end}` Unix timestamp objects representing when the alert is active. The convenience fields `start_time` and `end_time` contain the start and end of the first active period (or `null` if none is set).
 
 ```js
 import { getServiceAlerts } from 'gtfs';
@@ -1567,7 +1567,7 @@ const routeAlerts = getServiceAlerts({ route_id: 'ROUTE_ID' });
 
 #### getServiceAlertInformedEntities(query, fields, sortBy, options)
 
-Returns an array of GTFS Realtime service alert informed entities that match query parameters. Each row represents a single entity (stop, route, trip, etc.) that a service alert applies to, linked back to its alert via `alert_id`. Use this for direct access to the `service_alert_informed_entities` table; use `getServiceAlerts()` to get alerts with all informed entities already nested.
+Returns an array of GTFS Realtime service alert informed entities that match query parameters. Each row represents a single entity (agency, stop, route, trip, etc.) that a service alert applies to, linked back to its alert via `alert_id`. Use this for direct access to the `service_alert_informed_entities` table; use `getServiceAlerts()` to get alerts with all informed entities already nested.
 
 [More details on Service Alert Informed Entities](https://gtfs.org/realtime/feed-entities/service-alerts/#entityselector)
 
