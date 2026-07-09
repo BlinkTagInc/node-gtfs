@@ -1,3 +1,5 @@
 allowBuilds:
   better-sqlite3: true
   protobufjs: true
+minimumReleaseAgeExclude:
+  - tsdown@0.22.4
