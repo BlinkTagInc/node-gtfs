@@ -16,8 +16,9 @@ const ALERT_ID = 'test-alert-1';
 
 /*
  * Builds an encoded GTFS-Realtime FeedMessage protobuf payload containing a
- * single service alert with three informed entities, one of which is a
- * route-only entity (stop_id and trip_id are NULL) to exercise the NULL path.
+ * single service alert with four informed entities, one of which is a
+ * route-only entity (stop_id and trip_id are NULL) to exercise the NULL path
+ * and one of which is an agency-wide entity (only agency_id is set).
  */
 function buildAlertFeedBuffer(): Buffer {
   const { transit_realtime } = GtfsRealtimeBindings;
@@ -43,6 +44,8 @@ function buildAlertFeedBuffer(): Buffer {
             { trip: { tripId: 'trip-9' }, routeType: 3 },
             // Route-only entity (stop_id and trip_id are NULL)
             { routeId: 'route-7' },
+            // Agency-wide entity (no stop/route/trip)
+            { agencyId: 'agency-1' },
           ],
         },
       },
@@ -113,8 +116,8 @@ describe('getServiceAlerts():', () => {
     expect(alert.header_text).toBe('Test alert header');
     expect(alert.description_text).toBe('Test alert description');
 
-    // All three informed entities nested under the alert
-    expect(alert.informed_entities).toHaveLength(3);
+    // All four informed entities nested under the alert
+    expect(alert.informed_entities).toHaveLength(4);
 
     const stopRouteEntity = alert.informed_entities.find(
       (e) => e.stop_id === 'stop-A',
@@ -133,6 +136,14 @@ describe('getServiceAlerts():', () => {
         e.route_id === 'route-7' && e.stop_id === null && e.trip_id === null,
     );
     expect(routeOnlyEntity).toBeDefined();
+
+    const agencyEntity = alert.informed_entities.find(
+      (e) => e.agency_id === 'agency-1',
+    );
+    expect(agencyEntity).toBeDefined();
+    expect(agencyEntity?.stop_id).toBeNull();
+    expect(agencyEntity?.route_id).toBeNull();
+    expect(agencyEntity?.trip_id).toBeNull();
   });
 
   it('should not accumulate duplicate results across refreshes', async () => {
@@ -141,8 +152,8 @@ describe('getServiceAlerts():', () => {
 
     const results = getServiceAlerts({ id: ALERT_ID });
 
-    // Still one alert with exactly three informed entities
+    // Still one alert with exactly four informed entities
     expect(results).toHaveLength(1);
-    expect(results[0].informed_entities).toHaveLength(3);
+    expect(results[0].informed_entities).toHaveLength(4);
   });
 });

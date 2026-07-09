@@ -17,6 +17,7 @@ import {
 // alerts query — otherwise SQLite throws "no such column".
 const ENTITY_COLUMNS = new Set([
   'alert_id',
+  'agency_id',
   'stop_id',
   'route_id',
   'route_type',

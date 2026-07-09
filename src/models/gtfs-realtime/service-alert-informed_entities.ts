@@ -11,6 +11,14 @@ export const serviceAlertInformedEntities = {
       prefix: true,
     },
     {
+      name: 'agency_id',
+      type: 'text',
+      primary: true,
+      source: 'agencyId',
+      default: null,
+      prefix: true,
+    },
+    {
       name: 'stop_id',
       type: 'text',
       primary: true,
