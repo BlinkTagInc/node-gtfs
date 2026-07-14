@@ -86,11 +86,12 @@
     "gtfsrealtime-update": "dist/bin/gtfsrealtime-update.js"
   },
   "scripts": {
-    "prepare": "husky && pnpm run build",
     "test": "node --test --test-reporter=spec src/test/**/*.test.ts",
     "build": "tsdown",
     "build-watch": "tsdown --watch",
-    "lint": "eslint \"src/**/*.ts\""
+    "lint": "eslint \"src/**/*.ts\"",
+    "prepare": "node .husky/install.mjs && pnpm run build",
+    "prepack": "pnpm run build"
   },
   "exports": {
     ".": {
