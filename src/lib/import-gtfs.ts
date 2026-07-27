@@ -397,7 +397,8 @@ const AGENCY_ID_BACKFILL_MODELS = new Set([
 
 function shouldBackfillAgencyId(
   model: Model,
-  formattedLine: Record<string, string | null>,
+  formattedLine: (string | null)[],
+  columnIndexes: Map<string, number>,
 ): boolean {
   if (AGENCY_ID_BACKFILL_MODELS.has(model.filenameBase)) {
     return true;
@@ -406,7 +407,12 @@ function shouldBackfillAgencyId(
   if (model.filenameBase === 'attributions') {
     // Per GTFS spec, agency_id, route_id, and trip_id are mutually exclusive.
     // Only backfill when the row isn't already scoped to a route or trip.
-    return formattedLine.route_id == null && formattedLine.trip_id == null;
+    const routeIdIndex = columnIndexes.get('route_id');
+    const tripIdIndex = columnIndexes.get('trip_id');
+    return (
+      (routeIdIndex === undefined || formattedLine[routeIdIndex] == null) &&
+      (tripIdIndex === undefined || formattedLine[tripIdIndex] == null)
+    );
   }
 
   return false;
@@ -418,18 +424,20 @@ const formatGtfsLine = (
   totalLineCount: number,
   fillEmptyAgencyId: boolean,
   agencyId: string | undefined,
-): Record<string, string | null> => {
+  columnIndexes: Map<string, number>,
+): (string | null)[] => {
   const lineNumber = totalLineCount + 1;
-  const formattedLine: Record<string, string | null> = {};
+  const formattedLine: (string | null)[] = new Array(model.schema.length);
   const filenameBase = model.filenameBase;
   const filenameExtension = model.filenameExtension;
 
-  for (const { name, type, required } of model.schema) {
+  for (let index = 0; index < model.schema.length; index++) {
+    const { name, type, required } = model.schema[index];
     let value: string | null = line[name];
 
     // Early null check
     if (value === '' || value === undefined || value === null) {
-      formattedLine[name] = null;
+      formattedLine[index] = null;
 
       if (required) {
         throw new GtfsError(
@@ -474,18 +482,21 @@ const formatGtfsLine = (
       value = JSON.stringify(value);
     }
 
-    formattedLine[name] = value;
+    formattedLine[index] = value;
   }
+
+  const agencyIdIndex = columnIndexes.get('agency_id');
 
   if (
     fillEmptyAgencyId &&
     agencyId !== undefined &&
-    formattedLine.agency_id == null &&
-    shouldBackfillAgencyId(model, formattedLine)
+    agencyIdIndex !== undefined &&
+    formattedLine[agencyIdIndex] == null &&
+    shouldBackfillAgencyId(model, formattedLine, columnIndexes)
   ) {
     // Fill raw value — applyPrefixToValue handles prefixing at insert time
     // since agency_id is marked prefix: true in all affected models.
-    formattedLine.agency_id = agencyId;
+    formattedLine[agencyIdIndex] = agencyId;
   }
 
   return formattedLine;
@@ -534,39 +545,36 @@ const importGtfsFiles = async (
         // Create a list of all columns
         const columns = model.schema;
 
-        // Create a map of which columns need prefixing
-        const prefixedColumns = new Set(
-          columns
-            .filter((column) => column.prefix)
-            .map((column) => column.name),
+        // Positional lookups, computed once per file rather than per row
+        const columnIndexes = new Map(
+          columns.map((column, index) => [column.name, index]),
         );
+        const prefixedColumns = columns.map((column) => Boolean(column.prefix));
 
         const prepareStatement = `INSERT ${task.ignoreDuplicates ? 'OR IGNORE' : ''} INTO ${
           model.filenameBase
         } (${columns.map(({ name }) => name).join(', ')}) VALUES (${columns
-          .map(({ name }) => `@${name}`)
+          .map(() => '?')
           .join(', ')})`;
 
         const insert = db.prepare(prepareStatement);
 
         const insertLines = db.transaction((lines) => {
-          for (const [rowNumber, line] of Object.entries(lines)) {
+          for (let rowNumber = 0; rowNumber < lines.length; rowNumber++) {
+            const line = lines[rowNumber];
             try {
               if (task.prefix === undefined) {
-                insert.run(line);
+                insert.run(line as SqlValue[]);
               } else {
-                const prefixedLine = Object.fromEntries(
-                  Object.entries(
-                    line as { [x: string]: unknown; geojson?: string },
-                  ).map(([columnName, value]) => [
-                    columnName,
-                    applyPrefixToValue(
-                      value as string,
-                      prefixedColumns.has(columnName),
-                      task.prefix,
-                    ),
-                  ]),
-                );
+                const values = line as SqlValue[];
+                const prefixedLine = new Array(values.length);
+                for (let index = 0; index < values.length; index++) {
+                  prefixedLine[index] = applyPrefixToValue(
+                    values[index] as string,
+                    prefixedColumns[index],
+                    task.prefix,
+                  );
+                }
                 insert.run(prefixedLine);
               }
             } catch (error: unknown) {
@@ -621,7 +629,7 @@ const importGtfsFiles = async (
             ...task.csvOptions,
           });
 
-          let lines: { [x: string]: SqlValue; geojson?: string }[] = [];
+          let lines: (string | null)[][] = [];
 
           parser.on('readable', () => {
             try {
@@ -636,6 +644,7 @@ const importGtfsFiles = async (
                     totalLineCount,
                     task.fillEmptyAgencyId,
                     task.agencyId,
+                    columnIndexes,
                   ),
                 );
 
@@ -771,6 +780,7 @@ const importGtfsFiles = async (
                 totalLineCount,
                 task.fillEmptyAgencyId,
                 task.agencyId,
+                columnIndexes,
               );
               try {
                 insertLines([line]);

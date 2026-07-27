@@ -12,6 +12,7 @@ function setupDb(sqlitePath: string) {
   db.pragma('journal_mode = OFF');
   db.pragma('synchronous = OFF');
   db.pragma('temp_store = MEMORY');
+  db.pragma('cache_size = -256000');
   dbs[sqlitePath] = db;
 
   return db;
