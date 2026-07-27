@@ -363,25 +363,72 @@ const createGtfsTables = (db: Database.Database): void => {
   }
 };
 
+// For columns that are mostly empty, use a partial index (`WHERE column IS NOT NULL`) instead of a full index.
+const SPARSE_COLUMN_MAX_DENSITY = 0.1;
+
+const createGtfsIndex = (
+  db: Database.Database,
+  tableName: string,
+  columnName: string,
+  partial: boolean,
+): void => {
+  const predicate = partial ? ` WHERE ${columnName} IS NOT NULL` : '';
+  db.prepare(
+    `CREATE INDEX idx_${tableName}_${columnName} ON ${tableName} (${columnName})${predicate};`,
+  ).run();
+};
+
 const createGtfsIndexes = (db: Database.Database): void => {
   for (const model of Object.values(models) as Model[]) {
     if (!model.schema) {
       continue;
     }
+
+    const indexedColumns: string[] = [];
+
     for (const column of model.schema) {
       if (column.index) {
-        db.prepare(
-          `CREATE INDEX idx_${model.filenameBase}_${column.name} ON ${model.filenameBase} (${column.name});`,
-        ).run();
+        indexedColumns.push(column.name);
       }
 
+      // Index all timestamp columns
       if (column.type === 'time') {
-        // Index all timestamp columns
-        const timestampColumnName = getTimestampColumnName(column.name);
-        db.prepare(
-          `CREATE INDEX idx_${model.filenameBase}_${timestampColumnName} ON ${model.filenameBase} (${timestampColumnName});`,
-        ).run();
+        indexedColumns.push(getTimestampColumnName(column.name));
       }
+    }
+
+    if (indexedColumns.length === 0) {
+      continue;
+    }
+
+    const { rowCount } = db
+      .prepare(`SELECT COUNT(*) AS rowCount FROM ${model.filenameBase}`)
+      .get() as { rowCount: number };
+
+    if (rowCount === 0) {
+      for (const columnName of indexedColumns) {
+        createGtfsIndex(db, model.filenameBase, columnName, false);
+      }
+      continue;
+    }
+
+    // Count non-null values for each indexed column using COUNT(column) to skip NULLs
+    const counts = db
+      .prepare(
+        `SELECT ${indexedColumns
+          .map((columnName, index) => `COUNT(${columnName}) AS c${index}`)
+          .join(', ')} FROM ${model.filenameBase}`,
+      )
+      .get() as Record<string, number>;
+
+    for (const [index, columnName] of indexedColumns.entries()) {
+      const density = counts[`c${index}`] / rowCount;
+      createGtfsIndex(
+        db,
+        model.filenameBase,
+        columnName,
+        density <= SPARSE_COLUMN_MAX_DENSITY,
+      );
     }
   }
 };
