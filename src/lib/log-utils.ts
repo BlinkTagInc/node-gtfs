@@ -98,3 +98,19 @@ export function formatError(error: Error | string): string {
 
   return colors.red(`${colors.underline('Error')}: ${cleanMessage}`);
 }
+
+/**
+ * Formats an error's stack trace for terminal output
+ * @param {Error | string} error - The error object or message to format
+ * @returns {string} Dimmed stack trace, or an empty string if none is available
+ * @example
+ * const formattedStack = formatStackTrace(new Error('Connection failed'));
+ * console.error(formattedStack);
+ */
+export function formatStackTrace(error: Error | string): string {
+  if (error instanceof Error && error.stack) {
+    return colors.dim(error.stack);
+  }
+
+  return '';
+}

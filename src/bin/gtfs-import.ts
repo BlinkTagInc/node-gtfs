@@ -2,14 +2,11 @@
 
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import PrettyError from 'pretty-error';
 
 import { getConfig } from '../lib/file-utils.ts';
-import { formatError } from '../lib/log-utils.ts';
+import { formatError, formatStackTrace } from '../lib/log-utils.ts';
 import { closeDb, importGtfs, openDb } from '../index.ts';
 import type { Config } from '../types/global_interfaces.ts';
-
-const pe = new PrettyError();
 
 const argv = yargs(hideBin(process.argv))
   .usage('Usage: $0 --configPath ./config.json')
@@ -33,9 +30,9 @@ const argv = yargs(hideBin(process.argv))
   })
   .parseSync();
 
-const handleError = (error = 'Unknown Error') => {
+const handleError = (error: Error | string = 'Unknown Error') => {
   process.stdout.write(`\n${formatError(error)}\n`);
-  console.error(pe.render(error));
+  console.error(formatStackTrace(error));
   process.exit(1);
 };
 

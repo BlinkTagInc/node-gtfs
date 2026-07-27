@@ -1,6 +1,6 @@
 import path from 'node:path';
-import { existsSync } from 'node:fs';
-import { homedir } from 'node:os';
+import { existsSync, mkdtempSync } from 'node:fs';
+import { homedir, tmpdir } from 'node:os';
 import { mkdir, readFile, rm } from 'node:fs/promises';
 import { omit, snakeCase } from 'lodash-es';
 import sanitize from 'sanitize-filename';
@@ -130,4 +130,12 @@ export function untildify(pathWithTilde: string): string {
   return homeDirectory
     ? pathWithTilde.replace(/^~(?=$|\/|\\)/, homeDirectory)
     : pathWithTilde;
+}
+
+/**
+ * Creates a new, unique temporary directory and returns its path
+ * @returns {string} Path to the newly created temporary directory
+ */
+export function temporaryDirectory(): string {
+  return mkdtempSync(path.join(tmpdir(), 'gtfs-'));
 }

@@ -1,7 +1,8 @@
 import { describe, it, beforeEach, afterEach, expect } from './test-utils.ts';
 import { writeFile, rm } from 'node:fs/promises';
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { temporaryDirectory } from 'tempy';
 
 import {
   openDb,
@@ -19,7 +20,7 @@ import {
 const createGtfsFixture = async (
   files: Record<string, string>,
 ): Promise<string> => {
-  const dir = temporaryDirectory();
+  const dir = mkdtempSync(path.join(tmpdir(), 'gtfs-'));
   for (const [filename, content] of Object.entries(files)) {
     await writeFile(path.join(dir, filename), content);
   }

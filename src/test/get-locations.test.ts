@@ -1,6 +1,8 @@
 import { describe, it, beforeAll, afterAll, expect } from './test-utils.ts';
 import path from 'node:path';
+import { mkdtempSync } from 'node:fs';
 import { rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 
 import config from './test-config.ts';
 import {
@@ -11,9 +13,8 @@ import {
   unzip,
   prepDirectory,
 } from '../../dist/index.js';
-import { temporaryDirectory } from 'tempy';
 
-const temporaryDir = temporaryDirectory();
+const temporaryDir = mkdtempSync(path.join(tmpdir(), 'gtfs-'));
 
 const locationsConfig = {
   agencies: [

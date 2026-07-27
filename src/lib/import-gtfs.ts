@@ -2,14 +2,12 @@ import path from 'node:path';
 import { createReadStream, existsSync, lstatSync } from 'node:fs';
 import { cp, readdir, rename, readFile, rm, writeFile } from 'node:fs/promises';
 import { parse } from 'csv-parse';
-import stripBomStream from 'strip-bom-stream';
-import { temporaryDirectory } from 'tempy';
 import mapSeries from 'promise-map-series';
 import Database from 'better-sqlite3';
 
 import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
-import { untildify, unzip } from './file-utils.ts';
+import { temporaryDirectory, untildify, unzip } from './file-utils.ts';
 import { isValidJSON } from './geojson-utils.ts';
 import { updateGtfsRealtimeData } from './import-gtfs-realtime.ts';
 import { log, logError, logWarning } from './log-utils.ts';
@@ -261,6 +259,7 @@ const getSingleAgencyId = (
       relax_quotes: true,
       trim: true,
       skip_empty_lines: true,
+      bom: true,
       ...csvOptions,
     });
 
@@ -287,7 +286,7 @@ const getSingleAgencyId = (
       resolve(undefined);
     });
 
-    createReadStream(filepath).pipe(stripBomStream()).pipe(parser);
+    createReadStream(filepath).pipe(parser);
   });
 
 const createGtfsTables = (db: Database.Database): void => {
@@ -618,6 +617,7 @@ const importGtfsFiles = async (
             relax_quotes: true,
             trim: true,
             skip_empty_lines: true,
+            bom: true,
             ...task.csvOptions,
           });
 
@@ -736,7 +736,7 @@ const importGtfsFiles = async (
             }
           });
 
-          createReadStream(filepath).pipe(stripBomStream()).pipe(parser);
+          createReadStream(filepath).pipe(parser);
         } else if (model.filenameExtension === 'geojson') {
           readFile(filepath, 'utf8')
             .then((data) => {

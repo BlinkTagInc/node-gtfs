@@ -8,10 +8,10 @@ import {
   expect,
 } from './test-utils.ts';
 import path from 'node:path';
-import { createReadStream, existsSync } from 'node:fs';
+import { createReadStream, existsSync, mkdtempSync } from 'node:fs';
 import { rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { parse } from 'csv-parse';
-import { temporaryDirectory } from 'tempy';
 
 import config from './test-config.ts';
 import {
@@ -48,7 +48,7 @@ describe('exportGtfs():', function () {
     const countData: {
       [key: string]: number;
     } = {};
-    const temporaryDir = temporaryDirectory();
+    const temporaryDir = mkdtempSync(path.join(tmpdir(), 'gtfs-'));
 
     beforeAll(async () => {
       await prepDirectory(temporaryDir);
