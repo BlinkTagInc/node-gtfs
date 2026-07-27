@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fix for prepare command when dev dependencies are not installed
 
+### Updated
+- Dependency Updates
+
 ## [4.19.4] - 2026-07-08
 
 ### Added
