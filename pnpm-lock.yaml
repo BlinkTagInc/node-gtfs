@@ -32,9 +32,6 @@ importers:
       node-stream-zip:
         specifier: 1.16.0
         version: 1.16.0
-      promise-map-series:
-        specifier: 0.3.0
-        version: 0.3.0
       sanitize-filename:
         specifier: 1.6.4
         version: 1.6.4
@@ -984,10 +981,6 @@ packages:
     resolution: {integrity: sha512-OpN0zzVdiaiAhxpuuj5efpIS4sY9j7bY6uR5mnj5yPzGkdkjNKSJeUThPb60Jw29QuAZgA4o+/iB49kFiaBX6g==}
     engines: {node: '>=14'}
     hasBin: true
-
-  promise-map-series@0.3.0:
-    resolution: {integrity: sha512-3npG2NGhTc8BWBolLLf8l/92OxMGaRLbqvIh9wjCHhDXNvk4zsxaTaCpiCunW09qWPrN2zeNSNwRLVBrQQtutA==}
-    engines: {node: 10.* || >= 12.*}
 
   protobufjs-cli@2.6.1:
     resolution: {integrity: sha512-ty8A5JKY/mRTlV/eW7bRoUmOxgzBL66CIBDv7wq8rQUady60rwPwAgqqumcy+oxIkUV6wWTAcxsZjLZKwNsFog==}
@@ -2027,8 +2020,6 @@ snapshots:
   prelude-ls@1.2.1: {}
 
   prettier@3.9.6: {}
-
-  promise-map-series@0.3.0: {}
 
   protobufjs-cli@2.6.1(protobufjs@8.7.1):
     dependencies:

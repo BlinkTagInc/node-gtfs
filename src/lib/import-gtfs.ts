@@ -2,7 +2,6 @@ import path from 'node:path';
 import { createReadStream, existsSync, lstatSync } from 'node:fs';
 import { cp, readdir, rename, readFile, rm, writeFile } from 'node:fs/promises';
 import { parse } from 'csv-parse';
-import mapSeries from 'promise-map-series';
 import Database from 'better-sqlite3';
 
 import * as models from '../models/models.ts';
@@ -15,6 +14,7 @@ import {
   getTimestampColumnName,
   padLeadingZeros,
   applyPrefixToValue,
+  mapSeries,
   pluralize,
   setDefaultConfig,
   validateConfigForImport,

@@ -5,13 +5,17 @@ import { without, compact } from 'lodash-es';
 import { stringify } from 'csv-stringify';
 import sqlString from 'sqlstring-sqlite';
 import Database from 'better-sqlite3';
-import mapSeries from 'promise-map-series';
 
 import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
 import { prepDirectory, generateFolderName, untildify } from './file-utils.ts';
 import { log, logWarning } from './log-utils.ts';
-import { formatCurrency, pluralize, setDefaultConfig } from './utils.ts';
+import {
+  formatCurrency,
+  mapSeries,
+  pluralize,
+  setDefaultConfig,
+} from './utils.ts';
 
 import { Config, Model, SqlValue } from '../types/global_interfaces.ts';
 

@@ -1,5 +1,4 @@
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
-import mapSeries from 'promise-map-series';
 import { get } from 'lodash-es';
 import Database from 'better-sqlite3';
 
@@ -9,6 +8,7 @@ import { log, logError, logWarning } from './log-utils.ts';
 import {
   convertLongTimeToDate,
   applyPrefixToValue,
+  mapSeries,
   pluralize,
   setDefaultConfig,
   validateConfigForImport,
