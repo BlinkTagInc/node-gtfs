@@ -25,7 +25,7 @@ import {
   prepDirectory,
 } from '../../dist/index.js';
 import * as models from '../../dist/models/models.js';
-import type { Model } from '../../dist/types/global_interfaces.js';
+import type { Model } from '../../dist/index.js';
 
 describe('exportGtfs():', function () {
   describe('Export GTFS', () => {
@@ -146,7 +146,7 @@ describe('exportGtfs():', function () {
           },
         );
 
-        return createReadStream(filePath)
+        createReadStream(filePath)
           .pipe(parser)
           .on('error', (error) => {
             expect(error).toBeNull();

@@ -26,7 +26,7 @@ import {
   GtfsErrorCode,
 } from '../../dist/index.js';
 import * as models from '../../dist/models/models.js';
-import type { Model } from '../../dist/types/global_interfaces.js';
+import type { Model } from '../../dist/index.js';
 
 const agenciesFixturesRemote = [
   {

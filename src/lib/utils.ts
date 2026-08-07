@@ -57,7 +57,12 @@ export function validateConfigForImport(config: Config) {
   }
 
   for (const [index, agency] of config.agencies.entries()) {
-    if (!agency.path && !agency.url) {
+    // `ConfigAgency` is a union requiring one of `url`/`path`, so neither can be
+    // read directly. This runtime check still matters for untyped JS callers.
+    const hasPath = 'path' in agency && agency.path;
+    const hasUrl = 'url' in agency && agency.url;
+
+    if (!hasPath && !hasUrl) {
       throw new GtfsError(
         `No Agency \`url\` or \`path\` specified in config for agency index ${index}.`,
         {

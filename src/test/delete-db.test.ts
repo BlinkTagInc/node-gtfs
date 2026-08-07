@@ -3,7 +3,7 @@ import { rm } from 'fs/promises';
 import { existsSync } from 'fs';
 
 import config from './test-config.ts';
-import { deleteDb, openDb, importGtfs } from '../../dist/index.js';
+import { type Config, deleteDb, openDb, importGtfs } from '../../dist/index.js';
 
 const db4Config = {
   agencies: [
@@ -14,7 +14,7 @@ const db4Config = {
   ],
   verbose: false,
   sqlitePath: './tmpdb4',
-};
+} satisfies Config;
 
 const db5Config = {
   agencies: [
@@ -25,7 +25,7 @@ const db5Config = {
   ],
   verbose: false,
   sqlitePath: './tmpdb5',
-};
+} satisfies Config;
 
 describe('deleteDb():', () => {
   beforeAll(async () => {

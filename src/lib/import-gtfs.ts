@@ -556,7 +556,7 @@ const importGtfsFiles = async (
   task: GtfsImportTask,
 ): Promise<void> => {
   await mapSeries(
-    Object.values(models),
+    Object.values(models) as Model[],
     (model: Model) =>
       new Promise<void>((resolve, reject) => {
         let totalLineCount = 0;

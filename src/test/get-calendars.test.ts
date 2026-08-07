@@ -104,6 +104,9 @@ describe('getServiceIdsByDate():', () => {
 
   it('should throw an error if date is not provided', () => {
     expect(() => {
+      // Deliberately called without arguments to exercise the runtime guard
+      // that protects untyped JS callers.
+      // @ts-expect-error -- `date` is required by the type signature
       getServiceIdsByDate();
     }).toThrow('`date` is a required query parameter');
   });

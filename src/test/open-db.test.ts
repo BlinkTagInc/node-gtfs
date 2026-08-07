@@ -2,7 +2,13 @@ import fs from 'fs';
 import { describe, it, beforeEach, afterEach, expect } from './test-utils.ts';
 
 import config from './test-config.ts';
-import { openDb, closeDb, importGtfs, getShapes } from '../../dist/index.js';
+import {
+  type Config,
+  openDb,
+  closeDb,
+  importGtfs,
+  getShapes,
+} from '../../dist/index.js';
 
 const db2Config = {
   agencies: [
@@ -13,7 +19,7 @@ const db2Config = {
   ],
   verbose: false,
   sqlitePath: './tmpdb2',
-};
+} satisfies Config;
 
 const db3Config = {
   agencies: [
@@ -24,7 +30,7 @@ const db3Config = {
   ],
   verbose: false,
   sqlitePath: './tmpdb3',
-};
+} satisfies Config;
 
 beforeEach(async () => {
   openDb({ sqlitePath: ':memory:' });

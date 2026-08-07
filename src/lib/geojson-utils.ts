@@ -122,8 +122,12 @@ function formatProperties(
 ): Record<string, unknown> {
   const formattedProperties = omitBy(properties, (value) => value == null);
 
-  const formattedRouteColor = formatHexColor(properties.route_color);
-  const formattedRouteTextColor = formatHexColor(properties.route_text_color);
+  const formattedRouteColor = formatHexColor(
+    properties.route_color as string | null | undefined,
+  );
+  const formattedRouteTextColor = formatHexColor(
+    properties.route_text_color as string | null | undefined,
+  );
 
   if (formattedRouteColor) {
     formattedProperties.route_color = formattedRouteColor;
