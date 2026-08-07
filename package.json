@@ -86,12 +86,16 @@
     "gtfsrealtime-update": "dist/bin/gtfsrealtime-update.js"
   },
   "scripts": {
-    "test": "node --test --test-reporter=spec src/test/**/*.test.ts",
     "build": "tsdown",
-    "build-watch": "tsdown --watch",
-    "lint": "eslint \"src/**/*.ts\"",
-    "prepare": "node .husky/install.mjs && pnpm run build",
-    "prepack": "pnpm run build"
+    "test": "node --test --test-reporter=spec src/test/**/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix && eslint --fix \"src/**/*.ts\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky && pnpm run typecheck && pnpm run build",
+    "prepack": "pnpm run typecheck && pnpm run build",
+    "prepublishOnly": "pnpm run typecheck"
   },
   "exports": {
     ".": {
@@ -126,9 +130,11 @@
     "@types/node": "26",
     "@types/yargs": "17.0.35",
     "eslint": "10.8.0",
+    "eslint-plugin-oxlint": "^1.77.0",
     "globals": "17.8.0",
     "husky": "9.1.7",
     "lint-staged": "17.2.0",
+    "oxlint": "^1.77.0",
     "prettier": "3.9.6",
     "tsdown": "^0.22.14",
     "typescript": "6.0.3",
@@ -154,8 +160,14 @@
     "singleQuote": true
   },
   "lint-staged": {
-    "*.js": "prettier --write",
-    "*.ts": "prettier --write",
+    "*.js": [
+      "oxlint --fix",
+      "prettier --write"
+    ],
+    "*.ts": [
+      "oxlint --fix",
+      "prettier --write"
+    ],
     "*.json": "prettier --write"
   },
   "packageManager": "pnpm@11.17.0"

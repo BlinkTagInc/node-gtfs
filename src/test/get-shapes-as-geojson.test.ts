@@ -36,12 +36,9 @@ describe('getShapesAsGeoJSON():', () => {
     const exampleFeature = geojson.features.find(
       (feature) => feature?.properties?.route_id === 'Bu-16APR',
     );
-    expect(
-      (exampleFeature?.geometry as GeoJSON.MultiLineString).coordinates[0],
-    ).toHaveLength(381);
-    expect(
-      (exampleFeature?.geometry as GeoJSON.MultiLineString).coordinates[0][0],
-    ).toHaveLength(2);
+    const exampleGeometry = exampleFeature?.geometry as GeoJSON.MultiLineString;
+    expect(exampleGeometry.coordinates[0]).toHaveLength(381);
+    expect(exampleGeometry.coordinates[0][0]).toHaveLength(2);
     expect(exampleFeature?.properties?.route_color).toMatch(/^#/);
   });
 

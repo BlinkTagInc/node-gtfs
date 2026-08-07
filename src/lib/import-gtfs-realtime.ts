@@ -171,7 +171,7 @@ async function fetchGtfsRealtimeData(
         redirect: 'follow',
         headers: {
           'User-Agent': 'node-gtfs',
-          ...(urlConfig.headers ?? {}),
+          ...urlConfig.headers,
           'Accept-Encoding': 'gzip',
         },
         signal: task.downloadTimeout
