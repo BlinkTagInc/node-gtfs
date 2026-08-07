@@ -24,12 +24,12 @@ export function getAgencies<Fields extends keyof Agency>(
   const db = options.db ?? openDb();
   const tableName = 'agency';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<Agency, Fields>[];
+    .all(...params) as QueryResult<Agency, Fields>[];
 }

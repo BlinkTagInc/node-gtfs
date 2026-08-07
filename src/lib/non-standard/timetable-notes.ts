@@ -24,12 +24,12 @@ export function getTimetableNotes<Fields extends keyof TimetableNote>(
   const db = options.db ?? openDb();
   const tableName = 'timetable_notes';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<TimetableNote, Fields>[];
+    .all(...params) as QueryResult<TimetableNote, Fields>[];
 }

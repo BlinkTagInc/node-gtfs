@@ -3,6 +3,7 @@ import { omit, pick } from 'lodash-es';
 import type {
   QueryOptions,
   Route,
+  SqlClause,
   SqlOrderBy,
   QueryResult,
   SqlWhere,
@@ -15,12 +16,18 @@ import {
   formatWhereClauses,
 } from '../utils.ts';
 
-function buildStoptimeSubquery(query: { [key: string]: string }) {
-  const whereClause = formatWhereClauses(query);
-  return `SELECT DISTINCT trip_id FROM stop_times ${whereClause}`;
+function buildStoptimeSubquery(query: { [key: string]: string }): SqlClause {
+  const { clause: whereClause, params } = formatWhereClauses(query);
+  return {
+    clause: `SELECT DISTINCT trip_id FROM stop_times ${whereClause}`,
+    params,
+  };
 }
 
-function buildTripSubquery(query: { service_id?: string; stop_id?: string }) {
+function buildTripSubquery(query: {
+  service_id?: string;
+  stop_id?: string;
+}): SqlClause {
   let whereClause = '';
   const tripQuery = omit(query, ['stop_id']);
   const stoptimeQuery = pick(query, ['stop_id']);
@@ -30,14 +37,21 @@ function buildTripSubquery(query: { service_id?: string; stop_id?: string }) {
   );
 
   if (Object.values(stoptimeQuery).length > 0) {
-    whereClauses.push(`trip_id IN (${buildStoptimeSubquery(stoptimeQuery)})`);
+    const stoptimeSubquery = buildStoptimeSubquery(stoptimeQuery);
+    whereClauses.push({
+      clause: `trip_id IN (${stoptimeSubquery.clause})`,
+      params: stoptimeSubquery.params,
+    });
   }
 
   if (whereClauses.length > 0) {
-    whereClause = `WHERE ${whereClauses.join(' AND ')}`;
+    whereClause = `WHERE ${whereClauses.map(({ clause }) => clause).join(' AND ')}`;
   }
 
-  return `SELECT DISTINCT route_id FROM trips ${whereClause}`;
+  return {
+    clause: `SELECT DISTINCT route_id FROM trips ${whereClause}`,
+    params: whereClauses.flatMap(({ params }) => params),
+  };
 }
 
 /*
@@ -68,16 +82,23 @@ export function getRoutes<Fields extends keyof Route>(
   );
 
   if (Object.values(tripQuery).length > 0) {
-    whereClauses.push(`route_id IN (${buildTripSubquery(tripQuery)})`);
+    const tripSubquery = buildTripSubquery(tripQuery);
+    whereClauses.push({
+      clause: `route_id IN (${tripSubquery.clause})`,
+      params: tripSubquery.params,
+    });
   }
 
   if (whereClauses.length > 0) {
-    whereClause = `WHERE ${whereClauses.join(' AND ')}`;
+    whereClause = `WHERE ${whereClauses.map(({ clause }) => clause).join(' AND ')}`;
   }
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<Route, Fields>[];
+    .all(...whereClauses.flatMap(({ params }) => params)) as QueryResult<
+    Route,
+    Fields
+  >[];
 }

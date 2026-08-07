@@ -24,12 +24,12 @@ export function getRidership<Fields extends keyof Ridership>(
   const db = options.db ?? openDb();
   const tableName = 'ridership';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<Ridership, Fields>[];
+    .all(...params) as QueryResult<Ridership, Fields>[];
 }

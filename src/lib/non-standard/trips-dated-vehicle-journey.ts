@@ -26,12 +26,12 @@ export function getTripsDatedVehicleJourneys<
   const db = options.db ?? openDb();
   const tableName = 'trips_dated_vehicle_journey';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<TripsDatedVehicleJourney, Fields>[];
+    .all(...params) as QueryResult<TripsDatedVehicleJourney, Fields>[];
 }

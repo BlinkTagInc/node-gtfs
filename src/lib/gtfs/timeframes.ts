@@ -24,12 +24,12 @@ export function getTimeframes<Fields extends keyof Timeframe>(
   const db = options.db ?? openDb();
   const tableName = 'timeframes';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<Timeframe, Fields>[];
+    .all(...params) as QueryResult<Timeframe, Fields>[];
 }

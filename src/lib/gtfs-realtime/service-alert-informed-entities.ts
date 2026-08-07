@@ -26,12 +26,12 @@ export function getServiceAlertInformedEntities<
   const db = options.db ?? openDb();
   const tableName = 'service_alert_informed_entities';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<ServiceAlertInformedEntity, Fields>[];
+    .all(...params) as QueryResult<ServiceAlertInformedEntity, Fields>[];
 }

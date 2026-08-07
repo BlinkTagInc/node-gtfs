@@ -24,12 +24,12 @@ export function getStopAttributes<Fields extends keyof StopAttribute>(
   const db = options.db ?? openDb();
   const tableName = 'stop_attributes';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<StopAttribute, Fields>[];
+    .all(...params) as QueryResult<StopAttribute, Fields>[];
 }

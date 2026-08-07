@@ -24,12 +24,12 @@ export function getVehiclePositions<Fields extends keyof VehiclePosition>(
   const db = options.db ?? openDb();
   const tableName = 'vehicle_positions';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<VehiclePosition, Fields>[];
+    .all(...params) as QueryResult<VehiclePosition, Fields>[];
 }

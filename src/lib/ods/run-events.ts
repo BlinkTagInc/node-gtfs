@@ -24,12 +24,12 @@ export function getRunEvents<Fields extends keyof RunEvent>(
   const db = options.db ?? openDb();
   const tableName = 'run_events';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<RunEvent, Fields>[];
+    .all(...params) as QueryResult<RunEvent, Fields>[];
 }

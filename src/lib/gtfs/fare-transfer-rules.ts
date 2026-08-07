@@ -24,12 +24,12 @@ export function getFareTransferRules<Fields extends keyof FareTransferRule>(
   const db = options.db ?? openDb();
   const tableName = 'fare_transfer_rules';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<FareTransferRule, Fields>[];
+    .all(...params) as QueryResult<FareTransferRule, Fields>[];
 }

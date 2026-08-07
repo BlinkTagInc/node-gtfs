@@ -24,12 +24,12 @@ export function getLocations<Fields extends keyof Location>(
   const db = options.db ?? openDb();
   const tableName = 'locations';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<Location, Fields>[];
+    .all(...params) as QueryResult<Location, Fields>[];
 }

@@ -26,14 +26,14 @@ export function getCalendars<Fields extends keyof Calendar>(
   const db = options.db ?? openDb();
   const tableName = 'calendar';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<Calendar, Fields>[];
+    .all(...params) as QueryResult<Calendar, Fields>[];
 }
 
 /*

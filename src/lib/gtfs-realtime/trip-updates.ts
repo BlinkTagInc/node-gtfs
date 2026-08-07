@@ -24,12 +24,12 @@ export function getTripUpdates<Fields extends keyof TripUpdate>(
   const db = options.db ?? openDb();
   const tableName = 'trip_updates';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<TripUpdate, Fields>[];
+    .all(...params) as QueryResult<TripUpdate, Fields>[];
 }

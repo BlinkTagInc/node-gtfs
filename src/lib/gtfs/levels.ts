@@ -24,12 +24,12 @@ export function getLevels<Fields extends keyof Level>(
   const db = options.db ?? openDb();
   const tableName = 'levels';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<Level, Fields>[];
+    .all(...params) as QueryResult<Level, Fields>[];
 }

@@ -24,12 +24,12 @@ export function getRideFeedInfo<Fields extends keyof RideFeedInfo>(
   const db = options.db ?? openDb();
   const tableName = 'ride_feed_info';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<RideFeedInfo, Fields>[];
+    .all(...params) as QueryResult<RideFeedInfo, Fields>[];
 }

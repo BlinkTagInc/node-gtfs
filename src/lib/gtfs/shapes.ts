@@ -5,6 +5,7 @@ import { featureCollection } from '@turf/helpers';
 import type {
   QueryOptions,
   Shape,
+  SqlClause,
   SqlOrderBy,
   QueryResult,
   SqlWhere,
@@ -21,9 +22,14 @@ import { getAgencies } from './agencies.ts';
 import { getRoutes } from './routes.ts';
 import { getRouteAttributes } from '../gtfs-plus/route-attributes.ts';
 
-function buildTripSubquery(query: { [key: string]: string | number }) {
-  const whereClause = formatWhereClauses(query);
-  return `SELECT DISTINCT shape_id FROM trips ${whereClause}`;
+function buildTripSubquery(query: {
+  [key: string]: string | number;
+}): SqlClause {
+  const { clause: whereClause, params } = formatWhereClauses(query);
+  return {
+    clause: `SELECT DISTINCT shape_id FROM trips ${whereClause}`,
+    params,
+  };
 }
 
 /*
@@ -67,18 +73,25 @@ export function getShapes<Fields extends keyof Shape>(
   );
 
   if (Object.values(tripQuery).length > 0) {
-    whereClauses.push(`shape_id IN (${buildTripSubquery(tripQuery)})`);
+    const tripSubquery = buildTripSubquery(tripQuery);
+    whereClauses.push({
+      clause: `shape_id IN (${tripSubquery.clause})`,
+      params: tripSubquery.params,
+    });
   }
 
   if (whereClauses.length > 0) {
-    whereClause = `WHERE ${whereClauses.join(' AND ')}`;
+    whereClause = `WHERE ${whereClauses.map(({ clause }) => clause).join(' AND ')}`;
   }
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<Shape, Fields>[];
+    .all(...whereClauses.flatMap(({ params }) => params)) as QueryResult<
+    Shape,
+    Fields
+  >[];
 }
 
 /*

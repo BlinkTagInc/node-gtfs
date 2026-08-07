@@ -57,12 +57,12 @@ export function getServiceAlerts<Fields extends keyof ServiceAlert>(
     }
   }
 
-  const whereClause = formatWhereClauses(alertQuery);
+  const { clause: whereClause, params } = formatWhereClauses(alertQuery);
   const alerts = db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as Omit<ServiceAlert, 'informed_entities'>[];
+    .all(...params) as Omit<ServiceAlert, 'informed_entities'>[];
 
   const alertIds = alerts.map((alert) => alert.id);
   if (alertIds.length === 0) {
@@ -72,14 +72,17 @@ export function getServiceAlerts<Fields extends keyof ServiceAlert>(
   // Build the entities query, combining any entity-level filters with an
   // alert_id IN (...) clause to scope results to the matched alerts.
   const alertIdPlaceholders = alertIds.map(() => '?').join(', ');
-  const entityFilterClause = formatWhereClauses(entityQuery);
+  const { clause: entityFilterClause, params: entityFilterParams } =
+    formatWhereClauses(entityQuery);
   const entityWhereClause = entityFilterClause
     ? `${entityFilterClause} AND alert_id IN (${alertIdPlaceholders})`
     : `WHERE alert_id IN (${alertIdPlaceholders})`;
 
+  // The entity filters appear before the alert_id list in the statement, so
+  // their parameters must bind first.
   const entities = db
     .prepare(`SELECT * FROM ${joinTableName} ${entityWhereClause};`)
-    .all(...alertIds) as ServiceAlertInformedEntity[];
+    .all(...entityFilterParams, ...alertIds) as ServiceAlertInformedEntity[];
 
   const entitiesByAlertId = new Map<string, ServiceAlertInformedEntity[]>();
   for (const entity of entities) {

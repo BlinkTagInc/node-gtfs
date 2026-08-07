@@ -3,7 +3,6 @@ import { writeFile } from 'node:fs/promises';
 
 import { without, compact } from 'lodash-es';
 import { stringify } from 'csv-stringify';
-import sqlString from 'sqlstring-sqlite';
 import Database from 'better-sqlite3';
 
 import * as models from '../models/models.ts';
@@ -11,6 +10,7 @@ import { openDb } from './db.ts';
 import { prepDirectory, generateFolderName, untildify } from './file-utils.ts';
 import { log, logWarning } from './log-utils.ts';
 import {
+  escapeIdentifier,
   formatCurrency,
   mapSeries,
   pluralize,
@@ -80,7 +80,7 @@ export const exportGtfs = async (initialConfig: Config) => {
         exportPath,
         `${model.filenameBase}.${model.filenameExtension}`,
       );
-      const tableName = sqlString.escapeId(model.filenameBase);
+      const tableName = escapeIdentifier(model.filenameBase);
       const lines = db.prepare(`SELECT * FROM ${tableName};`).all() as Array<
         Record<string, SqlValue>
       >;

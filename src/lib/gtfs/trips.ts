@@ -1,5 +1,4 @@
 import { omit } from 'lodash-es';
-import sqlString from 'sqlstring-sqlite';
 import type {
   QueryOptions,
   SqlOrderBy,
@@ -51,18 +50,22 @@ export function getTrips<Fields extends keyof Trip>(
 
     const serviceIds = getServiceIdsByDate(query.date, options);
 
-    whereClauses.push(
-      `service_id IN (${serviceIds.map((id) => sqlString.escape(id)).join(',')})`,
-    );
+    whereClauses.push({
+      clause: `service_id IN (${serviceIds.map(() => '?').join(',')})`,
+      params: serviceIds,
+    });
   }
 
   if (whereClauses.length > 0) {
-    whereClause = `WHERE ${whereClauses.join(' AND ')}`;
+    whereClause = `WHERE ${whereClauses.map(({ clause }) => clause).join(' AND ')}`;
   }
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<Trip, Fields>[];
+    .all(...whereClauses.flatMap(({ params }) => params)) as QueryResult<
+    Trip,
+    Fields
+  >[];
 }

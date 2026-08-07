@@ -24,12 +24,12 @@ export function getPathways<Fields extends keyof Pathway>(
   const db = options.db ?? openDb();
   const tableName = 'pathways';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<Pathway, Fields>[];
+    .all(...params) as QueryResult<Pathway, Fields>[];
 }

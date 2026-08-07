@@ -24,12 +24,12 @@ export function getDeadheads<Fields extends keyof Deadhead>(
   const db = options.db ?? openDb();
   const tableName = 'deadheads';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<Deadhead, Fields>[];
+    .all(...params) as QueryResult<Deadhead, Fields>[];
 }

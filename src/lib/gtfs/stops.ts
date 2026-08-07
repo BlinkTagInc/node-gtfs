@@ -3,6 +3,8 @@ import { FeatureCollection } from 'geojson';
 
 import type {
   QueryOptions,
+  SqlBindValue,
+  SqlClause,
   SqlOrderBy,
   QueryResult,
   SqlWhere,
@@ -21,15 +23,17 @@ import { stopsToGeoJSONFeatureCollection } from '../geojson-utils.ts';
 import { getAgencies } from './agencies.ts';
 import { getStopAttributes } from '../gtfs-plus/stop-attributes.ts';
 
-function buildTripSubquery(query: { [key: string]: SqlValue }) {
-  const whereClause = formatWhereClauses(query);
-  return `SELECT trip_id FROM trips ${whereClause}`;
+function buildTripSubquery(query: { [key: string]: SqlValue }): SqlClause {
+  const { clause: whereClause, params } = formatWhereClauses(query);
+  return { clause: `SELECT trip_id FROM trips ${whereClause}`, params };
 }
 
-function buildStoptimeSubquery(query: { [key: string]: SqlValue }) {
-  return `SELECT DISTINCT stop_id FROM stop_times WHERE trip_id IN (${buildTripSubquery(
-    query,
-  )})`;
+function buildStoptimeSubquery(query: { [key: string]: SqlValue }): SqlClause {
+  const tripSubquery = buildTripSubquery(query);
+  return {
+    clause: `SELECT DISTINCT stop_id FROM stop_times WHERE trip_id IN (${tripSubquery.clause})`,
+    params: tripSubquery.params,
+  };
 }
 
 /*
@@ -84,6 +88,10 @@ export function getStops<Fields extends keyof Stop>(
     formatWhereClause(key, value as SqlValue),
   );
 
+  // Parameters for the ORDER BY clause bind after the WHERE parameters, since
+  // ORDER BY comes later in the statement.
+  const orderByParams: SqlBindValue[] = [];
+
   if (
     options.bounding_box_side_m !== undefined &&
     query.stop_lat !== undefined &&
@@ -99,23 +107,34 @@ export function getStops<Fields extends keyof Stop>(
 
     // Add distance-based sorting if bounding_box_side_m is set and no other orderBy is set
     if (orderBy.length === 0) {
-      orderByClause = `ORDER BY (((stop_lat - ${query.stop_lat}) * (stop_lat - ${query.stop_lat})) + ((stop_lon - ${query.stop_lon}) * (stop_lon - ${query.stop_lon}))) ASC`;
+      orderByClause =
+        'ORDER BY (((stop_lat - ?) * (stop_lat - ?)) + ((stop_lon - ?) * (stop_lon - ?))) ASC';
+      const lat = Number(query.stop_lat);
+      const lon = Number(query.stop_lon);
+      orderByParams.push(lat, lat, lon, lon);
     }
   }
 
   if (Object.values(tripQuery).length > 0) {
-    whereClauses.push(`stop_id IN (${buildStoptimeSubquery(tripQuery)})`);
+    const stoptimeSubquery = buildStoptimeSubquery(tripQuery);
+    whereClauses.push({
+      clause: `stop_id IN (${stoptimeSubquery.clause})`,
+      params: stoptimeSubquery.params,
+    });
   }
 
   if (whereClauses.length > 0) {
-    whereClause = `WHERE ${whereClauses.join(' AND ')}`;
+    whereClause = `WHERE ${whereClauses.map(({ clause }) => clause).join(' AND ')}`;
   }
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<Stop, Fields>[];
+    .all(
+      ...whereClauses.flatMap(({ params }) => params),
+      ...orderByParams,
+    ) as QueryResult<Stop, Fields>[];
 }
 
 /*

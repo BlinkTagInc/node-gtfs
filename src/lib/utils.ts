@@ -1,4 +1,3 @@
-import sqlString from 'sqlstring-sqlite';
 import Long from 'long';
 import {
   Config,
@@ -6,8 +5,41 @@ import {
   SqlWhere,
   SqlValue,
   SqlOrderBy,
+  SqlBindValue,
+  SqlClause,
 } from '../types/global_interfaces.ts';
 import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from './errors.ts';
+
+/**
+ * Quotes a SQL identifier so it can be interpolated into a statement.
+ * Identifiers cannot be passed as bound parameters, so they must be escaped.
+ * A qualified name is split on the dot, so `trips.trip_id` becomes
+ * `` `trips`.`trip_id` `` rather than a single identifier containing a dot.
+ * @param identifier Table, column, or alias name
+ * @returns Backtick-quoted identifier
+ */
+export function escapeIdentifier(identifier: string) {
+  return `\`${String(identifier).replaceAll('`', '``').replaceAll('.', '`.`')}\``;
+}
+
+/**
+ * Converts a query value into something better-sqlite3 can bind.
+ * SQLite has no boolean type, so booleans become 1/0, and `undefined` becomes
+ * null — both matching how these values were previously serialized into SQL.
+ * @param value Value from a query object
+ * @returns Value in bindable form
+ */
+function toBindValue(value: SqlValue): SqlBindValue {
+  if (value === undefined || value === null) {
+    return null;
+  }
+
+  if (typeof value === 'boolean') {
+    return value ? 1 : 0;
+  }
+
+  return value as SqlBindValue;
+}
 
 /**
  * Validates the configuration object for GTFS import
@@ -119,14 +151,15 @@ export function formatSelectClause(fields: string[]) {
   if (Array.isArray(fields)) {
     const selectItem =
       fields.length > 0
-        ? fields.map((fieldName) => sqlString.escapeId(fieldName)).join(', ')
+        ? fields.map((fieldName) => escapeIdentifier(fieldName)).join(', ')
         : '*';
     return `SELECT ${selectItem}`;
   }
 
   const selectItem = Object.entries(fields)
     .map(
-      (key) => `${sqlString.escapeId(key[0])} AS ${sqlString.escapeId(key[1])}`,
+      (key) =>
+        `${escapeIdentifier(key[0])} AS ${escapeIdentifier(String(key[1]))}`,
     )
     .join(', ');
   return `SELECT ${selectItem}`;
@@ -141,7 +174,7 @@ export function formatJoinClause(joinObject: JoinOptions[]) {
   return joinObject
     .map(
       (data) =>
-        `${data.type ? data.type + ' JOIN' : 'INNER JOIN'} ${sqlString.escapeId(
+        `${data.type ? data.type + ' JOIN' : 'INNER JOIN'} ${escapeIdentifier(
           data.table,
         )} ON ${data.on}`,
     )
@@ -173,13 +206,13 @@ const EARTH_RADIUS_METERS = 6371000;
  * @param latitudeDegree Center latitude in degrees
  * @param longitudeDegree Center longitude in degrees
  * @param boundingBoxSideMeters Size of bounding box in meters
- * @returns SQL WHERE clause for bounding box search
+ * @returns SQL WHERE clause for bounding box search and its bound parameters
  */
 export function formatWhereClauseBoundingBox(
   latitudeDegree: number | string,
   longitudeDegree: number | string,
   boundingBoxSideMeters: number,
-): string {
+): SqlClause {
   const lat = Number(latitudeDegree);
   const lon = Number(longitudeDegree);
 
@@ -205,56 +238,66 @@ export function formatWhereClauseBoundingBox(
   const deltaLatitude = radian2degree(halfSide / EARTH_RADIUS_METERS);
   const deltaLongitude = radian2degree(halfSide / radiusFromLatitude);
 
-  return [
-    `stop_lat BETWEEN ${lat - deltaLatitude} AND ${lat + deltaLatitude}`,
-    `stop_lon BETWEEN ${lon - deltaLongitude} AND ${lon + deltaLongitude}`,
-  ].join(' AND ');
+  return {
+    clause: 'stop_lat BETWEEN ? AND ? AND stop_lon BETWEEN ? AND ?',
+    params: [
+      lat - deltaLatitude,
+      lat + deltaLatitude,
+      lon - deltaLongitude,
+      lon + deltaLongitude,
+    ],
+  };
 }
 
 /**
  * Formats SQL WHERE clause for a single key-value pair
  * @param key Column name
  * @param value Single value, array of values, or null
- * @returns Formatted WHERE clause condition
+ * @returns Formatted WHERE clause condition and its bound parameters
  */
 export function formatWhereClause(
   key: string,
   value: null | SqlValue | SqlValue[],
-) {
+): SqlClause {
+  const escapedKey = escapeIdentifier(key);
+
   if (Array.isArray(value)) {
-    let whereClause = `${sqlString.escapeId(key)} IN (${value
-      .filter((v) => v !== null)
-      .map((v) => sqlString.escape(v))
-      .join(', ')})`;
+    const values = value.filter((v) => v !== null);
+    let clause = `${escapedKey} IN (${values.map(() => '?').join(', ')})`;
 
     if (value.includes(null)) {
-      whereClause = `(${whereClause} OR ${sqlString.escapeId(key)} IS NULL)`;
+      clause = `(${clause} OR ${escapedKey} IS NULL)`;
     }
 
-    return whereClause;
+    return { clause, params: values.map((v) => toBindValue(v)) };
   }
 
   if (value === null) {
-    return `${sqlString.escapeId(key)} IS NULL`;
+    return { clause: `${escapedKey} IS NULL`, params: [] };
   }
 
-  return `${sqlString.escapeId(key)} = ${sqlString.escape(value)}`;
+  return { clause: `${escapedKey} = ?`, params: [toBindValue(value)] };
 }
 
 /**
  * Formats complete SQL WHERE clause from query object
  * @param query Object containing column-value pairs
- * @returns Formatted WHERE clause or empty string if no conditions
+ * @returns Formatted WHERE clause and its bound parameters, or an empty clause
+ *          if there are no conditions
  */
-export function formatWhereClauses(query: SqlWhere) {
+export function formatWhereClauses(query: SqlWhere): SqlClause {
   if (Object.keys(query).length === 0) {
-    return '';
+    return { clause: '', params: [] };
   }
 
   const whereClauses = Object.entries(query).map(([key, value]) =>
     formatWhereClause(key, value),
   );
-  return `WHERE ${whereClauses.join(' AND ')}`;
+
+  return {
+    clause: `WHERE ${whereClauses.map(({ clause }) => clause).join(' AND ')}`,
+    params: whereClauses.flatMap(({ params }) => params),
+  };
 }
 
 /**
@@ -271,7 +314,7 @@ export function formatOrderByClause(orderBy: SqlOrderBy) {
     orderByClause += orderBy
       .map(([key, value]) => {
         const direction = value === 'DESC' ? 'DESC' : 'ASC';
-        return `${sqlString.escapeId(key)} ${direction}`;
+        return `${escapeIdentifier(key)} ${direction}`;
       })
       .join(', ');
   }

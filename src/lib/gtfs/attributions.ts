@@ -24,12 +24,12 @@ export function getAttributions<Fields extends keyof Attribution>(
   const db = options.db ?? openDb();
   const tableName = 'attributions';
   const selectClause = formatSelectClause(fields);
-  const whereClause = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<Attribution, Fields>[];
+    .all(...params) as QueryResult<Attribution, Fields>[];
 }

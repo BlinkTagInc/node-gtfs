@@ -1,5 +1,4 @@
 import { omit } from 'lodash-es';
-import sqlString from 'sqlstring-sqlite';
 import type {
   QueryOptions,
   SqlOrderBy,
@@ -51,9 +50,12 @@ export function getStoptimes<Fields extends keyof StopTime>(
 
     const serviceIds = getServiceIdsByDate(query.date, options);
 
-    const tripSubquery = `SELECT DISTINCT trip_id FROM trips WHERE service_id IN (${serviceIds.map((id) => sqlString.escape(id)).join(',')})`;
+    const tripSubquery = `SELECT DISTINCT trip_id FROM trips WHERE service_id IN (${serviceIds.map(() => '?').join(',')})`;
 
-    whereClauses.push(`trip_id IN (${tripSubquery})`);
+    whereClauses.push({
+      clause: `trip_id IN (${tripSubquery})`,
+      params: serviceIds,
+    });
   }
 
   if (query.start_time) {
@@ -65,9 +67,10 @@ export function getStoptimes<Fields extends keyof StopTime>(
       });
     }
 
-    whereClauses.push(
-      `arrival_timestamp >= ${calculateSecondsFromMidnight(query.start_time)}`,
-    );
+    whereClauses.push({
+      clause: 'arrival_timestamp >= ?',
+      params: [calculateSecondsFromMidnight(query.start_time)],
+    });
   }
 
   if (query.end_time) {
@@ -79,18 +82,22 @@ export function getStoptimes<Fields extends keyof StopTime>(
       });
     }
 
-    whereClauses.push(
-      `departure_timestamp <= ${calculateSecondsFromMidnight(query.end_time)}`,
-    );
+    whereClauses.push({
+      clause: 'departure_timestamp <= ?',
+      params: [calculateSecondsFromMidnight(query.end_time)],
+    });
   }
 
   if (whereClauses.length > 0) {
-    whereClause = `WHERE ${whereClauses.join(' AND ')}`;
+    whereClause = `WHERE ${whereClauses.map(({ clause }) => clause).join(' AND ')}`;
   }
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all() as QueryResult<StopTime, Fields>[];
+    .all(...whereClauses.flatMap(({ params }) => params)) as QueryResult<
+    StopTime,
+    Fields
+  >[];
 }

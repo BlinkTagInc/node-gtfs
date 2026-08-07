@@ -1,9 +1,9 @@
-import sqlString from 'sqlstring-sqlite';
 import Database from 'better-sqlite3';
 
 import { openDb } from './db.ts';
 
 import {
+  escapeIdentifier,
   formatOrderByClause,
   formatSelectClause,
   formatWhereClauses,
@@ -48,14 +48,16 @@ export function advancedQuery(
   const queryOptions = { ...defaultOptions, ...advancedQueryOptions };
 
   const db = queryOptions.options.db ?? openDb();
-  const tableName = sqlString.escapeId(table);
+  const tableName = escapeIdentifier(table);
   const selectClause = formatSelectClause(queryOptions.fields);
-  const whereClause = formatWhereClauses(queryOptions.query);
+  const { clause: whereClause, params } = formatWhereClauses(
+    queryOptions.query,
+  );
   const joinClause = formatJoinClause(queryOptions.join);
   const orderByClause = formatOrderByClause(queryOptions.orderBy);
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${joinClause} ${whereClause} ${orderByClause};`,
     )
-    .all() as Array<Record<string, SqlValue>>;
+    .all(...params) as Array<Record<string, SqlValue>>;
 }

@@ -35,9 +35,6 @@ importers:
       sanitize-filename:
         specifier: 1.6.4
         version: 1.6.4
-      sqlstring-sqlite:
-        specifier: 0.1.1
-        version: 0.1.1
       yargs:
         specifier: 18.1.0
         version: 18.1.0
@@ -1207,10 +1204,6 @@ packages:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
 
-  sqlstring-sqlite@0.1.1:
-    resolution: {integrity: sha512-9CAYUJ0lEUPYJrswqiqdINNSfq3jqWo/bFJ7tufdoNeSK0Fy+d1kFTxjqO9PIqza0Kri+ZtYMfPVf1aZaFOvrQ==}
-    engines: {node: '>= 0.6'}
-
   string-argv@0.3.2:
     resolution: {integrity: sha512-aqD2Q0144Z+/RqG52NeHEkZauTAUWJO8c6yTftGJKO3Tja5tUgIfmIl6kExvhtxSDP7fXB6DvzkfMpCd/F3G+Q==}
     engines: {node: '>=0.6.19'}
@@ -2334,8 +2327,6 @@ snapshots:
 
   source-map@0.6.1:
     optional: true
-
-  sqlstring-sqlite@0.1.1: {}
 
   string-argv@0.3.2: {}
 

@@ -221,15 +221,25 @@ export interface JoinOptions {
 }
 
 export type SqlValue =
-  | undefined
-  | null
-  | string
-  | number
-  | boolean
-  | Date
-  | SqlValue[];
+  undefined | null | string | number | boolean | SqlValue[];
 
 export type SqlWhere = Record<string, null | SqlValue | SqlValue[]>;
+
+/**
+ * A value in a form better-sqlite3 can bind to a statement parameter.
+ */
+export type SqlBindValue = null | string | number | bigint;
+
+/**
+ * A SQL fragment paired with the values bound to its `?` placeholders.
+ * `params` are ordered to match the placeholders in `clause`, so callers
+ * composing several fragments must concatenate `params` in the same order the
+ * fragments appear in the final statement.
+ */
+export interface SqlClause {
+  clause: string;
+  params: SqlBindValue[];
+}
 
 export type QueryResult<Base extends object, Select extends keyof Base> = [
   Select,
