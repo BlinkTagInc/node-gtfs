@@ -69,7 +69,7 @@ import { readFile } from 'fs/promises';
 import path from 'node:path';
 
 const config = JSON.parse(
-  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8')
+  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8'),
 );
 
 try {
@@ -152,19 +152,19 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 
     cp config-sample.json config.json
 
-| option                                                            | type              | description                                                                                                                                                         |
-| ----------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`agencies`](#agencies)                                           | array             | An array of GTFS files to be imported, and which files to exclude.                                                                                                  |
-| [`csvOptions`](#csvoptions)                                       | object            | Options passed to `csv-parse` for parsing GTFS CSV files. Optional.                                                                                                 |
-| [`db`](#db)                                                       | database instance | An existing database instance to use instead of relying on node-gtfs to connect. Optional.                                                                          |
-| [`downloadTimeout`](#downloadtimeout)                             | integer           | The number of milliseconds to wait before throwing an error when downloading GTFS. Optional.                                                                        |
-| [`exportPath`](#exportpath)                                       | string            | A path to a directory to put exported GTFS files. Optional, defaults to `gtfs-export/<agency_name>`.                                                                |
-| [`gtfsRealtimeExpirationSeconds`](#gtfsrealtimeexpirationseconds) | integer           | Amount of time in seconds to allow GTFS-Realtime data to be stored in database before allowing to be deleted. Optional, defaults to 0.                              |
-| [`ignoreDuplicates`](#ignoreduplicates)                           | boolean           | Whether or not to ignore unique constraints on ids when importing GTFS, such as `trip_id`, `calendar_id`. Optional, defaults to false.                              |
+| option                                                            | type              | description                                                                                                                                                 |
+| ----------------------------------------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`agencies`](#agencies)                                           | array             | An array of GTFS files to be imported, and which files to exclude.                                                                                          |
+| [`csvOptions`](#csvoptions)                                       | object            | Options passed to `csv-parse` for parsing GTFS CSV files. Optional.                                                                                         |
+| [`db`](#db)                                                       | database instance | An existing database instance to use instead of relying on node-gtfs to connect. Optional.                                                                  |
+| [`downloadTimeout`](#downloadtimeout)                             | integer           | The number of milliseconds to wait before throwing an error when downloading GTFS. Optional.                                                                |
+| [`exportPath`](#exportpath)                                       | string            | A path to a directory to put exported GTFS files. Optional, defaults to `gtfs-export/<agency_name>`.                                                        |
+| [`gtfsRealtimeExpirationSeconds`](#gtfsrealtimeexpirationseconds) | integer           | Amount of time in seconds to allow GTFS-Realtime data to be stored in database before allowing to be deleted. Optional, defaults to 0.                      |
+| [`ignoreDuplicates`](#ignoreduplicates)                           | boolean           | Whether or not to ignore unique constraints on ids when importing GTFS, such as `trip_id`, `calendar_id`. Optional, defaults to false.                      |
 | [`ignoreErrors`](#ignoreerrors)                                   | boolean           | Whether or not to ignore errors during the import process. If true, failed files will be skipped while the rest are processed. Optional, defaults to false. |
-| [`includeImportReport`](#includeimportreport)                     | boolean           | Whether to return a report object from `importGtfs()` containing details about what was imported and any errors encountered. Optional, defaults to false. |
-| [`sqlitePath`](#sqlitepath)                                       | string            | A path to a SQLite database. Optional, defaults to using an in-memory database.                                                                                    |
-| [`verbose`](#verbose)                                             | boolean           | Whether or not to print output to the console. Optional, defaults to true.                                                                                          |
+| [`includeImportReport`](#includeimportreport)                     | boolean           | Whether to return a report object from `importGtfs()` containing details about what was imported and any errors encountered. Optional, defaults to false.   |
+| [`sqlitePath`](#sqlitepath)                                       | string            | A path to a SQLite database. Optional, defaults to using an in-memory database.                                                                             |
+| [`verbose`](#verbose)                                             | boolean           | Whether or not to print output to the console. Optional, defaults to true.                                                                                  |
 
 ### agencies
 
@@ -174,18 +174,18 @@ For GTFS files that contain more than one agency, you only need to list each GTF
 
 #### agencies options
 
-| option                     | type   | description                                                                                                                                                         |
-| -------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `url`                      | string | The URL to a zipped GTFS file. Required if `path` not present.                                                                                                      |
-| `path`                     | string | A path to a zipped GTFS file or a directory of unzipped .txt files. Required if `url` is not present.                                                               |
-| `headers`                  | object | An object of HTTP headers in key:value format to use when fetching GTFS from the `url` specified. Optional.                                                         |
-| `prefix`                   | string | A prefix to be added to every ID field maintain uniqueness when importing multiple GTFS from multiple agencies. Optional.                                           |
-| `exclude`                  | array  | An array of GTFS file names (without `.txt`) to exclude when importing. Optional.                                                                                   |
-| `fillEmptyAgencyId`        | boolean | When `true`, fills empty `agency_id` on routes, fares, and other files for single-agency feeds. Useful for shared databases. Defaults to `false`. Optional.        |
-| `agencyId`                 | string | Explicit `agency_id` to use when `fillEmptyAgencyId` is `true` and `agency.txt` does not define one. Also backfills the `agency_id` on the agency row itself. If `agency.txt` already defines an `agency_id`, that value takes precedence. Optional. |
-| `realtimeAlerts`           | object | An object containing a `url` field for GTFS-Realtime alerts and a `headers` field in key:value format to use when fetching GTFS-Realtime data. Optional.            |
-| `realtimeTripUpdates`      | object | An object containing a `url` field for GTFS-Realtime trip updates and a `headers` field in key:value format to use when fetching GTFS-Realtime data. Optional.      |
-| `realtimeVehiclePositions` | object | An object containing a `url` field for GTFS-Realtime vehicle positions and a `headers` field in key:value format to use when fetching GTFS-Realtime data. Optional. |
+| option                     | type    | description                                                                                                                                                                                                                                          |
+| -------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `url`                      | string  | The URL to a zipped GTFS file. Required if `path` not present.                                                                                                                                                                                       |
+| `path`                     | string  | A path to a zipped GTFS file or a directory of unzipped .txt files. Required if `url` is not present.                                                                                                                                                |
+| `headers`                  | object  | An object of HTTP headers in key:value format to use when fetching GTFS from the `url` specified. Optional.                                                                                                                                          |
+| `prefix`                   | string  | A prefix to be added to every ID field maintain uniqueness when importing multiple GTFS from multiple agencies. Optional.                                                                                                                            |
+| `exclude`                  | array   | An array of GTFS file names (without `.txt`) to exclude when importing. Optional.                                                                                                                                                                    |
+| `fillEmptyAgencyId`        | boolean | When `true`, fills empty `agency_id` on routes, fares, and other files for single-agency feeds. Useful for shared databases. Defaults to `false`. Optional.                                                                                          |
+| `agencyId`                 | string  | Explicit `agency_id` to use when `fillEmptyAgencyId` is `true` and `agency.txt` does not define one. Also backfills the `agency_id` on the agency row itself. If `agency.txt` already defines an `agency_id`, that value takes precedence. Optional. |
+| `realtimeAlerts`           | object  | An object containing a `url` field for GTFS-Realtime alerts and a `headers` field in key:value format to use when fetching GTFS-Realtime data. Optional.                                                                                             |
+| `realtimeTripUpdates`      | object  | An object containing a `url` field for GTFS-Realtime trip updates and a `headers` field in key:value format to use when fetching GTFS-Realtime data. Optional.                                                                                       |
+| `realtimeVehiclePositions` | object  | An object containing a `url` field for GTFS-Realtime vehicle positions and a `headers` field in key:value format to use when fetching GTFS-Realtime data. Optional.                                                                                  |
 
 - Specify a `url` to download GTFS:
 
@@ -441,6 +441,7 @@ importGtfs({
 {Boolean} Controls error handling behavior during GTFS import. When `true`, the import process will continue even when encountering errors, logging them instead of stopping execution. Defaults to `false`.
 
 **When enabled, `ignoreErrors` will:**
+
 - Continue processing other GTFS files when one file fails
 - Log error messages instead of throwing exceptions
 - Skip problematic records within files while importing valid ones
@@ -452,11 +453,13 @@ importGtfs({
   - GTFS-Realtime API failures
 
 **Use cases:**
+
 - Importing from multiple GTFS sources where some may have data quality issues
 - Processing large datasets where minor errors shouldn't halt the entire import
 - Development/testing scenarios where you want to see all errors at once
 
 **⚠️ Important considerations:**
+
 - Errors are logged but not thrown, so you may miss critical data issues
 - Partial imports may result in incomplete or inconsistent data
 - Consider using the `exclude` config option to skip problematic files entirely instead of ignoring errors
@@ -554,7 +557,7 @@ import { readFile } from 'fs/promises';
 import path from 'node:path';
 
 const config = JSON.parse(
-  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8')
+  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8'),
 );
 
 await importGtfs(config);
@@ -600,7 +603,7 @@ import { readFile } from 'fs/promises';
 import path from 'node:path';
 
 const config = JSON.parse(
-  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8')
+  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8'),
 );
 
 await updateGtfsRealtime(config);
@@ -683,7 +686,7 @@ import { readFile } from 'fs/promises';
 import path from 'node:path';
 
 const config = JSON.parse(
-  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8')
+  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8'),
 );
 
 const db = openDb(config);
@@ -725,7 +728,7 @@ import { readFile } from 'fs/promises';
 import path from 'node:path';
 
 const config = JSON.parse(
-  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8')
+  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8'),
 );
 
 const db = openDb(config);
@@ -747,7 +750,7 @@ import { readFile } from 'fs/promises';
 import path from 'node:path';
 
 const config = JSON.parse(
-  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8')
+  await readFile(path.join(import.meta.dirname, 'config.json'), 'utf8'),
 );
 
 const db = openDb(config);
@@ -932,8 +935,8 @@ const stops = getStops(
   [],
   [],
   {
-    bounding_box_side_m: 1000
-  }
+    bounding_box_side_m: 1000,
+  },
 );
 ```
 
@@ -1000,20 +1003,20 @@ const stoptimes = getStoptimes({
  */
 const stoptimes = getStoptimes({
   stop_id: '70011',
-  date: 20160704
+  date: 20160704,
 });
 
 /*
- * `getStoptimes` allows passing a `start_time` and/or and 
- * `end_time` in the query to return only stoptimes after 
- * start_time and before end_time. This can be combined with the 
+ * `getStoptimes` allows passing a `start_time` and/or and
+ * `end_time` in the query to return only stoptimes after
+ * start_time and before end_time. This can be combined with the
  * `date` parameter to get upcoming stoptimes.
  */
 const stoptimes = getStoptimes({
   stop_id: '70011',
   date: 20160704,
   start_time: '11:30:00',
-  end_time: '11:45:00'
+  end_time: '11:45:00',
 });
 
 /*
@@ -1022,25 +1025,25 @@ const stoptimes = getStoptimes({
  * whose stoptimes occur after midnight (i.e., times greater than 24:00:00
  * in GTFS, such as 25:15:00 for 1:15 AM the next day).
  *
- * To retrieve all stoptimes for a calendar date including those from 
- * trips assigned to the previous service date but occurring after 
+ * To retrieve all stoptimes for a calendar date including those from
+ * trips assigned to the previous service date but occurring after
  * midnight:
  *   1. Call `getStoptimes` with the target date:
  *   2. Call `getStoptimes` with the previous date and `start_time: '24:00:00'`:
  *   3. Combine both results for a complete set of stoptimes for July 5th.
  *
  * This approach ensures you include:
- *   - All stoptimes for trips whose service date is July 4th but whose 
+ *   - All stoptimes for trips whose service date is July 4th but whose
  * stoptimes occur after midnight (i.e., in the early hours of July 5th)
- *   - All stoptimes for trips whose service date is July 5th (which can 
+ *   - All stoptimes for trips whose service date is July 5th (which can
  * include trips with stoptimes that occur on July 6th after midnight )
  */
 const stoptimesToday = getStoptimes({ date: 20240705 });
-const stoptimesYesterdayAfterMidnight = getStoptimes({ date: 20240704, start_time: '24:00:00' })
-const mergedStoptimes = [
-  ...stoptimesToday,
-  ...stoptimesYesterdayAfterMidnight
-];
+const stoptimesYesterdayAfterMidnight = getStoptimes({
+  date: 20240704,
+  start_time: '24:00:00',
+});
+const mergedStoptimes = [...stoptimesToday, ...stoptimesYesterdayAfterMidnight];
 ```
 
 #### getTrips(query, fields, sortBy, options)
@@ -1056,13 +1059,13 @@ const trips = getTrips();
 // Get trips for a specific route and direction
 const trips = getTrips({
   route_id: 'Lo-16APR',
-  direction_id: 0
+  direction_id: 0,
 });
 
 // Get trips for direction '' or null
 const trips = getTrips({
   route_id: 'Lo-16APR',
-  direction_id: null
+  direction_id: null,
 });
 
 // Get trips for a specific route and direction limited by a service_id
@@ -1073,12 +1076,12 @@ const trips = getTrips({
 });
 
 /*
- * `getTrips` allows passing a `date` in the query to return only trips 
+ * `getTrips` allows passing a `date` in the query to return only trips
  * for a specific service date.
  */
 const trips = getTrips({
   route_id: 'Bu-16APR',
-  date: 20170416
+  date: 20170416,
 });
 ```
 
@@ -1580,7 +1583,9 @@ import { getServiceAlertInformedEntities } from 'gtfs';
 const informedEntities = getServiceAlertInformedEntities();
 
 // Get all informed entities for a specific alert
-const informedEntities = getServiceAlertInformedEntities({ alert_id: 'some-alert-id' });
+const informedEntities = getServiceAlertInformedEntities({
+  alert_id: 'some-alert-id',
+});
 ```
 
 #### getTripUpdates(query, fields, sortBy, options)
@@ -1923,14 +1928,14 @@ const stops = db.prepare('SELECT * from stops').all();
 // Get all calendar_ids for specific date
 const calendarIds = db
   .prepare(
-    'SELECT service_id from calendar WHERE start_date <= $date AND end_date >= $date'
+    'SELECT service_id from calendar WHERE start_date <= $date AND end_date >= $date',
   )
   .all({ date: 20150101 });
 
 // Find all stops for route_id=18 by joining tables
 const stopIds = db
   .prepare(
-    'SELECT DISTINCT stops.stop_id from stops INNER JOIN stop_times ON stops.stop_id = stop_times.stop_id INNER JOIN trips on trips.trip_id = stop_times.trip_id WHERE trips.route_id = ?'
+    'SELECT DISTINCT stops.stop_id from stops INNER JOIN stop_times ON stops.stop_id = stop_times.stop_id INNER JOIN trips on trips.trip_id = stop_times.trip_id WHERE trips.route_id = ?',
   )
   .all('18');
 
