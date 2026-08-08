@@ -1,0 +1,7 @@
+# Generated files
+dist
+node_modules
+pnpm-lock.yaml
+
+# Managed by release-it / @release-it/keep-a-changelog
+CHANGELOG.md

@@ -9,12 +9,13 @@
     "geojson",
     "sqlite"
   ],
+  "homepage": "https://github.com/BlinkTagInc/node-gtfs#readme",
   "bugs": {
-    "url": "https://github.com/blinktaginc/node-gtfs/issues"
+    "url": "https://github.com/BlinkTagInc/node-gtfs/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/blinktaginc/node-gtfs.git"
+    "url": "git+https://github.com/BlinkTagInc/node-gtfs.git"
   },
   "license": "MIT",
   "author": "Brendan Nee <brendan@blinktag.com>",
@@ -87,25 +88,26 @@
   },
   "scripts": {
     "build": "tsdown",
-    "test": "node --test --test-reporter=spec src/test/**/*.test.ts",
-    "typecheck": "tsc --noEmit",
-    "lint": "oxlint",
+    "build-watch": "tsdown --watch",
+    "test": "pnpm run build && node --test --test-reporter=spec src/test/**/*.test.ts",
+    "typecheck": "pnpm run build && tsc --noEmit",
+    "lint": "oxlint && eslint \"src/**/*.ts\"",
     "lint:fix": "oxlint --fix && eslint --fix \"src/**/*.ts\"",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky && pnpm run typecheck && pnpm run build",
-    "prepack": "pnpm run typecheck && pnpm run build",
-    "prepublishOnly": "pnpm run typecheck"
+    "prepare": "node .husky/install.mjs",
+    "prepack": "pnpm run build"
   },
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
     "./models": {
-      "import": "./dist/models/models.js",
-      "types": "./dist/models/models.d.ts"
-    }
+      "types": "./dist/models/models.d.ts",
+      "default": "./dist/models/models.js"
+    },
+    "./package.json": "./package.json"
   },
   "dependencies": {
     "@turf/helpers": "7.3.5",
@@ -121,7 +123,6 @@
     "yoctocolors": "2.2.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "3.3.6",
     "@eslint/js": "10.0.1",
     "@types/better-sqlite3": "7.6.13",
     "@types/geojson": "7946.0.16",
@@ -129,18 +130,18 @@
     "@types/node": "26",
     "@types/yargs": "17.0.35",
     "eslint": "10.8.0",
-    "eslint-plugin-oxlint": "^1.77.0",
+    "eslint-plugin-oxlint": "1.77.0",
     "globals": "17.8.0",
     "husky": "9.1.7",
     "lint-staged": "17.2.0",
-    "oxlint": "^1.77.0",
+    "oxlint": "1.77.0",
     "prettier": "3.9.6",
-    "tsdown": "^0.22.14",
+    "tsdown": "0.22.14",
     "typescript": "6.0.3",
     "typescript-eslint": "8.65.0"
   },
   "engines": {
-    "node": ">= 22"
+    "node": ">=22"
   },
   "release-it": {
     "github": {
@@ -152,7 +153,7 @@
       }
     },
     "hooks": {
-      "after:bump": "npm run build"
+      "after:bump": "pnpm run build"
     }
   },
   "prettier": {
