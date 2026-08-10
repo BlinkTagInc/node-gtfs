@@ -1,6 +1,3 @@
 allowBuilds:
   better-sqlite3: true
   protobufjs: true
-minimumReleaseAgeExclude:
-  - globals@17.8.0
-  - yoctocolors@2.2.0
