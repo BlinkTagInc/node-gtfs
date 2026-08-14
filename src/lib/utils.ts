@@ -429,21 +429,6 @@ export function applyPrefixToValue(
 }
 
 /**
- * Pluralizes a word based on the count
- * @param singularWord The singular word
- * @param pluralWord The plural word
- * @param count The count of the word
- * @returns The pluralized word
- */
-export function pluralize(
-  singularWord: string,
-  pluralWord: string,
-  count: number,
-) {
-  return count === 1 ? singularWord : pluralWord;
-}
-
-/**
  * Runs an async callback for each item in an array one at a time, in order
  * @param items Items to iterate over
  * @param callback Async function called with each item in turn

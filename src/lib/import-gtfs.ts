@@ -9,13 +9,13 @@ import { openDb } from './db.ts';
 import { temporaryDirectory, untildify, unzip } from './file-utils.ts';
 import { isValidJSON } from './geojson-utils.ts';
 import { updateGtfsRealtimeData } from './import-gtfs-realtime.ts';
-import { log, logError, logWarning } from './log-utils.ts';
+import { log, progress, report, status } from '../reporting/report.ts';
+import { pluralize } from '../reporting/format.ts';
 import {
   getTimestampColumnName,
   padLeadingZeros,
   applyPrefixToValue,
   mapSeries,
-  pluralize,
   setDefaultConfig,
   validateConfigForImport,
 } from './utils.ts';
@@ -68,9 +68,7 @@ interface GtfsImportTask {
   fillEmptyAgencyId: boolean;
   agencyId?: string;
   currentTimestamp: number;
-  log: (message: string, newLine?: boolean) => void;
-  logWarning: (message: string) => void;
-  logError: (message: string) => void;
+  config: Config;
   report?: ImportReport;
 }
 
@@ -93,7 +91,7 @@ const downloadGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
     });
   }
 
-  task.log(`Downloading GTFS from ${task.url}`);
+  status(task.config, `Downloading GTFS from ${task.url}`);
 
   task.path = `${task.downloadDir}/gtfs.zip`;
 
@@ -128,7 +126,7 @@ const downloadGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
 
     const buffer = await response.arrayBuffer();
     await writeFile(task.path, Buffer.from(buffer));
-    task.log('Download successful');
+    status(task.config, 'Download successful');
   } catch (error: unknown) {
     throw toGtfsError(error, {
       message: `Unable to download GTFS from ${task.url}.`,
@@ -149,7 +147,7 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
   }
 
   const gtfsPath = untildify(task.path);
-  task.log(`Importing static GTFS from ${task.path}\r`);
+  status(task.config, `Importing static GTFS from ${task.path}`);
   if (path.extname(gtfsPath) === '.zip') {
     try {
       await unzip(gtfsPath, task.downloadDir);
@@ -214,7 +212,7 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
         category: GtfsErrorCategory.ZIP,
         details: { path: task.path },
       });
-      task.logError(formatGtfsError(wrappedError));
+      log(task.config, 'error', formatGtfsError(wrappedError));
       throw wrappedError;
     }
   } else {
@@ -243,7 +241,7 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
 const getSingleAgencyId = (
   downloadDir: string,
   csvOptions: object,
-  logWarning: (message: string) => void,
+  config: Config,
 ): Promise<string | undefined> =>
   new Promise((resolve) => {
     const filepath = path.join(downloadDir, 'agency.txt');
@@ -280,7 +278,9 @@ const getSingleAgencyId = (
     });
 
     parser.on('error', (err: Error) => {
-      logWarning(
+      log(
+        config,
+        'warning',
         `Unable to parse agency.txt for \`fillEmptyAgencyId\`: ${err.message}`,
       );
       resolve(undefined);
@@ -564,7 +564,7 @@ const importGtfsFiles = async (
 
         // Skip any models that are excluded by config
         if (task.exclude && task.exclude.includes(model.filenameBase)) {
-          task.log(`Skipping - ${filename}\r`);
+          status(task.config, `Skipping - ${filename}`);
           resolve();
           return;
         }
@@ -577,17 +577,19 @@ const importGtfsFiles = async (
 
         const filepath = path.join(task.downloadDir, `${filename}`);
 
-        // Log missing standard GTFS files, don't log nonstandard files
+        /*
+         * Only announce missing standard GTFS files.
+         */
         if (!existsSync(filepath)) {
-          if (!model.nonstandard) {
-            task.log(`Importing - ${filename} - No file found\r`);
+          if (!model.nonstandard && !model.extension) {
+            status(task.config, `Importing - ${filename} - No file found`);
           }
 
           resolve();
           return;
         }
 
-        task.log(`Importing - ${filename}\r`);
+        progress(task.config, `Importing - ${filename}`);
 
         // Create a list of all columns
         const columns = model.schema;
@@ -632,7 +634,9 @@ const importGtfsFiles = async (
                 const primaryColumns = columns.filter(
                   (column) => column.primary,
                 );
-                task.logWarning(
+                log(
+                  task.config,
+                  'warning',
                   `Duplicate values for primary key (${primaryColumns.map((column) => column.name).join(', ')}) found in ${filename}. Set the \`ignoreDuplicates\` option to true in config.json to ignore this error`,
                 );
                 if (task.report) {
@@ -648,8 +652,10 @@ const importGtfsFiles = async (
                 }
               }
 
-              task.logWarning(
-                `Check ${filename} for invalid data on line ${rowNumber + 1}.`,
+              log(
+                task.config,
+                'warning',
+                `Skipping invalid data in ${filename} on line ${rowNumber + 1}`,
               );
               throw toGtfsError(error, {
                 message: error instanceof Error ? error.message : String(error),
@@ -699,9 +705,9 @@ const importGtfsFiles = async (
                   insertLines(lines);
                   lines = [];
 
-                  task.log(
-                    `Importing - ${filename} - ${totalLineCount} lines imported\r`,
-                    true,
+                  progress(
+                    task.config,
+                    `Importing - ${filename} - ${pluralize('line', 'lines', totalLineCount)} imported`,
                   );
                 }
               }
@@ -714,7 +720,9 @@ const importGtfsFiles = async (
               });
               if (task.ignoreErrors) {
                 reportTaskError(task, gtfsError);
-                task.logError(
+                log(
+                  task.config,
+                  'error',
                   `Error processing ${filename}: ${gtfsError.message}`,
                 );
                 resolve();
@@ -738,7 +746,9 @@ const importGtfsFiles = async (
                     details: { file: filename, sqlitePath: task.sqlitePath },
                   });
                   if (task.ignoreErrors) {
-                    task.logError(
+                    log(
+                      task.config,
+                      'error',
                       `Error inserting data for ${filename}: ${gtfsError.message}`,
                     );
                     reportTaskError(task, gtfsError);
@@ -750,9 +760,9 @@ const importGtfsFiles = async (
                   }
                 }
               }
-              task.log(
-                `Importing - ${filename} - ${totalLineCount} lines imported\r`,
-                true,
+              status(
+                task.config,
+                `Importing - ${filename} - ${pluralize('line', 'lines', totalLineCount)} imported`,
               );
               resolve();
             } catch (error: unknown) {
@@ -763,7 +773,9 @@ const importGtfsFiles = async (
                 details: { file: filename, sqlitePath: task.sqlitePath },
               });
               if (task.ignoreErrors) {
-                task.logError(
+                log(
+                  task.config,
+                  'error',
                   `Error finalizing ${filename}: ${gtfsError.message}`,
                 );
                 reportTaskError(task, gtfsError);
@@ -782,7 +794,9 @@ const importGtfsFiles = async (
               details: { file: filename },
             });
             if (task.ignoreErrors) {
-              task.logError(
+              log(
+                task.config,
+                'error',
                 `Parser error for ${filename}: ${gtfsError.message}`,
               );
               reportTaskError(task, gtfsError);
@@ -798,7 +812,7 @@ const importGtfsFiles = async (
             .then((data) => {
               if (isValidJSON(data) === false) {
                 if (task.ignoreErrors) {
-                  task.logError(`Invalid JSON in ${filename}`);
+                  log(task.config, 'error', `Invalid JSON in ${filename}`);
                   reportTaskError(
                     task,
                     new GtfsError(`Invalid JSON in ${filename}`, {
@@ -831,9 +845,9 @@ const importGtfsFiles = async (
               );
               try {
                 insertLines([line]);
-                task.log(
-                  `Importing - ${filename} - ${totalLineCount} lines imported\r`,
-                  true,
+                status(
+                  task.config,
+                  `Importing - ${filename} - ${pluralize('line', 'lines', totalLineCount)} imported`,
                 );
                 resolve();
               } catch (error: unknown) {
@@ -845,7 +859,9 @@ const importGtfsFiles = async (
                   details: { file: filename, sqlitePath: task.sqlitePath },
                 });
                 if (task.ignoreErrors) {
-                  task.logError(
+                  log(
+                    task.config,
+                    'error',
                     `Error inserting data for ${filename}: ${gtfsError.message}`,
                   );
                   reportTaskError(task, gtfsError);
@@ -863,7 +879,9 @@ const importGtfsFiles = async (
                 details: { file: filename },
               });
               if (task.ignoreErrors) {
-                task.logError(
+                log(
+                  task.config,
+                  'error',
                   `Error reading ${filename}: ${gtfsError.message}`,
                 );
                 reportTaskError(task, gtfsError);
@@ -874,7 +892,9 @@ const importGtfsFiles = async (
             });
         } else {
           if (task.ignoreErrors) {
-            task.logError(
+            log(
+              task.config,
+              'error',
               `Unsupported file type: ${model.filenameExtension} for ${filename}`,
             );
             resolve();
@@ -896,7 +916,7 @@ const importGtfsFiles = async (
         }
       }),
   );
-  task.log(`Static GTFS import complete`);
+  status(task.config, 'Static GTFS import complete');
 };
 
 /**
@@ -914,15 +934,20 @@ export async function importGtfs(
 
   const config = setDefaultConfig(initialConfig);
   validateConfigForImport(config);
-  const report = config.includeImportReport ? createImportReport() : undefined;
+  const importReport = config.includeImportReport
+    ? createImportReport()
+    : undefined;
 
   try {
     const db = openDb(config);
     const agencyCount = config.agencies.length;
 
-    log(config)(
-      `Starting GTFS import for ${pluralize('file', 'files', agencyCount)} using SQLite database at ${config.sqlitePath}`,
-    );
+    report(config, {
+      type: 'run:start',
+      task: 'import',
+      agencyCount,
+      sqlitePath: config.sqlitePath ?? ':memory:',
+    });
 
     createGtfsTables(db);
 
@@ -947,10 +972,8 @@ export async function importGtfs(
           fillEmptyAgencyId: agency.fillEmptyAgencyId ?? false,
           agencyId: agency.agencyId,
           currentTimestamp: Math.floor(Date.now() / 1000),
-          log: log(config),
-          logWarning: logWarning(config),
-          logError: logError(config),
-          report,
+          config,
+          report: importReport,
         };
 
         if ('url' in agency) {
@@ -969,7 +992,7 @@ export async function importGtfs(
           const agencyIdFromGtfs = await getSingleAgencyId(
             task.downloadDir,
             task.csvOptions,
-            task.logWarning,
+            task.config,
           );
 
           if (agencyIdFromGtfs !== undefined) {
@@ -977,13 +1000,17 @@ export async function importGtfs(
               task.agencyId !== undefined &&
               task.agencyId !== agencyIdFromGtfs
             ) {
-              task.logWarning(
+              log(
+                task.config,
+                'warning',
                 `\`agencyId\` "${task.agencyId}" does not match the \`agency_id\` "${agencyIdFromGtfs}" in agency.txt. Using the value from agency.txt.`,
               );
             }
             task.agencyId = agencyIdFromGtfs;
           } else if (task.agencyId === undefined) {
-            task.logWarning(
+            log(
+              task.config,
+              'warning',
               '`fillEmptyAgencyId` is set but a single `agency_id` could not be determined for this feed and no `agencyId` was provided in config. `agency_id` will not be backfilled.',
             );
           }
@@ -1000,9 +1027,9 @@ export async function importGtfs(
           category: GtfsErrorCategory.PARSE,
         });
         if (config.ignoreErrors) {
-          logError(config)(formatGtfsError(wrappedError));
-          if (report) {
-            addImportError(report, wrappedError);
+          log(config, 'error', formatGtfsError(wrappedError));
+          if (importReport) {
+            addImportError(importReport, wrappedError);
           }
         } else {
           throw wrappedError;
@@ -1010,15 +1037,17 @@ export async function importGtfs(
       }
     });
 
-    log(config)(`Creating DB indexes`);
+    status(config, 'Creating DB indexes');
     createGtfsIndexes(db);
 
     const endTime = process.hrtime.bigint();
     const elapsedSeconds = Number(endTime - startTime) / 1_000_000_000;
 
-    log(config)(
-      `Completed GTFS import in ${elapsedSeconds.toFixed(1)} seconds\n`,
-    );
+    report(config, {
+      type: 'run:complete',
+      task: 'import',
+      elapsedSeconds,
+    });
   } catch (error: unknown) {
     if ((error as Error & { code?: string }).code === 'SQLITE_CANTOPEN') {
       const dbOpenError = new GtfsError(
@@ -1033,7 +1062,7 @@ export async function importGtfs(
           cause: error,
         },
       );
-      logError(config)(dbOpenError.message);
+      log(config, 'error', dbOpenError.message);
       throw dbOpenError;
     }
     throw toGtfsError(error, {
@@ -1043,7 +1072,7 @@ export async function importGtfs(
     });
   }
 
-  if (report) {
-    return report;
+  if (importReport) {
+    return importReport;
   }
 }

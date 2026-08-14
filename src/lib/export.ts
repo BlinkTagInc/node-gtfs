@@ -8,16 +8,15 @@ import Database from 'better-sqlite3';
 import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
 import { prepDirectory, generateFolderName, untildify } from './file-utils.ts';
-import { log, logWarning } from './log-utils.ts';
 import {
   escapeIdentifier,
   formatCurrency,
   mapSeries,
-  pluralize,
   setDefaultConfig,
 } from './utils.ts';
 
 import { Config, Model, SqlValue } from '../types/global_interfaces.ts';
+import { log, report, status } from '../reporting/report.ts';
 
 const getAgencies = (db: Database.Database, config: Config) => {
   try {
@@ -40,6 +39,7 @@ const getAgencies = (db: Database.Database, config: Config) => {
 export const exportGtfs = async (initialConfig: Config) => {
   const config = setDefaultConfig(initialConfig);
   const db = openDb(config);
+  const startTime = process.hrtime.bigint();
 
   // Get agency name for export folder from first line of agency.txt
 
@@ -50,18 +50,19 @@ export const exportGtfs = async (initialConfig: Config) => {
       'No agencies found in SQLite. Be sure to first import data into SQLite using `gtfs-import` or `importGtfs(config);`',
     );
   } else if (agencyCount > 1) {
-    logWarning(config)(
+    log(
+      config,
+      'warning',
       'More than one agency is defined in config.json. Export will merge all into one GTFS file.',
     );
   }
 
-  log(config)(
-    `Starting GTFS export for ${pluralize(
-      'agency',
-      'agencies',
-      agencyCount,
-    )} using SQLite database at ${config.sqlitePath}`,
-  );
+  report(config, {
+    type: 'run:start',
+    task: 'export',
+    agencyCount,
+    sqlitePath: config.sqlitePath ?? ':memory:',
+  });
 
   const folderName = generateFolderName(agencies[0].agency_name);
   const defaultExportPath = path.join(process.cwd(), 'gtfs-export', folderName);
@@ -87,8 +88,9 @@ export const exportGtfs = async (initialConfig: Config) => {
 
       if (!lines || lines.length === 0) {
         if (!model.nonstandard) {
-          log(config)(
-            `Skipping (no data) - ${model.filenameBase}.${model.filenameExtension}\r`,
+          status(
+            config,
+            `Skipping (no data) - ${model.filenameBase}.${model.filenameExtension}`,
           );
         }
 
@@ -139,8 +141,9 @@ export const exportGtfs = async (initialConfig: Config) => {
         );
       }
 
-      log(config)(
-        `Exporting - ${model.filenameBase}.${model.filenameExtension}\r`,
+      status(
+        config,
+        `Exporting - ${model.filenameBase}.${model.filenameExtension}`,
       );
 
       return `${model.filenameBase}.${model.filenameExtension}`;
@@ -148,15 +151,19 @@ export const exportGtfs = async (initialConfig: Config) => {
   );
 
   if (compact(exportedFiles).length === 0) {
-    log(config)(
+    log(
+      config,
+      'warning',
       'No GTFS data exported. Be sure to first import data into SQLite.',
     );
     return;
   }
 
-  log(config)(`Completed GTFS export to ${exportPath}`);
+  status(config, `Completed GTFS export to ${exportPath}`);
 
-  log(config)(
-    `Completed GTFS export for ${pluralize('agency', 'agencies', agencyCount)}\n`,
-  );
+  report(config, {
+    type: 'run:complete',
+    task: 'export',
+    elapsedSeconds: Number(process.hrtime.bigint() - startTime) / 1_000_000_000,
+  });
 };

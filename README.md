@@ -164,7 +164,9 @@ Copy `config-sample.json` to `config.json` and then add your projects configurat
 | [`ignoreErrors`](#ignoreerrors)                                   | boolean           | Whether or not to ignore errors during the import process. If true, failed files will be skipped while the rest are processed. Optional, defaults to false. |
 | [`includeImportReport`](#includeimportreport)                     | boolean           | Whether to return a report object from `importGtfs()` containing details about what was imported and any errors encountered. Optional, defaults to false.   |
 | [`sqlitePath`](#sqlitepath)                                       | string            | A path to a SQLite database. Optional, defaults to using an in-memory database.                                                                             |
-| [`verbose`](#verbose)                                             | boolean           | Whether or not to print output to the console. Optional, defaults to true.                                                                                  |
+| [`logLevel`](#loglevel)                                           | string            | How much to print to the console: `silent`, `error`, `warning` or `info`. Optional, defaults to `info`.                                                     |
+| [`verbose`](#verbose)                                             | boolean           | Deprecated, use `logLevel`. Optional.                                                                                                                       |
+| [`logFunction`](#logfunction)                                     | function          | A destination for log output instead of the console, called with a level and a message. Optional.                                                           |
 
 ### agencies
 
@@ -499,9 +501,9 @@ console.log(report.errors);
     "sqlitePath": "/tmp/gtfs.sqlite"
 ```
 
-### verbose
+### logLevel
 
-{Boolean} If you don't want the import script to print any output to the console, you can set `verbose` to `false`. Defaults to `true`.
+{String} How much output to print to the console. Valid options are `silent` (nothing), `error` (only errors), `warning` (errors and warnings) and `info` (everything, including progress). **Optional.** Defaults to `info`.
 
 ```json
 {
@@ -510,13 +512,23 @@ console.log(report.errors);
       "path": "/path/to/the/unzipped/gtfs/"
     }
   ],
-  "verbose": false
+  "logLevel": "warning"
 }
 ```
 
-If you want to route logs to a custom function, you can pass a function that takes a single `text` argument as `logFunction`. This can't be defined in `config.json` but instead passed in a config object to `importGtfs()`. For example:
+Errors and warnings are written to stderr and progress to stdout, so `gtfs-import > import.log` captures a run without swallowing its failures.
 
-```js
+### verbose
+
+{Boolean} **Deprecated — use [`logLevel`](#loglevel).** `verbose: false` maps to `logLevel: "warning"`, which is what it has always meant: it silenced progress output but left warnings and errors printing. Use `"logLevel": "silent"` to suppress everything.
+
+### logFunction
+
+{Function} If you want to route logs somewhere other than the console, pass a function taking `level` and `message`. `level` is `error`, `warning` or `info`, so each kind of output can be handled differently. Messages arrive unformatted, without color or a `Warning:` label. This can't be defined in `config.json`, only passed in a config object to `importGtfs()`, `exportGtfs()` or `updateGtfsRealtime()`. **Optional.** No default value.
+
+Anything [`logLevel`](#loglevel) filters out never reaches `logFunction`. The one thing it never receives is the progress line, which redraws a single line in place and only means anything on a console — everything it wraps around, including the summary at the end of a run, still arrives.
+
+```javascript
 import { importGtfs } from 'gtfs';
 
 const config = {
@@ -526,9 +538,13 @@ const config = {
       exclude: ['shapes'],
     },
   ],
-  logFunction: function (text) {
-    // Do something with the logs here, like save it or send it somewhere
-    console.log(text);
+  logFunction: function (level, message) {
+    // Do something with the logs here, like save them or send them somewhere
+    if (level === 'error') {
+      console.error(message);
+    } else {
+      console.log(message);
+    }
   },
 };
 

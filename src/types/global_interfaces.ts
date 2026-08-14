@@ -180,17 +180,40 @@ export interface Config {
   /**
    * Whether or not to print output to the console.
    *
-   * @defaulValue true
+   * @deprecated Use `logLevel` instead. `false` maps to `logLevel: 'warning'`,
+   * which is what it has always meant in practice - it silenced progress
+   * output but left warnings and errors printing.
    */
   verbose?: boolean;
   /**
-   * An optional custom logger instead of the build in console.log
+   * How much to print. Each level includes the ones above it, so `warning`
+   * prints errors as well.
    *
-   * @param message
-   * @returns
+   * @defaultValue 'info'
    */
-  logFunction?: (message: string) => void;
+  logLevel?: LogLevel;
+  /**
+   * An optional destination for log output instead of the console. Receives
+   * every message `logLevel` lets through, along with the level it was logged
+   * at, so a caller can route or format each level as it likes.
+   *
+   * The progress bar is not sent here: it redraws a single line in place, so
+   * it would arrive as hundreds of near-identical messages.
+   */
+  logFunction?: LogFunction;
 }
+
+/**
+ * How much a run prints. `silent` is a `logLevel` value only - nothing is ever
+ * logged at it.
+ */
+export type LogLevel = 'silent' | 'error' | 'warning' | 'info';
+
+/** The levels a single message can be logged at. */
+export type LogMessageLevel = Exclude<LogLevel, 'silent'>;
+
+/** A custom destination for log output. */
+export type LogFunction = (level: LogMessageLevel, message: string) => void;
 
 export interface ModelColumn {
   name: string;

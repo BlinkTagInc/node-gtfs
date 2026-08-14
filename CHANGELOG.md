@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- **Breaking:** `logFunction` now takes `(level, message)` instead of `(message)`, so callers can tell a progress line from an error
+- Warnings and errors are written to stderr instead of stdout
+- The progress line is no longer passed to `logFunction`
+- The command line no longer prints a stack trace for an ordinary user error, such as a missing or unparseable config file
+- A missing or unparseable config file now throws a `GtfsError` with a code, rather than a plain `Error`
+
+### Added
+- `logLevel` config option: `silent`, `error`, `warning` or `info`, each level including the ones above it
+- `exportGtfs` and `updateGtfsRealtime` now report how long they took, as `importGtfs` did
+- Exporting with nothing in the database is now a warning rather than an info line
+
+### Deprecated
+- `verbose` — use `logLevel`. `verbose: false` maps to `logLevel: 'warning'`, which is what it has always meant; use `'silent'` to suppress everything
+
 ## [4.20.2] - 2026-08-13
 
 ### Changed

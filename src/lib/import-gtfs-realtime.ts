@@ -4,12 +4,12 @@ import Database from 'better-sqlite3';
 
 import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
-import { log, logError, logWarning } from './log-utils.ts';
+import { log, report, status } from '../reporting/report.ts';
+import { pluralize } from '../reporting/format.ts';
 import {
   convertLongTimeToDate,
   applyPrefixToValue,
   mapSeries,
-  pluralize,
   setDefaultConfig,
   validateConfigForImport,
 } from './utils.ts';
@@ -45,9 +45,7 @@ interface GtfsRealtimeTask {
   sqlitePath: string;
   prefix?: string;
   currentTimestamp: number;
-  log: (message: string, newLine?: boolean) => void;
-  logWarning: (message: string) => void;
-  logError: (message: string) => void;
+  config: Config;
   report?: ImportReport;
 }
 
@@ -162,7 +160,7 @@ async function fetchGtfsRealtimeData(
     return null;
   }
 
-  task.log(`Importing - GTFS-Realtime from ${urlConfig.url}`);
+  status(task.config, `Importing - GTFS-Realtime from ${urlConfig.url}`);
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
@@ -218,7 +216,9 @@ async function fetchGtfsRealtimeData(
       });
       if (attempt === MAX_RETRIES) {
         if (task.ignoreErrors) {
-          task.logError(
+          log(
+            task.config,
+            'error',
             `Failed to fetch ${type} after ${MAX_RETRIES} attempts: ${gtfsError.message}`,
           );
           if (task.report) {
@@ -229,8 +229,10 @@ async function fetchGtfsRealtimeData(
         throw gtfsError;
       }
 
-      task.logWarning(
-        `Attempt ${attempt} failed for ${type}: ${gtfsError.message}`,
+      log(
+        task.config,
+        'warning',
+        `Attempt ${attempt} of ${MAX_RETRIES} for ${type} did not succeed, retrying: ${gtfsError.message}`,
       );
       await new Promise((resolve) =>
         setTimeout(resolve, RETRY_DELAY * attempt),
@@ -314,7 +316,11 @@ function createServiceAlertsProcessor(
           const errorMessage =
             error instanceof Error ? error.message : String(error);
           errorCount++;
-          task.logWarning(`Alert processing error: ${errorMessage}`);
+          log(
+            task.config,
+            'warning',
+            `Skipping a alert that could not be read: ${errorMessage}`,
+          );
         }
       }
     })();
@@ -393,7 +399,11 @@ function createTripUpdatesProcessor(
           const errorMessage =
             error instanceof Error ? error.message : String(error);
           errorCount++;
-          task.logWarning(`Trip update processing error: ${errorMessage}`);
+          log(
+            task.config,
+            'warning',
+            `Skipping a trip update that could not be read: ${errorMessage}`,
+          );
         }
       }
     })();
@@ -430,7 +440,11 @@ function createVehiclePositionsProcessor(
           const errorMessage =
             error instanceof Error ? error.message : String(error);
           errorCount++;
-          task.logWarning(`Vehicle position processing error: ${errorMessage}`);
+          log(
+            task.config,
+            'warning',
+            `Skipping a vehicle position that could not be read: ${errorMessage}`,
+          );
         }
       }
     })();
@@ -445,7 +459,7 @@ function createVehiclePositionsProcessor(
 function removeExpiredRealtimeData(config: Config): void {
   const db = openDb(config);
 
-  log(config)(`Removing expired GTFS-Realtime data`);
+  status(config, 'Removing expired GTFS-Realtime data');
 
   db.transaction(() => {
     const tables = [
@@ -463,7 +477,7 @@ function removeExpiredRealtimeData(config: Config): void {
     }
   })();
 
-  log(config)(`Removed expired GTFS-Realtime data\r`, true);
+  status(config, 'Removed expired GTFS-Realtime data');
 }
 
 /**
@@ -531,8 +545,9 @@ export async function updateGtfsRealtimeData(
     recordCounts.vehiclepositions = result.recordCount;
   }
 
-  task.log(
-    `GTFS-Realtime import complete: ${recordCounts.alerts} alerts, ${recordCounts.tripupdates} trip updates, ${recordCounts.vehiclepositions} vehicle positions`,
+  status(
+    task.config,
+    `GTFS-Realtime import complete: ${pluralize('alert', 'alerts', recordCounts.alerts)}, ${pluralize('trip update', 'trip updates', recordCounts.tripupdates)}, ${pluralize('vehicle position', 'vehicle positions', recordCounts.vehiclepositions)}`,
   );
 }
 
@@ -541,19 +556,19 @@ export async function updateGtfsRealtimeData(
  */
 export async function updateGtfsRealtime(initialConfig: Config): Promise<void> {
   const config = setDefaultConfig(initialConfig);
+  const startTime = process.hrtime.bigint();
   validateConfigForImport(config);
 
   try {
     openDb(config);
 
     const agencyCount = config.agencies.length;
-    log(config)(
-      `Starting GTFS-Realtime refresh for ${pluralize(
-        'agency',
-        'agencies',
-        agencyCount,
-      )} using SQLite database at ${config.sqlitePath}`,
-    );
+    report(config, {
+      type: 'run:start',
+      task: 'realtime',
+      agencyCount,
+      sqlitePath: config.sqlitePath ?? ':memory:',
+    });
 
     removeExpiredRealtimeData(config);
 
@@ -570,9 +585,7 @@ export async function updateGtfsRealtime(initialConfig: Config): Promise<void> {
           sqlitePath: config.sqlitePath,
           prefix: agency.prefix,
           currentTimestamp: Math.floor(Date.now() / 1000),
-          log: log(config),
-          logWarning: logWarning(config),
-          logError: logError(config),
+          config,
         };
 
         await updateGtfsRealtimeData(task);
@@ -584,7 +597,7 @@ export async function updateGtfsRealtime(initialConfig: Config): Promise<void> {
           details: { sqlitePath: task?.sqlitePath ?? config.sqlitePath },
         });
         if (config.ignoreErrors) {
-          logError(config)(formatGtfsError(gtfsError));
+          log(config, 'error', formatGtfsError(gtfsError));
           if (task?.report) {
             addImportError(task.report, gtfsError);
           }
@@ -594,13 +607,12 @@ export async function updateGtfsRealtime(initialConfig: Config): Promise<void> {
       }
     });
 
-    log(config)(
-      `Completed GTFS-Realtime refresh for ${pluralize(
-        'agency',
-        'agencies',
-        agencyCount,
-      )}\n`,
-    );
+    report(config, {
+      type: 'run:complete',
+      task: 'realtime',
+      elapsedSeconds:
+        Number(process.hrtime.bigint() - startTime) / 1_000_000_000,
+    });
   } catch (error: unknown) {
     if ((error as Error & { code?: string }).code === 'SQLITE_CANTOPEN') {
       const dbOpenError = new GtfsError(
@@ -615,7 +627,7 @@ export async function updateGtfsRealtime(initialConfig: Config): Promise<void> {
           cause: error,
         },
       );
-      logError(config)(dbOpenError.message);
+      log(config, 'error', dbOpenError.message);
       throw dbOpenError;
     }
     throw toGtfsError(error, {

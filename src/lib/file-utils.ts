@@ -6,8 +6,8 @@ import { omit, snakeCase } from 'lodash-es';
 import sanitize from 'sanitize-filename';
 import StreamZip from 'node-stream-zip';
 import type { Config } from '../types/global_interfaces.ts';
-
-import { log } from './log-utils.ts';
+import { status } from '../reporting/report.ts';
+import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from './errors.ts';
 
 const homeDirectory = homedir();
 
@@ -35,7 +35,21 @@ export async function getConfig(argv: ConfigArgs): Promise<Config> {
   try {
     if (argv.configPath) {
       const configPath = path.resolve(untildify(argv.configPath));
-      data = await readFile(configPath, 'utf8');
+
+      try {
+        data = await readFile(configPath, 'utf8');
+      } catch (error) {
+        throw new GtfsError(
+          `Cannot find configuration file at \`${argv.configPath}\`. Use config-sample.json as a starting point, pass --configPath option.`,
+          {
+            code: GtfsErrorCode.GTFS_CONFIG_FILE_NOT_FOUND,
+            category: GtfsErrorCategory.CONFIG,
+            details: { configPath: argv.configPath },
+            cause: error,
+          },
+        );
+      }
+
       config = Object.assign(JSON.parse(data), argv);
     } else if (argv.gtfsPath || argv.gtfsUrl || argv.sqlitePath) {
       const agencies = [
@@ -50,19 +64,27 @@ export async function getConfig(argv: ConfigArgs): Promise<Config> {
     } else if (existsSync(path.resolve('./config.json'))) {
       data = await readFile(path.resolve('./config.json'), 'utf8');
       config = Object.assign(JSON.parse(data), argv);
-      log(config)('Using configuration from ./config.json');
+      status(config, 'Using configuration from ./config.json');
     } else {
-      throw new Error(
+      throw new GtfsError(
         'Cannot find configuration file. Use config-sample.json as a starting point, pass --configPath option.',
+        {
+          code: GtfsErrorCode.GTFS_CONFIG_FILE_NOT_FOUND,
+          category: GtfsErrorCategory.CONFIG,
+        },
       );
     }
 
     return config;
   } catch (error) {
     if (error instanceof SyntaxError) {
-      throw new Error(
+      throw new GtfsError(
         `Cannot parse configuration file. Check to ensure that it is valid JSON. Error: ${error.message}`,
-        { cause: error },
+        {
+          code: GtfsErrorCode.GTFS_CONFIG_PARSE_FAILED,
+          category: GtfsErrorCategory.CONFIG,
+          cause: error,
+        },
       );
     }
     throw error;
