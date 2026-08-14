@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Changed timetable_notes.txt structure
 
+### Updated
+- Typescript 7
+- Removed eslint in favor of oxlint
+
 ## [4.20.1] - 2026-08-10
 
 ### Updated
