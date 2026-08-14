@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 
-import { CONFIG_PATH_FLAG, SQLITE_PATH_FLAG, parseFlags } from './cli-utils.ts';
+import {
+  CONFIG_PATH_FLAG,
+  LOG_LEVEL_FLAG,
+  SQLITE_PATH_FLAG,
+  parseFlags,
+} from './cli-utils.ts';
 import { getConfig } from '../lib/file-utils.ts';
 import { handleFatalError } from '../reporting/fatal.ts';
 import { closeDb, importGtfs, openDb } from '../index.ts';
@@ -25,6 +30,7 @@ const setupImport = async () => {
         description: 'URL of a zipped GTFS file',
       },
       SQLITE_PATH_FLAG,
+      LOG_LEVEL_FLAG,
     ],
   );
 

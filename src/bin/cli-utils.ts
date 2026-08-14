@@ -3,12 +3,17 @@ import { parseArgs } from 'node:util';
 import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from '../lib/errors.ts';
 import { version } from '../version.ts';
 
+import type { LogLevel } from '../types/global_interfaces.ts';
+
+const LOG_LEVELS = ['silent', 'error', 'warning', 'info'] as const;
+
 /*
  * The command line as parsed. A flag that wasn't passed is undefined, which is
  * what leaves the matching config.json option alone.
  */
 export interface FlagValues {
   configPath?: string;
+  logLevel?: LogLevel;
   gtfsPath?: string;
   gtfsUrl?: string;
   sqlitePath?: string;
@@ -18,13 +23,15 @@ export interface FlagValues {
 
 /*
  * One command line flag. `value` is the placeholder shown after the flag in
- * `--help`, for the flags that take one.
+ * `--help`, for the flags that take one; `choices` is the values it accepts,
+ * when it accepts a fixed set of them.
  */
 export interface Flag {
   name: string;
   short?: string;
   type: 'boolean' | 'string';
   value?: string;
+  choices?: readonly string[];
   description: string;
 }
 
@@ -50,6 +57,15 @@ export const CONFIG_PATH_FLAG: Flag = {
   type: 'string',
   value: 'path',
   description: 'Path to config file [default: ./config.json]',
+};
+
+export const LOG_LEVEL_FLAG: Flag = {
+  name: 'logLevel',
+  short: 'l',
+  type: 'string',
+  value: 'level',
+  choices: LOG_LEVELS,
+  description: `How much to log: ${LOG_LEVELS.join(', ')}`,
 };
 
 export const SQLITE_PATH_FLAG: Flag = {
@@ -123,6 +139,25 @@ export function parseFlags(
         details: { argv: process.argv.slice(2) },
       },
     );
+  }
+
+  for (const flag of flags) {
+    const value = values[flag.name];
+
+    if (
+      flag.choices !== undefined &&
+      typeof value === 'string' &&
+      !flag.choices.includes(value)
+    ) {
+      throw new GtfsError(
+        `Invalid --${flag.name}=${value} - use one of ${flag.choices.join(', ')}`,
+        {
+          code: GtfsErrorCode.GTFS_CONFIG_INVALID,
+          category: GtfsErrorCategory.CONFIG,
+          details: { flag: flag.name, value },
+        },
+      );
+    }
   }
 
   if (values.help === true) {
