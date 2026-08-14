@@ -120,13 +120,15 @@ The `gtfs-export` command-line utility will create GTFS from data previously imp
 
 ### gtfs-import Command-Line options
 
-`configPath`
+Run `gtfs-import --help` to see these at any time. Every option but `--version` and `--help` overrides the option of the same name in `config.json`, and an unknown flag is reported as an error naming what is accepted.
+
+`--configPath`, `-c`
 
 Allows specifying a path to a configuration json file. By default, `node-gtfs` will look for a `config.json` file in the directory it is being run from. Using a config.json file allows you specify more options than CLI arguments alone - see below.
 
     gtfs-import --configPath /path/to/your/custom-config.json
 
-`gtfsPath`
+`--gtfsPath`
 
 Specify a local path to GTFS, either zipped or unzipped.
 
@@ -136,11 +138,27 @@ or
 
     gtfs-import --gtfsPath /path/to/your/unzipped/gtfs
 
-`gtfsUrl`
+`--gtfsUrl`
 
 Specify a URL to a zipped GTFS file.
 
     gtfs-import --gtfsUrl http://www.bart.gov/dev/schedules/google_transit.zip
+
+`--sqlitePath`
+
+Specify where to write the SQLite database.
+
+    gtfs-import --sqlitePath /tmp/gtfs
+
+`--version`, `-v`
+
+Print the installed node-GTFS version.
+
+`--help`, `-h`
+
+Print the options above.
+
+`gtfs-export` accepts `--configPath` and `--sqlitePath`; `gtfsrealtime-update` accepts `--configPath`. Both also accept `--version` and `--help`.
 
 ## TypeScript Support
 

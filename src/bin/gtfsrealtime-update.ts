@@ -1,30 +1,21 @@
 #!/usr/bin/env node
 
-import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
-
+import { CONFIG_PATH_FLAG, parseFlags } from './cli-utils.ts';
 import { getConfig } from '../lib/file-utils.ts';
 import { handleFatalError } from '../reporting/fatal.ts';
 import { updateGtfsRealtime } from '../index.ts';
 import type { Config } from '../types/global_interfaces.ts';
 
-const argv = yargs(hideBin(process.argv))
-  .usage('Usage: $0 --configPath ./config.json')
-  .help()
-  .option('c', {
-    alias: 'configPath',
-    describe: 'Path to config file',
-    type: 'string',
-  })
-  .default('configPath', undefined)
-  .parseSync();
+const setupUpdate = async () => {
+  const values = parseFlags(
+    'gtfsrealtime-update',
+    'Refresh GTFS-Realtime data in a SQLite database.',
+    [CONFIG_PATH_FLAG],
+  );
 
-const setupImport = async () => {
-  const config = await getConfig({
-    configPath: argv.configPath,
-  });
+  const config = await getConfig({ configPath: values.configPath });
   await updateGtfsRealtime(config as Config);
   process.exit();
 };
 
-setupImport().catch(handleFatalError);
+setupUpdate().catch(handleFatalError);
