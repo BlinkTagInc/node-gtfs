@@ -598,10 +598,34 @@ export interface TimetableStopOrder {
   stop_sequence: number;
 }
 
+/*
+ * What a timetable note is attached to, which says how the id columns on the
+ * same row are read.
+ */
+export type TimetableNoteScope =
+  | 'timetable'
+  | 'route'
+  | 'trip'
+  | 'trip_stoptimes'
+  | 'stop'
+  | 'stop_stoptimes'
+  | 'stoptime';
+
+/*
+ * A note and where it goes. One row per placement: a note shown in several
+ * places repeats its `note_id`, and only one of those rows has to carry the
+ * `note` text.
+ */
 export interface TimetableNote {
   note_id: string;
   symbol: string | null;
-  note: string;
+  note: string | null;
+  scope: TimetableNoteScope | null;
+  timetable_id: string | null;
+  route_id: string | null;
+  trip_id: string | null;
+  stop_id: string | null;
+  stop_sequence: number | null;
 }
 
 export interface TimetableNotesReference {
