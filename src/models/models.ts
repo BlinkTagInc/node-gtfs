@@ -5,6 +5,7 @@ export { bookingRules } from './gtfs/booking-rules.ts';
 export { calendarDates } from './gtfs/calendar-dates.ts';
 export { calendar } from './gtfs/calendar.ts';
 export { fareAttributes } from './gtfs/fare-attributes.ts';
+export { fareLegJoinRules } from './gtfs/fare-leg-join-rules.ts';
 export { fareLegRules } from './gtfs/fare-leg-rules.ts';
 export { fareMedia } from './gtfs/fare-media.ts';
 export { fareProducts } from './gtfs/fare-products.ts';

@@ -364,6 +364,13 @@ export interface FareLegRule {
   rule_priority: number | null;
 }
 
+export interface FareLegJoinRule {
+  from_network_id: string;
+  to_network_id: string;
+  from_stop_id: string | null;
+  to_stop_id: string | null;
+}
+
 export interface FareMedia {
   fare_media_id: string;
   fare_media_name: string | null;

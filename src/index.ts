@@ -38,6 +38,7 @@ export { getCalendarDates } from './lib/gtfs/calendar-dates.ts';
 export { getCalendars } from './lib/gtfs/calendars.ts';
 export { getServiceIdsByDate } from './lib/gtfs/calendars.ts';
 export { getFareAttributes } from './lib/gtfs/fare-attributes.ts';
+export { getFareLegJoinRules } from './lib/gtfs/fare-leg-join-rules.ts';
 export { getFareLegRules } from './lib/gtfs/fare-leg-rules.ts';
 export { getFareMedia } from './lib/gtfs/fare-media.ts';
 export { getFareProducts } from './lib/gtfs/fare-products.ts';

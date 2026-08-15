@@ -1279,6 +1279,23 @@ const fareLegRules = getFareLegRules({
 });
 ```
 
+#### getFareLegJoinRules(query, fields, sortBy, options)
+
+Returns an array of fare_leg_join_rules that match query parameters. [Details on fare_leg_join_rules.txt](https://gtfs.org/schedule/reference/#fare_leg_join_rulestxt)
+
+```js
+import { getFareLegJoinRules } from 'gtfs';
+
+// Get all fare leg join rules
+const fareLegJoinRules = getFareLegJoinRules();
+
+// Get join rules for legs traveling between two networks
+const fareLegJoinRules = getFareLegJoinRules({
+  from_network_id: 'network1',
+  to_network_id: 'network2',
+});
+```
+
 #### getFareMedia(query, fields, sortBy, options)
 
 Returns an array of fare_media that match query parameters. [Details on fare_media.txt](https://gtfs.org/schedule/reference/#fare_mediatxt)
