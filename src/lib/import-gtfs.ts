@@ -1,13 +1,14 @@
 import path from 'node:path';
 import { createReadStream, existsSync, lstatSync } from 'node:fs';
-import { cp, readdir, rename, readFile, rm, writeFile } from 'node:fs/promises';
+import { cp, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import { parse } from 'csv-parse';
 import Database from 'better-sqlite3';
 
 import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
 import { temporaryDirectory, untildify, unzip } from './file-utils.ts';
-import { isValidJSON } from './geojson-utils.ts';
+import { parseGtfsFile } from './gtfs-record-parser.ts';
+import { createSqliteGtfsWriter } from './sqlite-gtfs-writer.ts';
 import { updateGtfsRealtimeData } from './import-gtfs-realtime.ts';
 import { log, progress, report, status } from '../reporting/report.ts';
 import {
@@ -22,22 +23,19 @@ import {
 import { validateConfig } from './validate-config.ts';
 import {
   getTimestampColumnName,
-  padLeadingZeros,
-  applyPrefixToValue,
   escapeIdentifier,
   mapSeries,
   setDefaultConfig,
 } from './utils.ts';
 import {
   addImportError,
-  addImportWarning,
   createImportReport,
   formatGtfsError,
   GtfsError,
   GtfsErrorCategory,
   GtfsErrorCode,
-  GtfsWarningCode,
   ImportReport,
+  isGtfsError,
   toGtfsError,
 } from './errors.ts';
 
@@ -45,7 +43,6 @@ import {
   Config,
   ConfigAgency,
   Model,
-  SqlValue,
   TableNames,
 } from '../types/global_interfaces.ts';
 
@@ -495,122 +492,6 @@ const createGtfsIndexes = (db: Database.Database): void => {
   createAdditionalGtfsIndexes(db);
 };
 
-const AGENCY_ID_BACKFILL_MODELS = new Set([
-  'agency',
-  'routes',
-  'fare_attributes',
-  'trip_capacity',
-  'rider_trip',
-  'ridership',
-]);
-
-function shouldBackfillAgencyId(
-  model: Model,
-  formattedLine: (string | null)[],
-  columnIndexes: Map<string, number>,
-): boolean {
-  if (AGENCY_ID_BACKFILL_MODELS.has(model.filenameBase)) {
-    return true;
-  }
-
-  if (model.filenameBase === 'attributions') {
-    // Per GTFS spec, agency_id, route_id, and trip_id are mutually exclusive.
-    // Only backfill when the row isn't already scoped to a route or trip.
-    const routeIdIndex = columnIndexes.get('route_id');
-    const tripIdIndex = columnIndexes.get('trip_id');
-    return (
-      (routeIdIndex === undefined || formattedLine[routeIdIndex] == null) &&
-      (tripIdIndex === undefined || formattedLine[tripIdIndex] == null)
-    );
-  }
-
-  return false;
-}
-
-const formatGtfsLine = (
-  line: { [x: string]: string | null },
-  model: Model,
-  totalLineCount: number,
-  fillEmptyAgencyId: boolean,
-  agencyId: string | undefined,
-  columnIndexes: Map<string, number>,
-): (string | null)[] => {
-  const lineNumber = totalLineCount + 1;
-  const formattedLine: (string | null)[] = new Array(model.schema.length);
-  const filenameBase = model.filenameBase;
-  const filenameExtension = model.filenameExtension;
-
-  for (let index = 0; index < model.schema.length; index++) {
-    const { name, type, required } = model.schema[index];
-    let value: string | null = line[name];
-
-    // Early null check
-    if (value === '' || value === undefined || value === null) {
-      formattedLine[index] = null;
-
-      if (required) {
-        throw new GtfsError(
-          `Missing required value in ${filenameBase}.${filenameExtension} for ${name} on line ${lineNumber}.`,
-          {
-            code: GtfsErrorCode.GTFS_REQUIRED_FIELD_MISSING,
-            category: GtfsErrorCategory.VALIDATION,
-            details: {
-              file: `${filenameBase}.${filenameExtension}`,
-              line: lineNumber,
-              column: name,
-            },
-          },
-        );
-      }
-      continue;
-    }
-
-    if (type === 'date') {
-      // Handle YYYY-MM-DD format
-      value = value?.toString().replace(/-/g, '');
-      if (value.length !== 8) {
-        throw new GtfsError(
-          `Invalid date in ${filenameBase}.${filenameExtension} for ${name} on line ${lineNumber}.`,
-          {
-            code: GtfsErrorCode.GTFS_INVALID_DATE,
-            category: GtfsErrorCategory.VALIDATION,
-            details: {
-              file: `${filenameBase}.${filenameExtension}`,
-              line: lineNumber,
-              column: name,
-              value,
-            },
-          },
-        );
-      }
-    } else if (type === 'time') {
-      value = padLeadingZeros(value);
-    }
-
-    if (type === 'json') {
-      value = JSON.stringify(value);
-    }
-
-    formattedLine[index] = value;
-  }
-
-  const agencyIdIndex = columnIndexes.get('agency_id');
-
-  if (
-    fillEmptyAgencyId &&
-    agencyId !== undefined &&
-    agencyIdIndex !== undefined &&
-    formattedLine[agencyIdIndex] == null &&
-    shouldBackfillAgencyId(model, formattedLine, columnIndexes)
-  ) {
-    // Fill raw value — applyPrefixToValue handles prefixing at insert time
-    // since agency_id is marked prefix: true in all affected models.
-    formattedLine[agencyIdIndex] = agencyId;
-  }
-
-  return formattedLine;
-};
-
 const BATCH_SIZE = 100_000;
 
 const importGtfsFiles = async (
@@ -627,368 +508,131 @@ const importGtfsFiles = async (
 
   status(task.config, 'Imported');
 
-  await mapSeries(
-    Object.values(models) as Model[],
-    (model: Model) =>
-      new Promise<void>((resolve, reject) => {
-        let totalLineCount = 0;
-        const filename = `${model.filenameBase}.${model.filenameExtension}`;
+  await mapSeries(Object.values(models) as Model[], async (model: Model) => {
+    const filename = `${model.filenameBase}.${model.filenameExtension}`;
 
-        // Skip any models that are excluded by config
-        if (task.exclude && task.exclude.includes(model.filenameBase)) {
-          status(task.config, formatFileNote(filename, 'skipped'));
-          resolve();
-          return;
-        }
+    if (task.exclude && task.exclude.includes(model.filenameBase)) {
+      status(task.config, formatFileNote(filename, 'skipped'));
+      return;
+    }
 
-        // Skip gtfs-realtime models not present in static GTFS
-        if (model.extension === 'gtfs-realtime') {
-          resolve();
-          return;
-        }
+    // GTFS-Realtime tables are populated by the realtime importer, not files.
+    if (model.extension === 'gtfs-realtime') {
+      return;
+    }
 
-        const filepath = path.join(task.downloadDir, `${filename}`);
+    const filepath = path.join(task.downloadDir, filename);
+    if (!existsSync(filepath)) {
+      if (!model.nonstandard && !model.extension) {
+        missing.push(filename);
+      }
+      return;
+    }
 
-        // Only standard GTFS files are worth reporting as missing.
-        if (!existsSync(filepath)) {
-          if (!model.nonstandard && !model.extension) {
-            missing.push(filename);
+    progress(task.config, `  ${filename}`);
+
+    const writer = createSqliteGtfsWriter({
+      db,
+      model,
+      filename,
+      ignoreDuplicates: task.ignoreDuplicates,
+      sqlitePath: task.sqlitePath,
+      prefix: task.prefix,
+      config: task.config,
+      report: task.report,
+    });
+    let totalRowCount = 0;
+
+    try {
+      for await (const batch of parseGtfsFile({
+        filepath,
+        model,
+        csvOptions: task.csvOptions,
+        fillEmptyAgencyId: task.fillEmptyAgencyId,
+        agencyId: task.agencyId,
+        batchSize: BATCH_SIZE,
+      })) {
+        try {
+          writer.writeBatch(batch.rows);
+        } catch (error: unknown) {
+          const gtfsError = toGtfsError(error, {
+            message: error instanceof Error ? error.message : String(error),
+            code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
+            category: GtfsErrorCategory.DATABASE,
+            details: { file: filename, sqlitePath: task.sqlitePath },
+          });
+          if (!task.ignoreErrors) {
+            throw gtfsError;
           }
 
-          resolve();
+          log(
+            task.config,
+            'error',
+            batch.isFinal
+              ? `Error inserting data for ${filename}: ${gtfsError.message}`
+              : `Error processing ${filename}: ${gtfsError.message}`,
+          );
+          reportTaskError(task, gtfsError);
           return;
         }
 
-        progress(task.config, `  ${filename}`);
+        totalRowCount = batch.totalRowCount;
+        if (!batch.isFinal) {
+          progress(task.config, formatFileCount(filename, totalRowCount));
+        }
+      }
+    } catch (error: unknown) {
+      const errorWasTyped = isGtfsError(error);
+      const gtfsError = toGtfsError(error, {
+        message: error instanceof Error ? error.message : String(error),
+        code: GtfsErrorCode.GTFS_CSV_PARSE_FAILED,
+        category: GtfsErrorCategory.PARSE,
+        details: { file: filename },
+      });
 
-        // Create a list of all columns
-        const columns = model.schema;
+      if (!task.ignoreErrors) {
+        throw gtfsError;
+      }
 
-        // Positional lookups, computed once per file rather than per row
-        const columnIndexes = new Map(
-          columns.map((column, index) => [column.name, index]),
+      if (gtfsError.code === GtfsErrorCode.GTFS_UNSUPPORTED_FILE_TYPE) {
+        log(
+          task.config,
+          'error',
+          `Unsupported file type: ${model.filenameExtension} for ${filename}`,
         );
-        const prefixedColumns = columns.map((column) => Boolean(column.prefix));
+        return;
+      }
 
-        const prepareStatement = `INSERT ${task.ignoreDuplicates ? 'OR IGNORE' : ''} INTO ${escapeIdentifier(
-          model.filenameBase,
-        )} (${columns
-          .map(({ name }) => escapeIdentifier(name))
-          .join(', ')}) VALUES (${columns.map(() => '?').join(', ')})`;
+      if (gtfsError.code === GtfsErrorCode.GTFS_JSON_INVALID) {
+        log(task.config, 'error', `Invalid JSON in ${filename}`);
+      } else if (model.filenameExtension === 'geojson') {
+        log(
+          task.config,
+          'error',
+          `Error reading ${filename}: ${gtfsError.message}`,
+        );
+      } else if (errorWasTyped) {
+        log(
+          task.config,
+          'error',
+          `Error processing ${filename}: ${gtfsError.message}`,
+        );
+      } else {
+        log(
+          task.config,
+          'error',
+          `Parser error for ${filename}: ${gtfsError.message}`,
+        );
+      }
+      reportTaskError(task, gtfsError);
+      return;
+    }
 
-        const insert = db.prepare(prepareStatement);
+    filesImported += 1;
+    rowsImported += totalRowCount;
+    status(task.config, formatFileCount(filename, totalRowCount));
+  });
 
-        const insertLines = db.transaction((lines) => {
-          for (let rowNumber = 0; rowNumber < lines.length; rowNumber++) {
-            const line = lines[rowNumber];
-            try {
-              if (task.prefix === undefined) {
-                insert.run(line as SqlValue[]);
-              } else {
-                const values = line as SqlValue[];
-                const prefixedLine = new Array(values.length);
-                for (let index = 0; index < values.length; index++) {
-                  prefixedLine[index] = applyPrefixToValue(
-                    values[index] as string,
-                    prefixedColumns[index],
-                    task.prefix,
-                  );
-                }
-                insert.run(prefixedLine);
-              }
-            } catch (error: unknown) {
-              if (
-                (error as Error & { code?: string }).code ===
-                'SQLITE_CONSTRAINT_PRIMARYKEY'
-              ) {
-                const primaryColumns = columns.filter(
-                  (column) => column.primary,
-                );
-                log(
-                  task.config,
-                  'warning',
-                  `Duplicate values for primary key (${primaryColumns.map((column) => column.name).join(', ')}) found in ${filename}. Set the \`ignoreDuplicates\` option to true in config.json to ignore this error`,
-                );
-                if (task.report) {
-                  addImportWarning(task.report, {
-                    code: GtfsWarningCode.GTFS_DUPLICATE_PRIMARY_KEY,
-                    message: `Duplicate values for primary key found in ${filename}.`,
-                    details: {
-                      file: filename,
-                      line: Number(rowNumber) + 1,
-                      columns: primaryColumns.map((column) => column.name),
-                    },
-                  });
-                }
-              }
-
-              log(
-                task.config,
-                'warning',
-                `Skipping invalid data in ${filename} on line ${rowNumber + 1}`,
-              );
-              throw toGtfsError(error, {
-                message: error instanceof Error ? error.message : String(error),
-                code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
-                category: GtfsErrorCategory.DATABASE,
-                details: {
-                  file: filename,
-                  line: Number(rowNumber) + 1,
-                  sqlitePath: task.sqlitePath,
-                  dbCode: (error as { code?: unknown }).code,
-                },
-              });
-            }
-          }
-        });
-
-        if (model.filenameExtension === 'txt') {
-          const parser = parse({
-            columns: true,
-            relax_quotes: true,
-            trim: true,
-            skip_empty_lines: true,
-            bom: true,
-            ...task.csvOptions,
-          });
-          const inputStream = createReadStream(filepath);
-
-          let lines: (string | null)[][] = [];
-
-          parser.on('readable', () => {
-            try {
-              let record;
-
-              while ((record = parser.read())) {
-                totalLineCount += 1;
-                lines.push(
-                  formatGtfsLine(
-                    record,
-                    model,
-                    totalLineCount,
-                    task.fillEmptyAgencyId,
-                    task.agencyId,
-                    columnIndexes,
-                  ),
-                );
-
-                if (lines.length >= BATCH_SIZE) {
-                  insertLines(lines);
-                  lines = [];
-
-                  progress(
-                    task.config,
-                    formatFileCount(filename, totalLineCount),
-                  );
-                }
-              }
-            } catch (error: unknown) {
-              const gtfsError = toGtfsError(error, {
-                message: error instanceof Error ? error.message : String(error),
-                code: GtfsErrorCode.GTFS_CSV_PARSE_FAILED,
-                category: GtfsErrorCategory.PARSE,
-                details: { file: filename },
-              });
-              if (task.ignoreErrors) {
-                reportTaskError(task, gtfsError);
-                log(
-                  task.config,
-                  'error',
-                  `Error processing ${filename}: ${gtfsError.message}`,
-                );
-                resolve();
-              } else {
-                reject(gtfsError);
-              }
-              inputStream.destroy();
-              parser.destroy();
-            }
-          });
-
-          parser.on('end', () => {
-            try {
-              if (lines.length > 0) {
-                try {
-                  insertLines(lines);
-                } catch (error: unknown) {
-                  const gtfsError = toGtfsError(error, {
-                    message:
-                      error instanceof Error ? error.message : String(error),
-                    code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
-                    category: GtfsErrorCategory.DATABASE,
-                    details: { file: filename, sqlitePath: task.sqlitePath },
-                  });
-                  if (task.ignoreErrors) {
-                    log(
-                      task.config,
-                      'error',
-                      `Error inserting data for ${filename}: ${gtfsError.message}`,
-                    );
-                    reportTaskError(task, gtfsError);
-                    resolve();
-                    return;
-                  } else {
-                    reject(gtfsError);
-                    return;
-                  }
-                }
-              }
-              filesImported += 1;
-              rowsImported += totalLineCount;
-              status(task.config, formatFileCount(filename, totalLineCount));
-              resolve();
-            } catch (error: unknown) {
-              const gtfsError = toGtfsError(error, {
-                message: error instanceof Error ? error.message : String(error),
-                code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
-                category: GtfsErrorCategory.DATABASE,
-                details: { file: filename, sqlitePath: task.sqlitePath },
-              });
-              if (task.ignoreErrors) {
-                log(
-                  task.config,
-                  'error',
-                  `Error finalizing ${filename}: ${gtfsError.message}`,
-                );
-                reportTaskError(task, gtfsError);
-                resolve();
-              } else {
-                reject(gtfsError);
-              }
-            }
-          });
-
-          parser.on('error', (error: unknown) => {
-            inputStream.destroy();
-            const gtfsError = toGtfsError(error, {
-              message: error instanceof Error ? error.message : String(error),
-              code: GtfsErrorCode.GTFS_CSV_PARSE_FAILED,
-              category: GtfsErrorCategory.PARSE,
-              details: { file: filename },
-            });
-            if (task.ignoreErrors) {
-              log(
-                task.config,
-                'error',
-                `Parser error for ${filename}: ${gtfsError.message}`,
-              );
-              reportTaskError(task, gtfsError);
-              resolve();
-            } else {
-              reject(gtfsError);
-            }
-          });
-
-          inputStream.on('error', (error) => parser.destroy(error));
-          inputStream.pipe(parser);
-        } else if (model.filenameExtension === 'geojson') {
-          readFile(filepath, 'utf8')
-            .then((data) => {
-              if (isValidJSON(data) === false) {
-                if (task.ignoreErrors) {
-                  log(task.config, 'error', `Invalid JSON in ${filename}`);
-                  reportTaskError(
-                    task,
-                    new GtfsError(`Invalid JSON in ${filename}`, {
-                      code: GtfsErrorCode.GTFS_JSON_INVALID,
-                      category: GtfsErrorCategory.PARSE,
-                      details: { file: filename },
-                    }),
-                  );
-                  resolve();
-                  return;
-                } else {
-                  reject(
-                    new GtfsError(`Invalid JSON in ${filename}`, {
-                      code: GtfsErrorCode.GTFS_JSON_INVALID,
-                      category: GtfsErrorCategory.PARSE,
-                      details: { file: filename },
-                    }),
-                  );
-                  return;
-                }
-              }
-              totalLineCount += 1;
-              const line = formatGtfsLine(
-                { geojson: data },
-                model,
-                totalLineCount,
-                task.fillEmptyAgencyId,
-                task.agencyId,
-                columnIndexes,
-              );
-              try {
-                insertLines([line]);
-                filesImported += 1;
-                rowsImported += totalLineCount;
-                status(task.config, formatFileCount(filename, totalLineCount));
-                resolve();
-              } catch (error: unknown) {
-                const gtfsError = toGtfsError(error, {
-                  message:
-                    error instanceof Error ? error.message : String(error),
-                  code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
-                  category: GtfsErrorCategory.DATABASE,
-                  details: { file: filename, sqlitePath: task.sqlitePath },
-                });
-                if (task.ignoreErrors) {
-                  log(
-                    task.config,
-                    'error',
-                    `Error inserting data for ${filename}: ${gtfsError.message}`,
-                  );
-                  reportTaskError(task, gtfsError);
-                  resolve();
-                } else {
-                  reject(gtfsError);
-                }
-              }
-            })
-            .catch((error: unknown) => {
-              const gtfsError = toGtfsError(error, {
-                message: error instanceof Error ? error.message : String(error),
-                code: GtfsErrorCode.GTFS_CSV_PARSE_FAILED,
-                category: GtfsErrorCategory.PARSE,
-                details: { file: filename },
-              });
-              if (task.ignoreErrors) {
-                log(
-                  task.config,
-                  'error',
-                  `Error reading ${filename}: ${gtfsError.message}`,
-                );
-                reportTaskError(task, gtfsError);
-                resolve();
-              } else {
-                reject(gtfsError);
-              }
-            });
-        } else {
-          if (task.ignoreErrors) {
-            log(
-              task.config,
-              'error',
-              `Unsupported file type: ${model.filenameExtension} for ${filename}`,
-            );
-            resolve();
-          } else {
-            reject(
-              new GtfsError(
-                `Unsupported file type: ${model.filenameExtension}`,
-                {
-                  code: GtfsErrorCode.GTFS_UNSUPPORTED_FILE_TYPE,
-                  category: GtfsErrorCategory.PARSE,
-                  details: {
-                    file: filename,
-                    extension: model.filenameExtension,
-                  },
-                },
-              ),
-            );
-          }
-        }
-      }),
-  );
   task.filesImported = filesImported;
   task.rowsImported = rowsImported;
 
