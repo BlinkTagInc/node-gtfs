@@ -58,7 +58,7 @@ describe('fillEmptyAgencyId:', function () {
 
     await importGtfs({
       agencies: [{ path: fixturePath, fillEmptyAgencyId: true }],
-      verbose: false,
+      logLevel: 'silent' as const,
     });
 
     const routes = getRoutes();
@@ -87,7 +87,7 @@ describe('fillEmptyAgencyId:', function () {
 
     await importGtfs({
       agencies: [{ path: fixturePath, fillEmptyAgencyId: true, prefix: 'X_' }],
-      verbose: false,
+      logLevel: 'silent' as const,
     });
 
     const routes = getRoutes();
@@ -108,7 +108,7 @@ describe('fillEmptyAgencyId:', function () {
 
     await importGtfs({
       agencies: [{ path: fixturePath, fillEmptyAgencyId: true }],
-      verbose: false,
+      logLevel: 'silent' as const,
     });
 
     const routes = getRoutes();
@@ -130,7 +130,7 @@ describe('fillEmptyAgencyId:', function () {
 
     await importGtfs({
       agencies: [{ path: fixturePath, fillEmptyAgencyId: true }],
-      verbose: false,
+      logLevel: 'silent' as const,
     });
 
     const attributions = getAttributions();
@@ -150,7 +150,7 @@ describe('fillEmptyAgencyId:', function () {
 
     await importGtfs({
       agencies: [{ path: fixturePath, fillEmptyAgencyId: true }],
-      verbose: false,
+      logLevel: 'silent' as const,
     });
 
     const routes = getRoutes();
@@ -176,7 +176,7 @@ describe('fillEmptyAgencyId:', function () {
       agencies: [
         { path: fixturePath, fillEmptyAgencyId: true, agencyId: 'CFG1' },
       ],
-      verbose: false,
+      logLevel: 'silent' as const,
     });
 
     const agencies = getAgencies();
@@ -208,7 +208,7 @@ describe('fillEmptyAgencyId:', function () {
       agencies: [
         { path: fixturePath, fillEmptyAgencyId: true, agencyId: 'CFG1' },
       ],
-      verbose: false,
+      logLevel: 'silent' as const,
     });
 
     const agencies = getAgencies();
@@ -237,7 +237,7 @@ describe('fillEmptyAgencyId:', function () {
           prefix: 'X_',
         },
       ],
-      verbose: false,
+      logLevel: 'silent' as const,
     });
 
     const agencies = getAgencies();

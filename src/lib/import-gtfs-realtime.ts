@@ -6,12 +6,12 @@ import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
 import { log, report, status } from '../reporting/report.ts';
 import { pluralize } from '../reporting/format.ts';
+import { validateConfig } from './validate-config.ts';
 import {
   convertLongTimeToDate,
   applyPrefixToValue,
   mapSeries,
   setDefaultConfig,
-  validateConfigForImport,
 } from './utils.ts';
 import {
   addImportError,
@@ -555,9 +555,12 @@ export async function updateGtfsRealtimeData(
  * Main function to update GTFS Realtime data
  */
 export async function updateGtfsRealtime(initialConfig: Config): Promise<void> {
+  validateConfig(initialConfig, (message) =>
+    log(initialConfig, 'warning', message),
+  );
+
   const config = setDefaultConfig(initialConfig);
   const startTime = process.hrtime.bigint();
-  validateConfigForImport(config);
 
   try {
     openDb(config);

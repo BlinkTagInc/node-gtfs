@@ -22,7 +22,7 @@ const locationsConfig = {
       path: temporaryDir,
     },
   ],
-  verbose: false,
+  logLevel: 'silent' as const,
 };
 
 describe('getLocations():', () => {

@@ -42,42 +42,6 @@ function toBindValue(value: SqlValue): SqlBindValue {
 }
 
 /**
- * Validates the configuration object for GTFS import
- * @param config The configuration object to validate
- * @throws Error if agencies are missing or if agency lacks both url and path
- * @returns The validated config object
- */
-export function validateConfigForImport(config: Config) {
-  if (!config.agencies || config.agencies.length === 0) {
-    throw new GtfsError('No `agencies` specified in config', {
-      code: GtfsErrorCode.GTFS_CONFIG_INVALID,
-      category: GtfsErrorCategory.CONFIG,
-      details: { field: 'agencies' },
-    });
-  }
-
-  for (const [index, agency] of config.agencies.entries()) {
-    // `ConfigAgency` is a union requiring one of `url`/`path`, so neither can be
-    // read directly. This runtime check still matters for untyped JS callers.
-    const hasPath = 'path' in agency && agency.path;
-    const hasUrl = 'url' in agency && agency.url;
-
-    if (!hasPath && !hasUrl) {
-      throw new GtfsError(
-        `No Agency \`url\` or \`path\` specified in config for agency index ${index}.`,
-        {
-          code: GtfsErrorCode.GTFS_CONFIG_INVALID,
-          category: GtfsErrorCategory.CONFIG,
-          details: { agencyIndex: index },
-        },
-      );
-    }
-  }
-
-  return config;
-}
-
-/**
  * Initializes configuration with default values
  * @param initialConfig The user-provided configuration
  * @returns Merged configuration with defaults
@@ -88,7 +52,6 @@ export function setDefaultConfig(initialConfig: Config) {
     ignoreDuplicates: false,
     ignoreErrors: false,
     gtfsRealtimeExpirationSeconds: 0,
-    verbose: true,
     downloadTimeout: 30000,
   };
 

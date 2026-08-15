@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `yargs` and `@types/yargs` — the command line scripts now use `parseArgs` from `node:util`
 
 ### Added
+- Configuration is validated on startup: every option is type-checked and all problems are reported in one error rather than one at a time. An option that looks like a misspelling of a real one is reported as a warning with a suggestion; options node-GTFS does not know are left alone, since tools that embed it pass their own configuration through
 - `--version` and `--help` on all three command line scripts, with usage text built from the same flag list the parser uses
 - `logLevel` config option: `silent`, `error`, `warning` or `info`, each level including the ones above it
 - `exportGtfs` and `updateGtfsRealtime` now report how long they took, as `importGtfs` did

@@ -13,9 +13,6 @@ import type {
  * One reporter per config object, which is one per run. The console reporter
  * holds the line its progress is drawn on, so it has to be the same object for
  * the whole run rather than rebuilt at each call site.
- *
- * Keyed by the config so that nothing has to thread a reporter through every
- * function that might have something to say.
  */
 const reporters = new WeakMap<Config, Reporter>();
 
@@ -32,9 +29,7 @@ function reporterFor(config: Config) {
 }
 
 /*
- * How much to print. `verbose` is the old spelling of this and is still
- * honoured: `verbose: false` silenced progress output but left warnings and
- * errors printing, which is `warning`.
+ * How much to print.
  */
 export function getLogLevel(config: Config): LogLevel {
   if (config.logLevel !== undefined) {

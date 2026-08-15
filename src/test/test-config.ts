@@ -4,8 +4,7 @@ const config = {
       path: 'src/test/fixture/caltrain_20160406.zip',
     },
   ],
-  verbose: false,
-  logFunction: console.log,
+  logLevel: 'silent' as const,
 };
 
 export default config;

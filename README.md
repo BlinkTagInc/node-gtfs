@@ -519,6 +519,25 @@ console.log(report.errors);
     "sqlitePath": "/tmp/gtfs.sqlite"
 ```
 
+### Configuration validation
+
+Your configuration is checked before anything else runs. Every option is type-checked, and all problems are reported in a single error rather than one per run:
+
+```
+Error: [GTFS] Invalid configuration:
+  - `sqlitePath` must be a string, got 42
+  - `ignoreErrors` must be a boolean, got "yes"
+  - `logLevel` must be one of `silent`, `error`, `warning`, `info`, got "chatty"
+```
+
+An option that looks like a misspelling of a real one is reported as a warning, since it is silently doing nothing:
+
+```
+Warning: Unknown configuration option `sqllitePath` - did you mean `sqlitePath`? It is being ignored
+```
+
+Options node-GTFS simply does not know are left alone. Tools that embed node-GTFS such as [GTFS-to-HTML](https://gtfstohtml.com), [GTFS-to-geojson](https://github.com/blinktaginc/gtfs-to-geojson) and others pass their own configuration through.
+
 ### logLevel
 
 {String} How much output to print to the console. Valid options are `silent` (nothing), `error` (only errors), `warning` (errors and warnings) and `info` (everything, including progress). **Optional.** Defaults to `info`.

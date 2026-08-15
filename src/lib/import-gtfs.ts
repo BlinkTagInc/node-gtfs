@@ -11,13 +11,13 @@ import { isValidJSON } from './geojson-utils.ts';
 import { updateGtfsRealtimeData } from './import-gtfs-realtime.ts';
 import { log, progress, report, status } from '../reporting/report.ts';
 import { pluralize } from '../reporting/format.ts';
+import { validateConfig } from './validate-config.ts';
 import {
   getTimestampColumnName,
   padLeadingZeros,
   applyPrefixToValue,
   mapSeries,
   setDefaultConfig,
-  validateConfigForImport,
 } from './utils.ts';
 import {
   addImportError,
@@ -932,8 +932,11 @@ export async function importGtfs(
   // Start timer
   const startTime = process.hrtime.bigint();
 
+  validateConfig(initialConfig, (message) =>
+    log(initialConfig, 'warning', message),
+  );
+
   const config = setDefaultConfig(initialConfig);
-  validateConfigForImport(config);
   const importReport = config.includeImportReport
     ? createImportReport()
     : undefined;

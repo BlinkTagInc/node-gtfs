@@ -14,7 +14,7 @@ describe('gtfs errors', () => {
     try {
       await importGtfs({
         agencies: [{} as never],
-        verbose: false,
+        logLevel: 'silent' as const,
       });
     } catch (error: unknown) {
       didThrow = true;
@@ -33,7 +33,7 @@ describe('gtfs errors', () => {
       agencies: [{ path: '/does/not/exist' }],
       ignoreErrors: true,
       includeImportReport: true,
-      verbose: false,
+      logLevel: 'silent' as const,
     });
 
     expect(report.errors.length).toBeGreaterThan(0);

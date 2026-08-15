@@ -17,7 +17,7 @@ const db2Config = {
       exclude: ['shapes'],
     },
   ],
-  verbose: false,
+  logLevel: 'silent' as const,
   sqlitePath: './tmpdb2',
 } satisfies Config;
 
@@ -28,7 +28,7 @@ const db3Config = {
       exclude: ['shapes'],
     },
   ],
-  verbose: false,
+  logLevel: 'silent' as const,
   sqlitePath: './tmpdb3',
 } satisfies Config;
 
