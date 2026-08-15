@@ -581,7 +581,7 @@ export async function updateGtfsRealtimeData(
   status(task.config, 'Imported');
 
   for (const [type, label] of Object.entries(RECORD_LABEL)) {
-    // A type this agency did not configure has no count to report.
+    // A feed this agency did not configure has no count to report.
     if (getUrlConfig(type as RealtimeType, task)) {
       status(
         task.config,

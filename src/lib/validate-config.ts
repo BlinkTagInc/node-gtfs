@@ -29,17 +29,13 @@ const KNOWN_KEYS: Record<string, KeySpec> = {
   verbose: { type: 'boolean' },
 };
 
-/*
- * Options that still work but have been replaced, with what to use instead.
- * A warning rather than an error, since the old name is still honoured.
- */
+/* Deprecated options and their replacements. */
 const DEPRECATED_KEYS: Record<string, string> = {
   verbose:
     '`verbose` is deprecated - use `logLevel`. `verbose: false` means `logLevel: "warning"`; use `"silent"` to suppress everything',
 };
 
 function checkType(key: string, value: unknown, spec: KeySpec): string | null {
-  // Any option may be explicitly null or undefined to mean "unset".
   if (value === null || value === undefined) {
     return null;
   }
@@ -76,10 +72,6 @@ function checkType(key: string, value: unknown, spec: KeySpec): string | null {
   }
 }
 
-/*
- * How many single-character edits separate two strings, capped at `limit` so a
- * pair that is obviously unrelated stops being compared early.
- */
 function editDistance(a: string, b: string, limit: number): number {
   if (Math.abs(a.length - b.length) > limit) {
     return limit + 1;
@@ -104,16 +96,7 @@ function editDistance(a: string, b: string, limit: number): number {
   return previous[b.length];
 }
 
-/*
- * The known option an unrecognised key was probably meant to be, or null when
- * it does not look like any of them.
- *
- * node-GTFS is embedded in other tools - GTFS-to-HTML, GTFS-to-geojson and
- * others hand it their own configuration wholesale - so an unrecognised key is
- * usually somebody else's option passing through and warning about it would
- * bury the run in noise. A key one or two characters away from a real one is a
- * different matter: that is a typo, and it is silently doing nothing.
- */
+// Embedding tools may add options, so only likely misspellings produce warnings.
 function findLikelyTypo(key: string): string | null {
   const limit = key.length <= 6 ? 1 : 2;
   let best: { name: string; distance: number } | null = null;
@@ -137,14 +120,7 @@ function findLikelyTypo(key: string): string | null {
   return best?.name ?? null;
 }
 
-/*
- * Validate a user-provided config object. Throws a single error listing every
- * problem found, rather than failing on the first, so a config with three
- * mistakes in it takes one run to fix rather than three.
- *
- * A misspelled option is only a warning: it may well be an option belonging to
- * whatever is calling node-GTFS, and the run can go on either way.
- */
+/** Validates configuration and reports likely misspellings through `warn`. */
 export function validateConfig(config: Config, warn: (text: string) => void) {
   const errors: string[] = [];
 
@@ -188,11 +164,6 @@ export function validateConfig(config: Config, warn: (text: string) => void) {
       continue;
     }
 
-    /*
-     * `ConfigAgency` is a union requiring one of `url`/`path`, so neither can
-     * be read directly. This runtime check still matters for untyped JS
-     * callers.
-     */
     const hasPath = 'path' in agency && agency.path;
     const hasUrl = 'url' in agency && agency.url;
 

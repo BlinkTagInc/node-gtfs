@@ -181,8 +181,7 @@ export interface Config {
    * Whether or not to print output to the console.
    *
    * @deprecated Use `logLevel` instead. `false` maps to `logLevel: 'warning'`,
-   * which is what it has always meant in practice - it silenced progress
-   * output but left warnings and errors printing.
+   * which is what it has always meant: no progress, but warnings and errors.
    */
   verbose?: boolean;
   /**
@@ -194,19 +193,15 @@ export interface Config {
   logLevel?: LogLevel;
   /**
    * An optional destination for log output instead of the console. Receives
-   * every message `logLevel` lets through, along with the level it was logged
-   * at, so a caller can route or format each level as it likes.
+   * every message `logLevel` lets through, with the level it was logged at.
    *
-   * The progress bar is not sent here: it redraws a single line in place, so
-   * it would arrive as hundreds of near-identical messages.
+   * The progress line is not sent here: it redraws in place, so it would
+   * arrive as hundreds of near-identical messages.
    */
   logFunction?: LogFunction;
 }
 
-/**
- * How much a run prints. `silent` is a `logLevel` value only - nothing is ever
- * logged at it.
- */
+/** How much a run prints. Nothing is ever logged at `silent`. */
 export type LogLevel = 'silent' | 'error' | 'warning' | 'info';
 
 /** The levels a single message can be logged at. */

@@ -7,10 +7,6 @@ import type { LogLevel } from '../types/global_interfaces.ts';
 
 const LOG_LEVELS = ['silent', 'error', 'warning', 'info'] as const;
 
-/*
- * The command line as parsed. A flag that wasn't passed is undefined, which is
- * what leaves the matching config.json option alone.
- */
 export interface FlagValues {
   configPath?: string;
   logLevel?: LogLevel;
@@ -21,11 +17,6 @@ export interface FlagValues {
   help?: boolean;
 }
 
-/*
- * One command line flag. `value` is the placeholder shown after the flag in
- * `--help`, for the flags that take one; `choices` is the values it accepts,
- * when it accepts a fixed set of them.
- */
 export interface Flag {
   name: string;
   short?: string;
@@ -35,7 +26,6 @@ export interface Flag {
   description: string;
 }
 
-/* Every binary accepts these, and lists them last. */
 const COMMON_FLAGS: Flag[] = [
   {
     name: 'version',
@@ -82,10 +72,6 @@ const flagSignature = (flag: Flag) =>
     flag.value === undefined ? '' : ` <${flag.value}>`,
   ].join('');
 
-/*
- * The usage text, built from the same flag list the parser is built from, so
- * `--help` and what is actually accepted cannot drift apart.
- */
 function formatUsage(command: string, summary: string, flags: Flag[]) {
   const width = Math.max(...flags.map((flag) => flagSignature(flag).length));
 
@@ -104,12 +90,6 @@ function formatUsage(command: string, summary: string, flags: Flag[]) {
   ].join('\n');
 }
 
-/*
- * Parse the command line for one of the binaries, reporting anything wrong
- * with it the same way as anything wrong with config.json rather than as an
- * unhandled exception. Handles `--help` and `--version` itself, since neither
- * goes on to do any work.
- */
 export function parseFlags(
   command: string,
   summary: string,
@@ -170,6 +150,5 @@ export function parseFlags(
     process.exit();
   }
 
-  // Every flag has been checked against what it declared it accepts.
   return values as FlagValues;
 }

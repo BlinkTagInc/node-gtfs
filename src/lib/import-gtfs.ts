@@ -162,10 +162,7 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
   }
 
   const gtfsPath = untildify(task.path);
-  /*
-   * When the feed came from a url it has already been named; repeating the
-   * temporary path it was written to says nothing a reader can act on.
-   */
+  /* A feed from a url has been named already, and its temp path says nothing. */
   if (!task.url) {
     status(task.config, `Importing static GTFS from ${task.path}`);
   }
@@ -577,9 +574,8 @@ const importGtfsFiles = async (
   task: GtfsImportTask,
 ): Promise<void> => {
   /*
-   * Standard files this feed does not contain. Collected rather than
-   * announced one by one: a typical feed is missing more of them than it has,
-   * and twenty lines of absence buries the fifteen of substance.
+   * Standard files this feed does not contain, collected rather than announced
+   * one by one: most feeds are missing more of them than they have.
    */
   const missing: string[] = [];
   let filesImported = 0;
@@ -609,9 +605,7 @@ const importGtfsFiles = async (
 
         const filepath = path.join(task.downloadDir, `${filename}`);
 
-        /*
-         * Only announce missing standard GTFS files.
-         */
+        // Only standard GTFS files are worth reporting as missing.
         if (!existsSync(filepath)) {
           if (!model.nonstandard && !model.extension) {
             missing.push(filename);
