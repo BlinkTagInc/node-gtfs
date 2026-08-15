@@ -98,6 +98,10 @@ export function toGtfsError(
   fallback: Omit<GtfsErrorOptions, 'cause'> & { message: string },
 ): GtfsError {
   if (isGtfsError(error)) {
+    // Add context without replacing public error metadata.
+    if (fallback.details) {
+      error.details = { ...fallback.details, ...error.details };
+    }
     return error;
   }
 
