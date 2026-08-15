@@ -115,6 +115,7 @@
     "csv-parse": "7.0.2",
     "csv-stringify": "6.8.3",
     "gtfs-realtime-bindings": "2.2.0",
+    "kysely": "0.29.5",
     "lodash-es": "4.18.1",
     "long": "5.3.2",
     "node-stream-zip": "1.16.0",

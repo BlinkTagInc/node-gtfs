@@ -14,7 +14,7 @@
   <a href="https://github.com/BlinkTagInc/node-gtfs/actions?query=workflow%3A%22Node+CI%22"><img src="https://img.shields.io/github/actions/workflow/status/BlinkTagInc/node-gtfs/nodejs.yml?branch=master" style="max-width: 100%;"></a>
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg">
   <br /><br />
-  Import and Export GTFS transit data into SQLite. Query or change routes, stops, times, fares and more.
+  Import GTFS transit data into SQLite, PostgreSQL, or MySQL. Query or change routes, stops, times, fares and more in SQLite.
   <br /><br />
   <a href="https://nodei.co/npm/gtfs/" rel="nofollow"><img src="https://nodei.co/npm/gtfs.png?downloads=true" alt="NPM" style="max-width: 100%;"></a>
 </p>
@@ -78,6 +78,43 @@ try {
   console.error(error);
 }
 ```
+
+### PostgreSQL and MySQL imports with Kysely
+
+`importGtfsToKysely()` imports static GTFS into a caller-owned Kysely database. Install the driver for your database alongside `gtfs` (`pg` for PostgreSQL or `mysql2` for MySQL), configure Kysely, and pass the instance to node-GTFS:
+
+```js
+import { importGtfsToKysely } from 'gtfs';
+import { Kysely, PostgresDialect } from 'kysely';
+import { Pool } from 'pg';
+
+const db = new Kysely({
+  dialect: new PostgresDialect({
+    pool: new Pool({ connectionString: process.env.DATABASE_URL }),
+  }),
+});
+
+try {
+  await importGtfsToKysely(
+    {
+      agencies: [{ path: '/path/to/gtfs.zip' }],
+    },
+    {
+      db,
+      dialect: 'postgres',
+    },
+  );
+} finally {
+  // The Kysely instance belongs to the caller and remains open after import.
+  await db.destroy();
+}
+```
+
+Use `MysqlDialect` with a `mysql2` pool and set `dialect: 'mysql'` for MySQL. A Kysely SQLite dialect is also supported with `dialect: 'sqlite'`.
+
+By default this function drops and recreates all GTFS tables, adds the same `*_timestamp` convenience columns used by node-GTFS, and creates query indexes. Pass `manageSchema: false` to insert into tables managed by your application's migrations. In that mode, tables must contain every source column defined by node-GTFS; `*_timestamp` columns are omitted unless `includeNodeGtfsExtras: true` is set.
+
+The existing synchronous getters, `openDb()`, export, and GTFS-Realtime support remain SQLite-only. `importGtfsToKysely()` currently imports static GTFS and skips configured realtime sources with a warning.
 
 ### Example Applications
 

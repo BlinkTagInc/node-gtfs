@@ -8,7 +8,8 @@ export type ReportEvent =
       type: 'run:start';
       task: TaskName;
       agencyCount: number;
-      sqlitePath: string;
+      sqlitePath?: string;
+      databaseDescription?: string;
     }
   | { type: 'progress'; message: string }
   | { type: 'status'; message: string }

@@ -1,5 +1,9 @@
 // GTFS import script
-export { importGtfs } from './lib/import-gtfs.ts';
+export { importGtfs, importGtfsToKysely } from './lib/import-gtfs.ts';
+export type {
+  KyselyImportDialect,
+  KyselyImportOptions,
+} from './lib/kysely-gtfs-writer.ts';
 export { updateGtfsRealtime } from './lib/import-gtfs-realtime.ts';
 
 // GTFS export script

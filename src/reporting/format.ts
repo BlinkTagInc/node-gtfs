@@ -112,7 +112,9 @@ export function pluralize(singular: string, plural: string, count: number) {
 export function formatRunStart(
   event: Extract<ReportEvent, { type: 'run:start' }>,
 ) {
-  return `Starting ${TASK_LABEL[event.task]} for ${pluralize('agency', 'agencies', event.agencyCount)} using SQLite database at ${event.sqlitePath}`;
+  const databaseDescription =
+    event.databaseDescription ?? `SQLite database at ${event.sqlitePath}`;
+  return `Starting ${TASK_LABEL[event.task]} for ${pluralize('agency', 'agencies', event.agencyCount)} using ${databaseDescription}`;
 }
 
 export function formatRunComplete(

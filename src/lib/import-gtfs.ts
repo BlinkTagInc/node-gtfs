@@ -8,6 +8,13 @@ import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
 import { temporaryDirectory, untildify, unzip } from './file-utils.ts';
 import { parseGtfsFile } from './gtfs-record-parser.ts';
+import type { GtfsFileWriter, GtfsFileWriterOptions } from './gtfs-writer.ts';
+import {
+  createKyselyGtfsIndexes,
+  createKyselyGtfsTables,
+  createKyselyGtfsWriter,
+  type KyselyImportOptions,
+} from './kysely-gtfs-writer.ts';
 import { createSqliteGtfsWriter } from './sqlite-gtfs-writer.ts';
 import { updateGtfsRealtimeData } from './import-gtfs-realtime.ts';
 import { log, progress, report, status } from '../reporting/report.ts';
@@ -78,6 +85,15 @@ interface GtfsImportTask {
   filesImported?: number;
   rowsImported?: number;
   report?: ImportReport;
+}
+
+interface StaticImportTarget {
+  databaseDescription: string;
+  errorDetails: Record<string, unknown>;
+  initialize(): void | Promise<void>;
+  createWriter(options: GtfsFileWriterOptions): GtfsFileWriter;
+  finalize(): void | Promise<void>;
+  updateRealtime(task: GtfsImportTask): void | Promise<void>;
 }
 
 function reportTaskError(task: GtfsImportTask, error: GtfsError): void {
@@ -161,7 +177,6 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
   }
 
   const gtfsPath = untildify(task.path);
-  /* A feed from a url has been named already, and its temp path says nothing. */
   if (!task.url) {
     status(task.config, `Importing static GTFS from ${task.path}`);
   }
@@ -492,16 +507,77 @@ const createGtfsIndexes = (db: Database.Database): void => {
   createAdditionalGtfsIndexes(db);
 };
 
+function createSqliteImportTarget(
+  db: Database.Database,
+  config: Config,
+): StaticImportTarget {
+  const sqlitePath = config.sqlitePath ?? ':memory:';
+
+  return {
+    databaseDescription: `SQLite database at ${sqlitePath}`,
+    errorDetails: { sqlitePath },
+    initialize() {
+      createGtfsTables(db);
+    },
+    createWriter(options) {
+      return createSqliteGtfsWriter({ db, sqlitePath, ...options });
+    },
+    finalize() {
+      createGtfsIndexes(db);
+    },
+    async updateRealtime(task) {
+      await updateGtfsRealtimeData(task);
+    },
+  };
+}
+
+function hasRealtimeSource(task: GtfsImportTask): boolean {
+  return Boolean(
+    task.realtimeAlerts ||
+    task.realtimeTripUpdates ||
+    task.realtimeVehiclePositions,
+  );
+}
+
+function createKyselyImportTarget<DB>(
+  options: KyselyImportOptions<DB>,
+): StaticImportTarget {
+  const manageSchema = options.manageSchema ?? true;
+
+  return {
+    databaseDescription: `Kysely ${options.dialect} database`,
+    errorDetails: { databaseDialect: options.dialect },
+    async initialize() {
+      if (manageSchema) {
+        await createKyselyGtfsTables(options);
+      }
+    },
+    createWriter(writerOptions) {
+      return createKyselyGtfsWriter(options, writerOptions);
+    },
+    async finalize() {
+      if (manageSchema) {
+        await createKyselyGtfsIndexes(options);
+      }
+    },
+    updateRealtime(task) {
+      if (hasRealtimeSource(task)) {
+        log(
+          task.config,
+          'warning',
+          'GTFS-Realtime sources are not yet supported by `importGtfsToKysely` and were skipped.',
+        );
+      }
+    },
+  };
+}
+
 const BATCH_SIZE = 100_000;
 
 const importGtfsFiles = async (
-  db: Database.Database,
+  target: StaticImportTarget,
   task: GtfsImportTask,
 ): Promise<void> => {
-  /*
-   * Standard files this feed does not contain, collected rather than announced
-   * one by one: most feeds are missing more of them than they have.
-   */
   const missing: string[] = [];
   let filesImported = 0;
   let rowsImported = 0;
@@ -531,12 +607,10 @@ const importGtfsFiles = async (
 
     progress(task.config, `  ${filename}`);
 
-    const writer = createSqliteGtfsWriter({
-      db,
+    const writer = target.createWriter({
       model,
       filename,
       ignoreDuplicates: task.ignoreDuplicates,
-      sqlitePath: task.sqlitePath,
       prefix: task.prefix,
       config: task.config,
       report: task.report,
@@ -553,13 +627,13 @@ const importGtfsFiles = async (
         batchSize: BATCH_SIZE,
       })) {
         try {
-          writer.writeBatch(batch.rows);
+          await writer.writeBatch(batch.rows);
         } catch (error: unknown) {
           const gtfsError = toGtfsError(error, {
             message: error instanceof Error ? error.message : String(error),
             code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
             category: GtfsErrorCategory.DATABASE,
-            details: { file: filename, sqlitePath: task.sqlitePath },
+            details: { file: filename, ...target.errorDetails },
           });
           if (!task.ignoreErrors) {
             throw gtfsError;
@@ -641,15 +715,10 @@ const importGtfsFiles = async (
   }
 };
 
-/**
- * Function to import GTFS files into the database
- *
- * @param initialConfig
- */
-export async function importGtfs(initialConfig: Config): Promise<ImportReport>;
-export async function importGtfs(initialConfig: Config): Promise<void>;
-export async function importGtfs(
+async function runStaticImport(
   initialConfig: Config,
+  targetFactory: (config: Config) => StaticImportTarget,
+  sqliteTarget: boolean,
 ): Promise<void | ImportReport> {
   // Start timer
   const startTime = process.hrtime.bigint();
@@ -664,19 +733,21 @@ export async function importGtfs(
     : undefined;
   let runFiles = 0;
   let runRows = 0;
+  let targetForError: StaticImportTarget | undefined;
 
   try {
-    const db = openDb(config);
+    const target = targetFactory(config);
+    targetForError = target;
     const agencyCount = config.agencies.length;
 
     report(config, {
       type: 'run:start',
       task: 'import',
       agencyCount,
-      sqlitePath: config.sqlitePath ?? ':memory:',
+      databaseDescription: target.databaseDescription,
     });
 
-    createGtfsTables(db);
+    await target.initialize();
 
     await mapSeries(config.agencies, async (agency: ConfigAgency) => {
       const tempPath = temporaryDirectory();
@@ -742,10 +813,10 @@ export async function importGtfs(
           }
         }
 
-        await importGtfsFiles(db, task);
+        await importGtfsFiles(target, task);
         runFiles += task.filesImported ?? 0;
         runRows += task.rowsImported ?? 0;
-        await updateGtfsRealtimeData(task);
+        await target.updateRealtime(task);
       } catch (error: unknown) {
         const wrappedError = toGtfsError(error, {
           message: error instanceof Error ? error.message : String(error),
@@ -770,7 +841,7 @@ export async function importGtfs(
     });
 
     status(config, 'Creating DB indexes');
-    createGtfsIndexes(db);
+    await target.finalize();
 
     const endTime = process.hrtime.bigint();
     const elapsedSeconds = Number(endTime - startTime) / 1_000_000_000;
@@ -782,7 +853,10 @@ export async function importGtfs(
       summary: `${pluralize('file', 'files', runFiles)}, ${formatCount(runRows)} rows`,
     });
   } catch (error: unknown) {
-    if ((error as Error & { code?: string }).code === 'SQLITE_CANTOPEN') {
+    if (
+      sqliteTarget &&
+      (error as Error & { code?: string }).code === 'SQLITE_CANTOPEN'
+    ) {
       const dbOpenError = new GtfsError(
         `Unable to open sqlite database "${config.sqlitePath}" defined as \`sqlitePath\` config.json. Ensure the parent directory exists or remove \`sqlitePath\` from config.json.`,
         {
@@ -800,13 +874,44 @@ export async function importGtfs(
     }
     throw toGtfsError(error, {
       message: error instanceof Error ? error.message : String(error),
-      code: GtfsErrorCode.GTFS_CSV_PARSE_FAILED,
-      category: GtfsErrorCategory.PARSE,
-      details: { sqlitePath: config.sqlitePath },
+      code: sqliteTarget
+        ? GtfsErrorCode.GTFS_CSV_PARSE_FAILED
+        : GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
+      category: sqliteTarget
+        ? GtfsErrorCategory.PARSE
+        : GtfsErrorCategory.DATABASE,
+      details: targetForError?.errorDetails ?? {
+        sqlitePath: config.sqlitePath,
+      },
     });
   }
 
   if (importReport) {
     return importReport;
   }
+}
+
+/** Imports GTFS into SQLite. */
+export async function importGtfs(initialConfig: Config): Promise<ImportReport>;
+export async function importGtfs(initialConfig: Config): Promise<void>;
+export async function importGtfs(
+  initialConfig: Config,
+): Promise<void | ImportReport> {
+  return runStaticImport(
+    initialConfig,
+    (config) => createSqliteImportTarget(openDb(config), config),
+    true,
+  );
+}
+
+/** Imports static GTFS through a caller-owned Kysely instance. */
+export async function importGtfsToKysely<DB>(
+  initialConfig: Config,
+  databaseOptions: KyselyImportOptions<DB>,
+): Promise<void | ImportReport> {
+  return runStaticImport(
+    initialConfig,
+    () => createKyselyImportTarget(databaseOptions),
+    false,
+  );
 }

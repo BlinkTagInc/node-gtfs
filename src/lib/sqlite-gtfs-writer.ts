@@ -1,8 +1,8 @@
 import Database from 'better-sqlite3';
 
-import type { Config, Model, SqlValue } from '../types/global_interfaces.ts';
-import type { ImportReport } from './errors.ts';
+import type { SqlValue } from '../types/global_interfaces.ts';
 import type { NormalizedGtfsRow } from './gtfs-record-parser.ts';
+import type { GtfsFileWriter, GtfsFileWriterOptions } from './gtfs-writer.ts';
 import { log } from '../reporting/report.ts';
 import {
   addImportWarning,
@@ -13,24 +13,14 @@ import {
 } from './errors.ts';
 import { applyPrefixToValue, escapeIdentifier } from './utils.ts';
 
-interface SqliteGtfsWriterOptions {
+interface SqliteGtfsWriterOptions extends GtfsFileWriterOptions {
   db: Database.Database;
-  model: Model;
-  filename: string;
-  ignoreDuplicates: boolean;
   sqlitePath: string;
-  prefix?: string;
-  config: Config;
-  report?: ImportReport;
-}
-
-export interface SqliteGtfsWriter {
-  writeBatch(rows: NormalizedGtfsRow[]): void;
 }
 
 export function createSqliteGtfsWriter(
   options: SqliteGtfsWriterOptions,
-): SqliteGtfsWriter {
+): GtfsFileWriter {
   const columns = options.model.schema;
   const prefixedColumns = columns.map((column) => Boolean(column.prefix));
   const statement = `INSERT ${options.ignoreDuplicates ? 'OR IGNORE' : ''} INTO ${escapeIdentifier(

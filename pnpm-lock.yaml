@@ -23,6 +23,9 @@ importers:
       gtfs-realtime-bindings:
         specifier: 2.2.0
         version: 2.2.0
+      kysely:
+        specifier: 0.29.5
+        version: 0.29.5
       lodash-es:
         specifier: 4.18.1
         version: 4.18.1
@@ -748,6 +751,10 @@ packages:
   klaw@3.0.0:
     resolution: {integrity: sha512-0Fo5oir+O9jnXu5EefYbVK+mHMBeEVEy2cmctR1O1NECcCkPRreJKrS6Qt/j3KC2C148Dfo9i3pCmCMsdqGr0g==}
 
+  kysely@0.29.5:
+    resolution: {integrity: sha512-ooa+eSbBNPTo3MycPEuW5jdrxQdQwdtB3LC3h43FiXQbIry5tR0C5lDG7eealK0E4D7XjrnOP5DIUg/LyjRMYQ==}
+    engines: {node: '>=22.0.0'}
+
   linkify-it@5.0.2:
     resolution: {integrity: sha512-ONTm2jCMAVZjgQa/Fy1kScXsuOoF5NPTsoFBdE1KVIZ2vAh/r9+Bqo+0jINCBYnavTPQZz38QzFTme79ENoN3Q==}
 
@@ -1416,6 +1423,8 @@ snapshots:
   klaw@3.0.0:
     dependencies:
       graceful-fs: 4.2.11
+
+  kysely@0.29.5: {}
 
   linkify-it@5.0.2:
     dependencies:
