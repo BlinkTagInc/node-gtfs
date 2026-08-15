@@ -24,6 +24,7 @@ import {
   getTimestampColumnName,
   padLeadingZeros,
   applyPrefixToValue,
+  escapeIdentifier,
   mapSeries,
   setDefaultConfig,
 } from './utils.ts';
@@ -396,6 +397,27 @@ const createGtfsIndex = (
   ).run();
 };
 
+const ADDITIONAL_INDEXES: Record<string, string[][]> = {
+  calendar_dates: [['date', 'exception_type', 'service_id']],
+  stop_times: [['stop_id', 'trip_id', 'stop_sequence']],
+  trips: [['route_id', 'service_id', 'trip_id']],
+};
+
+const createAdditionalGtfsIndexes = (db: Database.Database): void => {
+  for (const [tableName, indexes] of Object.entries(ADDITIONAL_INDEXES)) {
+    for (const columns of indexes) {
+      const indexName = escapeIdentifier(
+        `idx_${tableName}_${columns.join('_')}`,
+      );
+      db.prepare(
+        `CREATE INDEX ${indexName} ON ${escapeIdentifier(tableName)} (${columns
+          .map((columnName) => escapeIdentifier(columnName))
+          .join(', ')});`,
+      ).run();
+    }
+  }
+};
+
 const createGtfsIndexes = (db: Database.Database): void => {
   for (const model of Object.values(models) as Model[]) {
     if (!model.schema) {
@@ -449,6 +471,8 @@ const createGtfsIndexes = (db: Database.Database): void => {
       );
     }
   }
+
+  createAdditionalGtfsIndexes(db);
 };
 
 const AGENCY_ID_BACKFILL_MODELS = new Set([

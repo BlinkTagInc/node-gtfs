@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `logLevel` config option: `silent`, `error`, `warning` or `info`, each level including the ones above it
 - `exportGtfs` and `updateGtfsRealtime` now report how long they took, as `importGtfs` did
 - Exporting with nothing in the database is now a warning rather than an info line
+- Added composite indexes for common calendar-date, stop-time, and trip queries
 
 ### Deprecated
 - `verbose` — use `logLevel`. `verbose: false` maps to `logLevel: 'warning'`, which is what it has always meant; use `'silent'` to suppress everything
