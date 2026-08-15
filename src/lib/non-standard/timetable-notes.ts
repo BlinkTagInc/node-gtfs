@@ -1,16 +1,11 @@
 import type {
+  TimetableNote,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
-  TimetableNote,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { timetableNotes } from '../../models/non-standard/timetable-notes.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all timetable notes that match the query parameters.
@@ -21,15 +16,11 @@ export function getTimetableNotes<Fields extends keyof TimetableNote>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'timetable_notes';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<TimetableNote, Fields>[];
+  return findRows<TimetableNote, Fields>(
+    timetableNotes,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

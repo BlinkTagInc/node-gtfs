@@ -1,16 +1,11 @@
 import type {
+  TripCapacity,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
-  TripCapacity,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { tripCapacity } from '../../models/gtfs-ride/trip-capacity.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all trip-capacities that match the query parameters.
@@ -21,15 +16,11 @@ export function getTripCapacities<Fields extends keyof TripCapacity>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'trip_capacity';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<TripCapacity, Fields>[];
+  return findRows<TripCapacity, Fields>(
+    tripCapacity,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

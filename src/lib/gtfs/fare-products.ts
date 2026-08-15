@@ -2,15 +2,10 @@ import type {
   FareProduct,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { fareProducts } from '../../models/gtfs/fare-products.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all fare products that match the query parameters.
@@ -21,15 +16,11 @@ export function getFareProducts<Fields extends keyof FareProduct>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'fare_products';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<FareProduct, Fields>[];
+  return findRows<FareProduct, Fields>(
+    fareProducts,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

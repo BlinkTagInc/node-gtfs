@@ -2,15 +2,10 @@ import type {
   Frequency,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { frequencies } from '../../models/gtfs/frequencies.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all frequencies that match the query parameters.
@@ -21,15 +16,11 @@ export function getFrequencies<Fields extends keyof Frequency>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'frequencies';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<Frequency, Fields>[];
+  return findRows<Frequency, Fields>(
+    frequencies,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

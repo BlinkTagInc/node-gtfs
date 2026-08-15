@@ -2,15 +2,10 @@ import type {
   LocationGroupStop,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { locationGroupStops } from '../../models/gtfs/location-group-stops.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all location group stops that match the query parameters.
@@ -21,15 +16,11 @@ export function getLocationGroupStops<Fields extends keyof LocationGroupStop>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'location_group_stops';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<LocationGroupStop, Fields>[];
+  return findRows<LocationGroupStop, Fields>(
+    locationGroupStops,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

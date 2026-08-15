@@ -1,16 +1,11 @@
 import type {
+  CalendarAttribute,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
-  CalendarAttribute,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { calendarAttributes } from '../../models/gtfs-plus/calendar-attributes.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all calendar_attributes that match the query parameters.
@@ -21,15 +16,11 @@ export function getCalendarAttributes<Fields extends keyof CalendarAttribute>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'calendar_attributes';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<CalendarAttribute, Fields>[];
+  return findRows<CalendarAttribute, Fields>(
+    calendarAttributes,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

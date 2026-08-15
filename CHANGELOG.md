@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Database paths are normalized, registrations are removed by identity, and unregistered explicit databases can be closed
 - advancedQuery now honors top-level db
 - Preserve class, code, and category on errors
+- Direct single-table getters now share one internal query implementation
 
 ### Removed
 - `yargs` and `@types/yargs` — the command line scripts now use `parseArgs` from `node:util`

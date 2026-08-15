@@ -1,4 +1,5 @@
 import { describe, it, beforeAll, afterAll, expect } from './test-utils.ts';
+import Database from 'better-sqlite3';
 import config from './test-config.ts';
 import { openDb, closeDb, importGtfs, getAgencies } from '../../dist/index.js';
 
@@ -13,6 +14,22 @@ afterAll(async () => {
 });
 
 describe('getAgencies():', () => {
+  it('should query an explicitly supplied database through the shared implementation', () => {
+    const explicitDb = new Database(':memory:');
+
+    try {
+      explicitDb.exec(
+        "CREATE TABLE agency (agency_id TEXT); INSERT INTO agency VALUES ('isolated-agency');",
+      );
+
+      const results = getAgencies({}, ['agency_id'], [], { db: explicitDb });
+
+      expect(results).toEqual([{ agency_id: 'isolated-agency' }]);
+    } finally {
+      closeDb(explicitDb);
+    }
+  });
+
   it('should return empty array if no agencies exist', () => {
     const agencyId = 'fake-agency-id';
     const results = getAgencies({

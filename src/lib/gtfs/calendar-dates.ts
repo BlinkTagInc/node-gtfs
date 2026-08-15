@@ -2,15 +2,10 @@ import type {
   CalendarDate,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { calendarDates } from '../../models/gtfs/calendar-dates.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of calendarDates that match the query parameters.
@@ -21,15 +16,11 @@ export function getCalendarDates<Fields extends keyof CalendarDate>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'calendar_dates';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<CalendarDate, Fields>[];
+  return findRows<CalendarDate, Fields>(
+    calendarDates,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

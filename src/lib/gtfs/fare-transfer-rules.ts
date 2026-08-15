@@ -2,15 +2,10 @@ import type {
   FareTransferRule,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { fareTransferRules } from '../../models/gtfs/fare-transfer-rules.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all fare transfer rules that match the query parameters.
@@ -21,15 +16,11 @@ export function getFareTransferRules<Fields extends keyof FareTransferRule>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'fare_transfer_rules';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<FareTransferRule, Fields>[];
+  return findRows<FareTransferRule, Fields>(
+    fareTransferRules,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

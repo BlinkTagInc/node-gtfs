@@ -1,16 +1,12 @@
 import type {
+  Timetable,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
-  Timetable,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { timetables } from '../../models/non-standard/timetables.ts';
+import { findRows } from '../find-rows.ts';
+
 /*
  * Returns an array of all timetables that match the query parameters.
  */
@@ -20,15 +16,11 @@ export function getTimetables<Fields extends keyof Timetable>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'timetables';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<Timetable, Fields>[];
+  return findRows<Timetable, Fields>(
+    timetables,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

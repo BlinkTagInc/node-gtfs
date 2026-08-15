@@ -2,16 +2,12 @@ import type {
   Calendar,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
+import { calendar } from '../../models/gtfs/calendar.ts';
 import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-  getDayOfWeekFromDate,
-} from '../utils.ts';
+import { findRows } from '../find-rows.ts';
+import { getDayOfWeekFromDate } from '../utils.ts';
 import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from '../errors.ts';
 
 /*
@@ -23,17 +19,7 @@ export function getCalendars<Fields extends keyof Calendar>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'calendar';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<Calendar, Fields>[];
+  return findRows<Calendar, Fields>(calendar, query, fields, orderBy, options);
 }
 
 /*

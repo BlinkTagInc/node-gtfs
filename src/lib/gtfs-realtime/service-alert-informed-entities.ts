@@ -1,16 +1,11 @@
 import type {
+  ServiceAlertInformedEntity,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
-  ServiceAlertInformedEntity,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { serviceAlertInformedEntities } from '../../models/gtfs-realtime/service-alert-informed_entities.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all service alert informed entities that match the query parameters.
@@ -23,15 +18,11 @@ export function getServiceAlertInformedEntities<
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'service_alert_informed_entities';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<ServiceAlertInformedEntity, Fields>[];
+  return findRows<ServiceAlertInformedEntity, Fields>(
+    serviceAlertInformedEntities,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

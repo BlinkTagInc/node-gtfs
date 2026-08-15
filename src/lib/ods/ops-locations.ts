@@ -1,16 +1,11 @@
 import type {
+  OpsLocation,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
-  OpsLocation,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { opsLocations } from '../../models/ods/ops-locations.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all ops_locations that match the query parameters.
@@ -21,15 +16,11 @@ export function getOpsLocations<Fields extends keyof OpsLocation>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'ops_locations';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<OpsLocation, Fields>[];
+  return findRows<OpsLocation, Fields>(
+    opsLocations,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

@@ -1,16 +1,11 @@
 import type {
+  Timeframe,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
-  Timeframe,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { timeframes } from '../../models/gtfs/timeframes.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all timeframes that match the query parameters.
@@ -21,15 +16,11 @@ export function getTimeframes<Fields extends keyof Timeframe>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'timeframes';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<Timeframe, Fields>[];
+  return findRows<Timeframe, Fields>(
+    timeframes,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

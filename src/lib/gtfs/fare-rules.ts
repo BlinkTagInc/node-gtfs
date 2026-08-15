@@ -2,15 +2,10 @@ import type {
   FareRule,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { fareRules } from '../../models/gtfs/fare-rules.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all fare rules that match the query parameters.
@@ -21,15 +16,5 @@ export function getFareRules<Fields extends keyof FareRule>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'fare_rules';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<FareRule, Fields>[];
+  return findRows<FareRule, Fields>(fareRules, query, fields, orderBy, options);
 }

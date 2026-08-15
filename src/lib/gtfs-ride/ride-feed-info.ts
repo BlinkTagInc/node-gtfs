@@ -1,16 +1,11 @@
 import type {
+  RideFeedInfo,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
-  RideFeedInfo,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { rideFeedInfo } from '../../models/gtfs-ride/ride-feed-info.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all ride-feed-info that match the query parameters.
@@ -21,15 +16,11 @@ export function getRideFeedInfo<Fields extends keyof RideFeedInfo>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'ride_feed_info';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<RideFeedInfo, Fields>[];
+  return findRows<RideFeedInfo, Fields>(
+    rideFeedInfo,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

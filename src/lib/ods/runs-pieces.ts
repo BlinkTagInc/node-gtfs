@@ -1,16 +1,11 @@
 import type {
+  RunPiece,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
-  RunPiece,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { runsPieces } from '../../models/ods/runs-pieces.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all runs_pieces that match the query parameters.
@@ -21,15 +16,11 @@ export function getRunsPieces<Fields extends keyof RunPiece>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'runs_pieces';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<RunPiece, Fields>[];
+  return findRows<RunPiece, Fields>(
+    runsPieces,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

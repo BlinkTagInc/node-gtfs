@@ -1,16 +1,11 @@
 import type {
+  TimetableStopOrder,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
-  TimetableStopOrder,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { timetableStopOrder } from '../../models/non-standard/timetable-stop-order.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all timetable stop orders that match the query parameters.
@@ -21,15 +16,11 @@ export function getTimetableStopOrders<Fields extends keyof TimetableStopOrder>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'timetable_stop_order';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<TimetableStopOrder, Fields>[];
+  return findRows<TimetableStopOrder, Fields>(
+    timetableStopOrder,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

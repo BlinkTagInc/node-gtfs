@@ -1,16 +1,11 @@
 import type {
+  RouteAttribute,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
-  RouteAttribute,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { routeAttributes } from '../../models/gtfs-plus/route-attributes.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all route_attributes that match the query parameters.
@@ -21,15 +16,11 @@ export function getRouteAttributes<Fields extends keyof RouteAttribute>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'route_attributes';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<RouteAttribute, Fields>[];
+  return findRows<RouteAttribute, Fields>(
+    routeAttributes,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

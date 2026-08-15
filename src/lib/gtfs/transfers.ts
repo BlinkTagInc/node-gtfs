@@ -1,16 +1,11 @@
 import type {
+  Transfer,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
-  Transfer,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { transfers } from '../../models/gtfs/transfers.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all transfers that match the query parameters.
@@ -21,15 +16,5 @@ export function getTransfers<Fields extends keyof Transfer>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'transfers';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<Transfer, Fields>[];
+  return findRows<Transfer, Fields>(transfers, query, fields, orderBy, options);
 }

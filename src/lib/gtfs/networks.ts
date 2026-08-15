@@ -2,15 +2,10 @@ import type {
   Network,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { networks } from '../../models/gtfs/networks.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all networks that match the query parameters.
@@ -21,15 +16,5 @@ export function getNetworks<Fields extends keyof Network>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'networks';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<Network, Fields>[];
+  return findRows<Network, Fields>(networks, query, fields, orderBy, options);
 }

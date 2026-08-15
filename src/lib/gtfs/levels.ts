@@ -2,15 +2,10 @@ import type {
   Level,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { levels } from '../../models/gtfs/levels.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all levels that match the query parameters.
@@ -21,15 +16,5 @@ export function getLevels<Fields extends keyof Level>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'levels';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<Level, Fields>[];
+  return findRows<Level, Fields>(levels, query, fields, orderBy, options);
 }

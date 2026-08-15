@@ -1,16 +1,11 @@
 import type {
-  QueryOptions,
   RouteNetwork,
+  QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { routeNetworks } from '../../models/gtfs/route-networks.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all route_networks that match the query parameters.
@@ -21,15 +16,11 @@ export function getRouteNetworks<Fields extends keyof RouteNetwork>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'route_networks';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<RouteNetwork, Fields>[];
+  return findRows<RouteNetwork, Fields>(
+    routeNetworks,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

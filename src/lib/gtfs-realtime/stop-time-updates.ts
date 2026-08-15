@@ -1,16 +1,11 @@
 import type {
+  StopTimeUpdate,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
-  StopTimeUpdate,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { stopTimeUpdates } from '../../models/gtfs-realtime/stop-time-updates.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all stop time updates that match the query parameters.
@@ -21,15 +16,11 @@ export function getStopTimeUpdates<Fields extends keyof StopTimeUpdate>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'stop_time_updates';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<StopTimeUpdate, Fields>[];
+  return findRows<StopTimeUpdate, Fields>(
+    stopTimeUpdates,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

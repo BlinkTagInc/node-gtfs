@@ -1,16 +1,11 @@
 import type {
+  TripsDatedVehicleJourney,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
-  TripsDatedVehicleJourney,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { tripsDatedVehicleJourney } from '../../models/non-standard/trips-dated-vehicle-journey.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all trips dated vehicle journeys that match the query parameters.
@@ -23,15 +18,11 @@ export function getTripsDatedVehicleJourneys<
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'trips_dated_vehicle_journey';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<TripsDatedVehicleJourney, Fields>[];
+  return findRows<TripsDatedVehicleJourney, Fields>(
+    tripsDatedVehicleJourney,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

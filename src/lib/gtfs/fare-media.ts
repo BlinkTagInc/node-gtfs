@@ -2,15 +2,10 @@ import type {
   FareMedia,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { fareMedia } from '../../models/gtfs/fare-media.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all fare media that match the query parameters.
@@ -21,15 +16,11 @@ export function getFareMedia<Fields extends keyof FareMedia>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'fare_media';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<FareMedia, Fields>[];
+  return findRows<FareMedia, Fields>(
+    fareMedia,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

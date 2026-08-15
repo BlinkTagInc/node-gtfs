@@ -2,15 +2,10 @@ import type {
   RiderCategory,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { riderCategories } from '../../models/gtfs/rider-categories.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all rider categories that match the query parameters.
@@ -21,15 +16,11 @@ export function getRiderCategories<Fields extends keyof RiderCategory>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'rider_categories';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<RiderCategory, Fields>[];
+  return findRows<RiderCategory, Fields>(
+    riderCategories,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

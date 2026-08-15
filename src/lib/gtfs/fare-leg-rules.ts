@@ -2,15 +2,10 @@ import type {
   FareLegRule,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { fareLegRules } from '../../models/gtfs/fare-leg-rules.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all fare leg rules that match the query parameters.
@@ -21,15 +16,11 @@ export function getFareLegRules<Fields extends keyof FareLegRule>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'fare_leg_rules';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<FareLegRule, Fields>[];
+  return findRows<FareLegRule, Fields>(
+    fareLegRules,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }

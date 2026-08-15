@@ -1,16 +1,11 @@
 import type {
+  VehiclePosition,
   QueryOptions,
   SqlOrderBy,
-  QueryResult,
   SqlWhere,
-  VehiclePosition,
 } from '../../types/global_interfaces.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { vehiclePositions } from '../../models/gtfs-realtime/vehicle-positions.ts';
+import { findRows } from '../find-rows.ts';
 
 /*
  * Returns an array of all vehicle positions that match the query parameters.
@@ -21,15 +16,11 @@ export function getVehiclePositions<Fields extends keyof VehiclePosition>(
   orderBy: SqlOrderBy = [],
   options: QueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
-  const tableName = 'vehicle_positions';
-  const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
-  const orderByClause = formatOrderByClause(orderBy);
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...params) as QueryResult<VehiclePosition, Fields>[];
+  return findRows<VehiclePosition, Fields>(
+    vehiclePositions,
+    query,
+    fields,
+    orderBy,
+    options,
+  );
 }
