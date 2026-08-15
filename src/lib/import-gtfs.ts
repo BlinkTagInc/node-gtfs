@@ -122,6 +122,7 @@ const downloadGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
     });
 
     if (!response.ok) {
+      await response.body?.cancel();
       throw new GtfsError(
         `Unable to download GTFS from ${task.url}. Got status ${response.status}.`,
         {
@@ -317,47 +318,55 @@ const createGtfsTables = (db: Database.Database): void => {
     const sqlColumnCreateStatements = [];
 
     for (const column of model.schema) {
+      const columnName = escapeIdentifier(column.name);
       const checks = [];
       if (column.min !== undefined && column.max !== undefined) {
         checks.push(
-          `${column.name} >= ${column.min} AND ${column.name} <= ${column.max}`,
+          `${columnName} >= ${column.min} AND ${columnName} <= ${column.max}`,
         );
       } else if (column.min !== undefined) {
-        checks.push(`${column.name} >= ${column.min}`);
+        checks.push(`${columnName} >= ${column.min}`);
       } else if (column.max !== undefined) {
-        checks.push(`${column.name} <= ${column.max}`);
+        checks.push(`${columnName} <= ${column.max}`);
       }
 
       if (column.type === 'integer') {
         checks.push(
-          `(TYPEOF(${column.name}) = 'integer' OR ${column.name} IS NULL)`,
+          `(TYPEOF(${columnName}) = 'integer' OR ${columnName} IS NULL)`,
         );
       } else if (column.type === 'real') {
         checks.push(
-          `(TYPEOF(${column.name}) = 'real' OR ${column.name} IS NULL)`,
+          `(TYPEOF(${columnName}) = 'real' OR ${columnName} IS NULL)`,
         );
       }
 
       const required = column.required ? 'NOT NULL' : '';
-      const columnDefault = column.default ? 'DEFAULT ' + column.default : '';
+      const defaultValue =
+        column.default === null
+          ? 'NULL'
+          : typeof column.default === 'string'
+            ? `'${column.default.replaceAll("'", "''")}'`
+            : String(column.default);
+      const columnDefault =
+        column.default === undefined ? '' : `DEFAULT ${defaultValue}`;
       const columnCollation = column.nocase ? 'COLLATE NOCASE' : '';
       const checkClause =
         checks.length > 0 ? `CHECK(${checks.join(' AND ')})` : '';
 
       sqlColumnCreateStatements.push(
-        `${column.name} ${column.type} ${checkClause} ${required} ${columnDefault} ${columnCollation}`,
+        `${columnName} ${column.type} ${checkClause} ${required} ${columnDefault} ${columnCollation}`,
       );
 
       // Add an additional timestamp column for time columns
       if (column.type === 'time') {
         sqlColumnCreateStatements.push(
-          `${getTimestampColumnName(column.name)} INTEGER GENERATED ALWAYS AS (
+          `${escapeIdentifier(getTimestampColumnName(column.name))} INTEGER GENERATED ALWAYS AS (
             CASE
-              WHEN ${column.name} IS NULL OR ${column.name} = '' THEN NULL
+              WHEN ${columnName} IS NULL OR ${columnName} = '' THEN NULL
               ELSE CAST(
-                substr(${column.name}, 1, instr(${column.name}, ':') - 1) * 3600 +
-                substr(${column.name}, instr(${column.name}, ':') + 1, 2) * 60 +
-                substr(${column.name}, -2) AS INTEGER
+                substr(${columnName}, 1, instr(${columnName}, ':') - 1) * 3600 +
+                substr(${columnName}, instr(${columnName}, ':') + 1, 2) * 60 +
+                substr(${columnName}, -2) AS INTEGER
               )
             END
           ) STORED`,
@@ -370,14 +379,17 @@ const createGtfsTables = (db: Database.Database): void => {
 
     if (primaryColumns.length > 0) {
       sqlColumnCreateStatements.push(
-        `PRIMARY KEY (${primaryColumns.map(({ name }) => name).join(', ')})`,
+        `PRIMARY KEY (${primaryColumns
+          .map(({ name }) => escapeIdentifier(name))
+          .join(', ')})`,
       );
     }
 
-    db.prepare(`DROP TABLE IF EXISTS ${model.filenameBase};`).run();
+    const tableName = escapeIdentifier(model.filenameBase);
+    db.prepare(`DROP TABLE IF EXISTS ${tableName};`).run();
 
     db.prepare(
-      `CREATE TABLE ${model.filenameBase} (${sqlColumnCreateStatements.join(', ')});`,
+      `CREATE TABLE ${tableName} (${sqlColumnCreateStatements.join(', ')});`,
     ).run();
   }
 };
@@ -391,9 +403,12 @@ const createGtfsIndex = (
   columnName: string,
   partial: boolean,
 ): void => {
-  const predicate = partial ? ` WHERE ${columnName} IS NOT NULL` : '';
+  const escapedTableName = escapeIdentifier(tableName);
+  const escapedColumnName = escapeIdentifier(columnName);
+  const indexName = escapeIdentifier(`idx_${tableName}_${columnName}`);
+  const predicate = partial ? ` WHERE ${escapedColumnName} IS NOT NULL` : '';
   db.prepare(
-    `CREATE INDEX idx_${tableName}_${columnName} ON ${tableName} (${columnName})${predicate};`,
+    `CREATE INDEX ${indexName} ON ${escapedTableName} (${escapedColumnName})${predicate};`,
   ).run();
 };
 
@@ -442,7 +457,9 @@ const createGtfsIndexes = (db: Database.Database): void => {
     }
 
     const { rowCount } = db
-      .prepare(`SELECT COUNT(*) AS rowCount FROM ${model.filenameBase}`)
+      .prepare(
+        `SELECT COUNT(*) AS rowCount FROM ${escapeIdentifier(model.filenameBase)}`,
+      )
       .get() as { rowCount: number };
 
     if (rowCount === 0) {
@@ -456,8 +473,11 @@ const createGtfsIndexes = (db: Database.Database): void => {
     const counts = db
       .prepare(
         `SELECT ${indexedColumns
-          .map((columnName, index) => `COUNT(${columnName}) AS c${index}`)
-          .join(', ')} FROM ${model.filenameBase}`,
+          .map(
+            (columnName, index) =>
+              `COUNT(${escapeIdentifier(columnName)}) AS ${escapeIdentifier(`c${index}`)}`,
+          )
+          .join(', ')} FROM ${escapeIdentifier(model.filenameBase)}`,
       )
       .get() as Record<string, number>;
 
@@ -650,11 +670,11 @@ const importGtfsFiles = async (
         );
         const prefixedColumns = columns.map((column) => Boolean(column.prefix));
 
-        const prepareStatement = `INSERT ${task.ignoreDuplicates ? 'OR IGNORE' : ''} INTO ${
-          model.filenameBase
-        } (${columns.map(({ name }) => name).join(', ')}) VALUES (${columns
-          .map(() => '?')
-          .join(', ')})`;
+        const prepareStatement = `INSERT ${task.ignoreDuplicates ? 'OR IGNORE' : ''} INTO ${escapeIdentifier(
+          model.filenameBase,
+        )} (${columns
+          .map(({ name }) => escapeIdentifier(name))
+          .join(', ')}) VALUES (${columns.map(() => '?').join(', ')})`;
 
         const insert = db.prepare(prepareStatement);
 
@@ -731,6 +751,7 @@ const importGtfsFiles = async (
             bom: true,
             ...task.csvOptions,
           });
+          const inputStream = createReadStream(filepath);
 
           let lines: (string | null)[][] = [];
 
@@ -779,6 +800,8 @@ const importGtfsFiles = async (
               } else {
                 reject(gtfsError);
               }
+              inputStream.destroy();
+              parser.destroy();
             }
           });
 
@@ -836,6 +859,7 @@ const importGtfsFiles = async (
           });
 
           parser.on('error', (error: unknown) => {
+            inputStream.destroy();
             const gtfsError = toGtfsError(error, {
               message: error instanceof Error ? error.message : String(error),
               code: GtfsErrorCode.GTFS_CSV_PARSE_FAILED,
@@ -855,7 +879,8 @@ const importGtfsFiles = async (
             }
           });
 
-          createReadStream(filepath).pipe(parser);
+          inputStream.on('error', (error) => parser.destroy(error));
+          inputStream.pipe(parser);
         } else if (model.filenameExtension === 'geojson') {
           readFile(filepath, 'utf8')
             .then((data) => {
@@ -1010,9 +1035,8 @@ export async function importGtfs(
     createGtfsTables(db);
 
     await mapSeries(config.agencies, async (agency: ConfigAgency) => {
+      const tempPath = temporaryDirectory();
       try {
-        const tempPath = temporaryDirectory();
-
         const task: GtfsImportTask = {
           exclude: agency.exclude,
           headers: agency.headers,
@@ -1078,13 +1102,15 @@ export async function importGtfs(
         runFiles += task.filesImported ?? 0;
         runRows += task.rowsImported ?? 0;
         await updateGtfsRealtimeData(task);
-
-        await rm(tempPath, { recursive: true });
       } catch (error: unknown) {
         const wrappedError = toGtfsError(error, {
           message: error instanceof Error ? error.message : String(error),
           code: GtfsErrorCode.GTFS_CSV_PARSE_FAILED,
           category: GtfsErrorCategory.PARSE,
+          details:
+            'path' in agency
+              ? { agencyPath: agency.path }
+              : { agencyUrl: agency.url },
         });
         if (config.ignoreErrors) {
           log(config, 'error', formatGtfsError(wrappedError));
@@ -1094,6 +1120,8 @@ export async function importGtfs(
         } else {
           throw wrappedError;
         }
+      } finally {
+        await rm(tempPath, { recursive: true, force: true });
       }
     });
 
@@ -1130,6 +1158,7 @@ export async function importGtfs(
       message: error instanceof Error ? error.message : String(error),
       code: GtfsErrorCode.GTFS_CSV_PARSE_FAILED,
       category: GtfsErrorCategory.PARSE,
+      details: { sqlitePath: config.sqlitePath },
     });
   }
 

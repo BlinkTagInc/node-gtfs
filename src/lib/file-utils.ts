@@ -116,14 +116,26 @@ export async function unzip(
   zipfilePath: string,
   exportPath: string,
 ): Promise<void> {
+  let zip: StreamZip.StreamZipAsync | undefined;
+  let extractionError: unknown;
+
   try {
-    const zip = new StreamZip.async({ file: zipfilePath });
+    zip = new StreamZip.async({ file: zipfilePath });
     await zip.extract(null, exportPath);
-    await zip.close();
   } catch (error) {
+    extractionError = error;
+  } finally {
+    try {
+      await zip?.close();
+    } catch (error) {
+      extractionError ??= error;
+    }
+  }
+
+  if (extractionError) {
     throw new Error(
-      `Failed to extract zip file: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      { cause: error },
+      `Failed to extract zip file: ${extractionError instanceof Error ? extractionError.message : 'Unknown error'}`,
+      { cause: extractionError },
     );
   }
 }
