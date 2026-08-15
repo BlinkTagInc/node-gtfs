@@ -5,7 +5,12 @@ import Database from 'better-sqlite3';
 import * as models from '../models/models.ts';
 import { openDb } from './db.ts';
 import { log, report, status } from '../reporting/report.ts';
-import { pluralize } from '../reporting/format.ts';
+import {
+  formatCount,
+  formatFileCount,
+  formatUrl,
+  pluralize,
+} from '../reporting/format.ts';
 import { validateConfig } from './validate-config.ts';
 import {
   convertLongTimeToDate,
@@ -147,11 +152,29 @@ async function processBatch<T>(
   return { recordCount: totalRecordCount, errorCount: totalErrorCount };
 }
 
+type RealtimeType = 'alerts' | 'tripupdates' | 'vehiclepositions';
+
+type RealtimeRecordCounts = Record<RealtimeType, number>;
+
+/* The agency option that configures each feed. */
+const RECORD_AGENCY_KEY: Record<RealtimeType, keyof ConfigAgency> = {
+  alerts: 'realtimeAlerts',
+  tripupdates: 'realtimeTripUpdates',
+  vehiclepositions: 'realtimeVehiclePositions',
+};
+
+/* What each realtime feed is called in the lines describing a refresh. */
+const RECORD_LABEL: Record<RealtimeType, string> = {
+  alerts: 'alerts',
+  tripupdates: 'trip updates',
+  vehiclepositions: 'vehicle positions',
+};
+
 /**
  * Fetches GTFS Realtime data
  */
 async function fetchGtfsRealtimeData(
-  type: 'alerts' | 'tripupdates' | 'vehiclepositions',
+  type: RealtimeType,
   task: GtfsRealtimeTask,
 ): Promise<RealtimeData | null> {
   const urlConfig = getUrlConfig(type, task);
@@ -160,7 +183,10 @@ async function fetchGtfsRealtimeData(
     return null;
   }
 
-  status(task.config, `Importing - GTFS-Realtime from ${urlConfig.url}`);
+  status(
+    task.config,
+    `Importing GTFS-Realtime from ${formatUrl(urlConfig.url)}`,
+  );
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
@@ -247,7 +273,7 @@ async function fetchGtfsRealtimeData(
  * Gets URL configuration for a specific realtime type
  */
 function getUrlConfig(
-  type: 'alerts' | 'tripupdates' | 'vehiclepositions',
+  type: RealtimeType,
   task: GtfsRealtimeTask,
 ): RealtimeUrlConfig | undefined {
   switch (type) {
@@ -459,7 +485,7 @@ function createVehiclePositionsProcessor(
 function removeExpiredRealtimeData(config: Config): void {
   const db = openDb(config);
 
-  status(config, 'Removing expired GTFS-Realtime data');
+  let removed = 0;
 
   db.transaction(() => {
     const tables = [
@@ -471,13 +497,20 @@ function removeExpiredRealtimeData(config: Config): void {
     ];
 
     for (const table of tables) {
-      db.prepare(
-        `DELETE FROM ${table} WHERE expiration_timestamp <= strftime('%s','now')`,
-      ).run();
+      removed += db
+        .prepare(
+          `DELETE FROM ${table} WHERE expiration_timestamp <= strftime('%s','now')`,
+        )
+        .run().changes;
     }
   })();
 
-  status(config, 'Removed expired GTFS-Realtime data');
+  if (removed > 0) {
+    status(
+      config,
+      `Removed ${pluralize('expired record', 'expired records', removed)}`,
+    );
+  }
 }
 
 /**
@@ -485,13 +518,19 @@ function removeExpiredRealtimeData(config: Config): void {
  */
 export async function updateGtfsRealtimeData(
   task: GtfsRealtimeTask,
-): Promise<void> {
+): Promise<RealtimeRecordCounts> {
+  const recordCounts: RealtimeRecordCounts = {
+    alerts: 0,
+    tripupdates: 0,
+    vehiclepositions: 0,
+  };
+
   if (
     !task.realtimeAlerts &&
     !task.realtimeTripUpdates &&
     !task.realtimeVehiclePositions
   ) {
-    return;
+    return recordCounts;
   }
 
   // Download all data types in parallel
@@ -508,12 +547,6 @@ export async function updateGtfsRealtimeData(
   );
 
   const db = openDb({ sqlitePath: task.sqlitePath });
-
-  const recordCounts = {
-    alerts: 0,
-    tripupdates: 0,
-    vehiclepositions: 0,
-  };
 
   // Process each data type sequentially — all three processors share the same
   // SQLite connection and interleaving their transactions across async batches
@@ -545,10 +578,19 @@ export async function updateGtfsRealtimeData(
     recordCounts.vehiclepositions = result.recordCount;
   }
 
-  status(
-    task.config,
-    `GTFS-Realtime import complete: ${pluralize('alert', 'alerts', recordCounts.alerts)}, ${pluralize('trip update', 'trip updates', recordCounts.tripupdates)}, ${pluralize('vehicle position', 'vehicle positions', recordCounts.vehiclepositions)}`,
-  );
+  status(task.config, 'Imported');
+
+  for (const [type, label] of Object.entries(RECORD_LABEL)) {
+    // A type this agency did not configure has no count to report.
+    if (getUrlConfig(type as RealtimeType, task)) {
+      status(
+        task.config,
+        formatFileCount(label, recordCounts[type as RealtimeType]),
+      );
+    }
+  }
+
+  return recordCounts;
 }
 
 /**
@@ -575,6 +617,12 @@ export async function updateGtfsRealtime(initialConfig: Config): Promise<void> {
 
     removeExpiredRealtimeData(config);
 
+    const totals: RealtimeRecordCounts = {
+      alerts: 0,
+      tripupdates: 0,
+      vehiclepositions: 0,
+    };
+
     await mapSeries(config.agencies, async (agency: ConfigAgency) => {
       let task: GtfsRealtimeTask | undefined;
       try {
@@ -591,7 +639,11 @@ export async function updateGtfsRealtime(initialConfig: Config): Promise<void> {
           config,
         };
 
-        await updateGtfsRealtimeData(task);
+        const recordCounts = await updateGtfsRealtimeData(task);
+
+        for (const type of Object.keys(RECORD_LABEL) as RealtimeType[]) {
+          totals[type] += recordCounts[type];
+        }
       } catch (error: unknown) {
         const gtfsError = toGtfsError(error, {
           message: error instanceof Error ? error.message : String(error),
@@ -615,6 +667,12 @@ export async function updateGtfsRealtime(initialConfig: Config): Promise<void> {
       task: 'realtime',
       elapsedSeconds:
         Number(process.hrtime.bigint() - startTime) / 1_000_000_000,
+      summary: (Object.keys(RECORD_LABEL) as RealtimeType[])
+        .filter((type) =>
+          config.agencies.some((agency) => agency[RECORD_AGENCY_KEY[type]]),
+        )
+        .map((type) => `${formatCount(totals[type])} ${RECORD_LABEL[type]}`)
+        .join(', '),
     });
   } catch (error: unknown) {
     if ((error as Error & { code?: string }).code === 'SQLITE_CANTOPEN') {

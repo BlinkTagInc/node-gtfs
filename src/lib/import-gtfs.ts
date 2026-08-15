@@ -10,7 +10,15 @@ import { temporaryDirectory, untildify, unzip } from './file-utils.ts';
 import { isValidJSON } from './geojson-utils.ts';
 import { updateGtfsRealtimeData } from './import-gtfs-realtime.ts';
 import { log, progress, report, status } from '../reporting/report.ts';
-import { pluralize } from '../reporting/format.ts';
+import {
+  formatBytes,
+  formatCount,
+  formatFileCount,
+  formatFileList,
+  formatFileNote,
+  formatUrl,
+  pluralize,
+} from '../reporting/format.ts';
 import { validateConfig } from './validate-config.ts';
 import {
   getTimestampColumnName,
@@ -69,6 +77,8 @@ interface GtfsImportTask {
   agencyId?: string;
   currentTimestamp: number;
   config: Config;
+  filesImported?: number;
+  rowsImported?: number;
   report?: ImportReport;
 }
 
@@ -91,7 +101,9 @@ const downloadGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
     });
   }
 
-  status(task.config, `Downloading GTFS from ${task.url}`);
+  status(task.config, `Downloading GTFS from ${formatUrl(task.url)}`);
+
+  const downloadStart = process.hrtime.bigint();
 
   task.path = `${task.downloadDir}/gtfs.zip`;
 
@@ -126,7 +138,10 @@ const downloadGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
 
     const buffer = await response.arrayBuffer();
     await writeFile(task.path, Buffer.from(buffer));
-    status(task.config, 'Download successful');
+    status(
+      task.config,
+      `Downloaded ${formatBytes(buffer.byteLength)} in ${(Number(process.hrtime.bigint() - downloadStart) / 1_000_000_000).toFixed(1)} seconds`,
+    );
   } catch (error: unknown) {
     throw toGtfsError(error, {
       message: `Unable to download GTFS from ${task.url}.`,
@@ -147,7 +162,13 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
   }
 
   const gtfsPath = untildify(task.path);
-  status(task.config, `Importing static GTFS from ${task.path}`);
+  /*
+   * When the feed came from a url it has already been named; repeating the
+   * temporary path it was written to says nothing a reader can act on.
+   */
+  if (!task.url) {
+    status(task.config, `Importing static GTFS from ${task.path}`);
+  }
   if (path.extname(gtfsPath) === '.zip') {
     try {
       await unzip(gtfsPath, task.downloadDir);
@@ -555,6 +576,17 @@ const importGtfsFiles = async (
   db: Database.Database,
   task: GtfsImportTask,
 ): Promise<void> => {
+  /*
+   * Standard files this feed does not contain. Collected rather than
+   * announced one by one: a typical feed is missing more of them than it has,
+   * and twenty lines of absence buries the fifteen of substance.
+   */
+  const missing: string[] = [];
+  let filesImported = 0;
+  let rowsImported = 0;
+
+  status(task.config, 'Imported');
+
   await mapSeries(
     Object.values(models) as Model[],
     (model: Model) =>
@@ -564,7 +596,7 @@ const importGtfsFiles = async (
 
         // Skip any models that are excluded by config
         if (task.exclude && task.exclude.includes(model.filenameBase)) {
-          status(task.config, `Skipping - ${filename}`);
+          status(task.config, formatFileNote(filename, 'skipped'));
           resolve();
           return;
         }
@@ -582,14 +614,14 @@ const importGtfsFiles = async (
          */
         if (!existsSync(filepath)) {
           if (!model.nonstandard && !model.extension) {
-            status(task.config, `Importing - ${filename} - No file found`);
+            missing.push(filename);
           }
 
           resolve();
           return;
         }
 
-        progress(task.config, `Importing - ${filename}`);
+        progress(task.config, `  ${filename}`);
 
         // Create a list of all columns
         const columns = model.schema;
@@ -707,7 +739,7 @@ const importGtfsFiles = async (
 
                   progress(
                     task.config,
-                    `Importing - ${filename} - ${pluralize('line', 'lines', totalLineCount)} imported`,
+                    formatFileCount(filename, totalLineCount),
                   );
                 }
               }
@@ -760,10 +792,9 @@ const importGtfsFiles = async (
                   }
                 }
               }
-              status(
-                task.config,
-                `Importing - ${filename} - ${pluralize('line', 'lines', totalLineCount)} imported`,
-              );
+              filesImported += 1;
+              rowsImported += totalLineCount;
+              status(task.config, formatFileCount(filename, totalLineCount));
               resolve();
             } catch (error: unknown) {
               const gtfsError = toGtfsError(error, {
@@ -845,10 +876,9 @@ const importGtfsFiles = async (
               );
               try {
                 insertLines([line]);
-                status(
-                  task.config,
-                  `Importing - ${filename} - ${pluralize('line', 'lines', totalLineCount)} imported`,
-                );
+                filesImported += 1;
+                rowsImported += totalLineCount;
+                status(task.config, formatFileCount(filename, totalLineCount));
                 resolve();
               } catch (error: unknown) {
                 const gtfsError = toGtfsError(error, {
@@ -916,7 +946,12 @@ const importGtfsFiles = async (
         }
       }),
   );
-  status(task.config, 'Static GTFS import complete');
+  task.filesImported = filesImported;
+  task.rowsImported = rowsImported;
+
+  if (missing.length > 0) {
+    status(task.config, formatFileList('Not in this feed', missing));
+  }
 };
 
 /**
@@ -940,6 +975,8 @@ export async function importGtfs(
   const importReport = config.includeImportReport
     ? createImportReport()
     : undefined;
+  let runFiles = 0;
+  let runRows = 0;
 
   try {
     const db = openDb(config);
@@ -1020,6 +1057,8 @@ export async function importGtfs(
         }
 
         await importGtfsFiles(db, task);
+        runFiles += task.filesImported ?? 0;
+        runRows += task.rowsImported ?? 0;
         await updateGtfsRealtimeData(task);
 
         await rm(tempPath, { recursive: true });
@@ -1050,6 +1089,7 @@ export async function importGtfs(
       type: 'run:complete',
       task: 'import',
       elapsedSeconds,
+      summary: `${pluralize('file', 'files', runFiles)}, ${formatCount(runRows)} rows`,
     });
   } catch (error: unknown) {
     if ((error as Error & { code?: string }).code === 'SQLITE_CANTOPEN') {

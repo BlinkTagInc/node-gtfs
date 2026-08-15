@@ -4,7 +4,6 @@ import {
   formatError,
   formatErrorMessage,
   formatRunComplete,
-  formatRunDuration,
   formatRunStart,
   formatWarning,
 } from './format.ts';
@@ -106,7 +105,6 @@ function createConsoleReporter(animate: boolean): Reporter {
 
         case 'run:complete':
           writeLine(formatRunComplete(event));
-          writeLine(formatRunDuration(event));
           break;
       }
     },
@@ -147,7 +145,6 @@ function createLogFunctionReporter(logFunction: LogFunction): Reporter {
 
         case 'run:complete':
           logFunction('info', formatRunComplete(event));
-          logFunction('info', formatRunDuration(event));
           break;
       }
     },

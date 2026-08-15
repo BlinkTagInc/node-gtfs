@@ -40,6 +40,8 @@ export type ReportEvent =
       type: 'run:complete';
       task: TaskName;
       elapsedSeconds: number;
+      /* Where the run put what it produced, when that is a place. */
+      destination?: string;
       summary?: string;
     };
 

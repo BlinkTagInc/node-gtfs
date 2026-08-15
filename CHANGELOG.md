@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- **Breaking:** `logFunction` now takes `(level, message)` instead of `(message)`, so callers can tell a progress line from an error
+- More concise CLI output
+- `logFunction` now takes `(level, message)` instead of `(message)`, so callers can tell a progress line from an error
 - Warnings and errors are written to stderr instead of stdout
 - The progress line is no longer passed to `logFunction`
 - The command line no longer prints a stack trace for an ordinary user error, such as a missing or unparseable config file

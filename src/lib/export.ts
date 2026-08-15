@@ -17,6 +17,13 @@ import {
 
 import { Config, Model, SqlValue } from '../types/global_interfaces.ts';
 import { log, report, status } from '../reporting/report.ts';
+import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from './errors.ts';
+import {
+  formatCount,
+  formatFileCount,
+  formatFileList,
+  pluralize,
+} from '../reporting/format.ts';
 
 const getAgencies = (db: Database.Database, config: Config) => {
   try {
@@ -25,13 +32,21 @@ const getAgencies = (db: Database.Database, config: Config) => {
     }[];
   } catch {
     if (config.sqlitePath === ':memory:') {
-      throw new Error(
+      throw new GtfsError(
         'No agencies found in SQLite. You are using an in-memory database - if running this from command line be sure to specify a value for `sqlitePath` in config.json other than ":memory:".',
+        {
+          code: GtfsErrorCode.GTFS_CONFIG_INVALID,
+          category: GtfsErrorCategory.CONFIG,
+        },
       );
     }
 
-    throw new Error(
+    throw new GtfsError(
       'No agencies found in SQLite. Be sure to first import data into SQLite using `gtfs-import` or `importGtfs(config);`',
+      {
+        code: GtfsErrorCode.GTFS_QUERY_INVALID,
+        category: GtfsErrorCategory.DATABASE,
+      },
     );
   }
 };
@@ -46,8 +61,12 @@ export const exportGtfs = async (initialConfig: Config) => {
   const agencies = getAgencies(db, config);
   const agencyCount = agencies.length;
   if (agencyCount === 0) {
-    throw new Error(
+    throw new GtfsError(
       'No agencies found in SQLite. Be sure to first import data into SQLite using `gtfs-import` or `importGtfs(config);`',
+      {
+        code: GtfsErrorCode.GTFS_QUERY_INVALID,
+        category: GtfsErrorCategory.DATABASE,
+      },
     );
   } else if (agencyCount > 1) {
     log(
@@ -74,6 +93,12 @@ export const exportGtfs = async (initialConfig: Config) => {
   const modelsToExport = (Object.values(models) as Model[]).filter(
     (model) => model.extension !== 'gtfs-realtime',
   );
+  const empty: string[] = [];
+  let filesExported = 0;
+  let rowsExported = 0;
+
+  status(config, 'Exported');
+
   const exportedFiles = await mapSeries(
     modelsToExport,
     async (model: Model) => {
@@ -87,11 +112,8 @@ export const exportGtfs = async (initialConfig: Config) => {
       >;
 
       if (!lines || lines.length === 0) {
-        if (!model.nonstandard) {
-          status(
-            config,
-            `Skipping (no data) - ${model.filenameBase}.${model.filenameExtension}`,
-          );
+        if (!model.nonstandard && !model.extension) {
+          empty.push(`${model.filenameBase}.${model.filenameExtension}`);
         }
 
         return;
@@ -141,12 +163,13 @@ export const exportGtfs = async (initialConfig: Config) => {
         );
       }
 
-      status(
-        config,
-        `Exporting - ${model.filenameBase}.${model.filenameExtension}`,
-      );
+      const filename = `${model.filenameBase}.${model.filenameExtension}`;
 
-      return `${model.filenameBase}.${model.filenameExtension}`;
+      filesExported += 1;
+      rowsExported += lines.length;
+      status(config, formatFileCount(filename, lines.length));
+
+      return filename;
     },
   );
 
@@ -159,11 +182,15 @@ export const exportGtfs = async (initialConfig: Config) => {
     return;
   }
 
-  status(config, `Completed GTFS export to ${exportPath}`);
+  if (empty.length > 0) {
+    status(config, formatFileList('No data to export', empty));
+  }
 
   report(config, {
     type: 'run:complete',
     task: 'export',
     elapsedSeconds: Number(process.hrtime.bigint() - startTime) / 1_000_000_000,
+    destination: exportPath,
+    summary: `${pluralize('file', 'files', filesExported)}, ${formatCount(rowsExported)} rows`,
   });
 };
