@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - An unknown command line flag is reported as an error naming what is accepted, rather than yargs' default
 - stop_times.stop_id is no longer required, allowing valid GTFS Flex rows using location_group_id or location_id
 - Database paths are normalized, registrations are removed by identity, and unregistered explicit databases can be closed
+- advancedQuery now honors top-level db
 
 ### Removed
 - `yargs` and `@types/yargs` — the command line scripts now use `parseArgs` from `node:util`

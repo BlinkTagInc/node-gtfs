@@ -47,7 +47,7 @@ export function advancedQuery(
   };
   const queryOptions = { ...defaultOptions, ...advancedQueryOptions };
 
-  const db = queryOptions.options.db ?? openDb();
+  const db = queryOptions.db ?? queryOptions.options?.db ?? openDb();
   const tableName = escapeIdentifier(table);
   const selectClause = formatSelectClause(queryOptions.fields);
   const { clause: whereClause, params } = formatWhereClauses(
