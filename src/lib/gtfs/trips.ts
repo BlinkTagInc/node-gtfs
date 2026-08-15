@@ -49,11 +49,7 @@ export function getTrips<Fields extends keyof Trip>(
     }
 
     const serviceIds = getServiceIdsByDate(query.date, options);
-
-    whereClauses.push({
-      clause: `service_id IN (${serviceIds.map(() => '?').join(',')})`,
-      params: serviceIds,
-    });
+    whereClauses.push(formatWhereClause('service_id', serviceIds));
   }
 
   if (whereClauses.length > 0) {

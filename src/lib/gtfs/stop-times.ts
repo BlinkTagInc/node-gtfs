@@ -49,12 +49,12 @@ export function getStoptimes<Fields extends keyof StopTime>(
     }
 
     const serviceIds = getServiceIdsByDate(query.date, options);
-
-    const tripSubquery = `SELECT DISTINCT trip_id FROM trips WHERE service_id IN (${serviceIds.map(() => '?').join(',')})`;
+    const serviceIdClause = formatWhereClause('service_id', serviceIds);
+    const tripSubquery = `SELECT DISTINCT trip_id FROM trips WHERE ${serviceIdClause.clause}`;
 
     whereClauses.push({
       clause: `trip_id IN (${tripSubquery})`,
-      params: serviceIds,
+      params: serviceIdClause.params,
     });
   }
 

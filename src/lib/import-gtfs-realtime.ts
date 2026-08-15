@@ -15,6 +15,7 @@ import { validateConfig } from './validate-config.ts';
 import {
   convertLongTimeToDate,
   applyPrefixToValue,
+  escapeIdentifier,
   mapSeries,
   setDefaultConfig,
 } from './utils.ts';
@@ -120,7 +121,9 @@ function createPreparedStatement(db: Database.Database, model: Model) {
   const placeholders = model.schema.map(() => '?').join(', ');
 
   return db.prepare(
-    `REPLACE INTO ${model.filenameBase} (${columns.join(', ')}) VALUES (${placeholders})`,
+    `REPLACE INTO ${escapeIdentifier(model.filenameBase)} (${columns
+      .map((column) => escapeIdentifier(column))
+      .join(', ')}) VALUES (${placeholders})`,
   );
 }
 
@@ -204,6 +207,7 @@ async function fetchGtfsRealtimeData(
       });
 
       if (!response.ok) {
+        await response.body?.cancel();
         throw new GtfsError(`HTTP ${response.status}: ${response.statusText}`, {
           code: GtfsErrorCode.GTFS_DOWNLOAD_HTTP,
           category: GtfsErrorCategory.DOWNLOAD,
@@ -302,7 +306,7 @@ function createServiceAlertsProcessor(
   );
 
   const deleteInformedEntitiesStmt = db.prepare(
-    `DELETE FROM ${models.serviceAlertInformedEntities.filenameBase} WHERE alert_id = ?`,
+    `DELETE FROM ${escapeIdentifier(models.serviceAlertInformedEntities.filenameBase)} WHERE ${escapeIdentifier('alert_id')} = ?`,
   );
 
   return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
@@ -371,7 +375,7 @@ function createTripUpdatesProcessor(
     models.stopTimeUpdates as Model,
   );
   const deleteStopTimesByTripStmt = db.prepare(
-    `DELETE FROM ${models.stopTimeUpdates.filenameBase} WHERE trip_id = ? AND trip_start_time IS ?`,
+    `DELETE FROM ${escapeIdentifier(models.stopTimeUpdates.filenameBase)} WHERE ${escapeIdentifier('trip_id')} = ? AND ${escapeIdentifier('trip_start_time')} IS ?`,
   );
 
   return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
@@ -499,7 +503,7 @@ function removeExpiredRealtimeData(config: Config): void {
     for (const table of tables) {
       removed += db
         .prepare(
-          `DELETE FROM ${table} WHERE expiration_timestamp <= strftime('%s','now')`,
+          `DELETE FROM ${escapeIdentifier(table)} WHERE ${escapeIdentifier('expiration_timestamp')} <= strftime('%s','now')`,
         )
         .run().changes;
     }
