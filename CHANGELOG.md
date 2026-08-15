@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The command line no longer prints a stack trace for an ordinary user error, such as a missing or unparseable config file
 - A missing or unparseable config file now throws a `GtfsError` with a code, rather than a plain `Error`
 - An unknown command line flag is reported as an error naming what is accepted, rather than yargs' default
+- stop_times.stop_id is no longer required, allowing valid GTFS Flex rows using location_group_id or location_id
 
 ### Removed
 - `yargs` and `@types/yargs` — the command line scripts now use `parseArgs` from `node:util`

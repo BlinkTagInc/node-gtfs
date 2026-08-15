@@ -32,7 +32,6 @@ export const stopTimes = {
     {
       name: 'stop_id',
       type: 'text',
-      required: true,
       prefix: true,
       index: true,
     },
