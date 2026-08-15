@@ -14,12 +14,16 @@ import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from './errors.ts';
  * Quotes a SQL identifier so it can be interpolated into a statement.
  * Identifiers cannot be passed as bound parameters, so they must be escaped.
  * A qualified name is split on the dot, so `trips.trip_id` becomes
- * `` `trips`.`trip_id` `` rather than a single identifier containing a dot.
+ * `"trips"."trip_id"` rather than a single identifier containing a dot.
+ * Wildcards are preserved, so `trips.*` remains valid SQL.
  * @param identifier Table, column, or alias name
- * @returns Backtick-quoted identifier
+ * @returns Double-quoted identifier
  */
 export function escapeIdentifier(identifier: string) {
-  return `\`${String(identifier).replaceAll('`', '``').replaceAll('.', '`.`')}\``;
+  return String(identifier)
+    .split('.')
+    .map((part) => (part === '*' ? part : `"${part.replaceAll('"', '""')}"`))
+    .join('.');
 }
 
 /**
@@ -230,17 +234,27 @@ export function formatWhereClause(
   const escapedKey = escapeIdentifier(key);
 
   if (Array.isArray(value)) {
-    const values = value.filter((v) => v !== null);
+    if (value.length === 0) {
+      return { clause: '0 = 1', params: [] };
+    }
+
+    const values = value.filter((v) => v !== null && v !== undefined);
+    const includesNull = values.length !== value.length;
+
+    if (values.length === 0) {
+      return { clause: `${escapedKey} IS NULL`, params: [] };
+    }
+
     let clause = `${escapedKey} IN (${values.map(() => '?').join(', ')})`;
 
-    if (value.includes(null)) {
+    if (includesNull) {
       clause = `(${clause} OR ${escapedKey} IS NULL)`;
     }
 
     return { clause, params: values.map((v) => toBindValue(v)) };
   }
 
-  if (value === null) {
+  if (value === null || value === undefined) {
     return { clause: `${escapedKey} IS NULL`, params: [] };
   }
 
