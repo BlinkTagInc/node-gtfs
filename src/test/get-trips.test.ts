@@ -79,4 +79,8 @@ describe('getTrips():', () => {
 
     expect(sundayResults).toNotContainEqual(weekdayResult);
   });
+
+  it('should return no trips when a date has no active service', () => {
+    expect(getTrips({ date: 20991231 })).toEqual([]);
+  });
 });

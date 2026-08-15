@@ -41,6 +41,17 @@ describe('getAgencies():', () => {
     expect(results[0]).toEqual(expectedResult);
   });
 
+  it('should return no records for an empty IN array', () => {
+    expect(getAgencies({ agency_id: [] })).toEqual([]);
+  });
+
+  it('should bind nullish array values as SQL NULL', () => {
+    expect(getAgencies({ agency_fare_url: [undefined] })).toHaveLength(1);
+    expect(
+      getAgencies({ agency_fare_url: [null, 'not-present'] }),
+    ).toHaveLength(1);
+  });
+
   it('should return expected agency for agency_id and agency_lang', () => {
     const agencyId = 'CT';
     const agencyLand = 'en';

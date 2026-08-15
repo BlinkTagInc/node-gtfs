@@ -1,4 +1,5 @@
 import { describe, it, beforeAll, afterAll, expect } from './test-utils.ts';
+import Database from 'better-sqlite3';
 import config from './test-config.ts';
 import {
   openDb,
@@ -18,6 +19,28 @@ afterAll(async () => {
 });
 
 describe('advancedQuery():', () => {
+  it('should honor a top-level db and safely quote identifiers and bind values', () => {
+    const explicitDb = new Database(':memory:');
+    try {
+      explicitDb.exec(
+        'CREATE TABLE "odd""table" ("select""ion" TEXT); INSERT INTO "odd""table" VALUES (\'a "quoted" value\');',
+      );
+
+      const results = advancedQuery('odd"table', {
+        db: explicitDb,
+        query: { 'select"ion': 'a "quoted" value' },
+        fields: ['odd"table.*'],
+        // The declared top-level option should take precedence over this legacy
+        // nested location when both are supplied.
+        options: { db: openDb() },
+      });
+
+      expect(results).toEqual([{ 'select"ion': 'a "quoted" value' }]);
+    } finally {
+      closeDb(explicitDb);
+    }
+  });
+
   it('should return empty array if no trips', () => {
     const routeId = 'fake-route-id';
 

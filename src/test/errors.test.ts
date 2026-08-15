@@ -40,6 +40,8 @@ describe('gtfs errors', () => {
     expect(report.errorCountsByCode[GtfsErrorCode.GTFS_DOWNLOAD_FAILED]).toBe(
       1,
     );
+    expect(report.errors[0].details?.agencyPath).toBe('/does/not/exist');
+    expect(report.errors[0].details?.path).toBe('/does/not/exist');
   });
 
   it('should format developer-safe error details', () => {

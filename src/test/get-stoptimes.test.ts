@@ -154,4 +154,8 @@ describe('getStoptimes():', () => {
     expect(results[1].arrival_timestamp).toEqual(65400);
     expect(results[1].departure_timestamp).toEqual(65400);
   });
+
+  it('should return no stop times when a date has no active service', () => {
+    expect(getStoptimes({ date: 20991231 })).toEqual([]);
+  });
 });
