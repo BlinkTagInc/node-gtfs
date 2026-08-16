@@ -4,12 +4,9 @@ import type {
   SqlOrderBy,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { fareLegJoinRules } from '../../models/gtfs/fare-leg-join-rules.ts';
+import { fareLegJoinRules } from '../../schema/tables/gtfs-schedule/fare-leg-join-rules.ts';
 import { findRows } from '../find-rows.ts';
 
-/*
- * Returns an array of all fare leg join rules that match the query parameters.
- */
 export function getFareLegJoinRules<Fields extends keyof FareLegJoinRule>(
   query: SqlWhere = {},
   fields: Fields[] = [],

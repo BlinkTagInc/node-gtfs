@@ -21,10 +21,12 @@ interface SqliteGtfsWriterOptions extends GtfsFileWriterOptions {
 export function createSqliteGtfsWriter(
   options: SqliteGtfsWriterOptions,
 ): GtfsFileWriter {
-  const columns = options.model.schema;
-  const prefixedColumns = columns.map((column) => Boolean(column.prefix));
+  const columns = options.table.columns;
+  const prefixedColumns = columns.map((column) =>
+    Boolean(column.applyFeedPrefix),
+  );
   const statement = `INSERT ${options.ignoreDuplicates ? 'OR IGNORE' : ''} INTO ${escapeIdentifier(
-    options.model.filenameBase,
+    options.table.name,
   )} (${columns
     .map(({ name }) => escapeIdentifier(name))
     .join(', ')}) VALUES (${columns.map(() => '?').join(', ')})`;
@@ -41,7 +43,7 @@ export function createSqliteGtfsWriter(
             const prefixedRow = new Array(row.length);
             for (let index = 0; index < row.length; index++) {
               prefixedRow[index] = applyPrefixToValue(
-                row[index] as string,
+                row[index],
                 prefixedColumns[index],
                 options.prefix,
               );
@@ -53,7 +55,9 @@ export function createSqliteGtfsWriter(
             (error as Error & { code?: string }).code ===
             'SQLITE_CONSTRAINT_PRIMARYKEY'
           ) {
-            const primaryColumns = columns.filter((column) => column.primary);
+            const primaryColumns = columns.filter(
+              (column) => column.primaryKey,
+            );
             log(
               options.config,
               'warning',

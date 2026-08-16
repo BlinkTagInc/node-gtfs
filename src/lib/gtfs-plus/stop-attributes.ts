@@ -4,7 +4,7 @@ import type {
   SqlOrderBy,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { stopAttributes } from '../../models/gtfs-plus/stop-attributes.ts';
+import { stopAttributes } from '../../schema/tables/gtfs-plus/stop-attributes.ts';
 import { findRows } from '../find-rows.ts';
 
 /*

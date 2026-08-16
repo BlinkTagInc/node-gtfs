@@ -201,6 +201,14 @@ Print the options above.
 
 Basic TypeScript typings are included with this library. Please [open an issue](https://github.com/blinktaginc/node-gtfs/issues) if you find any inconsistencies between the declared types and underlying code.
 
+The declarative table metadata and its inferred `GtfsRow`, `GtfsStoredRow`,
+`GtfsInsert`, `GtfsQuery`, and `GtfsDatabase` types are available from
+`gtfs/schema` (and from the root package). Individual table declarations and a
+`tables` namespace containing all declarations are exported from the same
+entry point. The former `gtfs/models` entry point has been removed. See the
+[schema manifest design](docs/schema-manifest.md) for its compatibility boundary
+and the work deferred to the next major release.
+
 ## Configuration
 
 Copy `config-sample.json` to `config.json` and then add your projects configuration to `config.json`.
@@ -757,7 +765,7 @@ This library includes many methods you can use in your project to query GTFS dat
 
 - [GTFS-Realtime](https://gtfs.org/realtime/) - Realtime alerts, vehicle positions and predictions
 - [GTFS-Ride](https://gtfsride.org) - Passenger counts
-- [Operational Data Standard (ODS)](https://docs.calitp.org/operational-data-standard/) - Deadheads and personnel info
+- [Transit Operational Data Standard (TODS)](https://tods-transit.org/) - Deadheads and personnel info
 - [GTFS-Timetables](https://gtfstohtml.com) - Information for creating human-readable timetables
 
 There are also methods for retrieving stops and shapes in geoJSON format.
@@ -793,6 +801,40 @@ const db = openDb(config);
 // Close database connection when done.
 closeDb(db);
 ```
+
+### Case-insensitive SQLite comparisons
+
+Some human-readable text fields, including `agency_name`, `stop_name`, route
+names, and headsigns, are declared with `caseInsensitiveComparison: true` in
+the schema manifest. When node-GTFS creates its SQLite schema, these columns use
+SQLite's `COLLATE NOCASE`. Their stored and exported text is unchanged, but
+equality and `IN` filters from the query methods ignore ASCII letter case:
+
+```js
+import { getAgencies } from 'gtfs';
+
+// Matches an agency_name such as "Metro Transit".
+const agencies = getAgencies({ agency_name: 'metro transit' });
+```
+
+The column collation also affects its default `ORDER BY` behavior. GTFS ID
+fields are not marked case-insensitive and remain case-sensitive.
+
+SQLite's built-in `NOCASE` collation only folds the 26 ASCII letters; it does
+not provide complete Unicode-aware matching. An explicit collation in raw SQL
+can override the column default when a query needs different behavior:
+
+```sql
+SELECT * FROM agency
+WHERE agency_name COLLATE BINARY = ?;
+```
+
+This behavior applies to schemas created by `importGtfs()` for SQLite. For
+`importGtfsToKysely()`, PostgreSQL and MySQL comparisons follow the collation of
+the caller's database or application-managed schema; node-GTFS does not create
+a dialect-specific case-insensitive collation. See the
+[SQLite collation documentation](https://www.sqlite.org/datatype3.html#collating_sequences)
+for the precise `NOCASE` behavior.
 
 ### Deleting a Database
 
@@ -1901,11 +1943,15 @@ const tripCapacities = getTripCapacities({
 });
 ```
 
-### Operational Data Standard (ODS) Files
+### Transit Operational Data Standard (TODS) Files
+
+These APIs retain node-gtfs's existing operational tables under the current
+TODS project name. They are not yet a complete implementation of the current
+TODS specification.
 
 #### getDeadheads(query, fields, sortBy, options)
 
-Returns an array of deadheads that match query parameters. [Details on deadheads.txt](https://docs.calitp.org/operational-data-standard/spec/#deadheadstxt)
+Returns an array of deadheads that match query parameters. See the [TODS specification](https://tods-transit.org/spec/).
 
 ```js
 import { getDeadheads } from 'gtfs';
@@ -1921,7 +1967,7 @@ const deadheads = getDeadheads({
 
 #### getDeadheadTimes(query, fields, sortBy, options)
 
-Returns an array of deadhead_times that match query parameters. [Details on deadhead_times.txt](https://docs.calitp.org/operational-data-standard/spec/#deadhead_timestxt)
+Returns an array of deadhead_times that match query parameters. See the [TODS specification](https://tods-transit.org/spec/).
 
 ```js
 import { getDeadheadTimes } from 'gtfs';
@@ -1937,7 +1983,7 @@ const deadheadTimes = getDeadheadTimes({
 
 #### getOpsLocations(query, fields, sortBy, options)
 
-Returns an array of ops_locations that match query parameters. [Details on ops_locations.txt](https://docs.calitp.org/operational-data-standard/spec/#ops_locationstxt)
+Returns an array of ops_locations that match query parameters. See the [TODS specification](https://tods-transit.org/spec/).
 
 ```js
 import { getOpsLocations } from 'gtfs';
@@ -1953,7 +1999,7 @@ const opsLocations = getOpsLocations({
 
 #### getRunsPieces(query, fields, sortBy, options)
 
-Returns an array of runs_pieces that match query parameters. [Details on runs_pieces.txt](https://docs.calitp.org/operational-data-standard/spec/#runs_piecestxt)
+Returns an array of runs_pieces that match query parameters. See the [TODS specification](https://tods-transit.org/spec/).
 
 ```js
 import { getRunsPieces } from 'gtfs';
@@ -1964,7 +2010,7 @@ const runsPieces = getRunsPieces();
 
 #### getRunEvents(query, fields, sortBy, options)
 
-Returns an array of run_events that match query parameters. [Details on run_events.txt](https://docs.calitp.org/operational-data-standard/spec/#run_eventstxt)
+Returns an array of run_events that match query parameters. See the [TODS specification](https://tods-transit.org/spec/).
 
 ```js
 import { getRunEvents } from 'gtfs';

@@ -5,7 +5,7 @@ import { without, compact } from 'lodash-es';
 import { stringify } from 'csv-stringify';
 import Database from 'better-sqlite3';
 
-import * as models from '../models/models.ts';
+import { fileBackedTables } from '../schema/table-registry.ts';
 import { openDb } from './db.ts';
 import { prepDirectory, generateFolderName, untildify } from './file-utils.ts';
 import {
@@ -15,7 +15,7 @@ import {
   setDefaultConfig,
 } from './utils.ts';
 
-import { Config, Model, SqlValue } from '../types/global_interfaces.ts';
+import { Config, SqlValue } from '../types/global_interfaces.ts';
 import { log, report, status } from '../reporting/report.ts';
 import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from './errors.ts';
 import {
@@ -90,88 +90,77 @@ export const exportGtfs = async (initialConfig: Config) => {
   await prepDirectory(exportPath);
 
   // Loop through each GTFS file
-  const modelsToExport = (Object.values(models) as Model[]).filter(
-    (model) => model.extension !== 'gtfs-realtime',
-  );
   const empty: string[] = [];
   let filesExported = 0;
   let rowsExported = 0;
 
   status(config, 'Exported');
 
-  const exportedFiles = await mapSeries(
-    modelsToExport,
-    async (model: Model) => {
-      const filePath = path.join(
-        exportPath,
-        `${model.filenameBase}.${model.filenameExtension}`,
+  const exportedFiles = await mapSeries(fileBackedTables, async (table) => {
+    const filePath = path.join(exportPath, table.file);
+    const tableName = escapeIdentifier(table.name);
+    const lines = db.prepare(`SELECT * FROM ${tableName};`).all() as Array<
+      Record<string, SqlValue>
+    >;
+
+    if (!lines || lines.length === 0) {
+      if (table.namespace === 'gtfs-schedule') {
+        empty.push(table.file);
+      }
+
+      return;
+    }
+
+    const fileExtension = path.extname(table.file).slice(1);
+
+    if (fileExtension === 'txt') {
+      const excludeColumns = [];
+
+      // Omit an unused optional agency_id column.
+      if (table.name === 'routes') {
+        const routesWithAgencyId = db
+          .prepare('SELECT agency_id FROM routes WHERE agency_id IS NOT NULL;')
+          .all();
+        if (!routesWithAgencyId || routesWithAgencyId.length === 0) {
+          excludeColumns.push('agency_id');
+        }
+      } else if (table.name === 'fare_attributes') {
+        for (const line of lines) {
+          line.price = formatCurrency(
+            line.price as number,
+            line.currency_type as string,
+          );
+        }
+      } else if (table.name === 'fare_products') {
+        for (const line of lines) {
+          line.amount = formatCurrency(
+            line.amount as number,
+            line.currency as string,
+          );
+        }
+      }
+
+      const columns = without(
+        table.columns.map((column) => column.name),
+        ...excludeColumns,
       );
-      const tableName = escapeIdentifier(model.filenameBase);
-      const lines = db.prepare(`SELECT * FROM ${tableName};`).all() as Array<
-        Record<string, SqlValue>
-      >;
+      const fileText = await stringify(lines, { columns, header: true });
+      await writeFile(filePath, fileText);
+    } else if (fileExtension === 'geojson') {
+      const fileText = lines?.[0].geojson ?? '';
+      await writeFile(filePath, fileText as string);
+    } else {
+      throw new Error(`Unexpected filename extension: ${fileExtension}`);
+    }
 
-      if (!lines || lines.length === 0) {
-        if (!model.nonstandard && !model.extension) {
-          empty.push(`${model.filenameBase}.${model.filenameExtension}`);
-        }
+    const filename = table.file;
 
-        return;
-      }
+    filesExported += 1;
+    rowsExported += lines.length;
+    status(config, formatFileCount(filename, lines.length));
 
-      if (model.filenameExtension === 'txt') {
-        const excludeColumns = [];
-
-        // If no routes have values for agency_id, add it to the excludeColumns list
-        if (model.filenameBase === 'routes') {
-          const routesWithAgencyId = db
-            .prepare(
-              'SELECT agency_id FROM routes WHERE agency_id IS NOT NULL;',
-            )
-            .all();
-          if (!routesWithAgencyId || routesWithAgencyId.length === 0) {
-            excludeColumns.push('agency_id');
-          }
-        } else if (model.filenameBase === 'fare_attributes') {
-          for (const line of lines) {
-            line.price = formatCurrency(
-              line.price as number,
-              line.currency_type as string,
-            );
-          }
-        } else if (model.filenameBase === 'fare_products') {
-          for (const line of lines) {
-            line.amount = formatCurrency(
-              line.amount as number,
-              line.currency as string,
-            );
-          }
-        }
-
-        const columns = without(
-          model.schema.map((column) => column.name),
-          ...excludeColumns,
-        );
-        const fileText = await stringify(lines, { columns, header: true });
-        await writeFile(filePath, fileText);
-      } else if (model.filenameExtension === 'geojson') {
-        const fileText = lines?.[0].geojson ?? '';
-        await writeFile(filePath, fileText as string);
-      } else {
-        throw new Error(
-          `Unexpected filename extension: ${model.filenameExtension}`,
-        );
-      }
-
-      const filename = `${model.filenameBase}.${model.filenameExtension}`;
-
-      filesExported += 1;
-      rowsExported += lines.length;
-      status(config, formatFileCount(filename, lines.length));
-
-      return filename;
-    },
-  );
+    return filename;
+  });
 
   if (compact(exportedFiles).length === 0) {
     log(

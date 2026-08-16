@@ -4,7 +4,7 @@ import type {
   SqlOrderBy,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { calendarDates } from '../../models/gtfs/calendar-dates.ts';
+import { calendarDates } from '../../schema/tables/gtfs-schedule/calendar-dates.ts';
 import { findRows } from '../find-rows.ts';
 
 /*

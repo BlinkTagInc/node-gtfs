@@ -4,7 +4,11 @@ import { cp, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import { parse } from 'csv-parse';
 import Database from 'better-sqlite3';
 
-import * as models from '../models/models.ts';
+import {
+  getGtfsIndexPlan,
+  getTimestampColumnName,
+} from '../schema/compile-table.ts';
+import { compiledTables, fileBackedTables } from '../schema/table-registry.ts';
 import { openDb } from './db.ts';
 import { temporaryDirectory, untildify, unzip } from './file-utils.ts';
 import { parseGtfsFile } from './gtfs-record-parser.ts';
@@ -28,12 +32,7 @@ import {
   pluralize,
 } from '../reporting/format.ts';
 import { validateConfig } from './validate-config.ts';
-import {
-  getTimestampColumnName,
-  escapeIdentifier,
-  mapSeries,
-  setDefaultConfig,
-} from './utils.ts';
+import { escapeIdentifier, mapSeries, setDefaultConfig } from './utils.ts';
 import {
   addImportError,
   createImportReport,
@@ -49,7 +48,6 @@ import {
 import {
   Config,
   ConfigAgency,
-  Model,
   TableNames,
 } from '../types/global_interfaces.ts';
 
@@ -322,55 +320,53 @@ const getSingleAgencyId = (
   });
 
 const createGtfsTables = (db: Database.Database): void => {
-  for (const model of Object.values(models) as Model[]) {
-    if (!model.schema) {
-      continue;
-    }
-
+  for (const table of compiledTables) {
     const sqlColumnCreateStatements = [];
 
-    for (const column of model.schema) {
+    for (const column of table.columns) {
       const columnName = escapeIdentifier(column.name);
       const checks = [];
-      if (column.min !== undefined && column.max !== undefined) {
+      if (column.sqlMinimum !== undefined && column.sqlMaximum !== undefined) {
         checks.push(
-          `${columnName} >= ${column.min} AND ${columnName} <= ${column.max}`,
+          `${columnName} >= ${column.sqlMinimum} AND ${columnName} <= ${column.sqlMaximum}`,
         );
-      } else if (column.min !== undefined) {
-        checks.push(`${columnName} >= ${column.min}`);
-      } else if (column.max !== undefined) {
-        checks.push(`${columnName} <= ${column.max}`);
+      } else if (column.sqlMinimum !== undefined) {
+        checks.push(`${columnName} >= ${column.sqlMinimum}`);
+      } else if (column.sqlMaximum !== undefined) {
+        checks.push(`${columnName} <= ${column.sqlMaximum}`);
       }
 
-      if (column.type === 'integer') {
+      if (column.storageKind === 'integer') {
         checks.push(
           `(TYPEOF(${columnName}) = 'integer' OR ${columnName} IS NULL)`,
         );
-      } else if (column.type === 'real') {
+      } else if (column.storageKind === 'real') {
         checks.push(
           `(TYPEOF(${columnName}) = 'real' OR ${columnName} IS NULL)`,
         );
       }
 
-      const required = column.required ? 'NOT NULL' : '';
+      const required = column.presence === 'required' ? 'NOT NULL' : '';
       const defaultValue =
-        column.default === null
+        column.defaultValue === null
           ? 'NULL'
-          : typeof column.default === 'string'
-            ? `'${column.default.replaceAll("'", "''")}'`
-            : String(column.default);
+          : typeof column.defaultValue === 'string'
+            ? `'${column.defaultValue.replaceAll("'", "''")}'`
+            : String(column.defaultValue);
       const columnDefault =
-        column.default === undefined ? '' : `DEFAULT ${defaultValue}`;
-      const columnCollation = column.nocase ? 'COLLATE NOCASE' : '';
+        column.defaultValue === undefined ? '' : `DEFAULT ${defaultValue}`;
+      const columnCollation = column.caseInsensitiveComparison
+        ? 'COLLATE NOCASE'
+        : '';
       const checkClause =
         checks.length > 0 ? `CHECK(${checks.join(' AND ')})` : '';
 
       sqlColumnCreateStatements.push(
-        `${columnName} ${column.type} ${checkClause} ${required} ${columnDefault} ${columnCollation}`,
+        `${columnName} ${column.storageKind} ${checkClause} ${required} ${columnDefault} ${columnCollation}`,
       );
 
       // Add an additional timestamp column for time columns
-      if (column.type === 'time') {
+      if (column.storageKind === 'time') {
         sqlColumnCreateStatements.push(
           `${escapeIdentifier(getTimestampColumnName(column.name))} INTEGER GENERATED ALWAYS AS (
             CASE
@@ -387,7 +383,7 @@ const createGtfsTables = (db: Database.Database): void => {
     }
 
     // Find Primary Key fields
-    const primaryColumns = model.schema.filter((column) => column.primary);
+    const primaryColumns = table.columns.filter((column) => column.primaryKey);
 
     if (primaryColumns.length > 0) {
       sqlColumnCreateStatements.push(
@@ -397,7 +393,7 @@ const createGtfsTables = (db: Database.Database): void => {
       );
     }
 
-    const tableName = escapeIdentifier(model.filenameBase);
+    const tableName = escapeIdentifier(table.name);
     db.prepare(`DROP TABLE IF EXISTS ${tableName};`).run();
 
     db.prepare(
@@ -424,87 +420,65 @@ const createGtfsIndex = (
   ).run();
 };
 
-const ADDITIONAL_INDEXES: Record<string, string[][]> = {
-  calendar_dates: [['date', 'exception_type', 'service_id']],
-  stop_times: [['stop_id', 'trip_id', 'stop_sequence']],
-  trips: [['route_id', 'service_id', 'trip_id']],
-};
-
-const createAdditionalGtfsIndexes = (db: Database.Database): void => {
-  for (const [tableName, indexes] of Object.entries(ADDITIONAL_INDEXES)) {
-    for (const columns of indexes) {
-      const indexName = escapeIdentifier(
-        `idx_${tableName}_${columns.join('_')}`,
-      );
-      db.prepare(
-        `CREATE INDEX ${indexName} ON ${escapeIdentifier(tableName)} (${columns
-          .map((columnName) => escapeIdentifier(columnName))
-          .join(', ')});`,
-      ).run();
-    }
-  }
+const createGtfsCompositeIndex = (
+  db: Database.Database,
+  tableName: string,
+  columns: string[],
+): void => {
+  const indexName = escapeIdentifier(`idx_${tableName}_${columns.join('_')}`);
+  db.prepare(
+    `CREATE INDEX ${indexName} ON ${escapeIdentifier(tableName)} (${columns
+      .map((columnName) => escapeIdentifier(columnName))
+      .join(', ')});`,
+  ).run();
 };
 
 const createGtfsIndexes = (db: Database.Database): void => {
-  for (const model of Object.values(models) as Model[]) {
-    if (!model.schema) {
-      continue;
-    }
+  for (const table of compiledTables) {
+    const { singleColumnIndexes, compositeIndexes } = getGtfsIndexPlan(table, {
+      includeGeneratedTimeIndexes: true,
+    });
 
-    const indexedColumns: string[] = [];
+    if (singleColumnIndexes.length > 0) {
+      const columnNames = singleColumnIndexes;
+      const { rowCount } = db
+        .prepare(
+          `SELECT COUNT(*) AS rowCount FROM ${escapeIdentifier(table.name)}`,
+        )
+        .get() as { rowCount: number };
 
-    for (const column of model.schema) {
-      if (column.index) {
-        indexedColumns.push(column.name);
-      }
-
-      // Index all timestamp columns
-      if (column.type === 'time') {
-        indexedColumns.push(getTimestampColumnName(column.name));
-      }
-    }
-
-    if (indexedColumns.length === 0) {
-      continue;
-    }
-
-    const { rowCount } = db
-      .prepare(
-        `SELECT COUNT(*) AS rowCount FROM ${escapeIdentifier(model.filenameBase)}`,
-      )
-      .get() as { rowCount: number };
-
-    if (rowCount === 0) {
-      for (const columnName of indexedColumns) {
-        createGtfsIndex(db, model.filenameBase, columnName, false);
-      }
-      continue;
-    }
-
-    // Count non-null values for each indexed column using COUNT(column) to skip NULLs
-    const counts = db
-      .prepare(
-        `SELECT ${indexedColumns
-          .map(
-            (columnName, index) =>
-              `COUNT(${escapeIdentifier(columnName)}) AS ${escapeIdentifier(`c${index}`)}`,
+      if (rowCount === 0) {
+        for (const columnName of columnNames) {
+          createGtfsIndex(db, table.name, columnName, false);
+        }
+      } else {
+        const counts = db
+          .prepare(
+            `SELECT ${columnNames
+              .map(
+                (columnName, index) =>
+                  `COUNT(${escapeIdentifier(columnName)}) AS ${escapeIdentifier(`c${index}`)}`,
+              )
+              .join(', ')} FROM ${escapeIdentifier(table.name)}`,
           )
-          .join(', ')} FROM ${escapeIdentifier(model.filenameBase)}`,
-      )
-      .get() as Record<string, number>;
+          .get() as Record<string, number>;
 
-    for (const [index, columnName] of indexedColumns.entries()) {
-      const density = counts[`c${index}`] / rowCount;
-      createGtfsIndex(
-        db,
-        model.filenameBase,
-        columnName,
-        density <= SPARSE_COLUMN_MAX_DENSITY,
-      );
+        for (const [index, columnName] of columnNames.entries()) {
+          const density = counts[`c${index}`] / rowCount;
+          createGtfsIndex(
+            db,
+            table.name,
+            columnName,
+            density <= SPARSE_COLUMN_MAX_DENSITY,
+          );
+        }
+      }
+    }
+
+    for (const columns of compositeIndexes) {
+      createGtfsCompositeIndex(db, table.name, columns);
     }
   }
-
-  createAdditionalGtfsIndexes(db);
 };
 
 function createSqliteImportTarget(
@@ -584,22 +558,17 @@ const importGtfsFiles = async (
 
   status(task.config, 'Imported');
 
-  await mapSeries(Object.values(models) as Model[], async (model: Model) => {
-    const filename = `${model.filenameBase}.${model.filenameExtension}`;
+  await mapSeries(fileBackedTables, async (table) => {
+    const filename = table.file;
 
-    if (task.exclude && task.exclude.includes(model.filenameBase)) {
+    if (task.exclude?.some((tableName) => tableName === table.name)) {
       status(task.config, formatFileNote(filename, 'skipped'));
-      return;
-    }
-
-    // GTFS-Realtime tables are populated by the realtime importer, not files.
-    if (model.extension === 'gtfs-realtime') {
       return;
     }
 
     const filepath = path.join(task.downloadDir, filename);
     if (!existsSync(filepath)) {
-      if (!model.nonstandard && !model.extension) {
+      if (table.namespace === 'gtfs-schedule') {
         missing.push(filename);
       }
       return;
@@ -608,7 +577,7 @@ const importGtfsFiles = async (
     progress(task.config, `  ${filename}`);
 
     const writer = target.createWriter({
-      model,
+      table,
       filename,
       ignoreDuplicates: task.ignoreDuplicates,
       prefix: task.prefix,
@@ -620,7 +589,7 @@ const importGtfsFiles = async (
     try {
       for await (const batch of parseGtfsFile({
         filepath,
-        model,
+        table,
         csvOptions: task.csvOptions,
         fillEmptyAgencyId: task.fillEmptyAgencyId,
         agencyId: task.agencyId,
@@ -672,14 +641,14 @@ const importGtfsFiles = async (
         log(
           task.config,
           'error',
-          `Unsupported file type: ${model.filenameExtension} for ${filename}`,
+          `Unsupported file type: ${path.extname(filename).slice(1)} for ${filename}`,
         );
         return;
       }
 
       if (gtfsError.code === GtfsErrorCode.GTFS_JSON_INVALID) {
         log(task.config, 'error', `Invalid JSON in ${filename}`);
-      } else if (model.filenameExtension === 'geojson') {
+      } else if (path.extname(filename) === '.geojson') {
         log(
           task.config,
           'error',

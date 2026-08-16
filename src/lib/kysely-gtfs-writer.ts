@@ -6,15 +6,16 @@ import {
   type Kysely,
 } from 'kysely';
 
-import * as models from '../models/models.ts';
-import type { Model, ModelColumn } from '../types/global_interfaces.ts';
+import {
+  getGtfsIndexPlan,
+  getTimestampColumnName,
+  type CompiledGtfsColumn,
+  type CompiledGtfsTable,
+} from '../schema/compile-table.ts';
+import { fileBackedTables } from '../schema/table-registry.ts';
 import type { GtfsFileWriter, GtfsFileWriterOptions } from './gtfs-writer.ts';
 import type { NormalizedGtfsRow } from './gtfs-record-parser.ts';
-import {
-  applyPrefixToValue,
-  calculateSecondsFromMidnight,
-  getTimestampColumnName,
-} from './utils.ts';
+import { applyPrefixToValue, calculateSecondsFromMidnight } from './utils.ts';
 
 export type KyselyImportDialect = 'mysql' | 'postgres' | 'sqlite';
 
@@ -60,13 +61,13 @@ function shortenIdentifier(identifier: string): string {
 }
 
 function columnDataType(
-  column: ModelColumn,
+  column: CompiledGtfsColumn,
 ): 'double precision' | 'integer' | 'text' {
-  if (column.type === 'integer' || column.type === 'date') {
+  if (column.storageKind === 'integer' || column.storageKind === 'date') {
     return 'integer';
   }
 
-  if (column.type === 'real') {
+  if (column.storageKind === 'real') {
     return 'double precision';
   }
 
@@ -76,36 +77,36 @@ function columnDataType(
 
 function configureColumn(
   definition: ColumnDefinitionBuilder,
-  column: ModelColumn,
+  column: CompiledGtfsColumn,
 ): ColumnDefinitionBuilder {
   let configured = definition;
 
-  if (column.required) {
+  if (column.presence === 'required') {
     configured = configured.notNull();
   }
 
-  if (column.default !== undefined) {
-    configured = configured.defaultTo(column.default);
+  if (column.defaultValue !== undefined) {
+    configured = configured.defaultTo(column.defaultValue);
   }
 
   return configured;
 }
 
-function primaryColumns(model: Model): ModelColumn[] {
-  return model.schema.filter((column) => column.primary);
+function primaryColumns(table: CompiledGtfsTable): CompiledGtfsColumn[] {
+  return table.columns.filter((column) => column.primaryKey);
 }
 
-function checkExpression(column: ModelColumn) {
-  if (column.min !== undefined && column.max !== undefined) {
-    return sql`${sql.ref(column.name)} >= ${sql.lit(column.min)} and ${sql.ref(column.name)} <= ${sql.lit(column.max)}`;
+function checkExpression(column: CompiledGtfsColumn) {
+  if (column.sqlMinimum !== undefined && column.sqlMaximum !== undefined) {
+    return sql`${sql.ref(column.name)} >= ${sql.lit(column.sqlMinimum)} and ${sql.ref(column.name)} <= ${sql.lit(column.sqlMaximum)}`;
   }
 
-  if (column.min !== undefined) {
-    return sql`${sql.ref(column.name)} >= ${sql.lit(column.min)}`;
+  if (column.sqlMinimum !== undefined) {
+    return sql`${sql.ref(column.name)} >= ${sql.lit(column.sqlMinimum)}`;
   }
 
-  if (column.max !== undefined) {
-    return sql`${sql.ref(column.name)} <= ${sql.lit(column.max)}`;
+  if (column.sqlMaximum !== undefined) {
+    return sql`${sql.ref(column.name)} <= ${sql.lit(column.sqlMaximum)}`;
   }
 
   return null;
@@ -113,18 +114,18 @@ function checkExpression(column: ModelColumn) {
 
 async function createTable(
   db: DynamicKysely,
-  model: Model,
+  tableDefinition: CompiledGtfsTable,
   dialect: KyselyImportDialect,
   includeNodeGtfsExtras: boolean,
 ): Promise<void> {
-  await db.schema.dropTable(model.filenameBase).ifExists().execute();
+  await db.schema.dropTable(tableDefinition.name).ifExists().execute();
 
-  let table = db.schema.createTable(model.filenameBase) as CreateTableBuilder<
+  let table = db.schema.createTable(tableDefinition.name) as CreateTableBuilder<
     string,
     string
   >;
 
-  for (const column of model.schema) {
+  for (const column of tableDefinition.columns) {
     table = table.addColumn(column.name, columnDataType(column), (definition) =>
       configureColumn(definition, column),
     );
@@ -132,35 +133,35 @@ async function createTable(
     const check = checkExpression(column);
     if (check) {
       table = table.addCheckConstraint(
-        shortenIdentifier(`check_${model.filenameBase}_${column.name}`),
+        shortenIdentifier(`check_${tableDefinition.name}_${column.name}`),
         check,
       );
     }
 
-    if (includeNodeGtfsExtras && column.type === 'time') {
+    if (includeNodeGtfsExtras && column.storageKind === 'time') {
       table = table.addColumn(getTimestampColumnName(column.name), 'integer');
     }
   }
 
-  const keyColumns = primaryColumns(model);
+  const keyColumns = primaryColumns(tableDefinition);
   if (keyColumns.length > 0) {
     if (dialect === 'mysql') {
       // MySQL cannot index arbitrary-length text identifiers as a unique key.
       table = table
         .addColumn(MYSQL_PRIMARY_KEY_HASH, 'varchar(64)')
         .addUniqueConstraint(
-          shortenIdentifier(`unique_${model.filenameBase}_primary_key`),
+          shortenIdentifier(`unique_${tableDefinition.name}_primary_key`),
           [MYSQL_PRIMARY_KEY_HASH],
         );
-    } else if (keyColumns.every((column) => column.required)) {
+    } else if (keyColumns.every((column) => column.presence === 'required')) {
       table = table.addPrimaryKeyConstraint(
-        shortenIdentifier(`primary_${model.filenameBase}`),
+        shortenIdentifier(`primary_${tableDefinition.name}`),
         keyColumns.map((column) => column.name),
       );
     } else {
       // UNIQUE preserves NULL-distinct keys across SQLite and PostgreSQL.
       table = table.addUniqueConstraint(
-        shortenIdentifier(`unique_${model.filenameBase}_primary_key`),
+        shortenIdentifier(`unique_${tableDefinition.name}_primary_key`),
         keyColumns.map((column) => column.name),
       );
     }
@@ -169,34 +170,26 @@ async function createTable(
   await table.execute();
 }
 
-const ADDITIONAL_INDEXES: Record<string, string[][]> = {
-  calendar_dates: [['date', 'exception_type', 'service_id']],
-  stop_times: [['stop_id', 'trip_id', 'stop_sequence']],
-  trips: [['route_id', 'service_id', 'trip_id']],
-};
-
 async function createIndex(
   db: DynamicKysely,
   dialect: KyselyImportDialect,
   tableName: string,
   columns: string[],
+  tableDefinition?: CompiledGtfsTable,
 ): Promise<void> {
   let index = db.schema
     .createIndex(shortenIdentifier(`idx_${tableName}_${columns.join('_')}`))
     .on(tableName);
 
   if (dialect === 'mysql') {
-    const model = Object.values(models).find(
-      (candidate) => candidate.filenameBase === tableName,
-    ) as Model | undefined;
     const definitions = new Map(
-      model?.schema.map((column) => [column.name, column]),
+      tableDefinition?.columns.map((column) => [column.name, column]),
     );
 
     for (const columnName of columns) {
       const definition = definitions.get(columnName);
       index =
-        definition?.type === 'text'
+        definition?.storageKind === 'text'
           ? index.column(sql`${sql.ref(columnName)}${sql.raw('(191)')}`)
           : index.column(columnName);
     }
@@ -215,10 +208,8 @@ export async function createKyselyGtfsTables<DB>(
   const includeNodeGtfsExtras =
     options.includeNodeGtfsExtras ?? options.manageSchema ?? true;
 
-  for (const model of Object.values(models) as Model[]) {
-    if (model.schema && model.extension !== 'gtfs-realtime') {
-      await createTable(db, model, options.dialect, includeNodeGtfsExtras);
-    }
+  for (const table of fileBackedTables) {
+    await createTable(db, table, options.dialect, includeNodeGtfsExtras);
   }
 }
 
@@ -227,36 +218,20 @@ export async function createKyselyGtfsIndexes<DB>(
   options: KyselyImportOptions<DB>,
 ): Promise<void> {
   const db = asDynamicKysely(options.db);
+  const includeGeneratedTimeIndexes =
+    options.includeNodeGtfsExtras ?? options.manageSchema ?? true;
 
-  for (const model of Object.values(models) as Model[]) {
-    if (model.extension === 'gtfs-realtime') {
-      continue;
-    }
-
-    const indexedColumns = model.schema.flatMap((column) => {
-      const columns: string[] = [];
-
-      if (column.index) {
-        columns.push(column.name);
-      }
-
-      if (column.type === 'time') {
-        if (options.includeNodeGtfsExtras ?? options.manageSchema ?? true) {
-          columns.push(getTimestampColumnName(column.name));
-        }
-      }
-
-      return columns;
+  for (const table of fileBackedTables) {
+    const { singleColumnIndexes, compositeIndexes } = getGtfsIndexPlan(table, {
+      includeGeneratedTimeIndexes,
     });
 
-    for (const columnName of indexedColumns) {
-      await createIndex(db, options.dialect, model.filenameBase, [columnName]);
+    for (const columnName of singleColumnIndexes) {
+      await createIndex(db, options.dialect, table.name, [columnName], table);
     }
-  }
 
-  for (const [tableName, indexes] of Object.entries(ADDITIONAL_INDEXES)) {
-    for (const columns of indexes) {
-      await createIndex(db, options.dialect, tableName, columns);
+    for (const columns of compositeIndexes) {
+      await createIndex(db, options.dialect, table.name, columns, table);
     }
   }
 }
@@ -269,29 +244,29 @@ function buildRow(
   managedSchema: boolean,
 ): DynamicRow {
   const result: DynamicRow = {};
-  const keyValues: Array<string | null> = [];
+  const keyValues: Array<string | number | null> = [];
 
-  for (let index = 0; index < options.model.schema.length; index++) {
-    const column = options.model.schema[index];
+  for (let index = 0; index < options.table.columns.length; index++) {
+    const column = options.table.columns[index];
     const originalValue = row[index];
     const value =
       options.prefix === undefined
         ? originalValue
         : applyPrefixToValue(
-            originalValue as string,
-            Boolean(column.prefix),
+            originalValue,
+            Boolean(column.applyFeedPrefix),
             options.prefix,
           );
 
     result[column.name] = value;
 
-    if (column.primary) {
+    if (column.primaryKey) {
       keyValues.push(value);
     }
 
-    if (includeNodeGtfsExtras && column.type === 'time') {
+    if (includeNodeGtfsExtras && column.storageKind === 'time') {
       result[getTimestampColumnName(column.name)] =
-        value === null ? null : calculateSecondsFromMidnight(value);
+        value === null ? null : calculateSecondsFromMidnight(String(value));
     }
   }
 
@@ -316,15 +291,15 @@ export function createKyselyGtfsWriter<DB>(
   return {
     async writeBatch(rows) {
       const insertColumnCount =
-        writerOptions.model.schema.length +
+        writerOptions.table.columns.length +
         (includeNodeGtfsExtras
-          ? writerOptions.model.schema.filter(
-              (column) => column.type === 'time',
+          ? writerOptions.table.columns.filter(
+              (column) => column.storageKind === 'time',
             ).length
           : 0) +
         (databaseOptions.dialect === 'mysql' &&
         managedSchema &&
-        primaryColumns(writerOptions.model).length > 0
+        primaryColumns(writerOptions.table).length > 0
           ? 1
           : 0);
       const chunkSize = Math.max(
@@ -350,14 +325,14 @@ export function createKyselyGtfsWriter<DB>(
             );
 
           let insert = transaction
-            .insertInto(writerOptions.model.filenameBase)
+            .insertInto(writerOptions.table.name)
             .values(values);
 
           if (writerOptions.ignoreDuplicates) {
             if (databaseOptions.dialect === 'postgres') {
               insert = insert.onConflict((conflict) => conflict.doNothing());
             } else if (databaseOptions.dialect === 'mysql') {
-              const firstColumn = writerOptions.model.schema[0].name;
+              const firstColumn = writerOptions.table.columns[0].name;
               insert = insert.onDuplicateKeyUpdate({
                 [firstColumn]: sql.ref(firstColumn),
               });

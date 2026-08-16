@@ -4,7 +4,7 @@ import type {
   SqlOrderBy,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { stopTimeUpdates } from '../../models/gtfs-realtime/stop-time-updates.ts';
+import { stopTimeUpdates } from '../../schema/tables/gtfs-realtime/stop-time-updates.ts';
 import { findRows } from '../find-rows.ts';
 
 /*

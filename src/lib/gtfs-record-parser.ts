@@ -1,13 +1,14 @@
 import { createReadStream } from 'node:fs';
 import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import { parse } from 'csv-parse';
 
-import type { Model } from '../types/global_interfaces.ts';
+import type { CompiledGtfsTable } from '../schema/compile-table.ts';
 import { isValidJSON } from './geojson-utils.ts';
 import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from './errors.ts';
 import { padLeadingZeros } from './utils.ts';
 
-export type NormalizedGtfsRow = (string | null)[];
+export type NormalizedGtfsRow = (string | number | null)[];
 
 export interface NormalizedGtfsRowBatch {
   rows: NormalizedGtfsRow[];
@@ -17,14 +18,14 @@ export interface NormalizedGtfsRowBatch {
 
 interface ParseGtfsFileOptions {
   filepath: string;
-  model: Model;
+  table: CompiledGtfsTable;
   csvOptions: object;
   fillEmptyAgencyId: boolean;
   agencyId?: string;
   batchSize: number;
 }
 
-const AGENCY_ID_BACKFILL_MODELS = new Set([
+const AGENCY_ID_BACKFILL_TABLES = new Set([
   'agency',
   'routes',
   'fare_attributes',
@@ -34,15 +35,15 @@ const AGENCY_ID_BACKFILL_MODELS = new Set([
 ]);
 
 function shouldBackfillAgencyId(
-  model: Model,
+  table: CompiledGtfsTable,
   normalizedRow: NormalizedGtfsRow,
   columnIndexes: Map<string, number>,
 ): boolean {
-  if (AGENCY_ID_BACKFILL_MODELS.has(model.filenameBase)) {
+  if (AGENCY_ID_BACKFILL_TABLES.has(table.name)) {
     return true;
   }
 
-  if (model.filenameBase === 'attributions') {
+  if (table.name === 'attributions') {
     const routeIdIndex = columnIndexes.get('route_id');
     const tripIdIndex = columnIndexes.get('trip_id');
     return (
@@ -56,7 +57,7 @@ function shouldBackfillAgencyId(
 
 function normalizeGtfsRecord(
   record: Record<string, string | null>,
-  model: Model,
+  table: CompiledGtfsTable,
   recordNumber: number,
   fillEmptyAgencyId: boolean,
   agencyId: string | undefined,
@@ -64,30 +65,34 @@ function normalizeGtfsRecord(
 ): NormalizedGtfsRow {
   // The first data record is line 2 in a CSV file.
   const lineNumber = recordNumber + 1;
-  const normalizedRow: NormalizedGtfsRow = new Array(model.schema.length);
-  const filename = `${model.filenameBase}.${model.filenameExtension}`;
+  const normalizedRow: NormalizedGtfsRow = new Array(table.columns.length);
+  const filename = table.file ?? table.name;
 
-  for (let index = 0; index < model.schema.length; index++) {
-    const { name, type, required } = model.schema[index];
-    let value = record[name];
+  for (let index = 0; index < table.columns.length; index++) {
+    const { name, storageKind, presence, defaultValue } = table.columns[index];
+    let value: string | number | null | undefined = record[name];
 
     if (value === '' || value === undefined || value === null) {
-      normalizedRow[index] = null;
+      value = defaultValue;
 
-      if (required) {
-        throw new GtfsError(
-          `Missing required value in ${filename} for ${name} on line ${lineNumber}.`,
-          {
-            code: GtfsErrorCode.GTFS_REQUIRED_FIELD_MISSING,
-            category: GtfsErrorCategory.VALIDATION,
-            details: { file: filename, line: lineNumber, column: name },
-          },
-        );
+      if (value === undefined || value === null) {
+        normalizedRow[index] = null;
+
+        if (presence === 'required') {
+          throw new GtfsError(
+            `Missing required value in ${filename} for ${name} on line ${lineNumber}.`,
+            {
+              code: GtfsErrorCode.GTFS_REQUIRED_FIELD_MISSING,
+              category: GtfsErrorCategory.VALIDATION,
+              details: { file: filename, line: lineNumber, column: name },
+            },
+          );
+        }
+        continue;
       }
-      continue;
     }
 
-    if (type === 'date') {
+    if (storageKind === 'date') {
       value = value.toString().replace(/-/g, '');
       if (value.length !== 8) {
         throw new GtfsError(
@@ -99,11 +104,11 @@ function normalizeGtfsRecord(
           },
         );
       }
-    } else if (type === 'time') {
-      value = padLeadingZeros(value);
+    } else if (storageKind === 'time') {
+      value = padLeadingZeros(String(value));
     }
 
-    if (type === 'json') {
+    if (storageKind === 'json') {
       value = JSON.stringify(value);
     }
 
@@ -116,7 +121,7 @@ function normalizeGtfsRecord(
     agencyId !== undefined &&
     agencyIdIndex !== undefined &&
     normalizedRow[agencyIdIndex] == null &&
-    shouldBackfillAgencyId(model, normalizedRow, columnIndexes)
+    shouldBackfillAgencyId(table, normalizedRow, columnIndexes)
   ) {
     normalizedRow[agencyIdIndex] = agencyId;
   }
@@ -149,7 +154,7 @@ async function* parseTextGtfsFile(
       rows.push(
         normalizeGtfsRecord(
           record as Record<string, string | null>,
-          options.model,
+          options.table,
           totalRowCount,
           options.fillEmptyAgencyId,
           options.agencyId,
@@ -176,17 +181,19 @@ export async function* parseGtfsFile(
   options: ParseGtfsFileOptions,
 ): AsyncGenerator<NormalizedGtfsRowBatch> {
   const columnIndexes = new Map(
-    options.model.schema.map((column, index) => [column.name, index]),
+    options.table.columns.map((column, index) => [column.name, index]),
   );
 
-  if (options.model.filenameExtension === 'txt') {
+  const filename = options.table.file ?? options.table.name;
+  const fileExtension = path.extname(filename).slice(1);
+
+  if (fileExtension === 'txt') {
     yield* parseTextGtfsFile(options, columnIndexes);
     return;
   }
 
-  if (options.model.filenameExtension === 'geojson') {
+  if (fileExtension === 'geojson') {
     const data = await readFile(options.filepath, 'utf8');
-    const filename = `${options.model.filenameBase}.${options.model.filenameExtension}`;
     if (!isValidJSON(data)) {
       throw new GtfsError(`Invalid JSON in ${filename}`, {
         code: GtfsErrorCode.GTFS_JSON_INVALID,
@@ -199,7 +206,7 @@ export async function* parseGtfsFile(
       rows: [
         normalizeGtfsRecord(
           { geojson: data },
-          options.model,
+          options.table,
           1,
           options.fillEmptyAgencyId,
           options.agencyId,
@@ -212,16 +219,12 @@ export async function* parseGtfsFile(
     return;
   }
 
-  const filename = `${options.model.filenameBase}.${options.model.filenameExtension}`;
-  throw new GtfsError(
-    `Unsupported file type: ${options.model.filenameExtension}`,
-    {
-      code: GtfsErrorCode.GTFS_UNSUPPORTED_FILE_TYPE,
-      category: GtfsErrorCategory.PARSE,
-      details: {
-        file: filename,
-        extension: options.model.filenameExtension,
-      },
+  throw new GtfsError(`Unsupported file type: ${fileExtension}`, {
+    code: GtfsErrorCode.GTFS_UNSUPPORTED_FILE_TYPE,
+    category: GtfsErrorCategory.PARSE,
+    details: {
+      file: filename,
+      extension: fileExtension,
     },
-  );
+  });
 }

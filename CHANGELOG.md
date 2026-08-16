@@ -16,17 +16,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A missing or unparseable config file now throws a `GtfsError` with a code, rather than a plain `Error`
 - An unknown command line flag is reported as an error naming what is accepted, rather than yargs' default
 - stop_times.stop_id is no longer required, allowing valid GTFS Flex rows using location_group_id or location_id
-- Database paths are normalized, registrations are removed by identity, and unregistered explicit databases can be closed
 - advancedQuery now honors top-level db
 - Preserve class, code, and category on errors
-- Direct single-table getters now share one internal query implementation
 - Static GTFS parsing and normalization are separated internally from SQLite batch writes
 
 ### Removed
 - `yargs` and `@types/yargs` — the command line scripts now use `parseArgs` from `node:util`
 
 ### Added
+- Export the schema declarations and JSON-serializable manifest from `gtfs/schema` and the root package
 - Support for importing, exporting, and querying `fare_leg_join_rules.txt`
+- Add `stop_times.end_pickup_drop_off_window` field
 - Add `importGtfsToKysely()` for importing static GTFS into caller-owned PostgreSQL, MySQL, or SQLite Kysely databases without changing the existing synchronous SQLite APIs
 - Configuration is validated on startup: every option is type-checked and all problems are reported in one error rather than one at a time. An option that looks like a misspelling of a real one is reported as a warning with a suggestion; options node-GTFS does not know are left alone, since tools that embed it pass their own configuration through
 - `--version` and `--help` on all three command line scripts, with usage text built from the same flag list the parser uses

@@ -4,7 +4,7 @@ import type {
   SqlOrderBy,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { serviceAlertInformedEntities } from '../../models/gtfs-realtime/service-alert-informed_entities.ts';
+import { serviceAlertInformedEntities } from '../../schema/tables/gtfs-realtime/service-alert-informed_entities.ts';
 import { findRows } from '../find-rows.ts';
 
 /*

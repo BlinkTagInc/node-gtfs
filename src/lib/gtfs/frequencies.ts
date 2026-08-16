@@ -4,7 +4,7 @@ import type {
   SqlOrderBy,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { frequencies } from '../../models/gtfs/frequencies.ts';
+import { frequencies } from '../../schema/tables/gtfs-schedule/frequencies.ts';
 import { findRows } from '../find-rows.ts';
 
 /*

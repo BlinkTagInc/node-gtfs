@@ -56,19 +56,46 @@ describe('GTFS import regressions:', () => {
 
       const indexes = db
         .prepare(
-          "SELECT name FROM sqlite_master WHERE type = 'index' AND name IN (?, ?, ?) ORDER BY name",
+          "SELECT name FROM sqlite_master WHERE type = 'index' AND name IN (?, ?, ?, ?) ORDER BY name",
         )
         .all(
           'idx_calendar_dates_date_exception_type_service_id',
+          'idx_frequencies_trip_id',
           'idx_stop_times_stop_id_trip_id_stop_sequence',
           'idx_trips_route_id_service_id_trip_id',
         ) as { name: string }[];
 
       expect(indexes.map(({ name }) => name)).toEqual([
         'idx_calendar_dates_date_exception_type_service_id',
+        'idx_frequencies_trip_id',
         'idx_stop_times_stop_id_trip_id_stop_sequence',
         'idx_trips_route_id_service_id_trip_id',
       ]);
+    } finally {
+      closeDb(db);
+      await rm(fixturePath, { recursive: true, force: true });
+    }
+  });
+
+  it('should apply schema default values during normalization', async () => {
+    const fixturePath = mkdtempSync(path.join(tmpdir(), 'gtfs-defaults-'));
+    const db = openDb();
+
+    try {
+      await writeFile(
+        path.join(fixturePath, 'transfers.txt'),
+        ['from_stop_id,to_stop_id', 'from-stop,to-stop', ''].join('\n'),
+      );
+
+      await importGtfs({
+        agencies: [{ path: fixturePath }],
+        logLevel: 'silent',
+      });
+
+      const transfer = db
+        .prepare('SELECT transfer_type FROM transfers')
+        .get() as { transfer_type: number };
+      expect(transfer.transfer_type).toEqual(0);
     } finally {
       closeDb(db);
       await rm(fixturePath, { recursive: true, force: true });

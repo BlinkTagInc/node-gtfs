@@ -4,7 +4,7 @@ import type {
   SqlOrderBy,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { fareTransferRules } from '../../models/gtfs/fare-transfer-rules.ts';
+import { fareTransferRules } from '../../schema/tables/gtfs-schedule/fare-transfer-rules.ts';
 import { findRows } from '../find-rows.ts';
 
 /*

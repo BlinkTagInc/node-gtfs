@@ -103,9 +103,9 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./models": {
-      "types": "./dist/models/models.d.ts",
-      "default": "./dist/models/models.js"
+    "./schema": {
+      "types": "./dist/schema/index.d.ts",
+      "default": "./dist/schema/index.js"
     },
     "./package.json": "./package.json"
   },

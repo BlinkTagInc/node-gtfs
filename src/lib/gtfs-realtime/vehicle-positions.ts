@@ -4,7 +4,7 @@ import type {
   SqlOrderBy,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { vehiclePositions } from '../../models/gtfs-realtime/vehicle-positions.ts';
+import { vehiclePositions } from '../../schema/tables/gtfs-realtime/vehicle-positions.ts';
 import { findRows } from '../find-rows.ts';
 
 /*

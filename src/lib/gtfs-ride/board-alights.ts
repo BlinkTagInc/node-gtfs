@@ -4,7 +4,7 @@ import type {
   SqlOrderBy,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { boardAlight } from '../../models/gtfs-ride/board-alight.ts';
+import { boardAlight } from '../../schema/tables/gtfs-ride/board-alight.ts';
 import { findRows } from '../find-rows.ts';
 
 /*

@@ -4,7 +4,7 @@ import type {
   SqlOrderBy,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { ridership } from '../../models/gtfs-ride/ridership.ts';
+import { ridership } from '../../schema/tables/gtfs-ride/ridership.ts';
 import { findRows } from '../find-rows.ts';
 
 /*

@@ -1,0 +1,218 @@
+import assert from 'node:assert/strict';
+import { describe, test } from 'node:test';
+
+import {
+  gtfsJoins,
+  gtfsManifest,
+  gtfsScheduleReferenceRevision,
+  tables,
+} from '../../dist/schema/index.js';
+
+describe('GTFS schema manifest', () => {
+  test('contains every plain table definition without a legacy projection', () => {
+    const tableDefinitions = Object.values(tables);
+
+    assert.equal(Object.keys(gtfsManifest).length, tableDefinitions.length);
+
+    for (const table of tableDefinitions) {
+      const tableName =
+        table.file === null
+          ? table.table
+          : table.file.slice(0, table.file.lastIndexOf('.'));
+      const manifest = gtfsManifest[tableName];
+
+      assert.ok(manifest, `Missing manifest for ${tableName}`);
+      assert.equal('filenameBase' in table, false);
+      assert.equal('filenameExtension' in table, false);
+      assert.equal('schema' in table, false);
+      assert.deepEqual(Object.keys(manifest.fields), Object.keys(table.fields));
+      assert.deepEqual(
+        manifest.primaryKey,
+        'primaryKey' in table ? table.primaryKey : [],
+      );
+
+      if (manifest.file === null) {
+        assert.equal(manifest.table, tableName);
+      } else {
+        assert.equal(manifest.file, table.file);
+      }
+    }
+  });
+
+  test('declares the GTFS Schedule reference revision', () => {
+    assert.equal(gtfsScheduleReferenceRevision, '2026-04-27');
+    assert.equal(gtfsManifest.networks.presence, 'conditionallyForbidden');
+    assert.equal(
+      gtfsManifest.route_networks.presence,
+      'conditionallyForbidden',
+    );
+  });
+
+  test('retains every table namespace in the manifest', () => {
+    for (const table of Object.values(tables)) {
+      const tableName =
+        table.file === null
+          ? table.table
+          : table.file.slice(0, table.file.lastIndexOf('.'));
+      assert.equal(gtfsManifest[tableName].namespace, table.namespace);
+    }
+  });
+
+  test('expresses structural and semantic frequency metadata separately', () => {
+    const frequencies = gtfsManifest.frequencies;
+
+    assert.equal(frequencies.presence, 'optional');
+    assert.deepEqual(frequencies.primaryKey, ['trip_id', 'start_time']);
+    assert.deepEqual(frequencies.fields.trip_id.references, [
+      { file: 'trips.txt', field: 'trip_id' },
+    ]);
+    assert.equal(frequencies.fields.headway_secs.minimum, 1);
+    assert.equal(frequencies.fields.exact_times.kind, 'enumeration');
+    assert.deepEqual(frequencies.fields.exact_times.values, [0, 1]);
+    assert.deepEqual(frequencies.constraints, [
+      {
+        kind: 'range',
+        startField: 'start_time',
+        endField: 'end_time',
+        allowEqual: false,
+      },
+    ]);
+    assert.deepEqual(frequencies.storage.indexes, [
+      'trip_id',
+      'start_timestamp',
+      'end_timestamp',
+    ]);
+    assert.equal('index' in frequencies.fields.trip_id, false);
+    assert.equal(frequencies.fields.trip_id.applyFeedPrefix, true);
+    assert.equal('prefixOnMerge' in frequencies.fields.trip_id, false);
+    assert.equal('index' in tables.frequencies.fields.trip_id, false);
+    assert.deepEqual(gtfsJoins.frequencies, [
+      {
+        field: 'trip_id',
+        targetTable: 'trips',
+        targetField: 'trip_id',
+      },
+    ]);
+  });
+
+  test('distinguishes queryable joins from fields inside structured files', () => {
+    assert.deepEqual(gtfsManifest.stop_times.fields.location_id.references, [
+      { file: 'locations.geojson', field: 'id' },
+    ]);
+    assert.equal(
+      gtfsJoins.stop_times.some((join) => join.field === 'location_id'),
+      false,
+    );
+  });
+
+  test('includes both official Flex pickup and drop-off window fields', () => {
+    const stopTimes = gtfsManifest.stop_times;
+
+    assert.equal(stopTimes.fields.start_pickup_drop_off_window.kind, 'time');
+    assert.equal(stopTimes.fields.end_pickup_drop_off_window.kind, 'time');
+    assert.ok(
+      stopTimes.storage.indexes?.includes(
+        'start_pickup_drop_off_window_timestamp',
+      ),
+    );
+    assert.ok(
+      stopTimes.storage.indexes?.includes(
+        'end_pickup_drop_off_window_timestamp',
+      ),
+    );
+  });
+
+  test('projects GTFS-Realtime file references into schedule joins', () => {
+    assert.deepEqual(gtfsManifest.trip_updates.fields.trip_id.references, [
+      { file: 'trips.txt', field: 'trip_id' },
+    ]);
+    assert.deepEqual(gtfsJoins.trip_updates, [
+      {
+        field: 'trip_id',
+        targetTable: 'trips',
+        targetField: 'trip_id',
+      },
+      {
+        field: 'route_id',
+        targetTable: 'routes',
+        targetField: 'route_id',
+      },
+    ]);
+  });
+
+  test('projects GTFS-to-HTML, TODS, and TIDES references into joins', () => {
+    const referenceCountByNamespace = Object.values(gtfsManifest).reduce<
+      Record<string, number>
+    >((counts, table) => {
+      counts[table.namespace] =
+        (counts[table.namespace] ?? 0) +
+        Object.values(table.fields).reduce(
+          (count, field) => count + (field.references?.length ?? 0),
+          0,
+        );
+      return counts;
+    }, {});
+
+    const joinCountByNamespace = Object.entries(gtfsManifest).reduce<
+      Record<string, number>
+    >((counts, [tableName, table]) => {
+      counts[table.namespace] =
+        (counts[table.namespace] ?? 0) + gtfsJoins[tableName].length;
+      return counts;
+    }, {});
+
+    assert.equal(referenceCountByNamespace['gtfs-to-html'], 13);
+    assert.equal(referenceCountByNamespace.tods, 18);
+    assert.equal(referenceCountByNamespace.tides, 37);
+    assert.equal(joinCountByNamespace['gtfs-to-html'], 13);
+    assert.equal(joinCountByNamespace.tods, 18);
+    assert.equal(joinCountByNamespace.tides, 37);
+
+    assert.deepEqual(
+      gtfsManifest.timetable_notes_references.fields.note_id.references,
+      [{ file: 'timetable_notes.txt', field: 'note_id' }],
+    );
+    assert.deepEqual(gtfsManifest.deadheads.fields.service_id.references, [
+      { file: 'calendar.txt', field: 'service_id' },
+      { file: 'calendar_dates.txt', field: 'service_id' },
+    ]);
+    assert.deepEqual(
+      gtfsManifest.run_event.fields.event_from_location_id.references,
+      [
+        { file: 'stops.txt', field: 'stop_id' },
+        { file: 'ops_locations.txt', field: 'ops_location_id' },
+      ],
+    );
+    assert.deepEqual(
+      gtfsManifest.fare_transactions.fields.trip_id_scheduled.references,
+      [{ file: 'trips_performed.txt', field: 'trip_id_scheduled' }],
+    );
+    assert.equal(
+      gtfsManifest.fare_transactions.fields.fare_media_id.references,
+      undefined,
+    );
+    assert.equal(
+      gtfsManifest.timetable_stop_order.fields.stop_sequence.references,
+      undefined,
+    );
+  });
+
+  test('keeps semantic rules directly on the public definition', () => {
+    const headway = tables.frequencies.fields.headway_secs;
+    const exactTimes = tables.frequencies.fields.exact_times;
+
+    assert.equal(headway.minimum, 1);
+    assert.deepEqual(exactTimes.values, [0, 1]);
+    assert.equal('schema' in tables.frequencies, false);
+  });
+
+  test('uses explicit names for normalization and source metadata', () => {
+    assert.equal(tables.transfers.fields.transfer_type.defaultValue, 0);
+    assert.equal(
+      tables.tripUpdates.fields.trip_start_time.sourcePath,
+      'tripUpdate.trip.startTime',
+    );
+    assert.equal('default' in tables.transfers.fields.transfer_type, false);
+    assert.equal('source' in tables.tripUpdates.fields.trip_start_time, false);
+  });
+});

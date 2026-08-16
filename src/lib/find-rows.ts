@@ -4,6 +4,8 @@ import type {
   SqlOrderBy,
   SqlWhere,
 } from '../types/global_interfaces.ts';
+import type { GtfsTableDefinition } from '../schema/define-table.ts';
+import { getTableName } from '../schema/compile-table.ts';
 import { openDb } from './db.ts';
 import {
   escapeIdentifier,
@@ -12,22 +14,18 @@ import {
   formatWhereClauses,
 } from './utils.ts';
 
-interface QueryableDefinition {
-  filenameBase: string;
-}
-
 export function findRows<
   Row extends object,
   Fields extends Extract<keyof Row, string>,
 >(
-  definition: QueryableDefinition,
+  definition: GtfsTableDefinition,
   query: SqlWhere,
   fields: Fields[],
   orderBy: SqlOrderBy,
   options: QueryOptions,
 ): QueryResult<Row, Fields>[] {
   const db = options.db ?? openDb();
-  const tableName = escapeIdentifier(definition.filenameBase);
+  const tableName = escapeIdentifier(getTableName(definition));
   const selectClause = formatSelectClause(fields);
   const { clause: whereClause, params } = formatWhereClauses(query);
   const orderByClause = formatOrderByClause(orderBy);

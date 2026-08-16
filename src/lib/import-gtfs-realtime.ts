@@ -2,7 +2,11 @@ import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 import { get } from 'lodash-es';
 import Database from 'better-sqlite3';
 
-import * as models from '../models/models.ts';
+import {
+  type CompiledGtfsColumn,
+  type CompiledGtfsTable,
+} from '../schema/compile-table.ts';
+import { compiledTableRegistry } from '../schema/table-registry.ts';
 import { openDb } from './db.ts';
 import { log, report, status } from '../reporting/report.ts';
 import {
@@ -29,12 +33,7 @@ import {
   toGtfsError,
 } from './errors.ts';
 
-import {
-  Config,
-  ConfigAgency,
-  ModelColumn,
-  Model,
-} from '../types/global_interfaces.ts';
+import { Config, ConfigAgency } from '../types/global_interfaces.ts';
 
 interface RealtimeUrlConfig {
   url: string;
@@ -79,12 +78,20 @@ const BATCH_SIZE = 1000;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
 
+const {
+  serviceAlerts: serviceAlertsTable,
+  serviceAlertInformedEntities: informedEntitiesTable,
+  tripUpdates: tripUpdatesTable,
+  stopTimeUpdates: stopTimeUpdatesTable,
+  vehiclePositions: vehiclePositionsTable,
+} = compiledTableRegistry;
+
 /**
  * Prepares a field value for database insertion
  */
 function prepareRealtimeFieldValue(
   entity: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-  column: ModelColumn,
+  column: CompiledGtfsColumn,
   task: GtfsRealtimeTask,
 ) {
   if (column.name === 'created_timestamp') {
@@ -96,9 +103,9 @@ function prepareRealtimeFieldValue(
   }
 
   const baseValue =
-    column.source === undefined
-      ? column.default
-      : get(entity, column.source, column.default);
+    (column.sourcePath === undefined
+      ? column.defaultValue
+      : get(entity, column.sourcePath, column.defaultValue)) ?? null;
 
   const timeAdjustedValue = baseValue?.__isLong__
     ? convertLongTimeToDate(baseValue)
@@ -106,22 +113,27 @@ function prepareRealtimeFieldValue(
 
   const prefixedValue = applyPrefixToValue(
     timeAdjustedValue,
-    column.prefix,
+    column.applyFeedPrefix,
     task.prefix,
   );
 
-  return column.type === 'json' ? JSON.stringify(prefixedValue) : prefixedValue;
+  return column.storageKind === 'json'
+    ? JSON.stringify(prefixedValue)
+    : prefixedValue;
 }
 
 /**
  * Creates a prepared statement for a model
  */
-function createPreparedStatement(db: Database.Database, model: Model) {
-  const columns = model.schema.map((column: ModelColumn) => column.name);
-  const placeholders = model.schema.map(() => '?').join(', ');
+function createPreparedStatement(
+  db: Database.Database,
+  table: CompiledGtfsTable,
+) {
+  const columns = table.columns.map((column) => column.name);
+  const placeholders = table.columns.map(() => '?').join(', ');
 
   return db.prepare(
-    `REPLACE INTO ${escapeIdentifier(model.filenameBase)} (${columns
+    `REPLACE INTO ${escapeIdentifier(table.name)} (${columns
       .map((column) => escapeIdentifier(column))
       .join(', ')}) VALUES (${placeholders})`,
   );
@@ -299,14 +311,11 @@ function createServiceAlertsProcessor(
   db: Database.Database,
   task: GtfsRealtimeTask,
 ): BatchProcessor<ProcessedEntity> {
-  const alertStmt = createPreparedStatement(db, models.serviceAlerts as Model);
-  const informedEntityStmt = createPreparedStatement(
-    db,
-    models.serviceAlertInformedEntities as Model,
-  );
+  const alertStmt = createPreparedStatement(db, serviceAlertsTable);
+  const informedEntityStmt = createPreparedStatement(db, informedEntitiesTable);
 
   const deleteInformedEntitiesStmt = db.prepare(
-    `DELETE FROM ${escapeIdentifier(models.serviceAlertInformedEntities.filenameBase)} WHERE ${escapeIdentifier('alert_id')} = ?`,
+    `DELETE FROM ${escapeIdentifier(informedEntitiesTable.name)} WHERE ${escapeIdentifier('alert_id')} = ?`,
   );
 
   return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
@@ -323,9 +332,9 @@ function createServiceAlertsProcessor(
           deleteInformedEntitiesStmt.run(alertId);
 
           // Process main alert
-          const alertValues = (
-            models.serviceAlerts.schema as ModelColumn[]
-          ).map((column) => prepareRealtimeFieldValue(entity, column, task));
+          const alertValues = serviceAlertsTable.columns.map((column) =>
+            prepareRealtimeFieldValue(entity, column, task),
+          );
           alertStmt.run(alertValues);
           recordCount++;
 
@@ -333,9 +342,7 @@ function createServiceAlertsProcessor(
           if (entity.alert?.informedEntity?.length) {
             for (const informedEntity of entity.alert.informedEntity) {
               informedEntity.parent = entity;
-              const entityValues = (
-                models.serviceAlertInformedEntities.schema as ModelColumn[]
-              ).map((column) =>
+              const entityValues = informedEntitiesTable.columns.map((column) =>
                 prepareRealtimeFieldValue(informedEntity, column, task),
               );
               informedEntityStmt.run(entityValues);
@@ -366,16 +373,10 @@ function createTripUpdatesProcessor(
   db: Database.Database,
   task: GtfsRealtimeTask,
 ): BatchProcessor<ProcessedEntity> {
-  const tripUpdateStmt = createPreparedStatement(
-    db,
-    models.tripUpdates as Model,
-  );
-  const stopTimeStmt = createPreparedStatement(
-    db,
-    models.stopTimeUpdates as Model,
-  );
+  const tripUpdateStmt = createPreparedStatement(db, tripUpdatesTable);
+  const stopTimeStmt = createPreparedStatement(db, stopTimeUpdatesTable);
   const deleteStopTimesByTripStmt = db.prepare(
-    `DELETE FROM ${escapeIdentifier(models.stopTimeUpdates.filenameBase)} WHERE ${escapeIdentifier('trip_id')} = ? AND ${escapeIdentifier('trip_start_time')} IS ?`,
+    `DELETE FROM ${escapeIdentifier(stopTimeUpdatesTable.name)} WHERE ${escapeIdentifier('trip_id')} = ? AND ${escapeIdentifier('trip_start_time')} IS ?`,
   );
 
   return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
@@ -386,9 +387,9 @@ function createTripUpdatesProcessor(
       for (const entity of batch) {
         try {
           // Process main trip update
-          const tripUpdateValues = (
-            models.tripUpdates.schema as ModelColumn[]
-          ).map((column) => prepareRealtimeFieldValue(entity, column, task));
+          const tripUpdateValues = tripUpdatesTable.columns.map((column) =>
+            prepareRealtimeFieldValue(entity, column, task),
+          );
           tripUpdateStmt.run(tripUpdateValues);
           recordCount++;
 
@@ -416,10 +417,9 @@ function createTripUpdatesProcessor(
 
             for (const stopTimeUpdate of entity.tripUpdate.stopTimeUpdate) {
               stopTimeUpdate.parent = entity;
-              const stopTimeValues = (
-                models.stopTimeUpdates.schema as ModelColumn[]
-              ).map((column) =>
-                prepareRealtimeFieldValue(stopTimeUpdate, column, task),
+              const stopTimeValues = stopTimeUpdatesTable.columns.map(
+                (column) =>
+                  prepareRealtimeFieldValue(stopTimeUpdate, column, task),
               );
               stopTimeStmt.run(stopTimeValues);
               recordCount++;
@@ -451,7 +451,7 @@ function createVehiclePositionsProcessor(
 ): BatchProcessor<ProcessedEntity> {
   const vehiclePositionStmt = createPreparedStatement(
     db,
-    models.vehiclePositions as Model,
+    vehiclePositionsTable,
   );
 
   return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
@@ -461,9 +461,9 @@ function createVehiclePositionsProcessor(
     db.transaction(() => {
       for (const entity of batch) {
         try {
-          const fieldValues = (
-            models.vehiclePositions.schema as ModelColumn[]
-          ).map((column) => prepareRealtimeFieldValue(entity, column, task));
+          const fieldValues = vehiclePositionsTable.columns.map((column) =>
+            prepareRealtimeFieldValue(entity, column, task),
+          );
           vehiclePositionStmt.run(fieldValues);
           recordCount++;
         } catch (error: unknown) {

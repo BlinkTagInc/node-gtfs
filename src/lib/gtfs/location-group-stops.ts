@@ -4,7 +4,7 @@ import type {
   SqlOrderBy,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { locationGroupStops } from '../../models/gtfs/location-group-stops.ts';
+import { locationGroupStops } from '../../schema/tables/gtfs-schedule/location-group-stops.ts';
 import { findRows } from '../find-rows.ts';
 
 /*

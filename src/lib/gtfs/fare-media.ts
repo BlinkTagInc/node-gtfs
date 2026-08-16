@@ -4,7 +4,7 @@ import type {
   SqlOrderBy,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { fareMedia } from '../../models/gtfs/fare-media.ts';
+import { fareMedia } from '../../schema/tables/gtfs-schedule/fare-media.ts';
 import { findRows } from '../find-rows.ts';
 
 /*

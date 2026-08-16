@@ -371,28 +371,19 @@ export function formatCurrency(value: number, currency: string) {
 }
 
 /**
- * Gets the timestamp column name for a given column name
- * @param columnName The column name
- * @returns The timestamp column name
- */
-export function getTimestampColumnName(columnName: string) {
-  return columnName.endsWith('time')
-    ? `${columnName}stamp`
-    : `${columnName}_timestamp`;
-}
-
-/**
  * Applies a prefix to a value if the column should be prefixed and the value is not null
  * @param value The value to prefix
  * @param columnShouldBePrefixed Whether the column should be prefixed
  * @param prefix The prefix to apply
  * @returns The value with the prefix applied if the column should be prefixed and the value is not null
  */
-export function applyPrefixToValue(
-  value: string,
+export function applyPrefixToValue<
+  Value extends string | number | null | undefined,
+>(
+  value: Value,
   columnShouldBePrefixed?: boolean,
   prefix?: string,
-) {
+): Value | string {
   if (
     !columnShouldBePrefixed ||
     prefix === undefined ||

@@ -1,0 +1,40 @@
+import { defineGtfsTable } from '../../define-table.ts';
+
+export const ridership = defineGtfsTable({
+  file: 'ridership.txt',
+  presence: 'optional',
+  fields: {
+    total_boardings: { kind: 'integer', presence: 'required', minimum: 0 },
+    total_alightings: { kind: 'integer', presence: 'required', minimum: 0 },
+    ridership_start_date: { kind: 'date' },
+    ridership_end_date: { kind: 'date' },
+    ridership_start_time: { kind: 'time' },
+    ridership_end_time: { kind: 'time' },
+    service_id: { kind: 'id', applyFeedPrefix: true },
+    monday: { kind: 'integer', minimum: 0, maximum: 1 },
+    tuesday: { kind: 'integer', minimum: 0, maximum: 1 },
+    wednesday: { kind: 'integer', minimum: 0, maximum: 1 },
+    thursday: { kind: 'integer', minimum: 0, maximum: 1 },
+    friday: { kind: 'integer', minimum: 0, maximum: 1 },
+    saturday: { kind: 'integer', minimum: 0, maximum: 1 },
+    sunday: { kind: 'integer', minimum: 0, maximum: 1 },
+    agency_id: { kind: 'id', applyFeedPrefix: true },
+    route_id: { kind: 'id', applyFeedPrefix: true },
+    direction_id: { kind: 'integer', minimum: 0, maximum: 1 },
+    trip_id: { kind: 'id', applyFeedPrefix: true },
+    stop_id: { kind: 'id', applyFeedPrefix: true },
+  },
+  storage: {
+    indexes: [
+      'ridership_start_date',
+      'ridership_end_date',
+      'ridership_start_timestamp',
+      'ridership_end_timestamp',
+      'service_id',
+      'agency_id',
+      'route_id',
+      'direction_id',
+    ],
+  },
+  namespace: 'gtfs-ride',
+});

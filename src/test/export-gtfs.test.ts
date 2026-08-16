@@ -24,8 +24,7 @@ import {
   generateFolderName,
   prepDirectory,
 } from '../../dist/index.js';
-import * as models from '../../dist/models/models.js';
-import type { Model } from '../../dist/index.js';
+import { gtfsManifest } from '../../dist/schema/index.js';
 
 describe('exportGtfs():', function () {
   describe('Export GTFS', () => {
@@ -55,15 +54,13 @@ describe('exportGtfs():', function () {
       await unzip(config.agencies[0].path, temporaryDir);
 
       await Promise.all(
-        (Object.values(models) as Model[]).map((model) => {
-          const filePath = path.join(
-            temporaryDir,
-            `${model.filenameBase}.${model.filenameExtension}`,
-          );
+        Object.entries(gtfsManifest).map(([tableName, definition]) => {
+          if (definition.file === null) return false;
+          const filePath = path.join(temporaryDir, definition.file);
 
           // GTFS has optional files
           if (!existsSync(filePath)) {
-            countData[model.filenameBase] = 0;
+            countData[tableName] = 0;
             return false;
           }
 
@@ -79,14 +76,14 @@ describe('exportGtfs():', function () {
                 throw error;
               }
 
-              countData[model.filenameBase] = data.length;
+              countData[tableName] = data.length;
             },
           );
 
           return createReadStream(filePath)
             .pipe(parser)
             .on('error', (error) => {
-              countData[model.filenameBase] = 0;
+              countData[tableName] = 0;
               throw error;
             });
         }),
@@ -110,23 +107,23 @@ describe('exportGtfs():', function () {
       await rm(temporaryDir, { recursive: true, force: true });
     });
 
-    const modelsToValidate = (Object.values(models) as Model[]).filter(
-      (model) => model.extension !== 'gtfs-realtime',
+    const tablesToValidate = Object.entries(gtfsManifest).filter(
+      ([, definition]) => definition.namespace !== 'gtfs-realtime',
     );
 
-    for (const model of modelsToValidate) {
-      it(`should import the same number of ${model.filenameBase}`, async () => {
+    for (const [tableName, definition] of tablesToValidate) {
+      it(`should import the same number of ${tableName}`, async () => {
         const agencies = getAgencies({}, ['agency_name']);
         const filePath = path.join(
           process.cwd(),
           'gtfs-export',
           generateFolderName(agencies[0].agency_name),
-          `${model.filenameBase}.${model.filenameExtension}`,
+          definition.file as string,
         );
 
         // GTFS has optional files
         if (!existsSync(filePath)) {
-          expect(countData[model.filenameBase]).toEqual(0);
+          expect(countData[tableName]).toEqual(0);
           return;
         }
 
@@ -142,7 +139,7 @@ describe('exportGtfs():', function () {
               throw error;
             }
 
-            expect(data).toHaveLength(countData[model.filenameBase]);
+            expect(data).toHaveLength(countData[tableName]);
           },
         );
 

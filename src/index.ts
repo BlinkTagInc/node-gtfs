@@ -4,6 +4,7 @@ export type {
   KyselyImportDialect,
   KyselyImportOptions,
 } from './lib/kysely-gtfs-writer.ts';
+export * from './schema/index.ts';
 export { updateGtfsRealtime } from './lib/import-gtfs-realtime.ts';
 
 // GTFS export script
@@ -74,13 +75,12 @@ export { getDirections } from './lib/gtfs-plus/directions.ts';
 export { getRouteAttributes } from './lib/gtfs-plus/route-attributes.ts';
 export { getStopAttributes } from './lib/gtfs-plus/stop-attributes.ts';
 
-// Non-standard GTFS
-export { getTimetables } from './lib/non-standard/timetables.ts';
-export { getTimetableStopOrders } from './lib/non-standard/timetable-stop-order.ts';
-export { getTimetablePages } from './lib/non-standard/timetable-pages.ts';
-export { getTimetableNotes } from './lib/non-standard/timetable-notes.ts';
-export { getTimetableNotesReferences } from './lib/non-standard/timetable-notes-references.ts';
-export { getTripsDatedVehicleJourneys } from './lib/non-standard/trips-dated-vehicle-journey.ts';
+// GTFS-to-HTML
+export { getTimetables } from './lib/gtfs-to-html/timetables.ts';
+export { getTimetableStopOrders } from './lib/gtfs-to-html/timetable-stop-order.ts';
+export { getTimetablePages } from './lib/gtfs-to-html/timetable-pages.ts';
+export { getTimetableNotes } from './lib/gtfs-to-html/timetable-notes.ts';
+export { getTimetableNotesReferences } from './lib/gtfs-to-html/timetable-notes-references.ts';
 
 // GTFS-ride
 export { getBoardAlights } from './lib/gtfs-ride/board-alights.ts';
@@ -96,12 +96,14 @@ export { getVehiclePositions } from './lib/gtfs-realtime/vehicle-positions.ts';
 export { getServiceAlerts } from './lib/gtfs-realtime/service-alerts.ts';
 export { getServiceAlertInformedEntities } from './lib/gtfs-realtime/service-alert-informed-entities.ts';
 
-// ODS
-export { getDeadheads } from './lib/ods/deadheads.ts';
-export { getDeadheadTimes } from './lib/ods/deadhead-times.ts';
-export { getOpsLocations } from './lib/ods/ops-locations.ts';
-export { getRunEvents } from './lib/ods/run-events.ts';
-export { getRunsPieces } from './lib/ods/runs-pieces.ts';
+// NOPTIS
+export { getTripsDatedVehicleJourneys } from './lib/noptis/trips-dated-vehicle-journey.ts';
+
+// TODS
+export { getDeadheads } from './lib/tods/deadheads.ts';
+export { getDeadheadTimes } from './lib/tods/deadhead-times.ts';
+export { getOpsLocations } from './lib/tods/ops-locations.ts';
+export { getRunEvents } from './lib/tods/run-events.ts';
+export { getRunsPieces } from './lib/tods/runs-pieces.ts';
 
 export * from './types/global_interfaces.ts';
-export type { Model } from './types/global_interfaces.ts';

@@ -4,7 +4,7 @@ import type {
   SqlOrderBy,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { calendar } from '../../models/gtfs/calendar.ts';
+import { calendar } from '../../schema/tables/gtfs-schedule/calendar.ts';
 import { openDb } from '../db.ts';
 import { findRows } from '../find-rows.ts';
 import { getDayOfWeekFromDate } from '../utils.ts';

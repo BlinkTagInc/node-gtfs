@@ -4,7 +4,7 @@ import type {
   SqlOrderBy,
   SqlWhere,
 } from '../../types/global_interfaces.ts';
-import { networks } from '../../models/gtfs/networks.ts';
+import { networks } from '../../schema/tables/gtfs-schedule/networks.ts';
 import { findRows } from '../find-rows.ts';
 
 /*

@@ -1,41 +1,10 @@
 import type { Options } from 'csv-parse';
 import type { Database } from 'better-sqlite3';
+import type { GtfsScheduleTableName } from '../schema/database.ts';
 
 export type UnixTimestamp = number;
 
-export type TableNames =
-  | 'agency'
-  | 'stops'
-  | 'routes'
-  | 'trips'
-  | 'stop_times'
-  | 'calendar'
-  | 'calendar_dates'
-  | 'fare_attributes'
-  | 'fare_rules'
-  | 'timeframes'
-  | 'rider_categories'
-  | 'fare_media'
-  | 'fare_products'
-  | 'fare_leg_rules'
-  | 'fare_leg_join_rules'
-  | 'fare_transfer_rules'
-  | 'areas'
-  | 'stop_areas'
-  | 'networks'
-  | 'route_networks'
-  | 'shapes'
-  | 'frequencies'
-  | 'transfers'
-  | 'pathways'
-  | 'levels'
-  | 'location_groups'
-  | 'location_group_stops'
-  | 'locations'
-  | 'booking_rules'
-  | 'translations'
-  | 'feed_info'
-  | 'attributions';
+export type TableNames = GtfsScheduleTableName;
 
 interface BaseConfigAgency {
   /**
@@ -209,28 +178,6 @@ export type LogMessageLevel = Exclude<LogLevel, 'silent'>;
 
 /** A custom destination for log output. */
 export type LogFunction = (level: LogMessageLevel, message: string) => void;
-
-export interface ModelColumn {
-  name: string;
-  type: 'text' | 'integer' | 'real' | 'json' | 'date' | 'time';
-  min?: number;
-  max?: number;
-  required?: boolean;
-  primary?: boolean;
-  index?: boolean;
-  default?: string | number | null;
-  nocase?: boolean;
-  source?: string;
-  prefix?: boolean;
-}
-
-export interface Model {
-  filenameBase: TableNames;
-  filenameExtension?: string;
-  extension?: string;
-  nonstandard?: boolean;
-  schema: ModelColumn[];
-}
 
 export interface JoinOptions {
   type?: string;
@@ -513,6 +460,8 @@ export interface StopTime {
   stop_headsign: string | null;
   start_pickup_drop_off_window: string | null;
   start_pickup_drop_off_window_timestamp: UnixTimestamp | null;
+  end_pickup_drop_off_window: string | null;
+  end_pickup_drop_off_window_timestamp: UnixTimestamp | null;
   pickup_type: 0 | 1 | 2 | 3 | null;
   drop_off_type: 0 | 1 | 2 | 3 | null;
   continuous_pickup: 0 | 1 | 2 | 3 | null;
