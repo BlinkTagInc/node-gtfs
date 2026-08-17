@@ -31,20 +31,6 @@ function storageKind(
   return field.kind;
 }
 
-function numericEnumBounds(field: GtfsFieldDefinition): {
-  min?: number;
-  max?: number;
-} {
-  if (
-    field.kind !== 'enumeration' ||
-    !field.values.every((value) => typeof value === 'number')
-  ) {
-    return {};
-  }
-  const values = field.values as readonly number[];
-  return { min: Math.min(...values), max: Math.max(...values) };
-}
-
 export function getTableName(definition: GtfsTableDefinition): string {
   if (definition.file === null) return definition.table;
   const extensionIndex = definition.file.lastIndexOf('.');
@@ -58,14 +44,13 @@ export function compileTable(
 ): CompiledGtfsTable {
   const primaryFields = new Set<string>(definition.primaryKey ?? []);
   const columns = Object.entries(definition.fields).map(([name, field]) => {
-    const enumBounds = numericEnumBounds(field);
     return {
       ...field,
       name,
       storageKind: storageKind(field),
       primaryKey: primaryFields.has(name),
-      sqlMinimum: field.minimum ?? enumBounds.min,
-      sqlMaximum: field.maximum ?? enumBounds.max,
+      sqlMinimum: field.minimum,
+      sqlMaximum: field.maximum,
     } satisfies CompiledGtfsColumn;
   });
 

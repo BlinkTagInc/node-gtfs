@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - advancedQuery now honors top-level db
 - Preserve class, code, and category on errors
 - Static GTFS parsing and normalization are separated internally from SQLite batch writes
+- Updated GTFS realtime fields
 
 ### Removed
 - `yargs` and `@types/yargs` — the command line scripts now use `parseArgs` from `node:util`

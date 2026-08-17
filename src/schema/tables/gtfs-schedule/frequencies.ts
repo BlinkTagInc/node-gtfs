@@ -15,7 +15,7 @@ export const frequencies = defineGtfsTable({
     start_time: { kind: 'time', presence: 'required' },
     end_time: { kind: 'time', presence: 'required' },
     headway_secs: { kind: 'integer', presence: 'required', minimum: 1 },
-    exact_times: { kind: 'enumeration', values: [0, 1] },
+    exact_times: { kind: 'integer', minimum: 0, maximum: 1 },
   },
   constraints: [
     {

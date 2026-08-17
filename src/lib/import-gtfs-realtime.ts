@@ -117,9 +117,11 @@ function prepareRealtimeFieldValue(
     task.prefix,
   );
 
-  return column.storageKind === 'json'
-    ? JSON.stringify(prefixedValue)
-    : prefixedValue;
+  if (column.storageKind === 'json') {
+    return prefixedValue == null ? null : JSON.stringify(prefixedValue);
+  }
+
+  return prefixedValue;
 }
 
 /**

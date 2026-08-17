@@ -67,8 +67,9 @@ describe('GTFS schema manifest', () => {
       { file: 'trips.txt', field: 'trip_id' },
     ]);
     assert.equal(frequencies.fields.headway_secs.minimum, 1);
-    assert.equal(frequencies.fields.exact_times.kind, 'enumeration');
-    assert.deepEqual(frequencies.fields.exact_times.values, [0, 1]);
+    assert.equal(frequencies.fields.exact_times.kind, 'integer');
+    assert.equal(frequencies.fields.exact_times.minimum, 0);
+    assert.equal(frequencies.fields.exact_times.maximum, 1);
     assert.deepEqual(frequencies.constraints, [
       {
         kind: 'range',
@@ -140,6 +141,62 @@ describe('GTFS schema manifest', () => {
     ]);
   });
 
+  test('maps the supported GTFS-Realtime protobuf fields without inventing defaults', () => {
+    const vehiclePosition = gtfsManifest.vehicle_positions;
+    const tripUpdate = gtfsManifest.trip_updates;
+    const stopTimeUpdate = gtfsManifest.stop_time_updates;
+    const alert = gtfsManifest.service_alerts;
+
+    assert.equal(
+      vehiclePosition.fields.current_status.sourcePath,
+      'vehicle.currentStatus',
+    );
+    assert.equal(vehiclePosition.fields.stop_id.sourcePath, 'vehicle.stopId');
+    assert.equal(
+      vehiclePosition.fields.route_id.sourcePath,
+      'vehicle.trip.routeId',
+    );
+    assert.equal(
+      vehiclePosition.fields.direction_id.sourcePath,
+      'vehicle.trip.directionId',
+    );
+    assert.equal(vehiclePosition.fields.multi_carriage_details.kind, 'json');
+    assert.equal(
+      tripUpdate.fields.trip_properties_shape_id.sourcePath,
+      'tripUpdate.tripProperties.shapeId',
+    );
+    assert.equal(
+      stopTimeUpdate.fields.arrival_uncertainty.sourcePath,
+      'arrival.uncertainty',
+    );
+    assert.equal(
+      stopTimeUpdate.fields.assigned_stop_id.sourcePath,
+      'stopTimeProperties.assignedStopId',
+    );
+    assert.equal(
+      alert.fields.communication_period.sourcePath,
+      'alert.communicationPeriod',
+    );
+    assert.equal(alert.fields.header_text.defaultValue, undefined);
+    assert.equal(alert.fields.description_text.defaultValue, undefined);
+  });
+
+  test('uses open enumerations only for GTFS-Realtime fields', () => {
+    let enumerationCount = 0;
+
+    for (const table of Object.values(gtfsManifest)) {
+      for (const field of Object.values(table.fields)) {
+        if (field.kind === 'enumeration') {
+          enumerationCount += 1;
+          assert.equal(table.namespace, 'gtfs-realtime');
+          assert.notEqual(field.closed, true);
+        }
+      }
+    }
+
+    assert.ok(enumerationCount > 0);
+  });
+
   test('projects GTFS-to-HTML, TODS, and TIDES references into joins', () => {
     const referenceCountByNamespace = Object.values(gtfsManifest).reduce<
       Record<string, number>
@@ -202,7 +259,8 @@ describe('GTFS schema manifest', () => {
     const exactTimes = tables.frequencies.fields.exact_times;
 
     assert.equal(headway.minimum, 1);
-    assert.deepEqual(exactTimes.values, [0, 1]);
+    assert.equal(exactTimes.minimum, 0);
+    assert.equal(exactTimes.maximum, 1);
     assert.equal('schema' in tables.frequencies, false);
   });
 

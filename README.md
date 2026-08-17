@@ -205,9 +205,7 @@ The declarative table metadata and its inferred `GtfsRow`, `GtfsStoredRow`,
 `GtfsInsert`, `GtfsQuery`, and `GtfsDatabase` types are available from
 `gtfs/schema` (and from the root package). Individual table declarations and a
 `tables` namespace containing all declarations are exported from the same
-entry point. The former `gtfs/models` entry point has been removed. See the
-[schema manifest design](docs/schema-manifest.md) for its compatibility boundary
-and the work deferred to the next major release.
+entry point.
 
 ## Configuration
 
@@ -1704,7 +1702,7 @@ Returns an array of GTFS Realtime service alerts that match query parameters. Ea
 
 [More details on Service Alerts](https://gtfs.org/realtime/feed-entities/service-alerts/)
 
-Each alert has an `informed_entities` array containing all agencies, stops, routes, and trips the alert applies to. The `active_period` field is a JSON-serialised array of `{start, end}` Unix timestamp objects representing when the alert is active. The convenience fields `start_time` and `end_time` contain the start and end of the first active period (or `null` if none is set).
+Each alert has an `informed_entities` array containing all agencies, stops, routes, and trips the alert applies to. The `active_period`, `communication_period`, and `impact_period` fields are JSON-serialized arrays of `{start, end}` Unix timestamp objects. The convenience fields `start_time` and `end_time` contain the start and end of the first legacy active period (or `null` if none is set). Multilingual URL and text values retain their complete translation arrays in the corresponding `*_translations` JSON fields while the existing text fields contain the first translation. Images and their localized variants are retained in the `image` JSON field.
 
 ```js
 import { getServiceAlerts } from 'gtfs';
@@ -1741,6 +1739,8 @@ const informedEntities = getServiceAlertInformedEntities({
 
 Returns an array of GTFS Realtime trip updates that match query parameters. Note that this does not refresh the data from GTFS-Realtime feeds, it only fetches what is stored in the database. In order to fetch the latest trip updates from GTFS-Realtime feeds and store in your database, use the [GTFS-Realtime update script or function](#gtfsrealtime-update-script).
 
+Trip updates retain all fields from `TripDescriptor`, `VehicleDescriptor`, and `TripProperties`, including modified-trip selectors, trip-level delay, vehicle accessibility, and replacement or duplicated trip properties.
+
 [More details on Trip Updates](https://gtfs.org/realtime/feed-entities/trip-updates/)
 
 ```js
@@ -1754,6 +1754,8 @@ const tripUpdates = getTripUpdates();
 
 Returns an array of GTFS Realtime stop time updates that match query parameters. Note that this does not refresh the data from GTFS-Realtime feeds, it only fetches what is stored in the database. In order to fetch the latest stop time updates from GTFS-Realtime feeds and store in your database, use the [GTFS-Realtime update script or function](#gtfsrealtime-update-script).
 
+Stored stop-time updates include arrival and departure delay, time, uncertainty, scheduled time, departure occupancy, schedule relationship, and all `StopTimeProperties` fields. `trip_update_id` links each row to its parent trip-update entity.
+
 [More details on Stop Time Updates](https://gtfs.org/realtime/feed-entities/trip-updates/#stoptimeupdate)
 
 ```js
@@ -1766,6 +1768,8 @@ const stopTimeUpdates = getStopTimeUpdates();
 #### getVehiclePositions(query, fields, sortBy, options)
 
 Returns an array of GTFS Realtime vehicle positions that match query parameters. Note that this does not refresh the data from GTFS-Realtime feeds, it only fetches what is stored in the database. In order to fetch the latest vehicle positions from GTFS-Realtime feeds and store in your database, use the [GTFS-Realtime update script or function](#gtfsrealtime-update-script).
+
+Vehicle positions include the full trip and vehicle descriptors, `route_id`, `direction_id`, `stop_id`, `current_status`, odometer, occupancy fields, and timestamp. Repeated carriage details are retained in the `multi_carriage_details` JSON field.
 
 [More details on Vehicle Positions](https://gtfs.org/realtime/feed-entities/vehicle-positions/)
 

@@ -1,6 +1,7 @@
 export { defineGtfsTable } from './define-table.ts';
 export type {
   GtfsDatabaseFromTables,
+  GtfsEnumerationValue,
   GtfsFieldDefinition,
   GtfsFieldKind,
   GtfsFieldOptions,

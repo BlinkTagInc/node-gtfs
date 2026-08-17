@@ -43,18 +43,34 @@ The root package exports these too.
 - Time fields retain their GTFS string value. The current node-gtfs timestamp
   helper columns are storage projections and are reflected only in stored-row
   types.
-- Enum values, cross-file references, inclusive `minimum` and `maximum` bounds,
-  and cross-field range rules are retained as semantic metadata. References
+- Enumeration values, cross-file references, inclusive `minimum` and `maximum`
+  bounds, and cross-field range rules are retained as semantic metadata.
+  Enumeration `values` are the currently known values and enumerations are open
+  by default, so future values remain importable and type-safe consumers can
+  still pass them. Set `closed: true` only for a genuinely closed,
+  library-controlled enumeration. Enum membership is not emitted as a hard
+  database constraint. References
   use a consistent `[{ file, field }]` shape, and multiple entries are
   alternative targets. They are not automatically promoted to hard foreign
   keys; GTFS-Realtime references can be conditional on schedule relationships.
 - Storage indexes are dialect-neutral declarations. Dialect-specific details,
   such as SQLite partial indexes and MySQL text prefixes, remain writer policy.
 - Enumeration fields require a non-empty `values` tuple, while other field
-  kinds reject `values`. `sourcePath` locates GTFS-Realtime values in decoded
-  entities. A field's `defaultValue` is applied during normalization when its
-  static or realtime source value is missing or empty, before any writer sees
-  the row.
+  kinds reject `values`. Their inferred types retain autocomplete for known
+  values while accepting other strings or numbers unless `closed` is true.
+  `sourcePath` locates GTFS-Realtime values in decoded entities. A field's
+  `defaultValue` is applied during normalization when its static or realtime
+  source value is missing or empty, before any writer sees the row.
+- The GTFS-Realtime declarations are audited against the protobuf messages
+  exposed by `gtfs-realtime-bindings@2.2.0`. Scalar and singular nested values
+  that are useful for querying are projected as columns. Repeated structures
+  such as alert translations and vehicle carriage details use JSON columns so
+  the importer retains every value instead of selecting only one occurrence.
+- The current realtime importer supports the three established entity types:
+  `TripUpdate`, `VehiclePosition`, and `Alert`. Feed headers, differential-feed
+  deletion state, and the experimental `Shape`, `Stop`, and
+  `TripModifications` entities require separate tables and lifecycle behavior;
+  they are not represented as fields on one of the established entity tables.
 - `caseInsensitiveComparison` requests case-insensitive database comparison
   where the selected writer supports it.
 - Every table has an explicit namespace, constrained by the `GtfsNamespace`

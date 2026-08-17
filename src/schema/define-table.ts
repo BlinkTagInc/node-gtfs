@@ -53,6 +53,8 @@ export type GtfsFieldDefinition =
     })
   | (GtfsFieldOptions & {
       kind: 'enumeration';
+      /** Whether values outside `values` are semantically invalid. Defaults to false. */
+      closed?: boolean;
       values: readonly [string | number, ...(string | number)[]];
     });
 
@@ -163,11 +165,23 @@ export function defineGtfsTable<
   return definition;
 }
 
+/** A standards-defined enumeration that retains known-value autocomplete. */
+export type GtfsEnumerationValue<
+  KnownValue extends string | number,
+  Closed extends boolean = false,
+> = Closed extends true
+  ? KnownValue
+  : KnownValue extends string
+    ? KnownValue | (string & Record<never, never>)
+    : KnownValue extends number
+      ? KnownValue | (number & Record<never, never>)
+      : never;
+
 type ValueForKind<Field extends GtfsFieldDefinition> = Field extends {
   kind: 'enumeration';
   values: readonly (infer Value extends string | number)[];
 }
-  ? Value
+  ? GtfsEnumerationValue<Value, Field extends { closed: true } ? true : false>
   : Field['kind'] extends 'integer' | 'real' | 'date'
     ? number
     : string;

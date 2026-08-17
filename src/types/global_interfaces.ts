@@ -1,6 +1,7 @@
 import type { Options } from 'csv-parse';
 import type { Database } from 'better-sqlite3';
 import type { GtfsScheduleTableName } from '../schema/database.ts';
+import type { GtfsEnumerationValue } from '../schema/define-table.ts';
 
 export type UnixTimestamp = number;
 
@@ -682,41 +683,157 @@ export interface ServiceAlertInformedEntity {
   route_id: string | null;
   route_type: number | null;
   trip_id: string | null;
+  trip_route_id: string | null;
+  trip_direction_id: 0 | 1 | null;
+  trip_start_time: string | null;
+  trip_start_date: string | null;
+  trip_schedule_relationship: GtfsRealtimeTripScheduleRelationship | null;
+  trip_modified_trip_modifications_id: string | null;
+  trip_modified_trip_affected_trip_id: string | null;
+  trip_modified_trip_start_time: string | null;
+  trip_modified_trip_start_date: string | null;
   direction_id: number | null;
   created_timestamp: UnixTimestamp;
   expiration_timestamp: UnixTimestamp;
 }
 
+export type GtfsRealtimeTripScheduleRelationship = GtfsEnumerationValue<
+  | 'SCHEDULED'
+  | 'ADDED'
+  | 'UNSCHEDULED'
+  | 'CANCELED'
+  | 'REPLACEMENT'
+  | 'DUPLICATED'
+  | 'DELETED'
+  | 'NEW'
+>;
+
+export type GtfsRealtimeStopTimeScheduleRelationship = GtfsEnumerationValue<
+  'SCHEDULED' | 'SKIPPED' | 'NO_DATA' | 'UNSCHEDULED'
+>;
+
+export type GtfsRealtimeOccupancyStatus = GtfsEnumerationValue<
+  | 'EMPTY'
+  | 'MANY_SEATS_AVAILABLE'
+  | 'FEW_SEATS_AVAILABLE'
+  | 'STANDING_ROOM_ONLY'
+  | 'CRUSHED_STANDING_ROOM_ONLY'
+  | 'FULL'
+  | 'NOT_ACCEPTING_PASSENGERS'
+  | 'NO_DATA_AVAILABLE'
+  | 'NOT_BOARDABLE'
+>;
+
+export type GtfsRealtimeWheelchairAccessible = GtfsEnumerationValue<
+  'NO_VALUE' | 'UNKNOWN' | 'WHEELCHAIR_ACCESSIBLE' | 'WHEELCHAIR_INACCESSIBLE'
+>;
+
+export type GtfsRealtimeDropOffPickupType = GtfsEnumerationValue<
+  'REGULAR' | 'NONE' | 'PHONE_AGENCY' | 'COORDINATE_WITH_DRIVER'
+>;
+
+export type GtfsRealtimeAlertCause = GtfsEnumerationValue<
+  | 'UNKNOWN_CAUSE'
+  | 'OTHER_CAUSE'
+  | 'TECHNICAL_PROBLEM'
+  | 'STRIKE'
+  | 'DEMONSTRATION'
+  | 'ACCIDENT'
+  | 'HOLIDAY'
+  | 'WEATHER'
+  | 'MAINTENANCE'
+  | 'CONSTRUCTION'
+  | 'POLICE_ACTIVITY'
+  | 'MEDICAL_EMERGENCY'
+  | 'SPECIAL_EVENT'
+>;
+
+export type GtfsRealtimeAlertEffect = GtfsEnumerationValue<
+  | 'NO_SERVICE'
+  | 'REDUCED_SERVICE'
+  | 'SIGNIFICANT_DELAYS'
+  | 'DETOUR'
+  | 'ADDITIONAL_SERVICE'
+  | 'MODIFIED_SERVICE'
+  | 'OTHER_EFFECT'
+  | 'UNKNOWN_EFFECT'
+  | 'STOP_MOVED'
+  | 'NO_EFFECT'
+  | 'ACCESSIBILITY_ISSUE'
+>;
+
+export type GtfsRealtimeAlertSeverity = GtfsEnumerationValue<
+  'UNKNOWN_SEVERITY' | 'INFO' | 'WARNING' | 'SEVERE'
+>;
+
+export type GtfsRealtimeVehicleStopStatus = GtfsEnumerationValue<
+  'INCOMING_AT' | 'STOPPED_AT' | 'IN_TRANSIT_TO'
+>;
+
+export type GtfsRealtimeCongestionLevel = GtfsEnumerationValue<
+  | 'UNKNOWN_CONGESTION_LEVEL'
+  | 'RUNNING_SMOOTHLY'
+  | 'STOP_AND_GO'
+  | 'CONGESTION'
+  | 'SEVERE_CONGESTION'
+>;
+
 export interface ServiceAlert {
   id: string;
   active_period: string | null;
-  cause: string | null;
-  effect: string | null;
+  communication_period: string | null;
+  impact_period: string | null;
+  cause: GtfsRealtimeAlertCause | null;
+  effect: GtfsRealtimeAlertEffect | null;
   url: string | null;
-  start_time: string | null;
-  end_time: string | null;
+  url_translations: string | null;
+  start_time: UnixTimestamp | null;
+  end_time: UnixTimestamp | null;
   header_text: string;
+  header_text_translations: string | null;
   description_text: string;
+  description_text_translations: string | null;
   tts_header_text: string | null;
+  tts_header_text_translations: string | null;
   tts_description_text: string | null;
-  severity_level: string | null;
+  tts_description_text_translations: string | null;
+  severity_level: GtfsRealtimeAlertSeverity | null;
+  image: string | null;
+  image_alternative_text: string | null;
+  image_alternative_text_translations: string | null;
+  cause_detail: string | null;
+  cause_detail_translations: string | null;
+  effect_detail: string | null;
+  effect_detail_translations: string | null;
   created_timestamp: UnixTimestamp;
   expiration_timestamp: UnixTimestamp;
   informed_entities: ServiceAlertInformedEntity[];
 }
 
 export interface StopTimeUpdate {
+  trip_update_id: string;
   trip_id: string | null;
   trip_start_time: string | null;
+  trip_start_date: string | null;
   direction_id: 0 | 1 | null;
   route_id: string | null;
+  trip_schedule_relationship: GtfsRealtimeTripScheduleRelationship | null;
   stop_id: string | null;
   stop_sequence: number | null;
   arrival_delay: number | null;
+  arrival_timestamp: UnixTimestamp | null;
+  arrival_uncertainty: number | null;
+  arrival_scheduled_timestamp: UnixTimestamp | null;
   departure_delay: number | null;
   departure_timestamp: UnixTimestamp | null;
-  arrival_timestamp: UnixTimestamp | null;
-  schedule_relationship: string | null;
+  departure_uncertainty: number | null;
+  departure_scheduled_timestamp: UnixTimestamp | null;
+  departure_occupancy_status: GtfsRealtimeOccupancyStatus | null;
+  schedule_relationship: GtfsRealtimeStopTimeScheduleRelationship | null;
+  assigned_stop_id: string | null;
+  stop_headsign: string | null;
+  pickup_type: GtfsRealtimeDropOffPickupType | null;
+  drop_off_type: GtfsRealtimeDropOffPickupType | null;
   created_timestamp: UnixTimestamp;
   expiration_timestamp: UnixTimestamp;
 }
@@ -724,35 +841,59 @@ export interface StopTimeUpdate {
 export interface TripUpdate {
   id: string;
   vehicle_id: string | null;
+  vehicle_label: string | null;
+  vehicle_license_plate: string | null;
+  vehicle_wheelchair_accessible: GtfsRealtimeWheelchairAccessible | null;
   trip_id: string | null;
   trip_start_time: string | null;
   direction_id: 0 | 1 | null;
   route_id: string | null;
-  start_date: number | null;
+  start_date: string | null;
   timestamp: UnixTimestamp | null;
-  schedule_relationship: string | null;
+  schedule_relationship: GtfsRealtimeTripScheduleRelationship | null;
+  modified_trip_modifications_id: string | null;
+  modified_trip_affected_trip_id: string | null;
+  modified_trip_start_time: string | null;
+  modified_trip_start_date: string | null;
+  delay: number | null;
+  trip_properties_trip_id: string | null;
+  trip_properties_start_date: string | null;
+  trip_properties_start_time: string | null;
+  trip_properties_shape_id: string | null;
+  trip_properties_trip_headsign: string | null;
+  trip_properties_trip_short_name: string | null;
   created_timestamp: UnixTimestamp;
   expiration_timestamp: UnixTimestamp;
 }
 
 export interface VehiclePosition {
   id: string;
+  trip_id: string | null;
+  route_id: string | null;
+  direction_id: 0 | 1 | null;
+  trip_start_time: string | null;
+  trip_start_date: string | null;
+  schedule_relationship: GtfsRealtimeTripScheduleRelationship | null;
+  modified_trip_modifications_id: string | null;
+  modified_trip_affected_trip_id: string | null;
+  modified_trip_start_time: string | null;
+  modified_trip_start_date: string | null;
+  vehicle_id: string | null;
+  vehicle_label: string | null;
+  vehicle_license_plate: string | null;
+  vehicle_wheelchair_accessible: GtfsRealtimeWheelchairAccessible | null;
   bearing: number | null;
   latitude: number | null;
   longitude: number | null;
   speed: number | null;
+  odometer: number | null;
   current_stop_sequence: number | null;
-  trip_id: string | null;
-  trip_start_date: number | null;
-  trip_start_time: string | null;
-  congestion_level: string | null;
-  occupancy_status: string | null;
+  stop_id: string | null;
+  current_status: GtfsRealtimeVehicleStopStatus | null;
+  congestion_level: GtfsRealtimeCongestionLevel | null;
+  occupancy_status: GtfsRealtimeOccupancyStatus | null;
   occupancy_percentage: number | null;
-  vehicle_stop_status: string | null;
-  vehicle_id: string | null;
-  vehicle_label: string | null;
-  vehicle_license_plate: string | null;
-  vehicle_wheelchair_accessible: number | null;
+  multi_carriage_details: string | null;
   timestamp: UnixTimestamp | null;
   created_timestamp: UnixTimestamp;
   expiration_timestamp: UnixTimestamp;
