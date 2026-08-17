@@ -1,9 +1,9 @@
+import type { LocationGroupStop } from '../../schema/row-types.ts';
 import type {
-  LocationGroupStop,
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { locationGroupStops } from '../../schema/tables/gtfs-schedule/location-group-stops.ts';
 import { findRows } from '../find-rows.ts';
 
@@ -11,10 +11,10 @@ import { findRows } from '../find-rows.ts';
  * Returns an array of all location group stops that match the query parameters.
  */
 export function getLocationGroupStops<Fields extends keyof LocationGroupStop>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<LocationGroupStop> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<LocationGroupStop> = [],
+  options: SqliteQueryOptions = {},
 ) {
   return findRows<LocationGroupStop, Fields>(
     locationGroupStops,

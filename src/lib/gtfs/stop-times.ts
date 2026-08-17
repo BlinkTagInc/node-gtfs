@@ -1,12 +1,12 @@
 import { omit } from 'lodash-es';
+import type { StopTime } from '../../schema/row-types.ts';
 import type {
-  QueryOptions,
-  SqlOrderBy,
-  QueryResult,
-  SqlWhere,
-  StopTime,
-  SqlValue,
-} from '../../types/global_interfaces.ts';
+  QueryScalar,
+  RowOrderBy,
+  RowQuery,
+  SelectedRow,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { openDb } from '../db.ts';
 import {
   calculateSecondsFromMidnight,
@@ -21,10 +21,12 @@ import { getServiceIdsByDate } from './calendars.ts';
  * Returns an array of stoptimes that match the query parameters.
  */
 export function getStoptimes<Fields extends keyof StopTime>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<
+    StopTime & { date: number; start_time: string; end_time: string }
+  > = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<StopTime> = [],
+  options: SqliteQueryOptions = {},
 ) {
   const db = options.db ?? openDb();
   const tableName = 'stop_times';
@@ -36,7 +38,7 @@ export function getStoptimes<Fields extends keyof StopTime>(
 
   const stoptimeQuery = omit(query, stoptimeQueryOmitKeys);
   const whereClauses = Object.entries(stoptimeQuery).map(([key, value]) =>
-    formatWhereClause(key, value as SqlValue),
+    formatWhereClause(key, value as QueryScalar),
   );
 
   if (query.date) {
@@ -96,7 +98,7 @@ export function getStoptimes<Fields extends keyof StopTime>(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all(...whereClauses.flatMap(({ params }) => params)) as QueryResult<
+    .all(...whereClauses.flatMap(({ params }) => params)) as SelectedRow<
     StopTime,
     Fields
   >[];

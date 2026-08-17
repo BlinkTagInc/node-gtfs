@@ -9,7 +9,7 @@ import {
 import { getConfig } from '../lib/file-utils.ts';
 import { handleFatalError } from '../reporting/fatal.ts';
 import { closeDb, importGtfs, openDb } from '../index.ts';
-import type { Config } from '../types/global_interfaces.ts';
+import type { GtfsSqliteImportConfig } from '../types/config.ts';
 
 const setupImport = async () => {
   const values = parseFlags(
@@ -34,8 +34,8 @@ const setupImport = async () => {
     ],
   );
 
-  const config = await getConfig(values);
-  await importGtfs(config as Config);
+  const config = await getConfig<GtfsSqliteImportConfig>(values);
+  await importGtfs(config);
 
   const db = openDb(config);
   if (db.name !== ':memory:') {

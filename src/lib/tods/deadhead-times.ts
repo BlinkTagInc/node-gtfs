@@ -1,17 +1,17 @@
+import type { DeadheadTime } from '../../schema/row-types.ts';
 import type {
-  DeadheadTime,
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { deadheadTimes } from '../../schema/tables/tods/deadhead-times.ts';
 import { findRows } from '../find-rows.ts';
 
 export function getDeadheadTimes<Fields extends keyof DeadheadTime>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<DeadheadTime> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<DeadheadTime> = [],
+  options: SqliteQueryOptions = {},
 ) {
   return findRows<DeadheadTime, Fields>(
     deadheadTimes,

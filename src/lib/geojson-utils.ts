@@ -8,7 +8,7 @@ import {
   omitBy,
 } from 'lodash-es';
 import { feature, featureCollection } from '@turf/helpers';
-import { Shape, Stop } from '../types/global_interfaces.ts';
+import type { Shape, Stop } from '../schema/row-types.ts';
 
 /** Represents a GeoJSON coordinate pair [longitude, latitude] */
 type Position = [number, number];

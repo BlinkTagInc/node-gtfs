@@ -2,14 +2,15 @@ import { compact, omit, pick } from 'lodash-es';
 import { FeatureCollection } from 'geojson';
 import { featureCollection } from '@turf/helpers';
 
+import type { Shape } from '../../schema/row-types.ts';
 import type {
-  QueryOptions,
-  Shape,
-  SqlClause,
-  SqlOrderBy,
-  QueryResult,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  DynamicQuery,
+  RowOrderBy,
+  RowQuery,
+  SelectedRow,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
+import type { SqlClause } from '../sql-types.ts';
 import { openDb } from '../db.ts';
 import {
   formatOrderByClause,
@@ -25,7 +26,9 @@ import { getRouteAttributes } from '../gtfs-plus/route-attributes.ts';
 function buildTripSubquery(query: {
   [key: string]: string | number;
 }): SqlClause {
-  const { clause: whereClause, params } = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(
+    query as DynamicQuery,
+  );
   return {
     clause: `SELECT DISTINCT shape_id FROM trips ${whereClause}`,
     params,
@@ -39,10 +42,17 @@ function buildTripSubquery(query: {
  * query parameter may be passed to find all shapes for a direction.
  */
 export function getShapes<Fields extends keyof Shape>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<
+    Shape & {
+      route_id: string | null;
+      trip_id: string | null;
+      service_id: string | null;
+      direction_id: number | null;
+    }
+  > = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<Shape> = [],
+  options: SqliteQueryOptions = {},
 ) {
   const db = options.db ?? openDb();
   const tableName = 'shapes';
@@ -88,7 +98,7 @@ export function getShapes<Fields extends keyof Shape>(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all(...whereClauses.flatMap(({ params }) => params)) as QueryResult<
+    .all(...whereClauses.flatMap(({ params }) => params)) as SelectedRow<
     Shape,
     Fields
   >[];
@@ -101,8 +111,15 @@ export function getShapes<Fields extends keyof Shape>(
  * `direction_id` query parameter may be passed to find all shapes for a direction.
  */
 export function getShapesAsGeoJSON(
-  query: SqlWhere = {},
-  options: QueryOptions = {},
+  query: RowQuery<
+    Shape & {
+      route_id: string | null;
+      trip_id: string | null;
+      service_id: string | null;
+      direction_id: number | null;
+    }
+  > = {},
+  options: SqliteQueryOptions = {},
 ): FeatureCollection {
   const agencies = getAgencies({}, [], [], options);
   const routeQuery = pick(query, ['route_id']);

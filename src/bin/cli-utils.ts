@@ -3,7 +3,7 @@ import { parseArgs } from 'node:util';
 import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from '../lib/errors.ts';
 import { version } from '../version.ts';
 
-import type { LogLevel } from '../types/global_interfaces.ts';
+import type { LogLevel } from '../reporting/types.ts';
 
 const LOG_LEVELS = ['silent', 'error', 'warning', 'info'] as const;
 

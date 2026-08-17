@@ -12,10 +12,11 @@ import {
   escapeIdentifier,
   formatCurrency,
   mapSeries,
-  setDefaultConfig,
+  applyConfigDefaults,
 } from './utils.ts';
 
-import { Config, SqlValue } from '../types/global_interfaces.ts';
+import type { GtfsExportConfig } from '../types/config.ts';
+import type { DatabaseResultValue } from '../types/query.ts';
 import { log, report, status } from '../reporting/report.ts';
 import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from './errors.ts';
 import {
@@ -25,7 +26,7 @@ import {
   pluralize,
 } from '../reporting/format.ts';
 
-const getAgencies = (db: Database.Database, config: Config) => {
+const getAgencies = (db: Database.Database, config: GtfsExportConfig) => {
   try {
     return db.prepare('SELECT agency_name FROM agency;').all() as {
       agency_name: string;
@@ -51,8 +52,10 @@ const getAgencies = (db: Database.Database, config: Config) => {
   }
 };
 
-export const exportGtfs = async (initialConfig: Config) => {
-  const config = setDefaultConfig(initialConfig);
+export const exportGtfs = async (initialConfig: GtfsExportConfig) => {
+  const config = applyConfigDefaults(initialConfig, {
+    sqlitePath: ':memory:',
+  });
   const db = openDb(config);
   const startTime = process.hrtime.bigint();
 
@@ -100,7 +103,7 @@ export const exportGtfs = async (initialConfig: Config) => {
     const filePath = path.join(exportPath, table.file);
     const tableName = escapeIdentifier(table.name);
     const lines = db.prepare(`SELECT * FROM ${tableName};`).all() as Array<
-      Record<string, SqlValue>
+      Record<string, DatabaseResultValue>
     >;
 
     if (!lines || lines.length === 0) {

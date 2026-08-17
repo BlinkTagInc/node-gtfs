@@ -1,9 +1,9 @@
+import type { Agency } from '../../schema/row-types.ts';
 import type {
-  Agency,
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { agency } from '../../schema/tables/gtfs-schedule/agency.ts';
 import { findRows } from '../find-rows.ts';
 
@@ -11,10 +11,10 @@ import { findRows } from '../find-rows.ts';
  * Returns an array of all agencies that match the query parameters.
  */
 export function getAgencies<Fields extends keyof Agency>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<Agency> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<Agency> = [],
+  options: SqliteQueryOptions = {},
 ) {
   return findRows<Agency, Fields>(agency, query, fields, orderBy, options);
 }

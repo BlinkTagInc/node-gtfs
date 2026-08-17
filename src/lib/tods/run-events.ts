@@ -1,10 +1,11 @@
+import type { RunEvent } from '../../schema/row-types.ts';
 import type {
-  QueryOptions,
-  SqlOrderBy,
-  QueryResult,
-  SqlWhere,
-  RunEvent,
-} from '../../types/global_interfaces.ts';
+  DynamicQuery,
+  RowOrderBy,
+  RowQuery,
+  SelectedRow,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { openDb } from '../db.ts';
 import {
   formatOrderByClause,
@@ -16,20 +17,22 @@ import {
  * Returns an array of all run_events that match the query parameters.
  */
 export function getRunEvents<Fields extends keyof RunEvent>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<RunEvent> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<RunEvent> = [],
+  options: SqliteQueryOptions = {},
 ) {
   const db = options.db ?? openDb();
   const tableName = 'run_events';
   const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(
+    query as DynamicQuery,
+  );
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all(...params) as QueryResult<RunEvent, Fields>[];
+    .all(...params) as SelectedRow<RunEvent, Fields>[];
 }

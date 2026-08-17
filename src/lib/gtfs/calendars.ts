@@ -1,9 +1,9 @@
+import type { Calendar } from '../../schema/row-types.ts';
 import type {
-  Calendar,
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { calendar } from '../../schema/tables/gtfs-schedule/calendar.ts';
 import { openDb } from '../db.ts';
 import { findRows } from '../find-rows.ts';
@@ -14,10 +14,10 @@ import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from '../errors.ts';
  * Returns an array of calendars that match the query parameters.
  */
 export function getCalendars<Fields extends keyof Calendar>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<Calendar> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<Calendar> = [],
+  options: SqliteQueryOptions = {},
 ) {
   return findRows<Calendar, Fields>(calendar, query, fields, orderBy, options);
 }
@@ -25,7 +25,10 @@ export function getCalendars<Fields extends keyof Calendar>(
 /*
  * Returns an array of service_ids that are active on the given date.
  */
-export function getServiceIdsByDate(date: number, options: QueryOptions = {}) {
+export function getServiceIdsByDate(
+  date: number,
+  options: SqliteQueryOptions = {},
+) {
   const db = options.db ?? openDb();
 
   if (!date) {

@@ -1,19 +1,19 @@
+import type { TimetableNotesReference } from '../../schema/row-types.ts';
 import type {
-  TimetableNotesReference,
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { timetableNotesReferences } from '../../schema/tables/gtfs-to-html/timetable-notes-references.ts';
 import { findRows } from '../find-rows.ts';
 
 export function getTimetableNotesReferences<
   Fields extends keyof TimetableNotesReference,
 >(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<TimetableNotesReference> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<TimetableNotesReference> = [],
+  options: SqliteQueryOptions = {},
 ) {
   return findRows<TimetableNotesReference, Fields>(
     timetableNotesReferences,

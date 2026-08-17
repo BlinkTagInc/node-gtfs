@@ -1,6 +1,5 @@
 import Database from 'better-sqlite3';
 
-import type { SqlValue } from '../types/global_interfaces.ts';
 import type { NormalizedGtfsRow } from './gtfs-record-parser.ts';
 import type { GtfsFileWriter, GtfsFileWriterOptions } from './gtfs-writer.ts';
 import { log } from '../reporting/report.ts';
@@ -38,7 +37,7 @@ export function createSqliteGtfsWriter(
         const row = rows[rowNumber];
         try {
           if (options.prefix === undefined) {
-            insert.run(row as SqlValue[]);
+            insert.run(row);
           } else {
             const prefixedRow = new Array(row.length);
             for (let index = 0; index < row.length; index++) {

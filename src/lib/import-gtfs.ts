@@ -32,7 +32,7 @@ import {
   pluralize,
 } from '../reporting/format.ts';
 import { validateConfig } from './validate-config.ts';
-import { escapeIdentifier, mapSeries, setDefaultConfig } from './utils.ts';
+import { applyConfigDefaults, escapeIdentifier, mapSeries } from './utils.ts';
 import {
   addImportError,
   createImportReport,
@@ -46,26 +46,28 @@ import {
 } from './errors.ts';
 
 import {
-  Config,
-  ConfigAgency,
-  TableNames,
-} from '../types/global_interfaces.ts';
+  type GtfsFeedConfig,
+  type GtfsImportConfig,
+  type GtfsSqliteImportConfig,
+} from '../types/config.ts';
+import type { ReportingOptions } from '../reporting/types.ts';
+import type { GtfsFileBackedTableName } from '../schema/database.ts';
 
 interface GtfsImportTask {
-  exclude?: TableNames[];
+  exclude?: readonly GtfsFileBackedTableName[];
   url?: string;
-  headers?: Record<string, string>;
+  headers?: Readonly<Record<string, string>>;
   realtimeAlerts?: {
     url: string;
-    headers?: Record<string, string>;
+    headers?: Readonly<Record<string, string>>;
   };
   realtimeTripUpdates?: {
     url: string;
-    headers?: Record<string, string>;
+    headers?: Readonly<Record<string, string>>;
   };
   realtimeVehiclePositions?: {
     url: string;
-    headers?: Record<string, string>;
+    headers?: Readonly<Record<string, string>>;
   };
   downloadDir: string;
   downloadTimeout?: number;
@@ -74,12 +76,11 @@ interface GtfsImportTask {
   csvOptions: object;
   ignoreDuplicates: boolean;
   ignoreErrors: boolean;
-  sqlitePath: string;
   prefix?: string;
   fillEmptyAgencyId: boolean;
   agencyId?: string;
   currentTimestamp: number;
-  config: Config;
+  config: ReportingOptions;
   filesImported?: number;
   rowsImported?: number;
   report?: ImportReport;
@@ -93,6 +94,17 @@ interface StaticImportTarget {
   finalize(): void | Promise<void>;
   updateRealtime(task: GtfsImportTask): void | Promise<void>;
 }
+
+const STATIC_IMPORT_DEFAULTS = {
+  ignoreDuplicates: false,
+  ignoreErrors: false,
+  gtfsRealtimeExpirationSeconds: 0,
+  downloadTimeout: 30000,
+} as const;
+
+type ResolvedImportConfig<Config extends GtfsImportConfig> = ReturnType<
+  typeof applyConfigDefaults<Config, typeof STATIC_IMPORT_DEFAULTS>
+>;
 
 function reportTaskError(task: GtfsImportTask, error: GtfsError): void {
   if (task.report) {
@@ -271,7 +283,7 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
 const getSingleAgencyId = (
   downloadDir: string,
   csvOptions: object,
-  config: Config,
+  config: ReportingOptions,
 ): Promise<string | undefined> =>
   new Promise((resolve) => {
     const filepath = path.join(downloadDir, 'agency.txt');
@@ -483,7 +495,7 @@ const createGtfsIndexes = (db: Database.Database): void => {
 
 function createSqliteImportTarget(
   db: Database.Database,
-  config: Config,
+  config: GtfsSqliteImportConfig,
 ): StaticImportTarget {
   const sqlitePath = config.sqlitePath ?? ':memory:';
 
@@ -500,7 +512,10 @@ function createSqliteImportTarget(
       createGtfsIndexes(db);
     },
     async updateRealtime(task) {
-      await updateGtfsRealtimeData(task);
+      await updateGtfsRealtimeData({
+        ...task,
+        sqlitePath: config.sqlitePath ?? ':memory:',
+      });
     },
   };
 }
@@ -684,9 +699,9 @@ const importGtfsFiles = async (
   }
 };
 
-async function runStaticImport(
+async function runStaticImport<Config extends GtfsImportConfig>(
   initialConfig: Config,
-  targetFactory: (config: Config) => StaticImportTarget,
+  targetFactory: (config: ResolvedImportConfig<Config>) => StaticImportTarget,
   sqliteTarget: boolean,
 ): Promise<void | ImportReport> {
   // Start timer
@@ -696,7 +711,11 @@ async function runStaticImport(
     log(initialConfig, 'warning', message),
   );
 
-  const config = setDefaultConfig(initialConfig);
+  const config = applyConfigDefaults(initialConfig, STATIC_IMPORT_DEFAULTS);
+  const sqlitePath =
+    'sqlitePath' in config && typeof config.sqlitePath === 'string'
+      ? config.sqlitePath
+      : ':memory:';
   const importReport = config.includeImportReport
     ? createImportReport()
     : undefined;
@@ -718,7 +737,7 @@ async function runStaticImport(
 
     await target.initialize();
 
-    await mapSeries(config.agencies, async (agency: ConfigAgency) => {
+    await mapSeries(config.agencies, async (agency: GtfsFeedConfig) => {
       const tempPath = temporaryDirectory();
       try {
         const task: GtfsImportTask = {
@@ -733,7 +752,6 @@ async function runStaticImport(
           csvOptions: config.csvOptions || {},
           ignoreDuplicates: config.ignoreDuplicates,
           ignoreErrors: config.ignoreErrors,
-          sqlitePath: config.sqlitePath,
           prefix: agency.prefix,
           fillEmptyAgencyId: agency.fillEmptyAgencyId ?? false,
           agencyId: agency.agencyId,
@@ -827,12 +845,12 @@ async function runStaticImport(
       (error as Error & { code?: string }).code === 'SQLITE_CANTOPEN'
     ) {
       const dbOpenError = new GtfsError(
-        `Unable to open sqlite database "${config.sqlitePath}" defined as \`sqlitePath\` config.json. Ensure the parent directory exists or remove \`sqlitePath\` from config.json.`,
+        `Unable to open sqlite database "${sqlitePath}" defined as \`sqlitePath\` config.json. Ensure the parent directory exists or remove \`sqlitePath\` from config.json.`,
         {
           code: GtfsErrorCode.DB_OPEN_FAILED,
           category: GtfsErrorCategory.DATABASE,
           details: {
-            sqlitePath: config.sqlitePath,
+            sqlitePath,
             dbCode: (error as Error & { code?: string }).code,
           },
           cause: error,
@@ -850,7 +868,7 @@ async function runStaticImport(
         ? GtfsErrorCategory.PARSE
         : GtfsErrorCategory.DATABASE,
       details: targetForError?.errorDetails ?? {
-        sqlitePath: config.sqlitePath,
+        sqlitePath,
       },
     });
   }
@@ -861,10 +879,19 @@ async function runStaticImport(
 }
 
 /** Imports GTFS into SQLite. */
-export async function importGtfs(initialConfig: Config): Promise<ImportReport>;
-export async function importGtfs(initialConfig: Config): Promise<void>;
 export async function importGtfs(
-  initialConfig: Config,
+  initialConfig: GtfsSqliteImportConfig & { includeImportReport: true },
+): Promise<ImportReport>;
+export async function importGtfs(
+  initialConfig: GtfsSqliteImportConfig & {
+    includeImportReport?: false | undefined;
+  },
+): Promise<void>;
+export async function importGtfs(
+  initialConfig: GtfsSqliteImportConfig,
+): Promise<void | ImportReport>;
+export async function importGtfs(
+  initialConfig: GtfsSqliteImportConfig,
 ): Promise<void | ImportReport> {
   return runStaticImport(
     initialConfig,
@@ -875,7 +902,21 @@ export async function importGtfs(
 
 /** Imports static GTFS through a caller-owned Kysely instance. */
 export async function importGtfsToKysely<DB>(
-  initialConfig: Config,
+  initialConfig: GtfsImportConfig & { includeImportReport: true },
+  databaseOptions: KyselyImportOptions<DB>,
+): Promise<ImportReport>;
+export async function importGtfsToKysely<DB>(
+  initialConfig: GtfsImportConfig & {
+    includeImportReport?: false | undefined;
+  },
+  databaseOptions: KyselyImportOptions<DB>,
+): Promise<void>;
+export async function importGtfsToKysely<DB>(
+  initialConfig: GtfsImportConfig,
+  databaseOptions: KyselyImportOptions<DB>,
+): Promise<void | ImportReport>;
+export async function importGtfsToKysely<DB>(
+  initialConfig: GtfsImportConfig,
   databaseOptions: KyselyImportOptions<DB>,
 ): Promise<void | ImportReport> {
   return runStaticImport(

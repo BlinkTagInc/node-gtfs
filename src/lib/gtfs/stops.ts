@@ -1,16 +1,16 @@
 import { omit, orderBy, pick } from 'lodash-es';
 import { FeatureCollection } from 'geojson';
 
+import type { Stop } from '../../schema/row-types.ts';
 import type {
-  QueryOptions,
-  SqlBindValue,
-  SqlClause,
-  SqlOrderBy,
-  QueryResult,
-  SqlWhere,
-  Stop,
-  SqlValue,
-} from '../../types/global_interfaces.ts';
+  DynamicQuery,
+  QueryScalar,
+  RowOrderBy,
+  RowQuery,
+  SelectedRow,
+  StopQueryOptions,
+} from '../../types/query.ts';
+import type { SqlClause, SqliteBindValue } from '../sql-types.ts';
 import { openDb } from '../db.ts';
 import {
   formatOrderByClause,
@@ -23,12 +23,22 @@ import { stopsToGeoJSONFeatureCollection } from '../geojson-utils.ts';
 import { getAgencies } from './agencies.ts';
 import { getStopAttributes } from '../gtfs-plus/stop-attributes.ts';
 
-function buildTripSubquery(query: { [key: string]: SqlValue }): SqlClause {
+type StopQuery = RowQuery<
+  Stop & {
+    route_id: string | null;
+    trip_id: string | null;
+    service_id: string | null;
+    direction_id: number | null;
+    shape_id: string | null;
+  }
+>;
+
+function buildTripSubquery(query: DynamicQuery): SqlClause {
   const { clause: whereClause, params } = formatWhereClauses(query);
   return { clause: `SELECT trip_id FROM trips ${whereClause}`, params };
 }
 
-function buildStoptimeSubquery(query: { [key: string]: SqlValue }): SqlClause {
+function buildStoptimeSubquery(query: DynamicQuery): SqlClause {
   const tripSubquery = buildTripSubquery(query);
   return {
     clause: `SELECT DISTINCT stop_id FROM stop_times WHERE trip_id IN (${tripSubquery.clause})`,
@@ -44,10 +54,10 @@ function buildStoptimeSubquery(query: { [key: string]: SqlValue }): SqlClause {
  * direction.
  */
 export function getStops<Fields extends keyof Stop>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: StopQuery = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<Stop> = [],
+  options: StopQueryOptions = {},
 ) {
   const db = options.db ?? openDb();
   const tableName = 'stops';
@@ -85,12 +95,12 @@ export function getStops<Fields extends keyof Stop>(
   };
 
   const whereClauses = Object.entries(stopQuery).map(([key, value]) =>
-    formatWhereClause(key, value as SqlValue),
+    formatWhereClause(key, value as QueryScalar),
   );
 
   // Parameters for the ORDER BY clause bind after the WHERE parameters, since
   // ORDER BY comes later in the statement.
-  const orderByParams: SqlBindValue[] = [];
+  const orderByParams: SqliteBindValue[] = [];
 
   if (
     options.bounding_box_side_m !== undefined &&
@@ -116,7 +126,7 @@ export function getStops<Fields extends keyof Stop>(
   }
 
   if (Object.values(tripQuery).length > 0) {
-    const stoptimeSubquery = buildStoptimeSubquery(tripQuery);
+    const stoptimeSubquery = buildStoptimeSubquery(tripQuery as DynamicQuery);
     whereClauses.push({
       clause: `stop_id IN (${stoptimeSubquery.clause})`,
       params: stoptimeSubquery.params,
@@ -134,7 +144,7 @@ export function getStops<Fields extends keyof Stop>(
     .all(
       ...whereClauses.flatMap(({ params }) => params),
       ...orderByParams,
-    ) as QueryResult<Stop, Fields>[];
+    ) as SelectedRow<Stop, Fields>[];
 }
 
 /*
@@ -144,8 +154,8 @@ export function getStops<Fields extends keyof Stop>(
  * to find all shapes for a direction.
  */
 export function getStopsAsGeoJSON(
-  query: SqlWhere = {},
-  options: QueryOptions = {},
+  query: StopQuery = {},
+  options: StopQueryOptions = {},
 ): FeatureCollection {
   const db = options.db ?? openDb();
   const stops = getStops(query, [], [], options);

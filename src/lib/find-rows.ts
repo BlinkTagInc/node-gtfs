@@ -1,9 +1,10 @@
 import type {
-  QueryOptions,
-  QueryResult,
-  SqlOrderBy,
-  SqlWhere,
-} from '../types/global_interfaces.ts';
+  DynamicQuery,
+  RowOrderBy,
+  RowQuery,
+  SelectedRow,
+  SqliteQueryOptions,
+} from '../types/query.ts';
 import type { GtfsTableDefinition } from '../schema/define-table.ts';
 import { getTableName } from '../schema/compile-table.ts';
 import { openDb } from './db.ts';
@@ -19,20 +20,22 @@ export function findRows<
   Fields extends Extract<keyof Row, string>,
 >(
   definition: GtfsTableDefinition,
-  query: SqlWhere,
-  fields: Fields[],
-  orderBy: SqlOrderBy,
-  options: QueryOptions,
-): QueryResult<Row, Fields>[] {
+  query: RowQuery<Row>,
+  fields: readonly Fields[],
+  orderBy: RowOrderBy<Row>,
+  options: SqliteQueryOptions,
+): SelectedRow<Row, Fields>[] {
   const db = options.db ?? openDb();
   const tableName = escapeIdentifier(getTableName(definition));
   const selectClause = formatSelectClause(fields);
-  const { clause: whereClause, params } = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(
+    query as DynamicQuery,
+  );
   const orderByClause = formatOrderByClause(orderBy);
 
   return db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all(...params) as QueryResult<Row, Fields>[];
+    .all(...params) as SelectedRow<Row, Fields>[];
 }

@@ -105,4 +105,4 @@ export { getOpsLocations } from './lib/tods/ops-locations.ts';
 export { getRunEvents } from './lib/tods/run-events.ts';
 export { getRunsPieces } from './lib/tods/runs-pieces.ts';
 
-export * from './types/global_interfaces.ts';
+export type * from './types/index.ts';

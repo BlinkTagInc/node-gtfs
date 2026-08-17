@@ -1,17 +1,17 @@
+import type { Deadhead } from '../../schema/row-types.ts';
 import type {
-  Deadhead,
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { deadheads } from '../../schema/tables/tods/deadheads.ts';
 import { findRows } from '../find-rows.ts';
 
 export function getDeadheads<Fields extends keyof Deadhead>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<Deadhead> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<Deadhead> = [],
+  options: SqliteQueryOptions = {},
 ) {
   return findRows<Deadhead, Fields>(deadheads, query, fields, orderBy, options);
 }

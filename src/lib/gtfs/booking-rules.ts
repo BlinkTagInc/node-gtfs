@@ -1,9 +1,9 @@
+import type { BookingRule } from '../../schema/row-types.ts';
 import type {
-  BookingRule,
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { bookingRules } from '../../schema/tables/gtfs-schedule/booking-rules.ts';
 import { findRows } from '../find-rows.ts';
 
@@ -11,10 +11,10 @@ import { findRows } from '../find-rows.ts';
  * Returns an array of all booking rules that match the query parameters.
  */
 export function getBookingRules<Fields extends keyof BookingRule>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<BookingRule> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<BookingRule> = [],
+  options: SqliteQueryOptions = {},
 ) {
   return findRows<BookingRule, Fields>(
     bookingRules,

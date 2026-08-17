@@ -1,9 +1,9 @@
+import type { CalendarAttribute } from '../../schema/row-types.ts';
 import type {
-  CalendarAttribute,
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { calendarAttributes } from '../../schema/tables/gtfs-plus/calendar-attributes.ts';
 import { findRows } from '../find-rows.ts';
 
@@ -11,10 +11,10 @@ import { findRows } from '../find-rows.ts';
  * Returns an array of all calendar_attributes that match the query parameters.
  */
 export function getCalendarAttributes<Fields extends keyof CalendarAttribute>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<CalendarAttribute> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<CalendarAttribute> = [],
+  options: SqliteQueryOptions = {},
 ) {
   return findRows<CalendarAttribute, Fields>(
     calendarAttributes,

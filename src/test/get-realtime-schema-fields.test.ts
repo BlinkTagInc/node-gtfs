@@ -4,7 +4,7 @@ import config from './test-config.ts';
 import { afterAll, beforeAll, describe, expect, it } from './test-utils.ts';
 import {
   closeDb,
-  type Config,
+  type GtfsRealtimeConfig,
   getServiceAlerts,
   getStopTimeUpdates,
   getTripUpdates,
@@ -209,7 +209,7 @@ const alertFeed = encodeFeed({
 });
 
 describe('GTFS-Realtime schema field storage', () => {
-  let realtimeConfig: Config;
+  let realtimeConfig: GtfsRealtimeConfig;
   let originalFetch: typeof fetch;
 
   beforeAll(async () => {
@@ -228,12 +228,10 @@ describe('GTFS-Realtime schema field storage', () => {
     }) as typeof fetch;
 
     realtimeConfig = {
-      ...config,
       gtfsRealtimeExpirationSeconds: 3600,
       sqlitePath: ':memory:',
       agencies: [
         {
-          ...config.agencies[0],
           realtimeAlerts: { url: 'https://example.test/alerts' },
           realtimeTripUpdates: {
             url: 'https://example.test/trip-updates',

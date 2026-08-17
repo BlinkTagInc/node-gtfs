@@ -4,7 +4,7 @@ import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 
 import config from './test-config.ts';
 import {
-  type Config,
+  type GtfsRealtimeConfig,
   openDb,
   closeDb,
   importGtfs,
@@ -118,7 +118,7 @@ const POLL_2_STOPS = [
 
 describe('getStopTimeUpdates():', () => {
   let server: Server;
-  let realtimeConfig: Config;
+  let realtimeConfig: GtfsRealtimeConfig;
   let feedBuffer: Buffer;
 
   beforeAll(async () => {
@@ -139,12 +139,10 @@ describe('getStopTimeUpdates():', () => {
     // between polls — this forces the no-duplicates behavior to rely on the
     // per-trip delete rather than on expiration cleanup.
     realtimeConfig = {
-      ...config,
       gtfsRealtimeExpirationSeconds: 3600,
       sqlitePath: ':memory:',
       agencies: [
         {
-          ...config.agencies[0],
           realtimeTripUpdates: {
             url: `http://127.0.0.1:${port}/trip-updates`,
           },

@@ -4,7 +4,7 @@ import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 
 import config from './test-config.ts';
 import {
-  type Config,
+  type GtfsRealtimeConfig,
   openDb,
   closeDb,
   importGtfs,
@@ -57,7 +57,7 @@ function buildAlertFeedBuffer(): Buffer {
 
 describe('getServiceAlerts():', () => {
   let server: Server;
-  let realtimeConfig: Config;
+  let realtimeConfig: GtfsRealtimeConfig;
 
   beforeAll(async () => {
     const feedBuffer = buildAlertFeedBuffer();
@@ -74,7 +74,6 @@ describe('getServiceAlerts():', () => {
     const { port } = server.address() as { port: number };
 
     realtimeConfig = {
-      ...config,
       // Use a long expiration so rows are not removed by the expiry sweep
       // between polls — this forces the no-duplicates behavior to rely on the
       // per-alert delete rather than on expiration cleanup.
@@ -82,7 +81,6 @@ describe('getServiceAlerts():', () => {
       sqlitePath: ':memory:',
       agencies: [
         {
-          ...config.agencies[0],
           realtimeAlerts: {
             url: `http://127.0.0.1:${port}/alerts`,
           },
@@ -92,7 +90,7 @@ describe('getServiceAlerts():', () => {
 
     openDb(realtimeConfig);
     // Fresh import to (re)create tables with the current schema.
-    await importGtfs(realtimeConfig);
+    await importGtfs({ ...config, sqlitePath: ':memory:' });
   });
 
   afterAll(async () => {

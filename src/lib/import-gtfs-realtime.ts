@@ -19,9 +19,9 @@ import { validateConfig } from './validate-config.ts';
 import {
   convertLongTimeToDate,
   applyPrefixToValue,
+  applyConfigDefaults,
   escapeIdentifier,
   mapSeries,
-  setDefaultConfig,
 } from './utils.ts';
 import {
   addImportError,
@@ -33,24 +33,24 @@ import {
   toGtfsError,
 } from './errors.ts';
 
-import { Config, ConfigAgency } from '../types/global_interfaces.ts';
-
-interface RealtimeUrlConfig {
-  url: string;
-  headers?: Record<string, string>;
-}
+import type {
+  GtfsRealtimeConfig,
+  GtfsRealtimeEndpoint,
+  GtfsRealtimeFeedConfig,
+} from '../types/config.ts';
+import type { ReportingOptions } from '../reporting/types.ts';
 
 interface GtfsRealtimeTask {
-  realtimeAlerts?: RealtimeUrlConfig;
-  realtimeTripUpdates?: RealtimeUrlConfig;
-  realtimeVehiclePositions?: RealtimeUrlConfig;
+  realtimeAlerts?: GtfsRealtimeEndpoint;
+  realtimeTripUpdates?: GtfsRealtimeEndpoint;
+  realtimeVehiclePositions?: GtfsRealtimeEndpoint;
   downloadTimeout?: number;
   gtfsRealtimeExpirationSeconds: number;
   ignoreErrors: boolean;
   sqlitePath: string;
   prefix?: string;
   currentTimestamp: number;
-  config: Config;
+  config: ReportingOptions;
   report?: ImportReport;
 }
 
@@ -174,7 +174,7 @@ type RealtimeType = 'alerts' | 'tripupdates' | 'vehiclepositions';
 type RealtimeRecordCounts = Record<RealtimeType, number>;
 
 /* The agency option that configures each feed. */
-const RECORD_AGENCY_KEY: Record<RealtimeType, keyof ConfigAgency> = {
+const RECORD_AGENCY_KEY: Record<RealtimeType, keyof GtfsRealtimeFeedConfig> = {
   alerts: 'realtimeAlerts',
   tripupdates: 'realtimeTripUpdates',
   vehiclepositions: 'realtimeVehiclePositions',
@@ -293,7 +293,7 @@ async function fetchGtfsRealtimeData(
 function getUrlConfig(
   type: RealtimeType,
   task: GtfsRealtimeTask,
-): RealtimeUrlConfig | undefined {
+): GtfsRealtimeEndpoint | undefined {
   switch (type) {
     case 'alerts':
       return task.realtimeAlerts;
@@ -488,7 +488,7 @@ function createVehiclePositionsProcessor(
 /**
  * Removes expired GTFS-Realtime data
  */
-function removeExpiredRealtimeData(config: Config): void {
+function removeExpiredRealtimeData(config: GtfsRealtimeConfig): void {
   const db = openDb(config);
 
   let removed = 0;
@@ -602,12 +602,21 @@ export async function updateGtfsRealtimeData(
 /**
  * Main function to update GTFS Realtime data
  */
-export async function updateGtfsRealtime(initialConfig: Config): Promise<void> {
-  validateConfig(initialConfig, (message) =>
-    log(initialConfig, 'warning', message),
+export async function updateGtfsRealtime(
+  initialConfig: GtfsRealtimeConfig,
+): Promise<void> {
+  validateConfig(
+    initialConfig,
+    (message) => log(initialConfig, 'warning', message),
+    { requireStaticSource: false },
   );
 
-  const config = setDefaultConfig(initialConfig);
+  const config = applyConfigDefaults(initialConfig, {
+    sqlitePath: ':memory:',
+    ignoreErrors: false,
+    gtfsRealtimeExpirationSeconds: 0,
+    downloadTimeout: 30000,
+  });
   const startTime = process.hrtime.bigint();
 
   try {
@@ -629,7 +638,7 @@ export async function updateGtfsRealtime(initialConfig: Config): Promise<void> {
       vehiclepositions: 0,
     };
 
-    await mapSeries(config.agencies, async (agency: ConfigAgency) => {
+    await mapSeries(config.agencies, async (agency: GtfsRealtimeFeedConfig) => {
       let task: GtfsRealtimeTask | undefined;
       try {
         task = {

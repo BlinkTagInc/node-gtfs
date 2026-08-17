@@ -1,6 +1,8 @@
 import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from './errors.ts';
 
-import type { Config } from '../types/global_interfaces.ts';
+import type { GtfsImportConfig, GtfsRealtimeConfig } from '../types/config.ts';
+
+type ValidatableConfig = GtfsImportConfig | GtfsRealtimeConfig;
 
 const LOG_LEVELS = ['silent', 'error', 'warning', 'info'] as const;
 
@@ -121,7 +123,11 @@ function findLikelyTypo(key: string): string | null {
 }
 
 /** Validates configuration and reports likely misspellings through `warn`. */
-export function validateConfig(config: Config, warn: (text: string) => void) {
+export function validateConfig(
+  config: ValidatableConfig,
+  warn: (text: string) => void,
+  options: { requireStaticSource?: boolean } = { requireStaticSource: true },
+) {
   const errors: string[] = [];
 
   for (const [key, value] of Object.entries(config)) {
@@ -164,12 +170,18 @@ export function validateConfig(config: Config, warn: (text: string) => void) {
       continue;
     }
 
-    const hasPath = 'path' in agency && agency.path;
-    const hasUrl = 'url' in agency && agency.url;
+    const hasPath = 'path' in agency && Boolean(agency.path);
+    const hasUrl = 'url' in agency && Boolean(agency.url);
 
-    if (!hasPath && !hasUrl) {
+    if (options.requireStaticSource && !hasPath && !hasUrl) {
       errors.push(
         `No agency \`url\` or \`path\` specified in config for \`agencies[${index}]\``,
+      );
+    }
+
+    if (hasPath && hasUrl) {
+      errors.push(
+        `Only one of \`url\` or \`path\` may be specified for \`agencies[${index}]\``,
       );
     }
   }

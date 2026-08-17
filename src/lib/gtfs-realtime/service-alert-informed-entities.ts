@@ -1,9 +1,9 @@
+import type { ServiceAlertInformedEntity } from '../../schema/row-types.ts';
 import type {
-  ServiceAlertInformedEntity,
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { serviceAlertInformedEntities } from '../../schema/tables/gtfs-realtime/service-alert-informed_entities.ts';
 import { findRows } from '../find-rows.ts';
 
@@ -13,10 +13,10 @@ import { findRows } from '../find-rows.ts';
 export function getServiceAlertInformedEntities<
   Fields extends keyof ServiceAlertInformedEntity,
 >(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<ServiceAlertInformedEntity> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<ServiceAlertInformedEntity> = [],
+  options: SqliteQueryOptions = {},
 ) {
   return findRows<ServiceAlertInformedEntity, Fields>(
     serviceAlertInformedEntities,

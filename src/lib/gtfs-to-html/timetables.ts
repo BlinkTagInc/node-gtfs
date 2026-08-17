@@ -1,17 +1,17 @@
+import type { Timetable } from '../../schema/row-types.ts';
 import type {
-  Timetable,
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { timetables } from '../../schema/tables/gtfs-to-html/timetables.ts';
 import { findRows } from '../find-rows.ts';
 
 export function getTimetables<Fields extends keyof Timetable>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<Timetable> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<Timetable> = [],
+  options: SqliteQueryOptions = {},
 ) {
   return findRows<Timetable, Fields>(
     timetables,

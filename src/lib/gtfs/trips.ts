@@ -1,12 +1,12 @@
 import { omit } from 'lodash-es';
+import type { Trip } from '../../schema/row-types.ts';
 import type {
-  QueryOptions,
-  SqlOrderBy,
-  QueryResult,
-  SqlWhere,
-  Trip,
-  SqlValue,
-} from '../../types/global_interfaces.ts';
+  QueryScalar,
+  RowOrderBy,
+  RowQuery,
+  SelectedRow,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { openDb } from '../db.ts';
 import {
   formatOrderByClause,
@@ -20,10 +20,10 @@ import { getServiceIdsByDate } from './calendars.ts';
  * Returns an array of all trips that match the query parameters.
  */
 export function getTrips<Fields extends keyof Trip>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<Trip & { date: number }> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<Trip> = [],
+  options: SqliteQueryOptions = {},
 ) {
   const db = options.db ?? openDb();
   const tableName = 'trips';
@@ -36,7 +36,7 @@ export function getTrips<Fields extends keyof Trip>(
   const tripQuery = omit(query, tripQueryOmitKeys);
 
   const whereClauses = Object.entries(tripQuery).map(([key, value]) =>
-    formatWhereClause(key, value as SqlValue),
+    formatWhereClause(key, value as QueryScalar),
   );
 
   if (query.date) {
@@ -60,7 +60,7 @@ export function getTrips<Fields extends keyof Trip>(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all(...whereClauses.flatMap(({ params }) => params)) as QueryResult<
+    .all(...whereClauses.flatMap(({ params }) => params)) as SelectedRow<
     Trip,
     Fields
   >[];

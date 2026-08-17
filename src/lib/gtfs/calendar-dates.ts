@@ -1,9 +1,9 @@
+import type { CalendarDate } from '../../schema/row-types.ts';
 import type {
-  CalendarDate,
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { calendarDates } from '../../schema/tables/gtfs-schedule/calendar-dates.ts';
 import { findRows } from '../find-rows.ts';
 
@@ -11,10 +11,10 @@ import { findRows } from '../find-rows.ts';
  * Returns an array of calendarDates that match the query parameters.
  */
 export function getCalendarDates<Fields extends keyof CalendarDate>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<CalendarDate> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<CalendarDate> = [],
+  options: SqliteQueryOptions = {},
 ) {
   return findRows<CalendarDate, Fields>(
     calendarDates,

@@ -19,7 +19,11 @@ export type {
   GtfsTableName,
   GtfsValuePresence,
 } from './define-table.ts';
-export type { GtfsDatabase } from './database.ts';
+export type {
+  GtfsDatabase,
+  GtfsFileBackedTableName,
+  GtfsScheduleTableName,
+} from './database.ts';
 export type * from './row-types.ts';
 export {
   gtfsJoins,

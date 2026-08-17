@@ -1,9 +1,9 @@
+import type { StopArea } from '../../schema/row-types.ts';
 import type {
-  StopArea,
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { stopAreas } from '../../schema/tables/gtfs-schedule/stop-areas.ts';
 import { findRows } from '../find-rows.ts';
 
@@ -11,10 +11,10 @@ import { findRows } from '../find-rows.ts';
  * Returns an array of all stop areas that match the query parameters.
  */
 export function getStopAreas<Fields extends keyof StopArea>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<StopArea> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<StopArea> = [],
+  options: SqliteQueryOptions = {},
 ) {
   return findRows<StopArea, Fields>(stopAreas, query, fields, orderBy, options);
 }

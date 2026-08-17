@@ -1,4 +1,4 @@
-import type { LogLevel, LogMessageLevel } from '../types/global_interfaces.ts';
+import type { LogLevel, LogMessageLevel } from './types.ts';
 
 export type TaskName = 'import' | 'export' | 'realtime';
 

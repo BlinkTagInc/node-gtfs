@@ -1,24 +1,15 @@
 import Long from 'long';
-import {
-  Config,
-  JoinOptions,
-  SqlWhere,
-  SqlValue,
-  SqlOrderBy,
-  SqlBindValue,
-  SqlClause,
-} from '../types/global_interfaces.ts';
+import type { ReportingOptions } from '../reporting/types.ts';
+import type {
+  AdvancedQueryJoin,
+  DynamicQuery,
+  QueryScalar,
+  SortDirection,
+} from '../types/query.ts';
+import type { SqlClause, SqliteBindValue } from './sql-types.ts';
 import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from './errors.ts';
 
-/**
- * Quotes a SQL identifier so it can be interpolated into a statement.
- * Identifiers cannot be passed as bound parameters, so they must be escaped.
- * A qualified name is split on the dot, so `trips.trip_id` becomes
- * `"trips"."trip_id"` rather than a single identifier containing a dot.
- * Wildcards are preserved, so `trips.*` remains valid SQL.
- * @param identifier Table, column, or alias name
- * @returns Double-quoted identifier
- */
+/** Quotes qualified SQL identifiers while preserving wildcards. */
 export function escapeIdentifier(identifier: string) {
   return String(identifier)
     .split('.')
@@ -26,14 +17,8 @@ export function escapeIdentifier(identifier: string) {
     .join('.');
 }
 
-/**
- * Converts a query value into something better-sqlite3 can bind.
- * SQLite has no boolean type, so booleans become 1/0, and `undefined` becomes
- * null — both matching how these values were previously serialized into SQL.
- * @param value Value from a query object
- * @returns Value in bindable form
- */
-function toBindValue(value: SqlValue): SqlBindValue {
+/** Converts a query value to a better-sqlite3 bind value. */
+function toBindValue(value: QueryScalar): SqliteBindValue {
   if (value === undefined || value === null) {
     return null;
   }
@@ -42,27 +27,30 @@ function toBindValue(value: SqlValue): SqlBindValue {
     return value ? 1 : 0;
   }
 
-  return value as SqlBindValue;
+  return value;
 }
 
-/**
- * Initializes configuration with default values
- * @param initialConfig The user-provided configuration
- * @returns Merged configuration with defaults
- */
-export function setDefaultConfig(initialConfig: Config) {
-  const defaults = {
-    sqlitePath: ':memory:',
-    ignoreDuplicates: false,
-    ignoreErrors: false,
-    gtfsRealtimeExpirationSeconds: 0,
-    downloadTimeout: 30000,
-  };
+type ConfigWithDefaults<Config, Defaults> = Omit<Config, keyof Defaults> & {
+  [Key in keyof Defaults]:
+    | Defaults[Key]
+    | (Key extends keyof Config ? Exclude<Config[Key], undefined> : never);
+};
 
-  return {
-    ...defaults,
-    ...initialConfig,
-  };
+export function applyConfigDefaults<
+  Config extends ReportingOptions,
+  Defaults extends object,
+>(
+  initialConfig: Config,
+  defaults: Defaults,
+): ConfigWithDefaults<Config, Defaults> {
+  const definedConfig = Object.fromEntries(
+    Object.entries(initialConfig).filter(([, value]) => value !== undefined),
+  );
+
+  return { ...defaults, ...definedConfig } as ConfigWithDefaults<
+    Config,
+    Defaults
+  >;
 }
 
 /**
@@ -119,21 +107,11 @@ export function padLeadingZeros(time: string) {
  * @param fields Array of field names or object mapping source to alias
  * @returns Formatted SELECT clause
  */
-export function formatSelectClause(fields: string[]) {
-  if (Array.isArray(fields)) {
-    const selectItem =
-      fields.length > 0
-        ? fields.map((fieldName) => escapeIdentifier(fieldName)).join(', ')
-        : '*';
-    return `SELECT ${selectItem}`;
-  }
-
-  const selectItem = Object.entries(fields)
-    .map(
-      (key) =>
-        `${escapeIdentifier(key[0])} AS ${escapeIdentifier(String(key[1]))}`,
-    )
-    .join(', ');
+export function formatSelectClause(fields: readonly string[]) {
+  const selectItem =
+    fields.length > 0
+      ? fields.map((fieldName) => escapeIdentifier(fieldName)).join(', ')
+      : '*';
   return `SELECT ${selectItem}`;
 }
 
@@ -142,14 +120,20 @@ export function formatSelectClause(fields: string[]) {
  * @param joinObject Array of join options
  * @returns Formatted JOIN clause
  */
-export function formatJoinClause(joinObject: JoinOptions[]) {
+export function formatJoinClause(joinObject: readonly AdvancedQueryJoin[]) {
   return joinObject
-    .map(
-      (data) =>
-        `${data.type ? data.type + ' JOIN' : 'INNER JOIN'} ${escapeIdentifier(
-          data.table,
-        )} ON ${data.on}`,
-    )
+    .map((data) => {
+      const type = data.type ?? 'INNER';
+      if (!['INNER', 'LEFT', 'LEFT OUTER', 'CROSS'].includes(type)) {
+        throw new GtfsError(`Unsupported SQL join type "${type}"`, {
+          code: GtfsErrorCode.GTFS_QUERY_INVALID,
+          category: GtfsErrorCategory.QUERY,
+          details: { joinType: type },
+        });
+      }
+
+      return `${type} JOIN ${escapeIdentifier(data.table)} ON ${data.on}`;
+    })
     .join(' ');
 }
 
@@ -229,17 +213,21 @@ export function formatWhereClauseBoundingBox(
  */
 export function formatWhereClause(
   key: string,
-  value: null | SqlValue | SqlValue[],
+  value: QueryScalar | readonly QueryScalar[],
 ): SqlClause {
   const escapedKey = escapeIdentifier(key);
 
   if (Array.isArray(value)) {
-    if (value.length === 0) {
+    const arrayValue = value as readonly QueryScalar[];
+    if (arrayValue.length === 0) {
       return { clause: '0 = 1', params: [] };
     }
 
-    const values = value.filter((v) => v !== null && v !== undefined);
-    const includesNull = values.length !== value.length;
+    const values = arrayValue.filter(
+      (v): v is Exclude<QueryScalar, null | undefined> =>
+        v !== null && v !== undefined,
+    );
+    const includesNull = values.length !== arrayValue.length;
 
     if (values.length === 0) {
       return { clause: `${escapedKey} IS NULL`, params: [] };
@@ -258,7 +246,10 @@ export function formatWhereClause(
     return { clause: `${escapedKey} IS NULL`, params: [] };
   }
 
-  return { clause: `${escapedKey} = ?`, params: [toBindValue(value)] };
+  return {
+    clause: `${escapedKey} = ?`,
+    params: [toBindValue(value as QueryScalar)],
+  };
 }
 
 /**
@@ -267,7 +258,7 @@ export function formatWhereClause(
  * @returns Formatted WHERE clause and its bound parameters, or an empty clause
  *          if there are no conditions
  */
-export function formatWhereClauses(query: SqlWhere): SqlClause {
+export function formatWhereClauses(query: DynamicQuery): SqlClause {
   if (Object.keys(query).length === 0) {
     return { clause: '', params: [] };
   }
@@ -287,7 +278,9 @@ export function formatWhereClauses(query: SqlWhere): SqlClause {
  * @param orderBy Array of [column, direction] tuples
  * @returns Formatted ORDER BY clause
  */
-export function formatOrderByClause(orderBy: SqlOrderBy) {
+export function formatOrderByClause(
+  orderBy: readonly (readonly [string, SortDirection])[],
+) {
   let orderByClause = '';
 
   if (orderBy.length > 0) {
@@ -403,7 +396,7 @@ export function applyPrefixToValue<
  * @returns Array of results in the same order as `items`
  */
 export async function mapSeries<Item, Result>(
-  items: Item[],
+  items: readonly Item[],
   callback: (item: Item) => Promise<Result>,
 ): Promise<Result[]> {
   const results: Result[] = [];

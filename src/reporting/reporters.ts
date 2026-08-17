@@ -10,10 +10,10 @@ import {
 
 import type { ReportEvent } from './events.ts';
 import type {
-  Config,
   LogFunction,
   LogMessageLevel,
-} from '../types/global_interfaces.ts';
+  ReportingOptions,
+} from './types.ts';
 
 export interface Reporter {
   report(event: ReportEvent): void;
@@ -117,7 +117,7 @@ function createLogFunctionReporter(logFunction: LogFunction): Reporter {
   };
 }
 
-export function createReporter(config: Config): Reporter {
+export function createReporter(config: ReportingOptions): Reporter {
   if (config.logFunction) {
     return createLogFunctionReporter(config.logFunction);
   }

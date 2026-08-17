@@ -1,13 +1,14 @@
 import { omit, pick } from 'lodash-es';
 
+import type { Route } from '../../schema/row-types.ts';
 import type {
-  QueryOptions,
-  Route,
-  SqlClause,
-  SqlOrderBy,
-  QueryResult,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  DynamicQuery,
+  RowOrderBy,
+  RowQuery,
+  SelectedRow,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
+import type { SqlClause } from '../sql-types.ts';
 import { openDb } from '../db.ts';
 import {
   formatOrderByClause,
@@ -17,7 +18,9 @@ import {
 } from '../utils.ts';
 
 function buildStoptimeSubquery(query: { [key: string]: string }): SqlClause {
-  const { clause: whereClause, params } = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(
+    query as DynamicQuery,
+  );
   return {
     clause: `SELECT DISTINCT trip_id FROM stop_times ${whereClause}`,
     params,
@@ -61,10 +64,12 @@ function buildTripSubquery(query: {
  * calendars.
  */
 export function getRoutes<Fields extends keyof Route>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<
+    Route & { stop_id: string | null; service_id: string | null }
+  > = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<Route> = [],
+  options: SqliteQueryOptions = {},
 ) {
   const db = options.db ?? openDb();
   const tableName = 'routes';
@@ -97,7 +102,7 @@ export function getRoutes<Fields extends keyof Route>(
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
     )
-    .all(...whereClauses.flatMap(({ params }) => params)) as QueryResult<
+    .all(...whereClauses.flatMap(({ params }) => params)) as SelectedRow<
     Route,
     Fields
   >[];

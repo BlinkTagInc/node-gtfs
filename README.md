@@ -210,9 +210,39 @@ are inferred from that database schema instead of being maintained separately.
 GTFS-Realtime enumeration types suggest the values known to this release while
 remaining open to future values added by the specification.
 
+Configuration types are organized by operation instead of one permissive
+catch-all interface:
+
+- `GtfsSqliteImportConfig` for `importGtfs()`
+- `GtfsImportConfig` for the database-independent input to
+  `importGtfsToKysely()`
+- `GtfsExportConfig` for `exportGtfs()`
+- `GtfsRealtimeConfig` for `updateGtfsRealtime()`
+
+Each static feed uses `GtfsFeedConfig`, which requires exactly one of `url` or
+`path`. Realtime-only feeds use `GtfsRealtimeFeedConfig`, so they do not need a
+fake static source. `GtfsFileBackedTableName` is inferred from every
+file-backed schema and is used by the `exclude` option.
+
+Getter query, selected-field, and ordering types are inferred from their row
+schema. Selecting fields narrows the returned row type, and only `getStops()`
+accepts the `bounding_box_side_m` option. Lower-level reusable types such as
+`RowQuery`, `RowOrderBy`, `SelectedRow`, `SqliteQueryOptions`, and
+`StopQueryOptions` are exported from the root package.
+
+The former broad `Config`, `ConfigAgency`, `TableNames`, `QueryOptions`,
+`JoinOptions`, `QueryResult`, `SqlValue`, `SqlWhere`, and `UnixTimestamp` types
+have been removed. SQL-fragment and bind-value types are now implementation
+details rather than part of the public API.
+
 ## Configuration
 
 Copy `config-sample.json` to `config.json` and then add your projects configuration to `config.json`.
+
+The table below lists all supported options. The TypeScript operation-specific
+types above intentionally expose only the options used by each operation; for
+example, an export configuration does not require `agencies`, and a Kysely
+import configuration does not accept SQLite connection options.
 
     cp config-sample.json config.json
 
@@ -556,6 +586,9 @@ const report = await importGtfs({
 
 console.log(report.errors);
 ```
+
+In TypeScript, the literal `includeImportReport: true` makes the return type
+`Promise<ImportReport>`; `false` or an omitted option makes it `Promise<void>`.
 
 ### sqlitePath
 
@@ -2070,6 +2103,12 @@ const advancedQueryOptions = {
 
 const stoptimes = advancedQuery('stop_times', advancedQueryOptions);
 ```
+
+`advancedQueryOptions.db` selects an explicit SQLite connection. Join types
+are limited to `INNER`, `LEFT`, `LEFT OUTER`, and `CROSS`; an omitted type uses
+`INNER`. Table names, selected fields, query keys, and ordering fields are
+identifier-escaped, and query values are parameter-bound. The join `on`
+expression is raw SQL and must only be constructed from trusted input.
 
 #### Raw SQLite Query
 

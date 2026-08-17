@@ -21,9 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Static GTFS parsing and normalization are separated internally from SQLite batch writes
 - Updated GTFS realtime fields
 
-### Removed
-- `yargs` and `@types/yargs` — the command line scripts now use `parseArgs` from `node:util`
-
 ### Added
 - Export the schema declarations and JSON-serializable manifest from `gtfs/schema` and the root package
 - Support for importing, exporting, and querying `fare_leg_join_rules.txt`

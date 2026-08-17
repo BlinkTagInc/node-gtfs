@@ -3,7 +3,7 @@ import { describe, it, beforeEach, afterEach, expect } from './test-utils.ts';
 
 import config from './test-config.ts';
 import {
-  type Config,
+  type GtfsSqliteImportConfig,
   openDb,
   closeDb,
   importGtfs,
@@ -19,7 +19,7 @@ const db2Config = {
   ],
   logLevel: 'silent' as const,
   sqlitePath: './tmpdb2',
-} satisfies Config;
+} satisfies GtfsSqliteImportConfig;
 
 const db3Config = {
   agencies: [
@@ -30,7 +30,7 @@ const db3Config = {
   ],
   logLevel: 'silent' as const,
   sqlitePath: './tmpdb3',
-} satisfies Config;
+} satisfies GtfsSqliteImportConfig;
 
 beforeEach(async () => {
   openDb({ sqlitePath: ':memory:' });

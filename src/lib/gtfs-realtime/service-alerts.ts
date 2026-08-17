@@ -1,10 +1,14 @@
 import type {
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
   ServiceAlert,
   ServiceAlertInformedEntity,
-} from '../../types/global_interfaces.ts';
+  ServiceAlertRow,
+} from '../../schema/row-types.ts';
+import type {
+  DynamicQuery,
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { openDb } from '../db.ts';
 import {
   formatOrderByClause,
@@ -34,11 +38,23 @@ const ENTITY_COLUMNS = new Set([
  * direction_id) are applied to the entities table and only alerts with at
  * least one matching entity are returned.
  */
-export function getServiceAlerts<Fields extends keyof ServiceAlert>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+type ServiceAlertQuery = RowQuery<
+  ServiceAlertRow & {
+    alert_id: string;
+    agency_id: string | null;
+    stop_id: string | null;
+    route_id: string | null;
+    route_type: number | null;
+    trip_id: string | null;
+    direction_id: number | null;
+  }
+>;
+
+export function getServiceAlerts<Fields extends keyof ServiceAlertRow>(
+  query: ServiceAlertQuery = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<ServiceAlertRow> = [],
+  options: SqliteQueryOptions = {},
 ) {
   const db = options.db ?? openDb();
   const tableName = 'service_alerts';
@@ -47,8 +63,8 @@ export function getServiceAlerts<Fields extends keyof ServiceAlert>(
   const orderByClause = formatOrderByClause(orderBy);
 
   // Split query into alert-level filters and entity-level filters.
-  const alertQuery: SqlWhere = {};
-  const entityQuery: SqlWhere = {};
+  const alertQuery: DynamicQuery = {};
+  const entityQuery: DynamicQuery = {};
   for (const [key, value] of Object.entries(query)) {
     if (ENTITY_COLUMNS.has(key)) {
       entityQuery[key] = value;

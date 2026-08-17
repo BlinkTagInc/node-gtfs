@@ -1,9 +1,9 @@
+import type { StopAttribute } from '../../schema/row-types.ts';
 import type {
-  StopAttribute,
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { stopAttributes } from '../../schema/tables/gtfs-plus/stop-attributes.ts';
 import { findRows } from '../find-rows.ts';
 
@@ -11,10 +11,10 @@ import { findRows } from '../find-rows.ts';
  * Returns an array of all stop attributes that match the query parameters.
  */
 export function getStopAttributes<Fields extends keyof StopAttribute>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<StopAttribute> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<StopAttribute> = [],
+  options: SqliteQueryOptions = {},
 ) {
   return findRows<StopAttribute, Fields>(
     stopAttributes,

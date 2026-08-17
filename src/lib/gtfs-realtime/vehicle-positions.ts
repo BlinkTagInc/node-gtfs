@@ -1,9 +1,9 @@
+import type { VehiclePosition } from '../../schema/row-types.ts';
 import type {
-  VehiclePosition,
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { vehiclePositions } from '../../schema/tables/gtfs-realtime/vehicle-positions.ts';
 import { findRows } from '../find-rows.ts';
 
@@ -11,10 +11,10 @@ import { findRows } from '../find-rows.ts';
  * Returns an array of all vehicle positions that match the query parameters.
  */
 export function getVehiclePositions<Fields extends keyof VehiclePosition>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<VehiclePosition> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<VehiclePosition> = [],
+  options: SqliteQueryOptions = {},
 ) {
   return findRows<VehiclePosition, Fields>(
     vehiclePositions,

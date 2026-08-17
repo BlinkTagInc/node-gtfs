@@ -1,9 +1,9 @@
+import type { Attribution } from '../../schema/row-types.ts';
 import type {
-  Attribution,
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { attributions } from '../../schema/tables/gtfs-schedule/attributions.ts';
 import { findRows } from '../find-rows.ts';
 
@@ -11,10 +11,10 @@ import { findRows } from '../find-rows.ts';
  * Returns an array of all attributions that match the query parameters.
  */
 export function getAttributions<Fields extends keyof Attribution>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<Attribution> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<Attribution> = [],
+  options: SqliteQueryOptions = {},
 ) {
   return findRows<Attribution, Fields>(
     attributions,

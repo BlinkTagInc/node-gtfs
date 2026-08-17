@@ -1,9 +1,9 @@
+import type { FareMedia } from '../../schema/row-types.ts';
 import type {
-  FareMedia,
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { fareMedia } from '../../schema/tables/gtfs-schedule/fare-media.ts';
 import { findRows } from '../find-rows.ts';
 
@@ -11,10 +11,10 @@ import { findRows } from '../find-rows.ts';
  * Returns an array of all fare media that match the query parameters.
  */
 export function getFareMedia<Fields extends keyof FareMedia>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<FareMedia> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<FareMedia> = [],
+  options: SqliteQueryOptions = {},
 ) {
   return findRows<FareMedia, Fields>(
     fareMedia,

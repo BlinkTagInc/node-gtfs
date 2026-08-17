@@ -5,7 +5,7 @@ import { mkdir, readFile, rm } from 'node:fs/promises';
 import { omit, snakeCase } from 'lodash-es';
 import sanitize from 'sanitize-filename';
 import StreamZip from 'node-stream-zip';
-import type { Config } from '../types/global_interfaces.ts';
+import type { ReportingOptions } from '../reporting/types.ts';
 import { status } from '../reporting/report.ts';
 import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from './errors.ts';
 
@@ -28,7 +28,9 @@ interface ConfigArgs {
  * @example
  * const config = await getConfig({ configPath: './my-config.json' });
  */
-export async function getConfig(argv: ConfigArgs): Promise<Config> {
+export async function getConfig<Config extends ReportingOptions>(
+  argv: ConfigArgs,
+): Promise<Config> {
   let config;
   let data;
 
@@ -75,7 +77,7 @@ export async function getConfig(argv: ConfigArgs): Promise<Config> {
       );
     }
 
-    return config;
+    return config as Config;
   } catch (error) {
     if (error instanceof SyntaxError) {
       throw new GtfsError(

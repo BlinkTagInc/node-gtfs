@@ -30,15 +30,26 @@ describe('advancedQuery():', () => {
         db: explicitDb,
         query: { 'select"ion': 'a "quoted" value' },
         fields: ['odd"table.*'],
-        // The declared top-level option should take precedence over this legacy
-        // nested location when both are supplied.
-        options: { db: openDb() },
       });
 
       expect(results).toEqual([{ 'select"ion': 'a "quoted" value' }]);
     } finally {
       closeDb(explicitDb);
     }
+  });
+
+  it('should reject unsupported join types', () => {
+    expect(() =>
+      advancedQuery('stop_times', {
+        join: [
+          {
+            type: 'UNSAFE' as 'INNER',
+            table: 'trips',
+            on: 'stop_times.trip_id=trips.trip_id',
+          },
+        ],
+      }),
+    ).toThrow(/Unsupported SQL join type/);
   });
 
   it('should return empty array if no trips', () => {
@@ -51,7 +62,7 @@ describe('advancedQuery():', () => {
       fields: ['stop_times.trip_id', 'arrival_time'],
       join: [
         {
-          type: 'INNER',
+          type: 'INNER' as const,
           table: 'trips',
           on: 'stop_times.trip_id=trips.trip_id',
         },
@@ -72,7 +83,7 @@ describe('advancedQuery():', () => {
       fields: ['stop_times.trip_id', 'arrival_time'],
       join: [
         {
-          type: 'INNER',
+          type: 'INNER' as const,
           table: 'trips',
           on: 'stop_times.trip_id=trips.trip_id',
         },

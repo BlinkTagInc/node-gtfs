@@ -3,16 +3,12 @@ import { createReporter } from './reporters.ts';
 
 import type { ReportEvent } from './events.ts';
 import type { Reporter } from './reporters.ts';
-import type {
-  Config,
-  LogLevel,
-  LogMessageLevel,
-} from '../types/global_interfaces.ts';
+import type { LogLevel, LogMessageLevel, ReportingOptions } from './types.ts';
 
 // Console reporters retain live-line state for the duration of a run.
-const reporters = new WeakMap<Config, Reporter>();
+const reporters = new WeakMap<ReportingOptions, Reporter>();
 
-function reporterFor(config: Config) {
+function reporterFor(config: ReportingOptions) {
   const existing = reporters.get(config);
 
   if (existing) {
@@ -24,7 +20,7 @@ function reporterFor(config: Config) {
   return reporter;
 }
 
-export function getLogLevel(config: Config): LogLevel {
+export function getLogLevel(config: ReportingOptions): LogLevel {
   if (config.logLevel !== undefined) {
     return config.logLevel;
   }
@@ -32,7 +28,7 @@ export function getLogLevel(config: Config): LogLevel {
   return config.verbose === false ? 'warning' : 'info';
 }
 
-export function report(config: Config, event: ReportEvent) {
+export function report(config: ReportingOptions, event: ReportEvent) {
   if (!allowsLevel(getLogLevel(config), eventLevel(event))) {
     return;
   }
@@ -41,17 +37,17 @@ export function report(config: Config, event: ReportEvent) {
 }
 
 export function log(
-  config: Config,
+  config: ReportingOptions,
   level: LogMessageLevel,
   body: string | Error,
 ) {
   report(config, { type: 'message', level, body });
 }
 
-export function progress(config: Config, message: string) {
+export function progress(config: ReportingOptions, message: string) {
   report(config, { type: 'progress', message });
 }
 
-export function status(config: Config, message: string) {
+export function status(config: ReportingOptions, message: string) {
   report(config, { type: 'status', message });
 }

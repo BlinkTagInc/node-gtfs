@@ -1,9 +1,9 @@
+import type { Ridership } from '../../schema/row-types.ts';
 import type {
-  Ridership,
-  QueryOptions,
-  SqlOrderBy,
-  SqlWhere,
-} from '../../types/global_interfaces.ts';
+  RowOrderBy,
+  RowQuery,
+  SqliteQueryOptions,
+} from '../../types/query.ts';
 import { ridership } from '../../schema/tables/gtfs-ride/ridership.ts';
 import { findRows } from '../find-rows.ts';
 
@@ -11,10 +11,10 @@ import { findRows } from '../find-rows.ts';
  * Returns an array of all ridership that match the query parameters.
  */
 export function getRidership<Fields extends keyof Ridership>(
-  query: SqlWhere = {},
-  fields: Fields[] = [],
-  orderBy: SqlOrderBy = [],
-  options: QueryOptions = {},
+  query: RowQuery<Ridership> = {},
+  fields: readonly Fields[] = [],
+  orderBy: RowOrderBy<Ridership> = [],
+  options: SqliteQueryOptions = {},
 ) {
   return findRows<Ridership, Fields>(
     ridership,
