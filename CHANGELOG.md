@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `fare_leg_join_rules.txt` and `stop_times.end_pickup_drop_off_window`
 - `logLevel`, configuration validation, and CLI `--help` and `--version`
 - Composite query indexes and cross-database integration tests
+- Focused configuration, query, realtime, and troubleshooting guides
 
 ### Changed
 - Expanded GTFS-Realtime fields and corrected protobuf extraction
@@ -21,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Simplified getters through a shared query implementation
 - Improved CLI output; `logFunction` receives `(level, message)` and omits progress events
 - Warnings and errors use stderr
+- Reorganized the README around a persistent SQLite quick start
 
 ### Fixed
 - Database selection, normalized-path tracking, and explicit connection closing
