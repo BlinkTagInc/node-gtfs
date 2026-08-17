@@ -13,9 +13,7 @@ const setupUpdate = async () => {
     [CONFIG_PATH_FLAG, LOG_LEVEL_FLAG],
   );
 
-  const config = await getConfig<GtfsRealtimeConfig>({
-    configPath: values.configPath,
-  });
+  const config = await getConfig<GtfsRealtimeConfig>(values);
   await updateGtfsRealtime(config);
   process.exit();
 };
