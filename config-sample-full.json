@@ -1,20 +1,48 @@
 {
   "agencies": [
     {
-      "url": "http://www.bart.gov/dev/schedules/google_transit.zip",
-      "exclude": ["shapes"]
+      "url": "https://example.com/remote-feed/gtfs.zip",
+      "headers": {
+        "Authorization": "Bearer replace-with-your-token"
+      },
+      "prefix": "remote",
+      "exclude": ["shapes"],
+      "fillEmptyAgencyId": true,
+      "agencyId": "remote-transit",
+      "realtimeAlerts": {
+        "url": "https://example.com/remote-feed/alerts.pb",
+        "headers": {
+          "Authorization": "Bearer replace-with-your-token"
+        }
+      },
+      "realtimeTripUpdates": {
+        "url": "https://example.com/remote-feed/trip-updates.pb",
+        "headers": {
+          "Authorization": "Bearer replace-with-your-token"
+        }
+      },
+      "realtimeVehiclePositions": {
+        "url": "https://example.com/remote-feed/vehicle-positions.pb",
+        "headers": {
+          "Authorization": "Bearer replace-with-your-token"
+        }
+      }
     },
     {
-      "path": "/path/to/gtfs.zip",
-      "exclude": ["stop_times", "shapes"]
+      "path": "./data/local-gtfs.zip",
+      "prefix": "local"
     }
   ],
   "csvOptions": {
-    "skip_lines_with_error": true
+    "bom": true,
+    "skip_empty_lines": true
   },
-  "downloadTimeout": 5000,
+  "downloadTimeout": 60000,
+  "exportPath": "./gtfs-export",
+  "gtfsRealtimeExpirationSeconds": 3600,
   "ignoreDuplicates": false,
   "ignoreErrors": false,
-  "sqlitePath": "/tmp/gtfs.sqlite",
-  "exportPath": "~/path/to/export/gtfs"
+  "includeImportReport": false,
+  "logLevel": "info",
+  "sqlitePath": "./gtfs.sqlite"
 }

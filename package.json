@@ -79,7 +79,11 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "docs",
+    "config-sample.json",
+    "config-sample-full.json",
+    "config-sample-rtupdates.json"
   ],
   "bin": {
     "gtfs-export": "dist/bin/gtfs-export.js",
@@ -93,6 +97,7 @@
     "typecheck": "pnpm run build && tsc --noEmit",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
+    "docs:check": "node scripts/check-docs.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "node .husky/install.mjs",

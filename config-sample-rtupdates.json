@@ -1,21 +1,30 @@
 {
   "agencies": [
     {
-      "url": "https://marintransit.org/data/google_transit.zip",
+      "url": "https://svc.metrotransit.org/mtgtfs/gtfs.zip",
       "realtimeAlerts": {
-        "url": "https://marintransit.net/gtfs-rt/alerts"
+        "url": "https://svc.metrotransit.org/mtgtfs/alerts.pb",
+        "headers": {
+          "Authorization": "Bearer replace-with-your-token"
+        }
       },
       "realtimeTripUpdates": {
-        "url": "https://marintransit.net/gtfs-rt/tripupdates"
+        "url": "https://svc.metrotransit.org/mtgtfs/tripupdates.pb",
+        "headers": {
+          "Authorization": "Bearer replace-with-your-token"
+        }
       },
       "realtimeVehiclePositions": {
-        "url": "https://marintransit.net/gtfs-rt/vehiclepositions"
+        "url": "https://svc.metrotransit.org/mtgtfs/vehiclepositions.pb",
+        "headers": {
+          "Authorization": "Bearer replace-with-your-token"
+        }
       }
     }
   ],
-  "csvOptions": {
-    "skip_lines_with_error": true
-  },
-  "sqlitePath": "/tmp/gtfs.sqlite",
-  "gtfsRealtimeExpirationSeconds": 60
+  "downloadTimeout": 30000,
+  "gtfsRealtimeExpirationSeconds": 3600,
+  "ignoreErrors": false,
+  "logLevel": "info",
+  "sqlitePath": "./gtfs.sqlite"
 }

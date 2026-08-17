@@ -1,8 +1,8 @@
 {
   "agencies": [
     {
-      "path": "~/path/to/my/gtfs"
+      "path": "./gtfs.zip"
     }
   ],
-  "sqlitePath": "/tmp/gtfs.sqlite"
+  "sqlitePath": "./gtfs.sqlite"
 }
