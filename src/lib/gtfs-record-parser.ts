@@ -3,7 +3,10 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { parse } from 'csv-parse';
 
-import type { CompiledGtfsTable } from '../schema/compile-table.ts';
+import type {
+  CompiledGtfsColumn,
+  CompiledGtfsTable,
+} from '../schema/compile-table.ts';
 import { isValidJSON } from './geojson-utils.ts';
 import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from './errors.ts';
 import { padLeadingZeros } from './utils.ts';
@@ -11,7 +14,9 @@ import { padLeadingZeros } from './utils.ts';
 export type NormalizedGtfsRow = (string | number | null)[];
 
 export interface NormalizedGtfsRowBatch {
-  rows: NormalizedGtfsRow[];
+  table: CompiledGtfsTable;
+  columns: readonly CompiledGtfsColumn[];
+  rows: readonly NormalizedGtfsRow[];
   totalRowCount: number;
   isFinal: boolean;
 }
@@ -163,13 +168,25 @@ async function* parseTextGtfsFile(
       );
 
       if (rows.length >= options.batchSize) {
-        yield { rows, totalRowCount, isFinal: false };
+        yield {
+          table: options.table,
+          columns: options.table.columns,
+          rows,
+          totalRowCount,
+          isFinal: false,
+        };
         rows = [];
       }
     }
 
     if (rows.length > 0) {
-      yield { rows, totalRowCount, isFinal: true };
+      yield {
+        table: options.table,
+        columns: options.table.columns,
+        rows,
+        totalRowCount,
+        isFinal: true,
+      };
     }
   } finally {
     inputStream.destroy();
@@ -203,6 +220,8 @@ export async function* parseGtfsFile(
     }
 
     yield {
+      table: options.table,
+      columns: options.table.columns,
       rows: [
         normalizeGtfsRecord(
           { geojson: data },

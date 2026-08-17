@@ -48,3 +48,51 @@ jobs:
       - run: pnpm run test
         env:
           CI: true
+
+  database-test:
+    runs-on: ubuntu-latest
+    name: PostgreSQL and MySQL integration
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: gtfs
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d gtfs"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: gtfs
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h localhost -proot"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install
+      - run: pnpm run build
+      - run: node --test --test-reporter=spec src/test/database-integration.test.ts
+        env:
+          GTFS_TEST_POSTGRES_URL: postgresql://postgres:postgres@127.0.0.1:5432/gtfs
+          GTFS_TEST_MYSQL_URL: mysql://root:root@127.0.0.1:3306/gtfs

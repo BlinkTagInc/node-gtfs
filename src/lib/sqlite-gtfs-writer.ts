@@ -1,6 +1,9 @@
 import Database from 'better-sqlite3';
 
-import type { NormalizedGtfsRow } from './gtfs-record-parser.ts';
+import type {
+  NormalizedGtfsRow,
+  NormalizedGtfsRowBatch,
+} from './gtfs-record-parser.ts';
 import type { GtfsFileWriter, GtfsFileWriterOptions } from './gtfs-writer.ts';
 import { log } from '../reporting/report.ts';
 import {
@@ -32,7 +35,7 @@ export function createSqliteGtfsWriter(
   const insert = options.db.prepare(statement);
 
   const writeTransaction = options.db.transaction(
-    (rows: NormalizedGtfsRow[]) => {
+    (rows: readonly NormalizedGtfsRow[]) => {
       for (let rowNumber = 0; rowNumber < rows.length; rowNumber++) {
         const row = rows[rowNumber];
         try {
@@ -97,8 +100,13 @@ export function createSqliteGtfsWriter(
   );
 
   return {
-    writeBatch(rows) {
-      writeTransaction(rows);
+    writeBatch(batch: NormalizedGtfsRowBatch) {
+      if (batch.table.name !== options.table.name) {
+        throw new Error(
+          `Writer for ${options.table.name} received a batch for ${batch.table.name}`,
+        );
+      }
+      writeTransaction(batch.rows);
     },
   };
 }

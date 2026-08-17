@@ -14,6 +14,7 @@ import {
 
 import { describe, expect, it } from './test-utils.ts';
 import { importGtfsToKysely } from '../../dist/index.js';
+import { inspectKyselyGtfsSchema } from '../lib/kysely-schema-inspector.ts';
 
 interface TestDatabase {
   agency: {
@@ -81,8 +82,11 @@ describe('importGtfsToKysely():', () => {
         stop_sequence: 1,
       });
 
-      // A successful query after import proves node-gtfs did not destroy the
-      // caller-owned Kysely instance.
+      const inspection = await inspectKyselyGtfsSchema(db, {
+        includeNodeGtfsExtras: true,
+      });
+      expect(inspection).toEqual({ compatible: true, tables: [] });
+
       const { count } = await db
         .selectFrom('stop_times')
         .select((expression) => expression.fn.countAll<number>().as('count'))

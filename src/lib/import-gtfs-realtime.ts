@@ -1,12 +1,4 @@
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
-import { get } from 'lodash-es';
-import Database from 'better-sqlite3';
-
-import {
-  type CompiledGtfsColumn,
-  type CompiledGtfsTable,
-} from '../schema/compile-table.ts';
-import { compiledTableRegistry } from '../schema/table-registry.ts';
 import { openDb } from './db.ts';
 import { log, report, status } from '../reporting/report.ts';
 import {
@@ -16,13 +8,7 @@ import {
   pluralize,
 } from '../reporting/format.ts';
 import { validateConfig } from './validate-config.ts';
-import {
-  convertLongTimeToDate,
-  applyPrefixToValue,
-  applyConfigDefaults,
-  escapeIdentifier,
-  mapSeries,
-} from './utils.ts';
+import { applyConfigDefaults, escapeIdentifier, mapSeries } from './utils.ts';
 import {
   addImportError,
   formatGtfsError,
@@ -39,6 +25,13 @@ import type {
   GtfsRealtimeFeedConfig,
 } from '../types/config.ts';
 import type { ReportingOptions } from '../reporting/types.ts';
+import {
+  normalizeRealtimeEntity,
+  type RawRealtimeEntity,
+  type RealtimeFeedKind,
+} from './gtfs-realtime-normalizer.ts';
+import type { GtfsRealtimeWriter } from './gtfs-realtime-writer.ts';
+import { createSqliteGtfsRealtimeWriter } from './sqlite-gtfs-realtime-writer.ts';
 
 interface GtfsRealtimeTask {
   realtimeAlerts?: GtfsRealtimeEndpoint;
@@ -54,15 +47,8 @@ interface GtfsRealtimeTask {
   report?: ImportReport;
 }
 
-interface ProcessedEntity {
-  id: string;
-  alert?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  tripUpdate?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  vehicle?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-}
-
 interface RealtimeData {
-  entity: ProcessedEntity[];
+  entity: RawRealtimeEntity[];
 }
 
 interface ProcessingResult {
@@ -77,69 +63,6 @@ interface BatchProcessor<T> {
 const BATCH_SIZE = 1000;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
-
-const {
-  serviceAlerts: serviceAlertsTable,
-  serviceAlertInformedEntities: informedEntitiesTable,
-  tripUpdates: tripUpdatesTable,
-  stopTimeUpdates: stopTimeUpdatesTable,
-  vehiclePositions: vehiclePositionsTable,
-} = compiledTableRegistry;
-
-/**
- * Prepares a field value for database insertion
- */
-function prepareRealtimeFieldValue(
-  entity: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-  column: CompiledGtfsColumn,
-  task: GtfsRealtimeTask,
-) {
-  if (column.name === 'created_timestamp') {
-    return task.currentTimestamp;
-  }
-
-  if (column.name === 'expiration_timestamp') {
-    return task.currentTimestamp + task.gtfsRealtimeExpirationSeconds;
-  }
-
-  const baseValue =
-    (column.sourcePath === undefined
-      ? column.defaultValue
-      : get(entity, column.sourcePath, column.defaultValue)) ?? null;
-
-  const timeAdjustedValue = baseValue?.__isLong__
-    ? convertLongTimeToDate(baseValue)
-    : baseValue;
-
-  const prefixedValue = applyPrefixToValue(
-    timeAdjustedValue,
-    column.applyFeedPrefix,
-    task.prefix,
-  );
-
-  if (column.storageKind === 'json') {
-    return prefixedValue == null ? null : JSON.stringify(prefixedValue);
-  }
-
-  return prefixedValue;
-}
-
-/**
- * Creates a prepared statement for a model
- */
-function createPreparedStatement(
-  db: Database.Database,
-  table: CompiledGtfsTable,
-) {
-  const columns = table.columns.map((column) => column.name);
-  const placeholders = table.columns.map(() => '?').join(', ');
-
-  return db.prepare(
-    `REPLACE INTO ${escapeIdentifier(table.name)} (${columns
-      .map((column) => escapeIdentifier(column))
-      .join(', ')}) VALUES (${placeholders})`,
-  );
-}
 
 /**
  * Processes entities in batches
@@ -169,18 +92,16 @@ async function processBatch<T>(
   return { recordCount: totalRecordCount, errorCount: totalErrorCount };
 }
 
-type RealtimeType = 'alerts' | 'tripupdates' | 'vehiclepositions';
+type RealtimeType = RealtimeFeedKind;
 
 type RealtimeRecordCounts = Record<RealtimeType, number>;
 
-/* The agency option that configures each feed. */
 const RECORD_AGENCY_KEY: Record<RealtimeType, keyof GtfsRealtimeFeedConfig> = {
   alerts: 'realtimeAlerts',
   tripupdates: 'realtimeTripUpdates',
   vehiclepositions: 'realtimeVehiclePositions',
 };
 
-/* What each realtime feed is called in the lines describing a refresh. */
 const RECORD_LABEL: Record<RealtimeType, string> = {
   alerts: 'alerts',
   tripupdates: 'trip updates',
@@ -306,182 +227,55 @@ function getUrlConfig(
   }
 }
 
-/**
- * Creates a processor for service alerts
- */
-function createServiceAlertsProcessor(
-  db: Database.Database,
+function createRealtimeProcessor(
+  writer: GtfsRealtimeWriter,
+  kind: RealtimeType,
   task: GtfsRealtimeTask,
-): BatchProcessor<ProcessedEntity> {
-  const alertStmt = createPreparedStatement(db, serviceAlertsTable);
-  const informedEntityStmt = createPreparedStatement(db, informedEntitiesTable);
-
-  const deleteInformedEntitiesStmt = db.prepare(
-    `DELETE FROM ${escapeIdentifier(informedEntitiesTable.name)} WHERE ${escapeIdentifier('alert_id')} = ?`,
-  );
-
-  return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
-    let recordCount = 0;
-    let errorCount = 0;
-
-    db.transaction(() => {
-      for (const entity of batch) {
-        try {
-          // Delete stale informed entities before upserting the alert so that
-          // if the delete fails the catch fires before the alert INSERT, leaving
-          // no partial state in the batch transaction.
-          const alertId = applyPrefixToValue(entity.id, true, task.prefix);
-          deleteInformedEntitiesStmt.run(alertId);
-
-          // Process main alert
-          const alertValues = serviceAlertsTable.columns.map((column) =>
-            prepareRealtimeFieldValue(entity, column, task),
-          );
-          alertStmt.run(alertValues);
-          recordCount++;
-
-          // Insert fresh informed entities
-          if (entity.alert?.informedEntity?.length) {
-            for (const informedEntity of entity.alert.informedEntity) {
-              informedEntity.parent = entity;
-              const entityValues = informedEntitiesTable.columns.map((column) =>
-                prepareRealtimeFieldValue(informedEntity, column, task),
-              );
-              informedEntityStmt.run(entityValues);
-              recordCount++;
-            }
-          }
-        } catch (error: unknown) {
-          const errorMessage =
-            error instanceof Error ? error.message : String(error);
-          errorCount++;
-          log(
-            task.config,
-            'warning',
-            `Skipping a alert that could not be read: ${errorMessage}`,
-          );
-        }
-      }
-    })();
-
-    return { recordCount, errorCount };
+): BatchProcessor<RawRealtimeEntity> {
+  const entityLabel: Record<RealtimeType, string> = {
+    alerts: 'an alert',
+    tripupdates: 'a trip update',
+    vehiclepositions: 'a vehicle position',
   };
-}
 
-/**
- * Creates a processor for trip updates
- */
-function createTripUpdatesProcessor(
-  db: Database.Database,
-  task: GtfsRealtimeTask,
-): BatchProcessor<ProcessedEntity> {
-  const tripUpdateStmt = createPreparedStatement(db, tripUpdatesTable);
-  const stopTimeStmt = createPreparedStatement(db, stopTimeUpdatesTable);
-  const deleteStopTimesByTripStmt = db.prepare(
-    `DELETE FROM ${escapeIdentifier(stopTimeUpdatesTable.name)} WHERE ${escapeIdentifier('trip_id')} = ? AND ${escapeIdentifier('trip_start_time')} IS ?`,
-  );
-
-  return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
-    let recordCount = 0;
+  return async (batch): Promise<ProcessingResult> => {
+    const normalizedEntities = [];
     let errorCount = 0;
 
-    db.transaction(() => {
-      for (const entity of batch) {
-        try {
-          // Process main trip update
-          const tripUpdateValues = tripUpdatesTable.columns.map((column) =>
-            prepareRealtimeFieldValue(entity, column, task),
-          );
-          tripUpdateStmt.run(tripUpdateValues);
-          recordCount++;
-
-          // Process stop time updates
-          if (entity.tripUpdate?.stopTimeUpdate?.length) {
-            // Delete any existing stop_time_updates for this trip instance
-            // before inserting fresh predictions.  Without this delete, each
-            // poll appends rows rather than replacing them, causing stale /
-            // duplicate predictions to accumulate in the table.
-            //
-            // The dedup key is (trip_id, trip_start_time).  trip_start_time
-            // is NULL for ordinary scheduled trips and a clock string (e.g.
-            // '08:00:00') for frequency-based instances.  We use SQLite's IS
-            // operator (NULL-safe equality) so that NULL IS NULL is true and
-            // the delete fires correctly for both cases.
-            const tripId = applyPrefixToValue(
-              entity.tripUpdate?.trip?.tripId ?? null,
-              true,
-              task.prefix,
-            );
-            const tripStartTime = entity.tripUpdate?.trip?.startTime ?? null;
-            if (tripId !== null) {
-              deleteStopTimesByTripStmt.run(tripId, tripStartTime);
-            }
-
-            for (const stopTimeUpdate of entity.tripUpdate.stopTimeUpdate) {
-              stopTimeUpdate.parent = entity;
-              const stopTimeValues = stopTimeUpdatesTable.columns.map(
-                (column) =>
-                  prepareRealtimeFieldValue(stopTimeUpdate, column, task),
-              );
-              stopTimeStmt.run(stopTimeValues);
-              recordCount++;
-            }
-          }
-        } catch (error: unknown) {
-          const errorMessage =
-            error instanceof Error ? error.message : String(error);
-          errorCount++;
-          log(
-            task.config,
-            'warning',
-            `Skipping a trip update that could not be read: ${errorMessage}`,
-          );
-        }
+    for (const entity of batch) {
+      try {
+        normalizedEntities.push(
+          normalizeRealtimeEntity(kind, entity, {
+            currentTimestamp: task.currentTimestamp,
+            expirationSeconds: task.gtfsRealtimeExpirationSeconds,
+            prefix: task.prefix,
+          }),
+        );
+      } catch (error: unknown) {
+        errorCount += 1;
+        const message = error instanceof Error ? error.message : String(error);
+        log(
+          task.config,
+          'warning',
+          `Skipping ${entityLabel[kind]} that could not be normalized: ${message}`,
+        );
       }
-    })();
+    }
 
-    return { recordCount, errorCount };
-  };
-}
+    const result = await writer.writeEntities(normalizedEntities);
+    for (const error of result.errors) {
+      const message = error instanceof Error ? error.message : String(error);
+      log(
+        task.config,
+        'warning',
+        `Skipping ${entityLabel[kind]} that could not be written: ${message}`,
+      );
+    }
 
-/**
- * Creates a processor for vehicle positions
- */
-function createVehiclePositionsProcessor(
-  db: Database.Database,
-  task: GtfsRealtimeTask,
-): BatchProcessor<ProcessedEntity> {
-  const vehiclePositionStmt = createPreparedStatement(
-    db,
-    vehiclePositionsTable,
-  );
-
-  return async (batch: ProcessedEntity[]): Promise<ProcessingResult> => {
-    let recordCount = 0;
-    let errorCount = 0;
-
-    db.transaction(() => {
-      for (const entity of batch) {
-        try {
-          const fieldValues = vehiclePositionsTable.columns.map((column) =>
-            prepareRealtimeFieldValue(entity, column, task),
-          );
-          vehiclePositionStmt.run(fieldValues);
-          recordCount++;
-        } catch (error: unknown) {
-          const errorMessage =
-            error instanceof Error ? error.message : String(error);
-          errorCount++;
-          log(
-            task.config,
-            'warning',
-            `Skipping a vehicle position that could not be read: ${errorMessage}`,
-          );
-        }
-      }
-    })();
-
-    return { recordCount, errorCount };
+    return {
+      recordCount: result.recordCount,
+      errorCount: errorCount + result.errors.length,
+    };
   };
 }
 
@@ -553,15 +347,14 @@ export async function updateGtfsRealtimeData(
   );
 
   const db = openDb({ sqlitePath: task.sqlitePath });
+  const writer = createSqliteGtfsRealtimeWriter(db);
 
-  // Process each data type sequentially — all three processors share the same
-  // SQLite connection and interleaving their transactions across async batches
-  // is unsafe if processors ever touch overlapping tables.
+  // Shared SQLite transactions must not overlap.
   if (alertsData?.entity?.length) {
     const result = await processBatch(
       alertsData.entity,
       BATCH_SIZE,
-      createServiceAlertsProcessor(db, task),
+      createRealtimeProcessor(writer, 'alerts', task),
     );
     recordCounts.alerts = result.recordCount;
   }
@@ -570,7 +363,7 @@ export async function updateGtfsRealtimeData(
     const result = await processBatch(
       tripUpdatesData.entity,
       BATCH_SIZE,
-      createTripUpdatesProcessor(db, task),
+      createRealtimeProcessor(writer, 'tripupdates', task),
     );
     recordCounts.tripupdates = result.recordCount;
   }
@@ -579,7 +372,7 @@ export async function updateGtfsRealtimeData(
     const result = await processBatch(
       vehiclePositionsData.entity,
       BATCH_SIZE,
-      createVehiclePositionsProcessor(db, task),
+      createRealtimeProcessor(writer, 'vehiclepositions', task),
     );
     recordCounts.vehiclepositions = result.recordCount;
   }
@@ -587,7 +380,6 @@ export async function updateGtfsRealtimeData(
   status(task.config, 'Imported');
 
   for (const [type, label] of Object.entries(RECORD_LABEL)) {
-    // A feed this agency did not configure has no count to report.
     if (getUrlConfig(type as RealtimeType, task)) {
       status(
         task.config,

@@ -14,7 +14,7 @@
   <a href="https://github.com/BlinkTagInc/node-gtfs/actions?query=workflow%3A%22Node+CI%22"><img src="https://img.shields.io/github/actions/workflow/status/BlinkTagInc/node-gtfs/nodejs.yml?branch=master" style="max-width: 100%;"></a>
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg">
   <br /><br />
-  Import GTFS transit data into SQLite, PostgreSQL, or MySQL. Query or change routes, stops, times, fares and more in SQLite.
+  Import GTFS into SQLite, PostgreSQL, or MySQL. Query and export SQLite data.
   <br /><br />
   <a href="https://nodei.co/npm/gtfs/" rel="nofollow"><img src="https://nodei.co/npm/gtfs.png?downloads=true" alt="NPM" style="max-width: 100%;"></a>
 </p>
@@ -81,7 +81,7 @@ try {
 
 ### PostgreSQL and MySQL imports with Kysely
 
-`importGtfsToKysely()` imports static GTFS into a caller-owned Kysely database. Install the driver for your database alongside `gtfs` (`pg` for PostgreSQL or `mysql2` for MySQL), configure Kysely, and pass the instance to node-GTFS:
+`importGtfsToKysely()` imports static GTFS through a caller-owned Kysely instance. Install `pg` for PostgreSQL or `mysql2` for MySQL:
 
 ```js
 import { importGtfsToKysely } from 'gtfs';
@@ -105,16 +105,17 @@ try {
     },
   );
 } finally {
-  // The Kysely instance belongs to the caller and remains open after import.
   await db.destroy();
 }
 ```
 
-Use `MysqlDialect` with a `mysql2` pool and set `dialect: 'mysql'` for MySQL. A Kysely SQLite dialect is also supported with `dialect: 'sqlite'`.
+Use `MysqlDialect` and `dialect: 'mysql'` for MySQL. Kysely's SQLite dialect is supported with `dialect: 'sqlite'`.
 
-By default this function drops and recreates all GTFS tables, adds the same `*_timestamp` convenience columns used by node-GTFS, and creates query indexes. Pass `manageSchema: false` to insert into tables managed by your application's migrations. In that mode, tables must contain every source column defined by node-GTFS; `*_timestamp` columns are omitted unless `includeNodeGtfsExtras: true` is set.
+With `manageSchema: true` (the default), the import recreates GTFS tables and indexes. Use `manageSchema: false` with application-managed tables. Set `includeNodeGtfsExtras: true` to write generated `*_timestamp` columns.
 
-The existing synchronous getters, `openDb()`, export, and GTFS-Realtime support remain SQLite-only. `importGtfsToKysely()` currently imports static GTFS and skips configured realtime sources with a warning.
+Synchronous getters, export, and GTFS-Realtime storage require SQLite. Kysely imports skip configured realtime sources with a warning.
+
+See [Database portability](docs/database-portability.md) for storage details.
 
 ### Example Applications
 
@@ -201,17 +202,12 @@ Print the options above.
 
 Basic TypeScript typings are included with this library. Please [open an issue](https://github.com/blinktaginc/node-gtfs/issues) if you find any inconsistencies between the declared types and underlying code.
 
-The declarative table metadata and its inferred `GtfsRow`, `GtfsStoredRow`,
-`GtfsInsert`, `GtfsQuery`, and `GtfsDatabase` types are available from
-`gtfs/schema` (and from the root package). Individual table declarations and a
-`tables` namespace containing all declarations are exported from the same
-entry point. Named row types such as `Agency`, `VehiclePosition`, and `Device`
-are inferred from that database schema instead of being maintained separately.
-GTFS-Realtime enumeration types suggest the values known to this release while
-remaining open to future values added by the specification.
+Table declarations, `tables`, `GtfsRow`, `GtfsStoredRow`, `GtfsInsert`,
+`GtfsQuery`, and `GtfsDatabase` are exported from `gtfs/schema` and the root
+package. Named row types are inferred from these declarations. Open enumeration
+types provide autocomplete while accepting unknown specification values.
 
-Configuration types are organized by operation instead of one permissive
-catch-all interface:
+Use the configuration type for each operation:
 
 - `GtfsSqliteImportConfig` for `importGtfs()`
 - `GtfsImportConfig` for the database-independent input to
@@ -219,30 +215,14 @@ catch-all interface:
 - `GtfsExportConfig` for `exportGtfs()`
 - `GtfsRealtimeConfig` for `updateGtfsRealtime()`
 
-Each static feed uses `GtfsFeedConfig`, which requires exactly one of `url` or
-`path`. Realtime-only feeds use `GtfsRealtimeFeedConfig`, so they do not need a
-fake static source. `GtfsFileBackedTableName` is inferred from every
-file-backed schema and is used by the `exclude` option.
-
-Getter query, selected-field, and ordering types are inferred from their row
-schema. Selecting fields narrows the returned row type, and only `getStops()`
-accepts the `bounding_box_side_m` option. Lower-level reusable types such as
-`RowQuery`, `RowOrderBy`, `SelectedRow`, `SqliteQueryOptions`, and
-`StopQueryOptions` are exported from the root package.
-
-The former broad `Config`, `ConfigAgency`, `TableNames`, `QueryOptions`,
-`JoinOptions`, `QueryResult`, `SqlValue`, `SqlWhere`, and `UnixTimestamp` types
-have been removed. SQL-fragment and bind-value types are now implementation
-details rather than part of the public API.
+`GtfsFeedConfig` requires one of `url` or `path`; realtime-only feeds use
+`GtfsRealtimeFeedConfig`. Getter query and selected-field types are inferred
+from their row schemas, so field selection narrows the return type. See
+[Schema manifest](docs/schema-manifest.md) for schema exports.
 
 ## Configuration
 
 Copy `config-sample.json` to `config.json` and then add your projects configuration to `config.json`.
-
-The table below lists all supported options. The TypeScript operation-specific
-types above intentionally expose only the options used by each operation; for
-example, an export configuration does not require `agencies`, and a Kysely
-import configuration does not accept SQLite connection options.
 
     cp config-sample.json config.json
 
@@ -600,26 +580,13 @@ In TypeScript, the literal `includeImportReport: true` makes the return type
 
 ### Configuration validation
 
-Your configuration is checked before anything else runs. Every option is type-checked, and all problems are reported in a single error rather than one per run:
-
-```
-Error: [GTFS] Invalid configuration:
-  - `sqlitePath` must be a string, got 42
-  - `ignoreErrors` must be a boolean, got "yes"
-  - `logLevel` must be one of `silent`, `error`, `warning`, `info`, got "chatty"
-```
-
-An option that looks like a misspelling of a real one is reported as a warning, since it is silently doing nothing:
-
-```
-Warning: Unknown configuration option `sqllitePath` - did you mean `sqlitePath`? It is being ignored
-```
-
-Options node-GTFS simply does not know are left alone. Tools that embed node-GTFS such as [GTFS-to-HTML](https://gtfstohtml.com), [GTFS-to-geojson](https://github.com/blinktaginc/gtfs-to-geojson) and others pass their own configuration through.
+Configuration values are type-checked before an operation starts. Validation
+errors are grouped, and likely misspellings produce warnings. Unknown options
+are allowed for applications that share configuration with node-GTFS.
 
 ### logLevel
 
-{String} How much output to print to the console. Valid options are `silent` (nothing), `error` (only errors), `warning` (errors and warnings) and `info` (everything, including progress). **Optional.** Defaults to `info`.
+{String} Output threshold: `silent`, `error`, `warning`, or `info`. Optional; defaults to `info`.
 
 ```json
 {
@@ -632,17 +599,17 @@ Options node-GTFS simply does not know are left alone. Tools that embed node-GTF
 }
 ```
 
-Errors and warnings are written to stderr and progress to stdout, so `gtfs-import > import.log` captures a run without swallowing its failures.
+Errors and warnings use stderr; progress uses stdout.
 
 ### verbose
 
-{Boolean} **Deprecated — use [`logLevel`](#loglevel).** `verbose: false` maps to `logLevel: "warning"`, which is what it has always meant: it silenced progress output but left warnings and errors printing. Use `"logLevel": "silent"` to suppress everything.
+{Boolean} **Deprecated — use [`logLevel`](#loglevel).** `false` maps to `warning`. Use `logLevel: "silent"` to suppress all output.
 
 ### logFunction
 
-{Function} If you want to route logs somewhere other than the console, pass a function taking `level` and `message`. `level` is `error`, `warning` or `info`, so each kind of output can be handled differently. Messages arrive unformatted, without color or a `Warning:` label. This can't be defined in `config.json`, only passed in a config object to `importGtfs()`, `exportGtfs()` or `updateGtfsRealtime()`. **Optional.** No default value.
-
-Anything [`logLevel`](#loglevel) filters out never reaches `logFunction`. The one thing it never receives is the progress line, which redraws a single line in place and only means anything on a console — everything it wraps around, including the summary at the end of a run, still arrives.
+{Function} Receives unformatted `(level, message)` output from `importGtfs()`,
+`exportGtfs()`, or `updateGtfsRealtime()`. `logLevel` filtering applies, and
+progress events are omitted. This option must be supplied in JavaScript.
 
 ```javascript
 import { importGtfs } from 'gtfs';
@@ -655,7 +622,6 @@ const config = {
     },
   ],
   logFunction: function (level, message) {
-    // Do something with the logs here, like save them or send them somewhere
     if (level === 'error') {
       console.error(message);
     } else {
@@ -838,37 +804,25 @@ closeDb(db);
 
 ### Case-insensitive SQLite comparisons
 
-Some human-readable text fields, including `agency_name`, `stop_name`, route
-names, and headsigns, are declared with `caseInsensitiveComparison: true` in
-the schema manifest. When node-GTFS creates its SQLite schema, these columns use
-SQLite's `COLLATE NOCASE`. Their stored and exported text is unchanged, but
-equality and `IN` filters from the query methods ignore ASCII letter case:
+Fields marked `caseInsensitiveComparison` use SQLite's `COLLATE NOCASE`.
+Equality, `IN`, and default ordering therefore ignore ASCII letter case:
 
 ```js
 import { getAgencies } from 'gtfs';
 
-// Matches an agency_name such as "Metro Transit".
 const agencies = getAgencies({ agency_name: 'metro transit' });
 ```
 
-The column collation also affects its default `ORDER BY` behavior. GTFS ID
-fields are not marked case-insensitive and remain case-sensitive.
-
-SQLite's built-in `NOCASE` collation only folds the 26 ASCII letters; it does
-not provide complete Unicode-aware matching. An explicit collation in raw SQL
-can override the column default when a query needs different behavior:
+GTFS IDs remain case-sensitive. SQLite `NOCASE` is not Unicode-aware. Raw SQL
+can override the collation:
 
 ```sql
 SELECT * FROM agency
 WHERE agency_name COLLATE BINARY = ?;
 ```
 
-This behavior applies to schemas created by `importGtfs()` for SQLite. For
-`importGtfsToKysely()`, PostgreSQL and MySQL comparisons follow the collation of
-the caller's database or application-managed schema; node-GTFS does not create
-a dialect-specific case-insensitive collation. See the
-[SQLite collation documentation](https://www.sqlite.org/datatype3.html#collating_sequences)
-for the precise `NOCASE` behavior.
+PostgreSQL and MySQL use their configured database or column collation. See
+[SQLite collations](https://www.sqlite.org/datatype3.html#collating_sequences).
 
 ### Deleting a Database
 
@@ -1399,10 +1353,8 @@ Returns an array of fare_leg_join_rules that match query parameters. [Details on
 ```js
 import { getFareLegJoinRules } from 'gtfs';
 
-// Get all fare leg join rules
 const fareLegJoinRules = getFareLegJoinRules();
 
-// Get join rules for legs traveling between two networks
 const fareLegJoinRules = getFareLegJoinRules({
   from_network_id: 'network1',
   to_network_id: 'network2',
@@ -1738,7 +1690,7 @@ Returns an array of GTFS Realtime service alerts that match query parameters. Ea
 
 [More details on Service Alerts](https://gtfs.org/realtime/feed-entities/service-alerts/)
 
-Each alert has an `informed_entities` array containing all agencies, stops, routes, and trips the alert applies to. The `active_period`, `communication_period`, and `impact_period` fields are JSON-serialized arrays of `{start, end}` Unix timestamp objects. The convenience fields `start_time` and `end_time` contain the start and end of the first legacy active period (or `null` if none is set). Multilingual URL and text values retain their complete translation arrays in the corresponding `*_translations` JSON fields while the existing text fields contain the first translation. Images and their localized variants are retained in the `image` JSON field.
+Alerts include nested `informed_entities`. Periods, translations, and images are stored in JSON fields; convenience text and time columns contain the first value.
 
 ```js
 import { getServiceAlerts } from 'gtfs';
@@ -1775,7 +1727,7 @@ const informedEntities = getServiceAlertInformedEntities({
 
 Returns an array of GTFS Realtime trip updates that match query parameters. Note that this does not refresh the data from GTFS-Realtime feeds, it only fetches what is stored in the database. In order to fetch the latest trip updates from GTFS-Realtime feeds and store in your database, use the [GTFS-Realtime update script or function](#gtfsrealtime-update-script).
 
-Trip updates retain all fields from `TripDescriptor`, `VehicleDescriptor`, and `TripProperties`, including modified-trip selectors, trip-level delay, vehicle accessibility, and replacement or duplicated trip properties.
+Trip updates include fields from `TripDescriptor`, `VehicleDescriptor`, and `TripProperties`.
 
 [More details on Trip Updates](https://gtfs.org/realtime/feed-entities/trip-updates/)
 
@@ -1790,7 +1742,7 @@ const tripUpdates = getTripUpdates();
 
 Returns an array of GTFS Realtime stop time updates that match query parameters. Note that this does not refresh the data from GTFS-Realtime feeds, it only fetches what is stored in the database. In order to fetch the latest stop time updates from GTFS-Realtime feeds and store in your database, use the [GTFS-Realtime update script or function](#gtfsrealtime-update-script).
 
-Stored stop-time updates include arrival and departure delay, time, uncertainty, scheduled time, departure occupancy, schedule relationship, and all `StopTimeProperties` fields. `trip_update_id` links each row to its parent trip-update entity.
+`trip_update_id` links each stop-time update to its trip update.
 
 [More details on Stop Time Updates](https://gtfs.org/realtime/feed-entities/trip-updates/#stoptimeupdate)
 
@@ -1805,7 +1757,7 @@ const stopTimeUpdates = getStopTimeUpdates();
 
 Returns an array of GTFS Realtime vehicle positions that match query parameters. Note that this does not refresh the data from GTFS-Realtime feeds, it only fetches what is stored in the database. In order to fetch the latest vehicle positions from GTFS-Realtime feeds and store in your database, use the [GTFS-Realtime update script or function](#gtfsrealtime-update-script).
 
-Vehicle positions include the full trip and vehicle descriptors, `route_id`, `direction_id`, `stop_id`, `current_status`, odometer, occupancy fields, and timestamp. Repeated carriage details are retained in the `multi_carriage_details` JSON field.
+Vehicle positions include trip, vehicle, location, occupancy, and status fields. Carriage details are stored as JSON.
 
 [More details on Vehicle Positions](https://gtfs.org/realtime/feed-entities/vehicle-positions/)
 
@@ -1984,10 +1936,6 @@ const tripCapacities = getTripCapacities({
 ```
 
 ### Transit Operational Data Standard (TODS) Files
-
-These APIs retain node-gtfs's existing operational tables under the current
-TODS project name. They are not yet a complete implementation of the current
-TODS specification.
 
 #### getDeadheads(query, fields, sortBy, options)
 

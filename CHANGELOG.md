@@ -7,34 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-- More concise CLI output
-- `logFunction` now takes `(level, message)` instead of `(message)`, so callers can tell a progress line from an error
-- Warnings and errors are written to stderr instead of stdout
-- The progress line is no longer passed to `logFunction`
-- The command line no longer prints a stack trace for an ordinary user error, such as a missing or unparseable config file
-- A missing or unparseable config file now throws a `GtfsError` with a code, rather than a plain `Error`
-- An unknown command line flag is reported as an error naming what is accepted, rather than yargs' default
-- stop_times.stop_id is no longer required, allowing valid GTFS Flex rows using location_group_id or location_id
-- advancedQuery now honors top-level db
-- Preserve class, code, and category on errors
-- Static GTFS parsing and normalization are separated internally from SQLite batch writes
-- Updated GTFS realtime fields
-
 ### Added
-- Export the schema declarations and JSON-serializable manifest from `gtfs/schema` and the root package
-- Support for importing, exporting, and querying `fare_leg_join_rules.txt`
-- Add `stop_times.end_pickup_drop_off_window` field
-- Add `importGtfsToKysely()` for importing static GTFS into caller-owned PostgreSQL, MySQL, or SQLite Kysely databases without changing the existing synchronous SQLite APIs
-- Configuration is validated on startup: every option is type-checked and all problems are reported in one error rather than one at a time. An option that looks like a misspelling of a real one is reported as a warning with a suggestion; options node-GTFS does not know are left alone, since tools that embed it pass their own configuration through
-- `--version` and `--help` on all three command line scripts, with usage text built from the same flag list the parser uses
-- `logLevel` config option: `silent`, `error`, `warning` or `info`, each level including the ones above it
-- `exportGtfs` and `updateGtfsRealtime` now report how long they took, as `importGtfs` did
-- Exporting with nothing in the database is now a warning rather than an info line
-- Added composite indexes for common calendar-date, stop-time, and trip queries
+- Static GTFS imports to caller-owned SQLite, PostgreSQL, and MySQL Kysely databases
+- Declarative schema exports and inferred row, query, insert, and database types
+- `fare_leg_join_rules.txt` and `stop_times.end_pickup_drop_off_window`
+- `logLevel`, configuration validation, and CLI `--help` and `--version`
+- Composite query indexes and cross-database integration tests
+
+### Changed
+- Expanded GTFS-Realtime fields and corrected protobuf extraction
+- Organized schemas by namespace and renamed ODS to TODS
+- Split parsing and normalization from database writers
+- Simplified getters through a shared query implementation
+- Improved CLI output; `logFunction` receives `(level, message)` and omits progress events
+- Warnings and errors use stderr
+
+### Fixed
+- Database selection, normalized-path tracking, and explicit connection closing
+- SQL parameter binding, identifier escaping, and empty `IN` queries
+- Database error context, temporary resource cleanup, and stream cleanup
+- GTFS Flex stop-time validation and GTFS-Realtime row replacement
 
 ### Deprecated
-- `verbose` — use `logLevel`. `verbose: false` maps to `logLevel: 'warning'`, which is what it has always meant; use `'silent'` to suppress everything
+- `verbose`; use `logLevel`
 
 ## [4.20.2] - 2026-08-13
 

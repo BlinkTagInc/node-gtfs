@@ -16,8 +16,13 @@ import { fileBackedTables } from '../schema/table-registry.ts';
 import type { GtfsFileWriter, GtfsFileWriterOptions } from './gtfs-writer.ts';
 import type { NormalizedGtfsRow } from './gtfs-record-parser.ts';
 import { applyPrefixToValue, calculateSecondsFromMidnight } from './utils.ts';
+import {
+  getGtfsDialectCapabilities,
+  type GtfsDatabaseDialect,
+  type GtfsDialectCapabilities,
+} from './database-dialects.ts';
 
-export type KyselyImportDialect = 'mysql' | 'postgres' | 'sqlite';
+export type KyselyImportDialect = GtfsDatabaseDialect;
 
 /** Options for importing static GTFS into a caller-owned Kysely database. */
 export interface KyselyImportOptions<DB> {
@@ -40,16 +45,15 @@ type DynamicDatabase = Record<string, DynamicRow>;
 type DynamicKysely = Kysely<DynamicDatabase>;
 
 const MYSQL_PRIMARY_KEY_HASH = '_node_gtfs_primary_key';
-const MAX_IDENTIFIER_LENGTH = 63;
-const MAX_INSERT_CHUNK_SIZE = 1_000;
-const MAX_PARAMETERS_PER_INSERT = 60_000;
-
 function asDynamicKysely<DB>(db: Kysely<DB>): DynamicKysely {
   return db as unknown as DynamicKysely;
 }
 
-function shortenIdentifier(identifier: string): string {
-  if (identifier.length <= MAX_IDENTIFIER_LENGTH) {
+function shortenIdentifier(
+  identifier: string,
+  capabilities: GtfsDialectCapabilities,
+): string {
+  if (identifier.length <= capabilities.maximumIdentifierLength) {
     return identifier;
   }
 
@@ -57,7 +61,7 @@ function shortenIdentifier(identifier: string): string {
     .update(identifier)
     .digest('hex')
     .slice(0, 8);
-  return `${identifier.slice(0, MAX_IDENTIFIER_LENGTH - hash.length - 1)}_${hash}`;
+  return `${identifier.slice(0, capabilities.maximumIdentifierLength - hash.length - 1)}_${hash}`;
 }
 
 function columnDataType(
@@ -118,6 +122,7 @@ async function createTable(
   dialect: KyselyImportDialect,
   includeNodeGtfsExtras: boolean,
 ): Promise<void> {
+  const capabilities = getGtfsDialectCapabilities(dialect);
   await db.schema.dropTable(tableDefinition.name).ifExists().execute();
 
   let table = db.schema.createTable(tableDefinition.name) as CreateTableBuilder<
@@ -133,7 +138,10 @@ async function createTable(
     const check = checkExpression(column);
     if (check) {
       table = table.addCheckConstraint(
-        shortenIdentifier(`check_${tableDefinition.name}_${column.name}`),
+        shortenIdentifier(
+          `check_${tableDefinition.name}_${column.name}`,
+          capabilities,
+        ),
         check,
       );
     }
@@ -145,23 +153,29 @@ async function createTable(
 
   const keyColumns = primaryColumns(tableDefinition);
   if (keyColumns.length > 0) {
-    if (dialect === 'mysql') {
+    if (capabilities.primaryKeyStrategy === 'hash') {
       // MySQL cannot index arbitrary-length text identifiers as a unique key.
       table = table
         .addColumn(MYSQL_PRIMARY_KEY_HASH, 'varchar(64)')
         .addUniqueConstraint(
-          shortenIdentifier(`unique_${tableDefinition.name}_primary_key`),
+          shortenIdentifier(
+            `unique_${tableDefinition.name}_primary_key`,
+            capabilities,
+          ),
           [MYSQL_PRIMARY_KEY_HASH],
         );
     } else if (keyColumns.every((column) => column.presence === 'required')) {
       table = table.addPrimaryKeyConstraint(
-        shortenIdentifier(`primary_${tableDefinition.name}`),
+        shortenIdentifier(`primary_${tableDefinition.name}`, capabilities),
         keyColumns.map((column) => column.name),
       );
     } else {
       // UNIQUE preserves NULL-distinct keys across SQLite and PostgreSQL.
       table = table.addUniqueConstraint(
-        shortenIdentifier(`unique_${tableDefinition.name}_primary_key`),
+        shortenIdentifier(
+          `unique_${tableDefinition.name}_primary_key`,
+          capabilities,
+        ),
         keyColumns.map((column) => column.name),
       );
     }
@@ -177,11 +191,14 @@ async function createIndex(
   columns: string[],
   tableDefinition?: CompiledGtfsTable,
 ): Promise<void> {
+  const capabilities = getGtfsDialectCapabilities(dialect);
   let index = db.schema
-    .createIndex(shortenIdentifier(`idx_${tableName}_${columns.join('_')}`))
+    .createIndex(
+      shortenIdentifier(`idx_${tableName}_${columns.join('_')}`, capabilities),
+    )
     .on(tableName);
 
-  if (dialect === 'mysql') {
+  if (capabilities.textIndexPrefixLength !== undefined) {
     const definitions = new Map(
       tableDefinition?.columns.map((column) => [column.name, column]),
     );
@@ -190,7 +207,9 @@ async function createIndex(
       const definition = definitions.get(columnName);
       index =
         definition?.storageKind === 'text'
-          ? index.column(sql`${sql.ref(columnName)}${sql.raw('(191)')}`)
+          ? index.column(
+              sql`${sql.ref(columnName)}${sql.raw(`(${capabilities.textIndexPrefixLength})`)}`,
+            )
           : index.column(columnName);
     }
   } else {
@@ -239,7 +258,7 @@ export async function createKyselyGtfsIndexes<DB>(
 function buildRow(
   row: NormalizedGtfsRow,
   options: GtfsFileWriterOptions,
-  dialect: KyselyImportDialect,
+  capabilities: GtfsDialectCapabilities,
   includeNodeGtfsExtras: boolean,
   managedSchema: boolean,
 ): DynamicRow {
@@ -270,7 +289,11 @@ function buildRow(
     }
   }
 
-  if (dialect === 'mysql' && managedSchema && keyValues.length > 0) {
+  if (
+    capabilities.primaryKeyStrategy === 'hash' &&
+    managedSchema &&
+    keyValues.length > 0
+  ) {
     result[MYSQL_PRIMARY_KEY_HASH] = keyValues.includes(null)
       ? null
       : createHash('sha256').update(JSON.stringify(keyValues)).digest('hex');
@@ -284,12 +307,19 @@ export function createKyselyGtfsWriter<DB>(
   writerOptions: GtfsFileWriterOptions,
 ): GtfsFileWriter {
   const db = asDynamicKysely(databaseOptions.db);
+  const capabilities = getGtfsDialectCapabilities(databaseOptions.dialect);
   const managedSchema = databaseOptions.manageSchema ?? true;
   const includeNodeGtfsExtras =
     databaseOptions.includeNodeGtfsExtras ?? managedSchema;
 
   return {
-    async writeBatch(rows) {
+    async writeBatch(batch) {
+      if (batch.table.name !== writerOptions.table.name) {
+        throw new Error(
+          `Writer for ${writerOptions.table.name} received a batch for ${batch.table.name}`,
+        );
+      }
+      const rows = batch.rows;
       const insertColumnCount =
         writerOptions.table.columns.length +
         (includeNodeGtfsExtras
@@ -297,7 +327,7 @@ export function createKyselyGtfsWriter<DB>(
               (column) => column.storageKind === 'time',
             ).length
           : 0) +
-        (databaseOptions.dialect === 'mysql' &&
+        (capabilities.primaryKeyStrategy === 'hash' &&
         managedSchema &&
         primaryColumns(writerOptions.table).length > 0
           ? 1
@@ -305,8 +335,10 @@ export function createKyselyGtfsWriter<DB>(
       const chunkSize = Math.max(
         1,
         Math.min(
-          MAX_INSERT_CHUNK_SIZE,
-          Math.floor(MAX_PARAMETERS_PER_INSERT / insertColumnCount),
+          capabilities.maximumRowsPerInsert,
+          Math.floor(
+            capabilities.maximumParametersPerInsert / insertColumnCount,
+          ),
         ),
       );
 
@@ -318,7 +350,7 @@ export function createKyselyGtfsWriter<DB>(
               buildRow(
                 row,
                 writerOptions,
-                databaseOptions.dialect,
+                capabilities,
                 includeNodeGtfsExtras,
                 managedSchema,
               ),
@@ -329,9 +361,9 @@ export function createKyselyGtfsWriter<DB>(
             .values(values);
 
           if (writerOptions.ignoreDuplicates) {
-            if (databaseOptions.dialect === 'postgres') {
+            if (capabilities.duplicateStrategy === 'conflict') {
               insert = insert.onConflict((conflict) => conflict.doNothing());
-            } else if (databaseOptions.dialect === 'mysql') {
+            } else if (capabilities.duplicateStrategy === 'duplicate-key') {
               const firstColumn = writerOptions.table.columns[0].name;
               insert = insert.onDuplicateKeyUpdate({
                 [firstColumn]: sql.ref(firstColumn),

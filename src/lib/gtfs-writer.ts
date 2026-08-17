@@ -1,7 +1,7 @@
 import type { CompiledGtfsTable } from '../schema/compile-table.ts';
 import type { ReportingOptions } from '../reporting/types.ts';
 import type { ImportReport } from './errors.ts';
-import type { NormalizedGtfsRow } from './gtfs-record-parser.ts';
+import type { NormalizedGtfsRowBatch } from './gtfs-record-parser.ts';
 
 export interface GtfsFileWriterOptions {
   table: CompiledGtfsTable;
@@ -13,5 +13,5 @@ export interface GtfsFileWriterOptions {
 }
 
 export interface GtfsFileWriter {
-  writeBatch(rows: NormalizedGtfsRow[]): void | Promise<void>;
+  writeBatch(batch: NormalizedGtfsRowBatch): void | Promise<void>;
 }

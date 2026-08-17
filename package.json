@@ -127,9 +127,12 @@
     "@types/geojson": "7946.0.16",
     "@types/lodash-es": "4.17.12",
     "@types/node": "26",
+    "@types/pg": "8.21.0",
     "husky": "9.1.7",
     "lint-staged": "17.3.0",
+    "mysql2": "3.23.3",
     "oxlint": "1.78.0",
+    "pg": "8.23.0",
     "prettier": "3.9.6",
     "tsdown": "0.22.14",
     "typescript": "7.0.2"

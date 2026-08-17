@@ -20,6 +20,7 @@ import {
   type KyselyImportOptions,
 } from './kysely-gtfs-writer.ts';
 import { createSqliteGtfsWriter } from './sqlite-gtfs-writer.ts';
+import { getDatabaseErrorContext } from './database-error-context.ts';
 import { updateGtfsRealtimeData } from './import-gtfs-realtime.ts';
 import { log, progress, report, status } from '../reporting/report.ts';
 import {
@@ -611,13 +612,17 @@ const importGtfsFiles = async (
         batchSize: BATCH_SIZE,
       })) {
         try {
-          await writer.writeBatch(batch.rows);
+          await writer.writeBatch(batch);
         } catch (error: unknown) {
           const gtfsError = toGtfsError(error, {
             message: error instanceof Error ? error.message : String(error),
             code: GtfsErrorCode.GTFS_DB_OPERATION_FAILED,
             category: GtfsErrorCategory.DATABASE,
-            details: { file: filename, ...target.errorDetails },
+            details: {
+              file: filename,
+              ...target.errorDetails,
+              ...getDatabaseErrorContext(error),
+            },
           });
           if (!task.ignoreErrors) {
             throw gtfsError;
@@ -867,8 +872,9 @@ async function runStaticImport<Config extends GtfsImportConfig>(
       category: sqliteTarget
         ? GtfsErrorCategory.PARSE
         : GtfsErrorCategory.DATABASE,
-      details: targetForError?.errorDetails ?? {
-        sqlitePath,
+      details: {
+        ...(targetForError?.errorDetails ?? { sqlitePath }),
+        ...getDatabaseErrorContext(error),
       },
     });
   }
