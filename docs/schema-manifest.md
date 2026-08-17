@@ -27,9 +27,16 @@ removed rather than retained as a deprecated alias. Queryable table references
 are also projected as `gtfsJoins`. References to fields inside structured
 source files, such as GeoJSON feature IDs, remain in the manifest but are
 omitted from SQL joins.
-The same entry point exports the table-definition API and inferred
-`GtfsRow`, `GtfsStoredRow`, `GtfsInsert`, `GtfsQuery`, and `GtfsDatabase` types.
-The root package exports these too.
+The same entry point exports the table-definition API and inferred `GtfsRow`,
+`GtfsStoredRow`, `GtfsInsert`, `GtfsQuery`, and `GtfsDatabase` types. Named
+public rows such as `Agency`, `VehiclePosition`, and `Device` are aliases of
+their corresponding `GtfsDatabase` rows rather than separately maintained
+interfaces. The root package exports these too.
+
+The exported `gtfsNamespaces` tuple defines the canonical namespace order.
+Explicit table lists use those exact namespace identifiers and sort tables by
+database table name within each namespace. The runtime registry and manifest
+apply the same ordering.
 
 ## Design decisions
 
@@ -98,9 +105,9 @@ or error timing, so it is intentionally not enabled by this v4 refactor:
 - Audit conditional and polymorphic references against each future GTFS
   specification revision. Do not turn advisory join metadata into hard database
   foreign keys without a separate compatibility decision.
-- Replace the hand-maintained public row/query interfaces and getter signatures
-  with inferred manifest types after resolving their existing aliases and
-  historical result shapes.
+- Generate getter query types and signatures from the manifest after resolving
+  their historical query shapes. Named result rows are already inferred from
+  the manifest.
 - Decide whether public repositories should return Kysely builders or remain
   synchronous value-returning functions. Returning builders would be breaking.
 - Generate checked-in field-reference documentation and complete conformance

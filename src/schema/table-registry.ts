@@ -1,6 +1,10 @@
 import * as tables from './tables/index.ts';
-import { compileTable, type CompiledGtfsTable } from './compile-table.ts';
-import type { GtfsTableDefinition } from './define-table.ts';
+import {
+  compileTable,
+  getTableName,
+  type CompiledGtfsTable,
+} from './compile-table.ts';
+import { gtfsNamespaces, type GtfsTableDefinition } from './define-table.ts';
 
 type CompiledTableRegistry = {
   [Name in keyof typeof tables]: CompiledGtfsTable & (typeof tables)[Name];
@@ -10,13 +14,33 @@ export type FileBackedCompiledGtfsTable = CompiledGtfsTable & {
   file: string;
 };
 
-export const tableDefinitions = Object.values(tables) as GtfsTableDefinition[];
+const namespaceOrder = new Map(
+  gtfsNamespaces.map((namespace, index) => [namespace, index]),
+);
+
+function compareTableDefinitions(
+  left: GtfsTableDefinition,
+  right: GtfsTableDefinition,
+): number {
+  const namespaceDifference =
+    namespaceOrder.get(left.namespace)! - namespaceOrder.get(right.namespace)!;
+  if (namespaceDifference !== 0) return namespaceDifference;
+
+  const leftName = getTableName(left);
+  const rightName = getTableName(right);
+  return leftName < rightName ? -1 : leftName > rightName ? 1 : 0;
+}
+
+const tableEntries = Object.entries(tables).sort(([, left], [, right]) =>
+  compareTableDefinitions(left, right),
+);
+
+export const tableDefinitions = tableEntries.map(
+  ([, definition]) => definition,
+) as GtfsTableDefinition[];
 
 export const compiledTableRegistry = Object.fromEntries(
-  Object.entries(tables).map(([name, definition]) => [
-    name,
-    compileTable(definition),
-  ]),
+  tableEntries.map(([name, definition]) => [name, compileTable(definition)]),
 ) as CompiledTableRegistry;
 
 export const compiledTables = Object.values(

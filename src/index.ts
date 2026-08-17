@@ -34,14 +34,13 @@ export {
 } from './lib/errors.ts';
 export type { GtfsWarning, ImportReport } from './lib/errors.ts';
 
-// Standard GTFS
+// gtfs-schedule
 export { getAgencies } from './lib/gtfs/agencies.ts';
 export { getAreas } from './lib/gtfs/areas.ts';
 export { getAttributions } from './lib/gtfs/attributions.ts';
 export { getBookingRules } from './lib/gtfs/booking-rules.ts';
+export { getCalendars, getServiceIdsByDate } from './lib/gtfs/calendars.ts';
 export { getCalendarDates } from './lib/gtfs/calendar-dates.ts';
-export { getCalendars } from './lib/gtfs/calendars.ts';
-export { getServiceIdsByDate } from './lib/gtfs/calendars.ts';
 export { getFareAttributes } from './lib/gtfs/fare-attributes.ts';
 export { getFareLegJoinRules } from './lib/gtfs/fare-leg-join-rules.ts';
 export { getFareLegRules } from './lib/gtfs/fare-leg-rules.ts';
@@ -52,8 +51,8 @@ export { getFareTransferRules } from './lib/gtfs/fare-transfer-rules.ts';
 export { getFeedInfo } from './lib/gtfs/feed-info.ts';
 export { getFrequencies } from './lib/gtfs/frequencies.ts';
 export { getLevels } from './lib/gtfs/levels.ts';
-export { getLocationGroups } from './lib/gtfs/location-groups.ts';
 export { getLocationGroupStops } from './lib/gtfs/location-group-stops.ts';
+export { getLocationGroups } from './lib/gtfs/location-groups.ts';
 export { getLocations } from './lib/gtfs/locations.ts';
 export { getNetworks } from './lib/gtfs/networks.ts';
 export { getPathways } from './lib/gtfs/pathways.ts';
@@ -62,46 +61,46 @@ export { getRouteNetworks } from './lib/gtfs/route-networks.ts';
 export { getRoutes } from './lib/gtfs/routes.ts';
 export { getShapes, getShapesAsGeoJSON } from './lib/gtfs/shapes.ts';
 export { getStopAreas } from './lib/gtfs/stop-areas.ts';
-export { getStops, getStopsAsGeoJSON } from './lib/gtfs/stops.ts';
 export { getStoptimes } from './lib/gtfs/stop-times.ts';
+export { getStops, getStopsAsGeoJSON } from './lib/gtfs/stops.ts';
 export { getTimeframes } from './lib/gtfs/timeframes.ts';
 export { getTransfers } from './lib/gtfs/transfers.ts';
 export { getTranslations } from './lib/gtfs/translations.ts';
 export { getTrips } from './lib/gtfs/trips.ts';
 
-// GTFS Plus
+// gtfs-realtime
+export { getServiceAlertInformedEntities } from './lib/gtfs-realtime/service-alert-informed-entities.ts';
+export { getServiceAlerts } from './lib/gtfs-realtime/service-alerts.ts';
+export { getStopTimeUpdates } from './lib/gtfs-realtime/stop-time-updates.ts';
+export { getTripUpdates } from './lib/gtfs-realtime/trip-updates.ts';
+export { getVehiclePositions } from './lib/gtfs-realtime/vehicle-positions.ts';
+
+// gtfs-plus
 export { getCalendarAttributes } from './lib/gtfs-plus/calendar-attributes.ts';
 export { getDirections } from './lib/gtfs-plus/directions.ts';
 export { getRouteAttributes } from './lib/gtfs-plus/route-attributes.ts';
 export { getStopAttributes } from './lib/gtfs-plus/stop-attributes.ts';
 
-// GTFS-to-HTML
-export { getTimetables } from './lib/gtfs-to-html/timetables.ts';
-export { getTimetableStopOrders } from './lib/gtfs-to-html/timetable-stop-order.ts';
-export { getTimetablePages } from './lib/gtfs-to-html/timetable-pages.ts';
-export { getTimetableNotes } from './lib/gtfs-to-html/timetable-notes.ts';
-export { getTimetableNotesReferences } from './lib/gtfs-to-html/timetable-notes-references.ts';
-
-// GTFS-ride
+// gtfs-ride
 export { getBoardAlights } from './lib/gtfs-ride/board-alights.ts';
 export { getRideFeedInfo } from './lib/gtfs-ride/ride-feed-info.ts';
 export { getRiderTrips } from './lib/gtfs-ride/rider-trips.ts';
 export { getRidership } from './lib/gtfs-ride/ridership.ts';
 export { getTripCapacities } from './lib/gtfs-ride/trip-capacities.ts';
 
-// GTFS-Realtime
-export { getStopTimeUpdates } from './lib/gtfs-realtime/stop-time-updates.ts';
-export { getTripUpdates } from './lib/gtfs-realtime/trip-updates.ts';
-export { getVehiclePositions } from './lib/gtfs-realtime/vehicle-positions.ts';
-export { getServiceAlerts } from './lib/gtfs-realtime/service-alerts.ts';
-export { getServiceAlertInformedEntities } from './lib/gtfs-realtime/service-alert-informed-entities.ts';
+// gtfs-to-html
+export { getTimetableNotes } from './lib/gtfs-to-html/timetable-notes.ts';
+export { getTimetableNotesReferences } from './lib/gtfs-to-html/timetable-notes-references.ts';
+export { getTimetablePages } from './lib/gtfs-to-html/timetable-pages.ts';
+export { getTimetableStopOrders } from './lib/gtfs-to-html/timetable-stop-order.ts';
+export { getTimetables } from './lib/gtfs-to-html/timetables.ts';
 
-// NOPTIS
+// noptis
 export { getTripsDatedVehicleJourneys } from './lib/noptis/trips-dated-vehicle-journey.ts';
 
-// TODS
-export { getDeadheads } from './lib/tods/deadheads.ts';
+// tods
 export { getDeadheadTimes } from './lib/tods/deadhead-times.ts';
+export { getDeadheads } from './lib/tods/deadheads.ts';
 export { getOpsLocations } from './lib/tods/ops-locations.ts';
 export { getRunEvents } from './lib/tods/run-events.ts';
 export { getRunsPieces } from './lib/tods/runs-pieces.ts';

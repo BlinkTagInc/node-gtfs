@@ -4,6 +4,7 @@ import { describe, test } from 'node:test';
 import {
   gtfsJoins,
   gtfsManifest,
+  gtfsNamespaces,
   gtfsScheduleReferenceRevision,
   tables,
 } from '../../dist/schema/index.js';
@@ -56,6 +57,24 @@ describe('GTFS schema manifest', () => {
           : table.file.slice(0, table.file.lastIndexOf('.'));
       assert.equal(gtfsManifest[tableName].namespace, table.namespace);
     }
+  });
+
+  test('uses the canonical namespace and table order', () => {
+    const namespaceOrder = new Map(
+      gtfsNamespaces.map((namespace, index) => [namespace, index]),
+    );
+    const manifestEntries = Object.entries(gtfsManifest);
+    const expectedEntries = [...manifestEntries].sort(
+      ([leftName, left], [rightName, right]) => {
+        const namespaceDifference =
+          namespaceOrder.get(left.namespace)! -
+          namespaceOrder.get(right.namespace)!;
+        if (namespaceDifference !== 0) return namespaceDifference;
+        return leftName < rightName ? -1 : leftName > rightName ? 1 : 0;
+      },
+    );
+
+    assert.deepEqual(manifestEntries, expectedEntries);
   });
 
   test('expresses structural and semantic frequency metadata separately', () => {

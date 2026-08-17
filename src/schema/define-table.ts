@@ -1,12 +1,16 @@
-export type GtfsNamespace =
-  | 'gtfs-schedule'
-  | 'gtfs-realtime'
-  | 'gtfs-plus'
-  | 'gtfs-ride'
-  | 'gtfs-to-html'
-  | 'noptis'
-  | 'tods'
-  | 'tides';
+/** Canonical namespace order used by schema declarations and public exports. */
+export const gtfsNamespaces = [
+  'gtfs-schedule',
+  'gtfs-realtime',
+  'gtfs-plus',
+  'gtfs-ride',
+  'gtfs-to-html',
+  'noptis',
+  'tods',
+  'tides',
+] as const;
+
+export type GtfsNamespace = (typeof gtfsNamespaces)[number];
 
 export type GtfsPresence =
   | 'required'

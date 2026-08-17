@@ -1,4 +1,4 @@
-export { defineGtfsTable } from './define-table.ts';
+export { defineGtfsTable, gtfsNamespaces } from './define-table.ts';
 export type {
   GtfsDatabaseFromTables,
   GtfsEnumerationValue,
@@ -20,6 +20,7 @@ export type {
   GtfsValuePresence,
 } from './define-table.ts';
 export type { GtfsDatabase } from './database.ts';
+export type * from './row-types.ts';
 export {
   gtfsJoins,
   gtfsManifest,

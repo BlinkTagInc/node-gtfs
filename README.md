@@ -205,7 +205,10 @@ The declarative table metadata and its inferred `GtfsRow`, `GtfsStoredRow`,
 `GtfsInsert`, `GtfsQuery`, and `GtfsDatabase` types are available from
 `gtfs/schema` (and from the root package). Individual table declarations and a
 `tables` namespace containing all declarations are exported from the same
-entry point.
+entry point. Named row types such as `Agency`, `VehiclePosition`, and `Device`
+are inferred from that database schema instead of being maintained separately.
+GTFS-Realtime enumeration types suggest the values known to this release while
+remaining open to future values added by the specification.
 
 ## Configuration
 

@@ -1,4 +1,9 @@
 import type {
+  Agency,
+  BoardAlight,
+  CalendarAttribute,
+  Deadhead,
+  Device,
   GtfsDatabase,
   GtfsEnumerationValue,
   GtfsFieldDefinition,
@@ -6,6 +11,12 @@ import type {
   GtfsQuery,
   GtfsRow,
   GtfsStoredRow,
+  GtfsTableRow,
+  ServiceAlert,
+  ServiceAlertRow,
+  Timetable,
+  TripsDatedVehicleJourney,
+  VehiclePosition as PublicVehiclePosition,
 } from '../schema/index.ts';
 import type { GtfsScheduleTableName } from '../schema/database.ts';
 import type { TableNames } from '../types/global_interfaces.ts';
@@ -83,6 +94,37 @@ type _TableNamesIncludeFareLegJoinRules = Assert<
 type _TableNamesExcludeRealtimeTables = Assert<
   Equal<Extract<TableNames, 'trip_updates'>, never>
 >;
+type _ScheduleAliasComesFromSchema = Assert<
+  Equal<Agency, GtfsTableRow<'agency'>>
+>;
+type _GtfsToHtmlAliasComesFromSchema = Assert<
+  Equal<Timetable, GtfsTableRow<'timetables'>>
+>;
+type _GtfsPlusAliasComesFromSchema = Assert<
+  Equal<CalendarAttribute, GtfsTableRow<'calendar_attributes'>>
+>;
+type _GtfsRideAliasComesFromSchema = Assert<
+  Equal<BoardAlight, GtfsTableRow<'board_alight'>>
+>;
+type _RealtimeAliasComesFromSchema = Assert<
+  Equal<PublicVehiclePosition, GtfsTableRow<'vehicle_positions'>>
+>;
+type _ComposedRealtimeResultUsesSchemaRow = Assert<
+  ServiceAlert extends ServiceAlertRow & {
+    informed_entities: unknown[];
+  }
+    ? true
+    : false
+>;
+type _NoptisAliasComesFromSchema = Assert<
+  Equal<TripsDatedVehicleJourney, GtfsTableRow<'trips_dated_vehicle_journey'>>
+>;
+type _TodsAliasComesFromSchema = Assert<
+  Equal<Deadhead, GtfsTableRow<'deadheads'>>
+>;
+type _TidesAliasComesFromSchema = Assert<
+  Equal<Device, GtfsTableRow<'devices'>>
+>;
 
 export type SchemaTypeAssertions =
   | _TripIdIsRequiredString
@@ -99,4 +141,13 @@ export type SchemaTypeAssertions =
   | _ScalarForbidsValues
   | _TableNamesUseScheduleDefinitions
   | _TableNamesIncludeFareLegJoinRules
-  | _TableNamesExcludeRealtimeTables;
+  | _TableNamesExcludeRealtimeTables
+  | _ScheduleAliasComesFromSchema
+  | _GtfsToHtmlAliasComesFromSchema
+  | _GtfsPlusAliasComesFromSchema
+  | _GtfsRideAliasComesFromSchema
+  | _RealtimeAliasComesFromSchema
+  | _ComposedRealtimeResultUsesSchemaRow
+  | _NoptisAliasComesFromSchema
+  | _TodsAliasComesFromSchema
+  | _TidesAliasComesFromSchema;
