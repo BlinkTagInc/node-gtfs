@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reorganized the README around a persistent SQLite quick start
 
 ### Fixed
-- Database selection, normalized-path tracking, and explicit connection closing
+- Database selection, nested GeoJSON queries, normalized-path tracking, and explicit connection closing
 - SQL parameter binding, identifier escaping, and empty `IN` queries
 - Database error context, temporary resource cleanup, and stream cleanup
 - GTFS Flex stop-time validation and GTFS-Realtime row replacement

@@ -61,7 +61,7 @@ export async function getConfig<Config extends ReportingOptions>(
 
       config = {
         agencies,
-        ...omit(argv, ['path', 'url']),
+        ...omit(argv, ['gtfsPath', 'gtfsUrl']),
       };
     } else if (existsSync(path.resolve('./config.json'))) {
       data = await readFile(path.resolve('./config.json'), 'utf8');

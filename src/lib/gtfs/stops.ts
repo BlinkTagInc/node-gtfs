@@ -170,7 +170,12 @@ export function getStopsAsGeoJSON(
       .prepare(`SELECT * FROM routes WHERE route_id IN (${routeSubquery})`)
       .all(stop.stop_id);
 
-    const stopAttributes = getStopAttributes({ stop_id: stop.stop_id });
+    const stopAttributes = getStopAttributes(
+      { stop_id: stop.stop_id },
+      [],
+      [],
+      options,
+    );
 
     return {
       ...stop,

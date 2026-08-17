@@ -71,6 +71,7 @@ async function processBatch<T>(
   items: T[],
   batchSize: number,
   processor: BatchProcessor<T>,
+  config: ReportingOptions,
 ): Promise<ProcessingResult> {
   let totalRecordCount = 0;
   let totalErrorCount = 0;
@@ -85,7 +86,7 @@ async function processBatch<T>(
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       totalErrorCount += batch.length;
-      console.error(`Batch processing error: ${errorMessage}`);
+      log(config, 'error', `Batch processing error: ${errorMessage}`);
     }
   }
 
@@ -355,6 +356,7 @@ export async function updateGtfsRealtimeData(
       alertsData.entity,
       BATCH_SIZE,
       createRealtimeProcessor(writer, 'alerts', task),
+      task.config,
     );
     recordCounts.alerts = result.recordCount;
   }
@@ -364,6 +366,7 @@ export async function updateGtfsRealtimeData(
       tripUpdatesData.entity,
       BATCH_SIZE,
       createRealtimeProcessor(writer, 'tripupdates', task),
+      task.config,
     );
     recordCounts.tripupdates = result.recordCount;
   }
@@ -373,6 +376,7 @@ export async function updateGtfsRealtimeData(
       vehiclePositionsData.entity,
       BATCH_SIZE,
       createRealtimeProcessor(writer, 'vehiclepositions', task),
+      task.config,
     );
     recordCounts.vehiclepositions = result.recordCount;
   }

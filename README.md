@@ -83,12 +83,11 @@ import { closeDb, getAgencies, getRoutes, openDb } from 'gtfs';
 const db = openDb({ sqlitePath: './gtfs.sqlite' });
 
 try {
-  const agencies = getAgencies({}, ['agency_id', 'agency_name'], [], { db });
+  const agencies = getAgencies({}, ['agency_id', 'agency_name']);
   const routes = getRoutes(
     {},
     ['route_id', 'route_short_name', 'route_long_name'],
     [['route_short_name', 'ASC']],
-    { db },
   );
 
   console.table(agencies);
@@ -115,14 +114,13 @@ Install node-GTFS in your application:
 npm install gtfs
 ```
 
-Import a feed and query it in the same process:
+Import a feed and query it in the same process using an in-memory database:
 
 ```js
 import { closeDb, getStops, importGtfs, openDb } from 'gtfs';
 
 const config = {
   agencies: [{ path: './data/gtfs.zip' }],
-  sqlitePath: './data/gtfs.sqlite',
 };
 
 await importGtfs(config);
@@ -133,7 +131,6 @@ try {
     { stop_id: ['123', '234', '345'] },
     ['stop_id', 'stop_name'],
     [['stop_name', 'ASC']],
-    { db },
   );
   console.table(stops);
 } finally {
@@ -238,9 +235,7 @@ Fields marked `caseInsensitiveComparison` in the schema use SQLite's
 case for those fields:
 
 ```js
-const agencies = getAgencies({ agency_name: 'metro transit' }, [], [], {
-  db,
-});
+const agencies = getAgencies({ agency_name: 'metro transit' });
 ```
 
 GTFS identifiers remain case-sensitive. SQLite `NOCASE` is not Unicode-aware.

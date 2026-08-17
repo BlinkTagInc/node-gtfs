@@ -1,4 +1,5 @@
 import { describe, it, beforeAll, afterAll, expect } from './test-utils.ts';
+import Database from 'better-sqlite3';
 import config from './test-config.ts';
 import {
   openDb,
@@ -84,5 +85,23 @@ describe('getStopsAsGeoJSON(): ', () => {
     expect(
       (geojson.features[0].geometry as GeoJSON.Point).coordinates,
     ).toHaveLength(2);
+  });
+
+  it('should use the explicit database for stop attributes', async () => {
+    const db = new Database(':memory:');
+
+    try {
+      await importGtfs({ ...config, db });
+      db.prepare(
+        'INSERT INTO stop_attributes (stop_id, stop_city) VALUES (?, ?)',
+      ).run('70031', 'Test City');
+
+      const geojson = getStopsAsGeoJSON({ stop_id: '70031' }, { db });
+
+      expect(geojson.features).toHaveLength(1);
+      expect(geojson.features[0].properties?.stop_city).toBe('Test City');
+    } finally {
+      closeDb(db);
+    }
   });
 });
