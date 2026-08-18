@@ -116,7 +116,7 @@ export const exportGtfs = async (initialConfig: GtfsExportConfig) => {
 
     const fileExtension = path.extname(table.file).slice(1);
 
-    if (fileExtension === 'txt') {
+    if (fileExtension === 'txt' || fileExtension === 'csv') {
       const excludeColumns = [];
 
       // Omit an unused optional agency_id column.

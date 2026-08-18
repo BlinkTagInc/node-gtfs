@@ -1,7 +1,7 @@
 import { defineGtfsTable } from '../../define-table.ts';
 
 export const stationActivities = defineGtfsTable({
-  file: 'station_activities.txt',
+  file: 'station_activities.csv',
   presence: 'optional',
   primaryKey: [
     'service_date',

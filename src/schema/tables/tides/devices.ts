@@ -1,7 +1,7 @@
 import { defineGtfsTable } from '../../define-table.ts';
 
 export const devices = defineGtfsTable({
-  file: 'devices.txt',
+  file: 'devices.csv',
   presence: 'optional',
   primaryKey: ['device_id'],
   fields: {
@@ -13,12 +13,12 @@ export const devices = defineGtfsTable({
     },
     vehicle_id: {
       kind: 'id',
-      references: [{ file: 'vehicles.txt', field: 'vehicle_id' }],
+      references: [{ file: 'vehicles.csv', field: 'vehicle_id' }],
       applyFeedPrefix: true,
     },
     train_car_id: {
       kind: 'id',
-      references: [{ file: 'train_cars.txt', field: 'train_car_id' }],
+      references: [{ file: 'train_cars.csv', field: 'train_car_id' }],
       applyFeedPrefix: true,
     },
     device_type: { kind: 'text' },

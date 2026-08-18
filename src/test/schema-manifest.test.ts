@@ -261,7 +261,7 @@ describe('GTFS schema manifest', () => {
     );
     assert.deepEqual(
       gtfsManifest.fare_transactions.fields.trip_id_scheduled.references,
-      [{ file: 'trips_performed.txt', field: 'trip_id_scheduled' }],
+      [{ file: 'trips_performed.csv', field: 'trip_id_scheduled' }],
     );
     assert.equal(
       gtfsManifest.fare_transactions.fields.fare_media_id.references,

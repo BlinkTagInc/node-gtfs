@@ -113,9 +113,12 @@ function reportTaskError(task: GtfsImportTask, error: GtfsError): void {
   }
 }
 
-const getTextFiles = async (folderPath: string): Promise<string[]> => {
+const getFeedFiles = async (folderPath: string): Promise<string[]> => {
   const files = await readdir(folderPath);
-  return files.filter((filename) => filename.slice(-3) === 'txt');
+  return files.filter((filename) => {
+    const extension = filename.slice(-4);
+    return extension === '.txt' || extension === '.csv';
+  });
 };
 
 const downloadGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
@@ -194,10 +197,10 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
   if (path.extname(gtfsPath) === '.zip') {
     try {
       await unzip(gtfsPath, task.downloadDir);
-      const textFiles = await getTextFiles(task.downloadDir);
+      const feedFiles = await getFeedFiles(task.downloadDir);
 
-      // If no .txt files in this directory, check for subdirectories and copy them here
-      if (textFiles.length === 0) {
+      // If no feed files in this directory, check for subdirectories and copy them here
+      if (feedFiles.length === 0) {
         const files = await readdir(task.downloadDir);
         // Ignore system directories within zip file
         const folders = files
@@ -207,7 +210,7 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
 
         if (folders.length > 1) {
           throw new GtfsError(
-            `More than one subfolder found in zip file at \`${task.path}\`. Ensure that .txt files are in the top level of the zip file, or in a single subdirectory.`,
+            `More than one subfolder found in zip file at \`${task.path}\`. Ensure that .txt or .csv files are in the top level of the zip file, or in a single subdirectory.`,
             {
               code: GtfsErrorCode.GTFS_ZIP_INVALID,
               category: GtfsErrorCategory.ZIP,
@@ -216,7 +219,7 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
           );
         } else if (folders.length === 0) {
           throw new GtfsError(
-            `No .txt files found in \`${task.path}\`. Ensure that .txt files are in the top level of the zip file, or in a single subdirectory.`,
+            `No .txt or .csv files found in \`${task.path}\`. Ensure that feed files are in the top level of the zip file, or in a single subdirectory.`,
             {
               code: GtfsErrorCode.GTFS_ZIP_INVALID,
               category: GtfsErrorCategory.ZIP,
@@ -226,11 +229,11 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
         }
 
         const subfolderName = folders[0];
-        const directoryTextFiles = await getTextFiles(subfolderName);
+        const directoryFeedFiles = await getFeedFiles(subfolderName);
 
-        if (directoryTextFiles.length === 0) {
+        if (directoryFeedFiles.length === 0) {
           throw new GtfsError(
-            `No .txt files found in \`${task.path}\`. Ensure that .txt files are in the top level of the zip file, or in a single subdirectory.`,
+            `No .txt or .csv files found in \`${task.path}\`. Ensure that feed files are in the top level of the zip file, or in a single subdirectory.`,
             {
               code: GtfsErrorCode.GTFS_ZIP_INVALID,
               category: GtfsErrorCategory.ZIP,
@@ -240,7 +243,7 @@ const extractGtfsFiles = async (task: GtfsImportTask): Promise<void> => {
         }
 
         await Promise.all(
-          directoryTextFiles.map(async (fileName) =>
+          directoryFeedFiles.map(async (fileName) =>
             rename(
               path.join(subfolderName, fileName),
               path.join(task.downloadDir, fileName),

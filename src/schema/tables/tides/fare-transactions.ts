@@ -1,7 +1,7 @@
 import { defineGtfsTable } from '../../define-table.ts';
 
 export const fareTransactions = defineGtfsTable({
-  file: 'fare_transactions.txt',
+  file: 'fare_transactions.csv',
   presence: 'optional',
   fields: {
     transaction_id: { kind: 'id', presence: 'required', applyFeedPrefix: true },
@@ -10,7 +10,7 @@ export const fareTransactions = defineGtfsTable({
     location_ping_id: {
       kind: 'id',
       references: [
-        { file: 'vehicle_locations.txt', field: 'location_ping_id' },
+        { file: 'vehicle_locations.csv', field: 'location_ping_id' },
       ],
       applyFeedPrefix: true,
     },
@@ -19,23 +19,23 @@ export const fareTransactions = defineGtfsTable({
     fare_action: { kind: 'text', presence: 'required' },
     trip_id_performed: {
       kind: 'text',
-      references: [{ file: 'trips_performed.txt', field: 'trip_id_performed' }],
+      references: [{ file: 'trips_performed.csv', field: 'trip_id_performed' }],
     },
     trip_id_scheduled: {
       kind: 'text',
-      references: [{ file: 'trips_performed.txt', field: 'trip_id_scheduled' }],
+      references: [{ file: 'trips_performed.csv', field: 'trip_id_scheduled' }],
     },
     pattern_id: { kind: 'id', applyFeedPrefix: true },
     trip_stop_sequence: { kind: 'integer', minimum: 1 },
     scheduled_stop_sequence: { kind: 'integer', minimum: 0 },
     vehicle_id: {
       kind: 'id',
-      references: [{ file: 'vehicles.txt', field: 'vehicle_id' }],
+      references: [{ file: 'vehicles.csv', field: 'vehicle_id' }],
       applyFeedPrefix: true,
     },
     device_id: {
       kind: 'id',
-      references: [{ file: 'devices.txt', field: 'device_id' }],
+      references: [{ file: 'devices.csv', field: 'device_id' }],
       applyFeedPrefix: true,
     },
     fare_id: {

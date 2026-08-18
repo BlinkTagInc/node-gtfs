@@ -1,7 +1,7 @@
 import { defineGtfsTable } from '../../define-table.ts';
 
 export const stopVisits = defineGtfsTable({
-  file: 'stop_visits.txt',
+  file: 'stop_visits.csv',
   presence: 'optional',
   primaryKey: ['service_date', 'trip_id_performed', 'trip_stop_sequence'],
   fields: {
@@ -9,7 +9,7 @@ export const stopVisits = defineGtfsTable({
     trip_id_performed: {
       kind: 'text',
       presence: 'required',
-      references: [{ file: 'trips_performed.txt', field: 'trip_id_performed' }],
+      references: [{ file: 'trips_performed.csv', field: 'trip_id_performed' }],
       applyFeedPrefix: true,
     },
     trip_stop_sequence: { kind: 'integer', presence: 'required', minimum: 1 },
@@ -17,7 +17,7 @@ export const stopVisits = defineGtfsTable({
     pattern_id: { kind: 'id', applyFeedPrefix: true },
     vehicle_id: {
       kind: 'id',
-      references: [{ file: 'vehicles.txt', field: 'vehicle_id' }],
+      references: [{ file: 'vehicles.csv', field: 'vehicle_id' }],
       applyFeedPrefix: true,
     },
     dwell: { kind: 'integer', minimum: 0 },

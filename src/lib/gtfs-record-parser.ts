@@ -204,7 +204,7 @@ export async function* parseGtfsFile(
   const filename = options.table.file ?? options.table.name;
   const fileExtension = path.extname(filename).slice(1);
 
-  if (fileExtension === 'txt') {
+  if (fileExtension === 'txt' || fileExtension === 'csv') {
     yield* parseTextGtfsFile(options, columnIndexes);
     return;
   }
