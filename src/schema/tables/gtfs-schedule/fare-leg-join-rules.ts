@@ -31,11 +31,13 @@ export const fareLegJoinRules = defineGtfsTable({
     },
     from_stop_id: {
       kind: 'id',
+      presence: 'conditionallyRequired',
       references: [{ file: 'stops.txt', field: 'stop_id' }],
       applyFeedPrefix: true,
     },
     to_stop_id: {
       kind: 'id',
+      presence: 'conditionallyRequired',
       references: [{ file: 'stops.txt', field: 'stop_id' }],
       applyFeedPrefix: true,
     },

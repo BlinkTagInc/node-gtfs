@@ -22,9 +22,18 @@ export const fareTransferRules = defineGtfsTable({
       references: [{ file: 'fare_leg_rules.txt', field: 'leg_group_id' }],
       applyFeedPrefix: true,
     },
-    transfer_count: { kind: 'integer', minimum: -1 },
+    transfer_count: {
+      kind: 'integer',
+      presence: 'conditionallyForbidden',
+      minimum: -1,
+    },
     duration_limit: { kind: 'integer', minimum: 1 },
-    duration_limit_type: { kind: 'integer', minimum: 0, maximum: 3 },
+    duration_limit_type: {
+      kind: 'integer',
+      presence: 'conditionallyRequired',
+      minimum: 0,
+      maximum: 3,
+    },
     fare_transfer_type: {
       kind: 'integer',
       presence: 'required',

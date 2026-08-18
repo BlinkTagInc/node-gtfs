@@ -17,8 +17,12 @@ export const translations = defineGtfsTable({
     field_name: { kind: 'text', presence: 'required' },
     language: { kind: 'text', presence: 'required' },
     translation: { kind: 'text', presence: 'required' },
-    record_id: { kind: 'id', applyFeedPrefix: true },
-    record_sub_id: { kind: 'id' },
-    field_value: { kind: 'text' },
+    record_id: {
+      kind: 'id',
+      presence: 'conditionallyRequired',
+      applyFeedPrefix: true,
+    },
+    record_sub_id: { kind: 'id', presence: 'conditionallyRequired' },
+    field_value: { kind: 'text', presence: 'conditionallyRequired' },
   },
 });

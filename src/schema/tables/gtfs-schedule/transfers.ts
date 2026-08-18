@@ -15,11 +15,13 @@ export const transfers = defineGtfsTable({
   fields: {
     from_stop_id: {
       kind: 'id',
+      presence: 'conditionallyRequired',
       references: [{ file: 'stops.txt', field: 'stop_id' }],
       applyFeedPrefix: true,
     },
     to_stop_id: {
       kind: 'id',
+      presence: 'conditionallyRequired',
       references: [{ file: 'stops.txt', field: 'stop_id' }],
       applyFeedPrefix: true,
     },
@@ -35,15 +37,21 @@ export const transfers = defineGtfsTable({
     },
     from_trip_id: {
       kind: 'id',
+      presence: 'conditionallyRequired',
       references: [{ file: 'trips.txt', field: 'trip_id' }],
       applyFeedPrefix: true,
     },
     to_trip_id: {
       kind: 'id',
+      presence: 'conditionallyRequired',
       references: [{ file: 'trips.txt', field: 'trip_id' }],
       applyFeedPrefix: true,
     },
     transfer_type: { kind: 'integer', minimum: 0, maximum: 5, defaultValue: 0 },
-    min_transfer_time: { kind: 'integer', minimum: 0 },
+    min_transfer_time: {
+      kind: 'integer',
+      presence: 'conditionallyRequired',
+      minimum: 0,
+    },
   },
 });

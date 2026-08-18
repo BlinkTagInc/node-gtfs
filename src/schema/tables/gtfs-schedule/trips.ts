@@ -28,6 +28,7 @@ export const trips = defineGtfsTable({
     block_id: { kind: 'id', applyFeedPrefix: true },
     shape_id: {
       kind: 'id',
+      presence: 'conditionallyRequired',
       references: [{ file: 'shapes.txt', field: 'shape_id' }],
       applyFeedPrefix: true,
     },

@@ -6,7 +6,11 @@ export const agency = defineGtfsTable({
   presence: 'required',
   primaryKey: ['agency_id'],
   fields: {
-    agency_id: { kind: 'id', applyFeedPrefix: true },
+    agency_id: {
+      kind: 'id',
+      presence: 'conditionallyRequired',
+      applyFeedPrefix: true,
+    },
     agency_name: {
       kind: 'text',
       presence: 'required',

@@ -11,8 +11,8 @@ export const timeframes = defineGtfsTable({
       presence: 'required',
       applyFeedPrefix: true,
     },
-    start_time: { kind: 'time' },
-    end_time: { kind: 'time' },
+    start_time: { kind: 'time', presence: 'conditionallyRequired' },
+    end_time: { kind: 'time', presence: 'conditionallyRequired' },
     service_id: {
       kind: 'id',
       references: [

@@ -17,14 +17,30 @@ export const bookingRules = defineGtfsTable({
       minimum: 0,
       maximum: 2,
     },
-    prior_notice_duration_min: { kind: 'integer' },
-    prior_notice_duration_max: { kind: 'integer' },
-    prior_notice_last_day: { kind: 'integer' },
-    prior_notice_last_time: { kind: 'time' },
-    prior_notice_start_day: { kind: 'integer' },
-    prior_notice_start_time: { kind: 'time' },
+    prior_notice_duration_min: {
+      kind: 'integer',
+      presence: 'conditionallyRequired',
+    },
+    prior_notice_duration_max: {
+      kind: 'integer',
+      presence: 'conditionallyForbidden',
+    },
+    prior_notice_last_day: {
+      kind: 'integer',
+      presence: 'conditionallyRequired',
+    },
+    prior_notice_last_time: { kind: 'time', presence: 'conditionallyRequired' },
+    prior_notice_start_day: {
+      kind: 'integer',
+      presence: 'conditionallyForbidden',
+    },
+    prior_notice_start_time: {
+      kind: 'time',
+      presence: 'conditionallyRequired',
+    },
     prior_notice_service_id: {
       kind: 'id',
+      presence: 'conditionallyForbidden',
       references: [{ file: 'calendar.txt', field: 'service_id' }],
       applyFeedPrefix: true,
     },

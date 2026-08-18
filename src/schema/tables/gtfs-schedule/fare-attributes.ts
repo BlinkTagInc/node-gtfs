@@ -18,6 +18,7 @@ export const fareAttributes = defineGtfsTable({
     transfers: { kind: 'integer', minimum: 0, maximum: 2 },
     agency_id: {
       kind: 'id',
+      presence: 'conditionallyRequired',
       references: [{ file: 'agency.txt', field: 'agency_id' }],
       applyFeedPrefix: true,
     },

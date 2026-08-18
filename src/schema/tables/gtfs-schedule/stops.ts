@@ -8,16 +8,31 @@ export const stops = defineGtfsTable({
   fields: {
     stop_id: { kind: 'id', presence: 'required', applyFeedPrefix: true },
     stop_code: { kind: 'text' },
-    stop_name: { kind: 'text', caseInsensitiveComparison: true },
+    stop_name: {
+      kind: 'text',
+      presence: 'conditionallyRequired',
+      caseInsensitiveComparison: true,
+    },
     tts_stop_name: { kind: 'text', caseInsensitiveComparison: true },
     stop_desc: { kind: 'text', caseInsensitiveComparison: true },
-    stop_lat: { kind: 'real', minimum: -90, maximum: 90 },
-    stop_lon: { kind: 'real', minimum: -180, maximum: 180 },
+    stop_lat: {
+      kind: 'real',
+      presence: 'conditionallyRequired',
+      minimum: -90,
+      maximum: 90,
+    },
+    stop_lon: {
+      kind: 'real',
+      presence: 'conditionallyRequired',
+      minimum: -180,
+      maximum: 180,
+    },
     zone_id: { kind: 'id', applyFeedPrefix: true },
     stop_url: { kind: 'text' },
     location_type: { kind: 'integer', minimum: 0, maximum: 4 },
     parent_station: {
       kind: 'id',
+      presence: 'conditionallyRequired',
       references: [{ file: 'stops.txt', field: 'stop_id' }],
       applyFeedPrefix: true,
     },
@@ -29,7 +44,12 @@ export const stops = defineGtfsTable({
       applyFeedPrefix: true,
     },
     platform_code: { kind: 'text' },
-    stop_access: { kind: 'integer', minimum: 0, maximum: 1 },
+    stop_access: {
+      kind: 'integer',
+      presence: 'conditionallyForbidden',
+      minimum: 0,
+      maximum: 1,
+    },
   },
   storage: {
     indexes: ['stop_code', 'parent_station'],
