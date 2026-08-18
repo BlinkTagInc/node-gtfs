@@ -44,7 +44,7 @@ describe('GTFS import regressions:', () => {
     }
   });
 
-  it('should create query-oriented indexes without changing imported rows', async () => {
+  it('should create declared indexes without changing imported rows', async () => {
     const fixturePath = mkdtempSync(path.join(tmpdir(), 'gtfs-indexes-'));
     const db = openDb();
 
@@ -60,16 +60,16 @@ describe('GTFS import regressions:', () => {
         )
         .all(
           'idx_calendar_dates_date_exception_type_service_id',
-          'idx_frequencies_trip_id',
-          'idx_stop_times_stop_id_trip_id_stop_sequence',
+          'idx_stop_times_stop_id_trip_id_stop_sequence_arrival_timestamp',
           'idx_trips_route_id_service_id_trip_id',
+          'idx_trips_service_id',
         ) as { name: string }[];
 
       expect(indexes.map(({ name }) => name)).toEqual([
         'idx_calendar_dates_date_exception_type_service_id',
-        'idx_frequencies_trip_id',
-        'idx_stop_times_stop_id_trip_id_stop_sequence',
+        'idx_stop_times_stop_id_trip_id_stop_sequence_arrival_timestamp',
         'idx_trips_route_id_service_id_trip_id',
+        'idx_trips_service_id',
       ]);
     } finally {
       closeDb(db);

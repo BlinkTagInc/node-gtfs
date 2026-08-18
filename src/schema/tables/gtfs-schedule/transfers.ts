@@ -54,4 +54,7 @@ export const transfers = defineGtfsTable({
       minimum: 0,
     },
   },
+  storage: {
+    indexes: ['to_stop_id'],
+  },
 });

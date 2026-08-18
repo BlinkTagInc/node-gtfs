@@ -43,7 +43,7 @@ export const timetables = defineGtfsTable({
     show_trip_continuation: { kind: 'integer', minimum: 0, maximum: 1 },
   },
   storage: {
-    indexes: ['start_timestamp', 'end_timestamp', 'timetable_sequence'],
+    indexes: ['timetable_sequence'],
   },
   namespace: 'gtfs-to-html',
 });

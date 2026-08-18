@@ -134,13 +134,7 @@ export const stopTimeUpdates = defineGtfsTable({
     expiration_timestamp: { kind: 'integer', presence: 'required' },
   },
   storage: {
-    indexes: [
-      'trip_update_id',
-      'trip_id',
-      'route_id',
-      'stop_id',
-      'assigned_stop_id',
-    ],
+    indexes: ['trip_id', 'route_id', 'stop_id'],
   },
   namespace: 'gtfs-realtime',
 });

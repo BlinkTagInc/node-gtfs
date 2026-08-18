@@ -19,4 +19,7 @@ export const stopAreas = defineGtfsTable({
       applyFeedPrefix: true,
     },
   },
+  storage: {
+    indexes: ['stop_id'],
+  },
 });

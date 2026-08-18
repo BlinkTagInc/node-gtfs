@@ -32,8 +32,6 @@ export const riderTrip = defineGtfsTable({
       'alighting_stop_id',
       'alighting_stop_sequence',
       'service_date',
-      'boarding_timestamp',
-      'alighting_timestamp',
     ],
   },
   namespace: 'gtfs-ride',

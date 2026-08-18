@@ -19,7 +19,4 @@ export const routeNetworks = defineGtfsTable({
       applyFeedPrefix: true,
     },
   },
-  storage: {
-    indexes: ['route_id'],
-  },
 });

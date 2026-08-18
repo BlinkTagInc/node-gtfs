@@ -40,9 +40,7 @@ export const trips = defineGtfsTable({
   },
   storage: {
     indexes: [
-      'route_id',
       'service_id',
-      'direction_id',
       'block_id',
       'shape_id',
       ['route_id', 'service_id', 'trip_id'],

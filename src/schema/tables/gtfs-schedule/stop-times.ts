@@ -81,16 +81,11 @@ export const stopTimes = defineGtfsTable({
   },
   storage: {
     indexes: [
-      'arrival_timestamp',
-      'departure_timestamp',
       'location_group_id',
       'location_id',
-      'stop_id',
-      'start_pickup_drop_off_window_timestamp',
-      'end_pickup_drop_off_window_timestamp',
       'pickup_booking_rule_id',
       'drop_off_booking_rule_id',
-      ['stop_id', 'trip_id', 'stop_sequence'],
+      ['stop_id', 'trip_id', 'stop_sequence', 'arrival_timestamp'],
     ],
   },
 });

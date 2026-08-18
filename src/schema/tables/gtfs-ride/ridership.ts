@@ -28,8 +28,6 @@ export const ridership = defineGtfsTable({
     indexes: [
       'ridership_start_date',
       'ridership_end_date',
-      'ridership_start_timestamp',
-      'ridership_end_timestamp',
       'service_id',
       'agency_id',
       'route_id',

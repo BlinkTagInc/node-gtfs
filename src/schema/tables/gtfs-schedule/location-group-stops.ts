@@ -20,6 +20,6 @@ export const locationGroupStops = defineGtfsTable({
     },
   },
   storage: {
-    indexes: ['location_group_id', 'stop_id'],
+    indexes: ['stop_id'],
   },
 });

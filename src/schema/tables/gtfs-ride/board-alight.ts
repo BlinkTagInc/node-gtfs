@@ -49,8 +49,6 @@ export const boardAlight = defineGtfsTable({
       'stop_sequence',
       'record_use',
       'service_date',
-      'service_arrival_timestamp',
-      'service_departure_timestamp',
     ],
   },
   namespace: 'gtfs-ride',

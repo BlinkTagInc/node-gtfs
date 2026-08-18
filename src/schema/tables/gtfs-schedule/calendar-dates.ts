@@ -17,6 +17,6 @@ export const calendarDates = defineGtfsTable({
     holiday_name: { kind: 'text', caseInsensitiveComparison: true },
   },
   storage: {
-    indexes: ['exception_type', ['date', 'exception_type', 'service_id']],
+    indexes: [['date', 'exception_type', 'service_id']],
   },
 });

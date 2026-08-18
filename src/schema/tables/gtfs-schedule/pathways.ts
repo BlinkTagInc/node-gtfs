@@ -39,4 +39,7 @@ export const pathways = defineGtfsTable({
     signposted_as: { kind: 'text', caseInsensitiveComparison: true },
     reversed_signposted_as: { kind: 'text', caseInsensitiveComparison: true },
   },
+  storage: {
+    indexes: ['from_stop_id', 'to_stop_id'],
+  },
 });

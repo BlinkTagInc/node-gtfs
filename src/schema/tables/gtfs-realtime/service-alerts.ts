@@ -137,8 +137,5 @@ export const serviceAlerts = defineGtfsTable({
     created_timestamp: { kind: 'integer', presence: 'required' },
     expiration_timestamp: { kind: 'integer', presence: 'required' },
   },
-  storage: {
-    indexes: ['id', 'cause', 'effect', 'severity_level'],
-  },
   namespace: 'gtfs-realtime',
 });

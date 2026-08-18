@@ -24,7 +24,7 @@ export const timetableStopOrder = defineGtfsTable({
     },
   },
   storage: {
-    indexes: ['timetable_id', 'stop_sequence'],
+    indexes: ['stop_sequence'],
   },
   namespace: 'gtfs-to-html',
 });

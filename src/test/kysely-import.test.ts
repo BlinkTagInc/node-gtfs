@@ -242,6 +242,63 @@ describe('importGtfsToKysely():', () => {
     }
   });
 
+  it('truncates indexes at generated columns when node-GTFS extras are omitted', async () => {
+    const fixturePath = mkdtempSync(path.join(tmpdir(), 'gtfs-kysely-plain-'));
+    const queries: string[] = [];
+    const connection = {
+      processID: 1,
+      async query(statement: string) {
+        queries.push(statement);
+        return { command: 'SELECT' as const, rowCount: 0, rows: [] };
+      },
+      release() {},
+    } as unknown as PostgresPoolClient;
+    const db = new Kysely<TestDatabase>({
+      dialect: new PostgresDialect({
+        pool: {
+          options: {},
+          async connect() {
+            return connection;
+          },
+          async end() {},
+        },
+      }),
+    });
+
+    try {
+      await writeFile(
+        path.join(fixturePath, 'agency.txt'),
+        [
+          'agency_id,agency_name,agency_url,agency_timezone',
+          'agency-1,Example Transit,https://example.com,America/Los_Angeles',
+          '',
+        ].join('\n'),
+      );
+
+      await importGtfsToKysely(
+        { agencies: [{ path: fixturePath }], logLevel: 'silent' },
+        { db, dialect: 'postgres', includeNodeGtfsExtras: false },
+      );
+
+      const stopTimeIndexes = queries.filter(
+        (query) =>
+          query.startsWith('create index') && query.includes('"stop_times"'),
+      );
+
+      expect(
+        stopTimeIndexes.some((query) =>
+          query.includes('("stop_id", "trip_id", "stop_sequence")'),
+        ),
+      ).toBeTruthy();
+      expect(
+        stopTimeIndexes.some((query) => query.includes('arrival_timestamp')),
+      ).toBeFalsy();
+    } finally {
+      await db.destroy();
+      await rm(fixturePath, { recursive: true, force: true });
+    }
+  });
+
   it('compiles managed schema and conflict handling for PostgreSQL', async () => {
     const fixturePath = mkdtempSync(
       path.join(tmpdir(), 'gtfs-kysely-postgres-'),

@@ -39,4 +39,7 @@ export const fareRules = defineGtfsTable({
       applyFeedPrefix: true,
     },
   },
+  storage: {
+    indexes: ['route_id'],
+  },
 });

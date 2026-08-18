@@ -24,6 +24,6 @@ export const timeframes = defineGtfsTable({
     },
   },
   storage: {
-    indexes: ['start_timestamp', 'end_timestamp', 'service_id'],
+    indexes: ['service_id'],
   },
 });

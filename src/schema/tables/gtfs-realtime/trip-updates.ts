@@ -129,13 +129,7 @@ export const tripUpdates = defineGtfsTable({
     expiration_timestamp: { kind: 'integer', presence: 'required' },
   },
   storage: {
-    indexes: [
-      'id',
-      'vehicle_id',
-      'trip_id',
-      'route_id',
-      'trip_properties_trip_id',
-    ],
+    indexes: ['vehicle_id', 'trip_id', 'route_id'],
   },
   namespace: 'gtfs-realtime',
 });

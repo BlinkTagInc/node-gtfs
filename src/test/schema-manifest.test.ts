@@ -97,11 +97,7 @@ describe('GTFS schema manifest', () => {
         allowEqual: false,
       },
     ]);
-    assert.deepEqual(frequencies.storage.indexes, [
-      'trip_id',
-      'start_timestamp',
-      'end_timestamp',
-    ]);
+    assert.equal(frequencies.storage.indexes, undefined);
     assert.equal('index' in frequencies.fields.trip_id, false);
     assert.equal(frequencies.fields.trip_id.applyFeedPrefix, true);
     assert.equal('prefixOnMerge' in frequencies.fields.trip_id, false);
@@ -130,15 +126,13 @@ describe('GTFS schema manifest', () => {
 
     assert.equal(stopTimes.fields.start_pickup_drop_off_window.kind, 'time');
     assert.equal(stopTimes.fields.end_pickup_drop_off_window.kind, 'time');
-    assert.ok(
-      stopTimes.storage.indexes?.includes(
-        'start_pickup_drop_off_window_timestamp',
-      ),
+    assert.equal(
+      stopTimes.fields.start_pickup_drop_off_window.presence,
+      'conditionallyRequired',
     );
-    assert.ok(
-      stopTimes.storage.indexes?.includes(
-        'end_pickup_drop_off_window_timestamp',
-      ),
+    assert.equal(
+      stopTimes.fields.end_pickup_drop_off_window.presence,
+      'conditionallyRequired',
     );
   });
 
@@ -281,6 +275,34 @@ describe('GTFS schema manifest', () => {
     assert.equal(exactTimes.minimum, 0);
     assert.equal(exactTimes.maximum, 1);
     assert.equal('schema' in tables.frequencies, false);
+  });
+
+  test('declares no index that a primary key or composite already covers', () => {
+    const redundant: string[] = [];
+
+    for (const [tableName, table] of Object.entries(gtfsManifest)) {
+      const primaryKey = table.primaryKey ?? [];
+      const indexes = (table.storage?.indexes ?? []).map((index) =>
+        typeof index === 'string' ? [index] : index,
+      );
+
+      for (const columns of indexes) {
+        const coveredByPrimaryKey = columns.every(
+          (column, position) => primaryKey[position] === column,
+        );
+        const coveredByComposite = indexes.some(
+          (other) =>
+            other.length > columns.length &&
+            columns.every((column, position) => other[position] === column),
+        );
+
+        if (coveredByPrimaryKey || coveredByComposite) {
+          redundant.push(`${tableName} (${columns.join(', ')})`);
+        }
+      }
+    }
+
+    assert.deepEqual(redundant, []);
   });
 
   test('uses explicit names for normalization and source metadata', () => {

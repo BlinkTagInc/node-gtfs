@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Declarative schema exports and inferred row, query, insert, and database types
 - `fare_leg_join_rules.txt` and `stop_times.end_pickup_drop_off_window`
 - `logLevel`, configuration validation, and CLI `--help` and `--version`
-- Composite query indexes and cross-database integration tests
+- Reworked database indexes: composites for stop, route, and service-date lookups; point-lookup indexes for transfers, pathways, and fare rules; removed redundant and unused indexes.
 - Focused configuration, query, realtime, and troubleshooting guides
 - Query methods for TIDES files
 

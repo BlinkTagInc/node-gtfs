@@ -31,12 +31,7 @@ export const deadheadTimes = defineGtfsTable({
     shape_dist_traveled: { kind: 'real', minimum: 0 },
   },
   storage: {
-    indexes: [
-      'deadhead_id',
-      'arrival_timestamp',
-      'departure_timestamp',
-      'location_sequence',
-    ],
+    indexes: ['location_sequence'],
   },
   namespace: 'tods',
 });

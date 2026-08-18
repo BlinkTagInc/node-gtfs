@@ -25,7 +25,4 @@ export const frequencies = defineGtfsTable({
       allowEqual: false,
     },
   ],
-  storage: {
-    indexes: ['trip_id', 'start_timestamp', 'end_timestamp'],
-  },
 });

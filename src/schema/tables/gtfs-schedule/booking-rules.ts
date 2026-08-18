@@ -51,7 +51,4 @@ export const bookingRules = defineGtfsTable({
     info_url: { kind: 'text' },
     booking_url: { kind: 'text' },
   },
-  storage: {
-    indexes: ['prior_notice_last_timestamp', 'prior_notice_start_timestamp'],
-  },
 });
