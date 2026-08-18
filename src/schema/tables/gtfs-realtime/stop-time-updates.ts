@@ -4,6 +4,7 @@ export const stopTimeUpdates = defineGtfsTable({
   file: null,
   table: 'stop_time_updates',
   presence: 'optional',
+  primaryKey: ['trip_update_id', 'stop_sequence'],
   fields: {
     trip_update_id: {
       kind: 'id',
@@ -28,6 +29,8 @@ export const stopTimeUpdates = defineGtfsTable({
     direction_id: {
       kind: 'integer',
       sourcePath: 'parent.tripUpdate.trip.directionId',
+      minimum: 0,
+      maximum: 1,
     },
     route_id: {
       kind: 'id',
