@@ -36,7 +36,7 @@ export function getTrips<Fields extends keyof Trip>(
   const tripQuery = omit(query, tripQueryOmitKeys);
 
   const whereClauses = Object.entries(tripQuery).map(([key, value]) =>
-    formatWhereClause(key, value as QueryScalar),
+    formatWhereClause(key, value as QueryScalar, tableName),
   );
 
   if (query.date) {
@@ -49,7 +49,7 @@ export function getTrips<Fields extends keyof Trip>(
     }
 
     const serviceIds = getServiceIdsByDate(query.date, options);
-    whereClauses.push(formatWhereClause('service_id', serviceIds));
+    whereClauses.push(formatWhereClause('service_id', serviceIds, tableName));
   }
 
   if (whereClauses.length > 0) {

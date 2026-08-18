@@ -34,7 +34,7 @@ type StopQuery = RowQuery<
 >;
 
 function buildTripSubquery(query: DynamicQuery): SqlClause {
-  const { clause: whereClause, params } = formatWhereClauses(query);
+  const { clause: whereClause, params } = formatWhereClauses(query, 'trips');
   return { clause: `SELECT trip_id FROM trips ${whereClause}`, params };
 }
 
@@ -95,7 +95,7 @@ export function getStops<Fields extends keyof Stop>(
   };
 
   const whereClauses = Object.entries(stopQuery).map(([key, value]) =>
-    formatWhereClause(key, value as QueryScalar),
+    formatWhereClause(key, value as QueryScalar, tableName),
   );
 
   // Parameters for the ORDER BY clause bind after the WHERE parameters, since

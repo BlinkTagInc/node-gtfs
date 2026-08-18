@@ -7,6 +7,10 @@ import type {
   SortDirection,
 } from '../types/query.ts';
 import type { SqlClause, SqliteBindValue } from './sql-types.ts';
+import {
+  getColumnStorageKinds,
+  type ColumnStorageKinds,
+} from '../schema/table-registry.ts';
 import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from './errors.ts';
 
 /** Quotes qualified SQL identifiers while preserving wildcards. */
@@ -17,14 +21,43 @@ export function escapeIdentifier(identifier: string) {
     .join('.');
 }
 
+function resolveColumnStorageKind(
+  key: string,
+  table: string | undefined,
+): ColumnStorageKinds[string] | undefined {
+  const separatorIndex = key.lastIndexOf('.');
+
+  if (separatorIndex === -1) {
+    return table === undefined
+      ? undefined
+      : getColumnStorageKinds(table)?.[key];
+  }
+
+  return getColumnStorageKinds(key.slice(0, separatorIndex))?.[
+    key.slice(separatorIndex + 1)
+  ];
+}
+
 /** Converts a query value to a better-sqlite3 bind value. */
-function toBindValue(value: QueryScalar): SqliteBindValue {
+function toBindValue(
+  value: QueryScalar,
+  storageKind?: ColumnStorageKinds[string],
+): SqliteBindValue {
   if (value === undefined || value === null) {
     return null;
   }
 
   if (typeof value === 'boolean') {
     return value ? 1 : 0;
+  }
+
+  // SQLite does not apply text affinity to a bound parameter, so a number
+  // queried against a text column would never match the stored text value.
+  if (
+    storageKind === 'text' &&
+    (typeof value === 'number' || typeof value === 'bigint')
+  ) {
+    return String(value);
   }
 
   return value;
@@ -209,13 +242,17 @@ export function formatWhereClauseBoundingBox(
  * Formats SQL WHERE clause for a single key-value pair
  * @param key Column name
  * @param value Single value, array of values, or null
+ * @param table Table the column belongs to, used to match value types to
+ *              column types
  * @returns Formatted WHERE clause condition and its bound parameters
  */
 export function formatWhereClause(
   key: string,
   value: QueryScalar | readonly QueryScalar[],
+  table?: string,
 ): SqlClause {
   const escapedKey = escapeIdentifier(key);
+  const storageKind = resolveColumnStorageKind(key, table);
 
   if (Array.isArray(value)) {
     const arrayValue = value as readonly QueryScalar[];
@@ -239,7 +276,7 @@ export function formatWhereClause(
       clause = `(${clause} OR ${escapedKey} IS NULL)`;
     }
 
-    return { clause, params: values.map((v) => toBindValue(v)) };
+    return { clause, params: values.map((v) => toBindValue(v, storageKind)) };
   }
 
   if (value === null || value === undefined) {
@@ -248,23 +285,28 @@ export function formatWhereClause(
 
   return {
     clause: `${escapedKey} = ?`,
-    params: [toBindValue(value as QueryScalar)],
+    params: [toBindValue(value as QueryScalar, storageKind)],
   };
 }
 
 /**
  * Formats complete SQL WHERE clause from query object
  * @param query Object containing column-value pairs
+ * @param table Table the columns belong to, used to match value types to
+ *              column types
  * @returns Formatted WHERE clause and its bound parameters, or an empty clause
  *          if there are no conditions
  */
-export function formatWhereClauses(query: DynamicQuery): SqlClause {
+export function formatWhereClauses(
+  query: DynamicQuery,
+  table?: string,
+): SqlClause {
   if (Object.keys(query).length === 0) {
     return { clause: '', params: [] };
   }
 
   const whereClauses = Object.entries(query).map(([key, value]) =>
-    formatWhereClause(key, value),
+    formatWhereClause(key, value, table),
   );
 
   return {

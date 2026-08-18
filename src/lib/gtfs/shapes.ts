@@ -28,6 +28,7 @@ function buildTripSubquery(query: {
 }): SqlClause {
   const { clause: whereClause, params } = formatWhereClauses(
     query as DynamicQuery,
+    'trips',
   );
   return {
     clause: `SELECT DISTINCT shape_id FROM trips ${whereClause}`,
@@ -79,7 +80,7 @@ export function getShapes<Fields extends keyof Shape>(
   };
 
   const whereClauses = Object.entries(shapeQuery).map(([key, value]) =>
-    formatWhereClause(key, value),
+    formatWhereClause(key, value, tableName),
   );
 
   if (Object.values(tripQuery).length > 0) {

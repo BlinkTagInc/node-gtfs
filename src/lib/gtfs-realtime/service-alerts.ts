@@ -73,7 +73,10 @@ export function getServiceAlerts<Fields extends keyof ServiceAlertRow>(
     }
   }
 
-  const { clause: whereClause, params } = formatWhereClauses(alertQuery);
+  const { clause: whereClause, params } = formatWhereClauses(
+    alertQuery,
+    tableName,
+  );
   const alerts = db
     .prepare(
       `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
@@ -89,7 +92,7 @@ export function getServiceAlerts<Fields extends keyof ServiceAlertRow>(
   // alert_id IN (...) clause to scope results to the matched alerts.
   const alertIdPlaceholders = alertIds.map(() => '?').join(', ');
   const { clause: entityFilterClause, params: entityFilterParams } =
-    formatWhereClauses(entityQuery);
+    formatWhereClauses(entityQuery, joinTableName);
   const entityWhereClause = entityFilterClause
     ? `${entityFilterClause} AND alert_id IN (${alertIdPlaceholders})`
     : `WHERE alert_id IN (${alertIdPlaceholders})`;

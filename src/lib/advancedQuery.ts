@@ -34,6 +34,7 @@ export function advancedQuery(
   const selectClause = formatSelectClause(queryOptions.fields);
   const { clause: whereClause, params } = formatWhereClauses(
     queryOptions.query as DynamicQuery,
+    table,
   );
   const joinClause = formatJoinClause(queryOptions.join);
   const orderByClause = formatOrderByClause(queryOptions.orderBy);

@@ -43,10 +43,11 @@ export function executeSqliteRead<
   options: SqliteQueryOptions,
 ): SelectedRow<Row, Fields>[] {
   const db = options.db ?? openDb();
-  const tableName = escapeIdentifier(getTableName(definition));
+  const tableName = getTableName(definition);
   const selectClause = formatSelectClause(spec.select);
   const { clause: whereClause, params } = formatWhereClauses(
     spec.where as DynamicQuery,
+    tableName,
   );
   const orderByClause = formatOrderByClause(spec.orderBy);
   const limitClause =
@@ -64,7 +65,7 @@ export function executeSqliteRead<
 
   return db
     .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause} ${limitClause} ${offsetClause};`,
+      `${selectClause} FROM ${escapeIdentifier(tableName)} ${whereClause} ${orderByClause} ${limitClause} ${offsetClause};`,
     )
     .all(...params) as SelectedRow<Row, Fields>[];
 }

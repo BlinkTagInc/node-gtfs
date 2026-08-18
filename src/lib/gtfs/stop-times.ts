@@ -38,7 +38,7 @@ export function getStoptimes<Fields extends keyof StopTime>(
 
   const stoptimeQuery = omit(query, stoptimeQueryOmitKeys);
   const whereClauses = Object.entries(stoptimeQuery).map(([key, value]) =>
-    formatWhereClause(key, value as QueryScalar),
+    formatWhereClause(key, value as QueryScalar, tableName),
   );
 
   if (query.date) {
@@ -51,7 +51,11 @@ export function getStoptimes<Fields extends keyof StopTime>(
     }
 
     const serviceIds = getServiceIdsByDate(query.date, options);
-    const serviceIdClause = formatWhereClause('service_id', serviceIds);
+    const serviceIdClause = formatWhereClause(
+      'service_id',
+      serviceIds,
+      'trips',
+    );
     const tripSubquery = `SELECT DISTINCT trip_id FROM trips WHERE ${serviceIdClause.clause}`;
 
     whereClauses.push({

@@ -20,6 +20,7 @@ import {
 function buildStoptimeSubquery(query: { [key: string]: string }): SqlClause {
   const { clause: whereClause, params } = formatWhereClauses(
     query as DynamicQuery,
+    'stop_times',
   );
   return {
     clause: `SELECT DISTINCT trip_id FROM stop_times ${whereClause}`,
@@ -36,7 +37,7 @@ function buildTripSubquery(query: {
   const stoptimeQuery = pick(query, ['stop_id']);
 
   const whereClauses = Object.entries(tripQuery).map(([key, value]) =>
-    formatWhereClause(key, value),
+    formatWhereClause(key, value, 'trips'),
   );
 
   if (Object.values(stoptimeQuery).length > 0) {
@@ -83,7 +84,7 @@ export function getRoutes<Fields extends keyof Route>(
   };
 
   const whereClauses = Object.entries(routeQuery).map(([key, value]) =>
-    formatWhereClause(key, value),
+    formatWhereClause(key, value, tableName),
   );
 
   if (Object.values(tripQuery).length > 0) {

@@ -2,6 +2,7 @@ import * as tables from './tables/index.ts';
 import {
   compileTable,
   getTableName,
+  type CompiledGtfsColumn,
   type CompiledGtfsTable,
 } from './compile-table.ts';
 import { gtfsNamespaces, type GtfsTableDefinition } from './define-table.ts';
@@ -51,3 +52,22 @@ export const fileBackedTables: FileBackedCompiledGtfsTable[] =
   compiledTables.filter(
     (table): table is FileBackedCompiledGtfsTable => table.file !== null,
   );
+
+export type ColumnStorageKinds = Readonly<
+  Record<string, CompiledGtfsColumn['storageKind']>
+>;
+
+const columnStorageKindsByTable = new Map<string, ColumnStorageKinds>(
+  compiledTables.map((table) => [
+    table.name,
+    Object.fromEntries(
+      table.columns.map((column) => [column.name, column.storageKind]),
+    ),
+  ]),
+);
+
+export function getColumnStorageKinds(
+  tableName: string,
+): ColumnStorageKinds | undefined {
+  return columnStorageKindsByTable.get(tableName);
+}
