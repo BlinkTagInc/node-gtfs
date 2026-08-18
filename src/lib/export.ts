@@ -6,14 +6,11 @@ import { stringify } from 'csv-stringify';
 import Database from 'better-sqlite3';
 
 import { fileBackedTables } from '../schema/table-registry.ts';
-import { openDb } from './db.ts';
+import { openDb } from './sqlite-db.ts';
 import { prepDirectory, generateFolderName, untildify } from './file-utils.ts';
-import {
-  escapeIdentifier,
-  formatCurrency,
-  mapSeries,
-  applyConfigDefaults,
-} from './utils.ts';
+import { escapeIdentifier } from './sql-clauses.ts';
+import { mapSeries } from './map-series.ts';
+import { applyConfigDefaults } from './validate-config.ts';
 
 import type { GtfsExportConfig } from '../types/config.ts';
 import type { DatabaseResultValue } from '../types/query.ts';
@@ -25,6 +22,31 @@ import {
   formatFileList,
   pluralize,
 } from '../reporting/format.ts';
+
+/**
+ * Formats a numeric value according to the decimal precision rules of the specified currency,
+ * without any currency symbols or separators.
+ * @param value The numeric value to format (e.g., 10.5)
+ * @param currency The ISO 4217 currency code (e.g., 'USD', 'JPY', 'EUR')
+ * @returns The formatted string with appropriate decimal places
+ *          Examples:
+ *          - formatCurrency(10.5, 'USD') => '10.50'    // USD uses 2 decimal places
+ *          - formatCurrency(10.5, 'JPY') => '10'       // JPY uses 0 decimal places
+ *          - formatCurrency(10.523, 'BHD') => '10.523' // BHD uses 3 decimal places
+ */
+function formatCurrency(value: number, currency: string) {
+  const parts = new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency,
+  }).formatToParts(value);
+
+  const integerPart =
+    parts.find((part) => part.type === 'integer')?.value ?? '0';
+  const fractionPart =
+    parts.find((part) => part.type === 'fraction')?.value ?? '';
+
+  return `${integerPart}${fractionPart !== '' ? `.${fractionPart}` : ''}`;
+}
 
 const getAgencies = (db: Database.Database, config: GtfsExportConfig) => {
   try {

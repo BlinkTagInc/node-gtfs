@@ -132,7 +132,7 @@ export function formatRunComplete(
 }
 
 // Fixed width prevents live progress output from shifting between files.
-export const FILENAME_WIDTH = 24;
+const FILENAME_WIDTH = 24;
 
 const COUNT_WIDTH = 11;
 

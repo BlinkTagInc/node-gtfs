@@ -5,64 +5,22 @@ import type {
   DynamicQuery,
   RowOrderBy,
   RowQuery,
-  SelectedRow,
   SqliteQueryOptions,
 } from '../../types/query.ts';
-import type { SqlClause } from '../sql-types.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { selectRows } from '../sqlite-query.ts';
+import { formatWhereConditions } from '../sql-clauses.ts';
+import { routeIdsForTrips } from './subqueries.ts';
 
-function buildStoptimeSubquery(query: { [key: string]: string }): SqlClause {
-  const { clause: whereClause, params } = formatWhereClauses(
-    query as DynamicQuery,
-    'stop_times',
-  );
-  return {
-    clause: `SELECT DISTINCT trip_id FROM stop_times ${whereClause}`,
-    params,
-  };
-}
-
-function buildTripSubquery(query: {
-  service_id?: string;
-  stop_id?: string;
-}): SqlClause {
-  let whereClause = '';
-  const tripQuery = omit(query, ['stop_id']);
-  const stoptimeQuery = pick(query, ['stop_id']);
-
-  const whereClauses = Object.entries(tripQuery).map(([key, value]) =>
-    formatWhereClause(key, value, 'trips'),
-  );
-
-  if (Object.values(stoptimeQuery).length > 0) {
-    const stoptimeSubquery = buildStoptimeSubquery(stoptimeQuery);
-    whereClauses.push({
-      clause: `trip_id IN (${stoptimeSubquery.clause})`,
-      params: stoptimeSubquery.params,
-    });
-  }
-
-  if (whereClauses.length > 0) {
-    whereClause = `WHERE ${whereClauses.map(({ clause }) => clause).join(' AND ')}`;
-  }
-
-  return {
-    clause: `SELECT DISTINCT route_id FROM trips ${whereClause}`,
-    params: whereClauses.flatMap(({ params }) => params),
-  };
-}
-
-/*
+/**
  * Returns an array of routes that match the query parameters. A `stop_id`
  * query parameter may be passed to find all routes that contain that stop.
  * A `service_id` query parameter may be passed to limit routes to specific
  * calendars.
+ * @param query Column values to match, as single values or arrays
+ * @param fields Columns to select, or every column when empty
+ * @param orderBy Column and direction pairs to sort by
+ * @param options Query options, including the database to read from
+ * @returns Matching rows, containing only `fields` when it is not empty
  */
 export function getRoutes<Fields extends keyof Route>(
   query: RowQuery<
@@ -72,39 +30,27 @@ export function getRoutes<Fields extends keyof Route>(
   orderBy: RowOrderBy<Route> = [],
   options: SqliteQueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
   const tableName = 'routes';
-  const selectClause = formatSelectClause(fields);
-  let whereClause = '';
-  const orderByClause = formatOrderByClause(orderBy);
-  const routeQuery = omit(query, ['stop_id', 'service_id']);
+  const where = formatWhereConditions(
+    omit(query, ['stop_id', 'service_id']) as DynamicQuery,
+    tableName,
+  );
   const tripQuery = pick(query, ['stop_id', 'service_id']) as {
     stop_id?: string;
     service_id?: string;
   };
 
-  const whereClauses = Object.entries(routeQuery).map(([key, value]) =>
-    formatWhereClause(key, value, tableName),
-  );
-
   if (Object.values(tripQuery).length > 0) {
-    const tripSubquery = buildTripSubquery(tripQuery);
-    whereClauses.push({
-      clause: `route_id IN (${tripSubquery.clause})`,
-      params: tripSubquery.params,
+    const routeIds = routeIdsForTrips(tripQuery);
+    where.push({
+      clause: `route_id IN (${routeIds.clause})`,
+      params: routeIds.params,
     });
   }
 
-  if (whereClauses.length > 0) {
-    whereClause = `WHERE ${whereClauses.map(({ clause }) => clause).join(' AND ')}`;
-  }
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...whereClauses.flatMap(({ params }) => params)) as SelectedRow<
-    Route,
-    Fields
-  >[];
+  return selectRows<Route, Fields>(
+    tableName,
+    { fields, where, orderBy },
+    options,
+  );
 }

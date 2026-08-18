@@ -7,7 +7,9 @@ import {
 } from 'kysely';
 
 import {
+  getGtfsIndexName,
   getGtfsIndexPlan,
+  getPrimaryKeyColumns,
   getTimestampColumnName,
   type CompiledGtfsColumn,
   type CompiledGtfsTable,
@@ -15,7 +17,8 @@ import {
 import { fileBackedTables } from '../schema/table-registry.ts';
 import type { GtfsFileWriter, GtfsFileWriterOptions } from './gtfs-writer.ts';
 import type { NormalizedGtfsRow } from './gtfs-record-parser.ts';
-import { applyPrefixToValue, calculateSecondsFromMidnight } from './utils.ts';
+import { applyPrefixToValue } from './feed-prefix.ts';
+import { calculateSecondsFromMidnight } from './time-utils.ts';
 import {
   getGtfsDialectCapabilities,
   type GtfsDatabaseDialect,
@@ -96,10 +99,6 @@ function configureColumn(
   return configured;
 }
 
-function primaryColumns(table: CompiledGtfsTable): CompiledGtfsColumn[] {
-  return table.columns.filter((column) => column.primaryKey);
-}
-
 function checkExpression(column: CompiledGtfsColumn) {
   if (column.sqlMinimum !== undefined && column.sqlMaximum !== undefined) {
     return sql`${sql.ref(column.name)} >= ${sql.lit(column.sqlMinimum)} and ${sql.ref(column.name)} <= ${sql.lit(column.sqlMaximum)}`;
@@ -151,7 +150,7 @@ async function createTable(
     }
   }
 
-  const keyColumns = primaryColumns(tableDefinition);
+  const keyColumns = getPrimaryKeyColumns(tableDefinition);
   if (keyColumns.length > 0) {
     if (capabilities.primaryKeyStrategy === 'hash') {
       // MySQL cannot index arbitrary-length text identifiers as a unique key.
@@ -194,7 +193,7 @@ async function createIndex(
   const capabilities = getGtfsDialectCapabilities(dialect);
   let index = db.schema
     .createIndex(
-      shortenIdentifier(`idx_${tableName}_${columns.join('_')}`, capabilities),
+      shortenIdentifier(getGtfsIndexName(tableName, columns), capabilities),
     )
     .on(tableName);
 
@@ -329,7 +328,7 @@ export function createKyselyGtfsWriter<DB>(
           : 0) +
         (capabilities.primaryKeyStrategy === 'hash' &&
         managedSchema &&
-        primaryColumns(writerOptions.table).length > 0
+        getPrimaryKeyColumns(writerOptions.table).length > 0
           ? 1
           : 0);
       const chunkSize = Math.max(

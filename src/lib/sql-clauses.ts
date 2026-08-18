@@ -1,17 +1,23 @@
-import Long from 'long';
-import type { ReportingOptions } from '../reporting/types.ts';
 import type {
   AdvancedQueryJoin,
   DynamicQuery,
   QueryScalar,
   SortDirection,
 } from '../types/query.ts';
-import type { SqlClause, SqliteBindValue } from './sql-types.ts';
 import {
   getColumnStorageKinds,
   type ColumnStorageKinds,
 } from '../schema/table-registry.ts';
 import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from './errors.ts';
+
+/** A value accepted by better-sqlite3 as a statement parameter. */
+export type SqliteBindValue = null | string | number | bigint | Uint8Array;
+
+/** SQL text paired with values ordered for its `?` placeholders. */
+export interface SqlClause {
+  clause: string;
+  params: SqliteBindValue[];
+}
 
 /** Quotes qualified SQL identifiers while preserving wildcards. */
 export function escapeIdentifier(identifier: string) {
@@ -61,78 +67,6 @@ function toBindValue(
   }
 
   return value;
-}
-
-type ConfigWithDefaults<Config, Defaults> = Omit<Config, keyof Defaults> & {
-  [Key in keyof Defaults]:
-    | Defaults[Key]
-    | (Key extends keyof Config ? Exclude<Config[Key], undefined> : never);
-};
-
-export function applyConfigDefaults<
-  Config extends ReportingOptions,
-  Defaults extends object,
->(
-  initialConfig: Config,
-  defaults: Defaults,
-): ConfigWithDefaults<Config, Defaults> {
-  const definedConfig = Object.fromEntries(
-    Object.entries(initialConfig).filter(([, value]) => value !== undefined),
-  );
-
-  return { ...defaults, ...definedConfig } as ConfigWithDefaults<
-    Config,
-    Defaults
-  >;
-}
-
-/**
- * Converts a Long timestamp to ISO date string
- * @param longDate Object containing high, low, and unsigned values
- * @returns ISO formatted date string
- */
-export function convertLongTimeToDate(longDate: {
-  high: number;
-  low: number;
-  unsigned: boolean;
-}) {
-  const { high, low, unsigned } = longDate;
-  return new Date(
-    Long.fromBits(low, high, unsigned).toNumber() * 1000,
-  ).toISOString();
-}
-
-/**
- * Converts time string in HH:mm:ss format to seconds since midnight
- * @param time Time string in HH:mm:ss format
- * @returns Number of seconds since midnight, or null if invalid format
- */
-export function calculateSecondsFromMidnight(time: string): number | null {
-  if (!time || typeof time !== 'string') {
-    return null;
-  }
-
-  const [hours, minutes, seconds] = time.split(':').map(Number);
-
-  if ([hours, minutes, seconds].some(isNaN) || minutes >= 60 || seconds >= 60) {
-    return null;
-  }
-
-  return hours * 3600 + minutes * 60 + seconds;
-}
-
-/**
- * Ensures time components have leading zeros (e.g., "9:5:1" -> "09:05:01")
- * @param time Time string in HH:mm:ss format
- * @returns Formatted time string with leading zeros, or null if invalid format
- */
-export function padLeadingZeros(time: string) {
-  const split = time.split(':').map((d) => String(Number(d)).padStart(2, '0'));
-  if (split.length !== 3) {
-    return null;
-  }
-
-  return split.join(':');
 }
 
 /**
@@ -191,13 +125,14 @@ function radian2degree(angle: number) {
 const EARTH_RADIUS_METERS = 6371000;
 
 /**
- * Creates SQL WHERE clause for geographic bounding box search
+ * Creates a bare condition matching stops inside a geographic bounding box
  * @param latitudeDegree Center latitude in degrees
  * @param longitudeDegree Center longitude in degrees
  * @param boundingBoxSideMeters Size of bounding box in meters
- * @returns SQL WHERE clause for bounding box search and its bound parameters
+ * @returns Bounding box condition and its bound parameters, without a leading
+ *          `WHERE`
  */
-export function formatWhereClauseBoundingBox(
+export function formatBoundingBoxCondition(
   latitudeDegree: number | string,
   longitudeDegree: number | string,
   boundingBoxSideMeters: number,
@@ -239,14 +174,14 @@ export function formatWhereClauseBoundingBox(
 }
 
 /**
- * Formats SQL WHERE clause for a single key-value pair
+ * Formats a bare condition for a single key-value pair
  * @param key Column name
  * @param value Single value, array of values, or null
  * @param table Table the column belongs to, used to match value types to
  *              column types
- * @returns Formatted WHERE clause condition and its bound parameters
+ * @returns Condition and its bound parameters, without a leading `WHERE`
  */
-export function formatWhereClause(
+export function formatWhereCondition(
   key: string,
   value: QueryScalar | readonly QueryScalar[],
   table?: string,
@@ -290,6 +225,42 @@ export function formatWhereClause(
 }
 
 /**
+ * Formats every entry of a query object as a bare condition, without the
+ * leading `WHERE`, so that callers can append conditions of their own
+ * @param query Object containing column-value pairs
+ * @param table Table the columns belong to, used to match value types to
+ *              column types
+ * @returns One condition per query entry
+ */
+export function formatWhereConditions(
+  query: DynamicQuery,
+  table?: string,
+): SqlClause[] {
+  return Object.entries(query).map(([key, value]) =>
+    formatWhereCondition(key, value, table),
+  );
+}
+
+/**
+ * Joins bare conditions with `AND` behind a leading `WHERE`
+ * @param conditions Conditions to combine
+ * @returns Formatted WHERE clause and its bound parameters, or an empty clause
+ *          if there are no conditions
+ */
+export function combineWhereClauses(
+  conditions: readonly SqlClause[],
+): SqlClause {
+  if (conditions.length === 0) {
+    return { clause: '', params: [] };
+  }
+
+  return {
+    clause: `WHERE ${conditions.map(({ clause }) => clause).join(' AND ')}`,
+    params: conditions.flatMap(({ params }) => params),
+  };
+}
+
+/**
  * Formats complete SQL WHERE clause from query object
  * @param query Object containing column-value pairs
  * @param table Table the columns belong to, used to match value types to
@@ -301,18 +272,7 @@ export function formatWhereClauses(
   query: DynamicQuery,
   table?: string,
 ): SqlClause {
-  if (Object.keys(query).length === 0) {
-    return { clause: '', params: [] };
-  }
-
-  const whereClauses = Object.entries(query).map(([key, value]) =>
-    formatWhereClause(key, value, table),
-  );
-
-  return {
-    clause: `WHERE ${whereClauses.map(({ clause }) => clause).join(' AND ')}`,
-    params: whereClauses.flatMap(({ params }) => params),
-  };
+  return combineWhereClauses(formatWhereConditions(query, table));
 }
 
 /**
@@ -337,115 +297,4 @@ export function formatOrderByClause(
   }
 
   return orderByClause;
-}
-
-/**
- * Gets day of week name from YYYYMMDD date number
- * @param date Date in YYYYMMDD format
- * @returns Lowercase day name (sunday-saturday)
- */
-export function getDayOfWeekFromDate(date: number): string {
-  const DAYS_OF_WEEK = [
-    'sunday',
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-  ] as const;
-
-  if (!Number.isInteger(date) || date.toString().length !== 8) {
-    throw new GtfsError('Date must be in YYYYMMDD format', {
-      code: GtfsErrorCode.GTFS_INVALID_DATE,
-      category: GtfsErrorCategory.VALIDATION,
-      details: { value: date },
-    });
-  }
-
-  const year = Math.floor(date / 10000);
-  const month = Math.floor((date % 10000) / 100);
-  const day = date % 100;
-
-  const dateObj = new Date(year, month - 1, day);
-
-  if (dateObj.toString() === 'Invalid Date') {
-    throw new GtfsError('Invalid date', {
-      code: GtfsErrorCode.GTFS_INVALID_DATE,
-      category: GtfsErrorCategory.VALIDATION,
-      details: { value: date },
-    });
-  }
-
-  return DAYS_OF_WEEK[dateObj.getDay()];
-}
-
-/**
- * Formats a numeric value according to the decimal precision rules of the specified currency,
- * without any currency symbols or separators.
- * @param value The numeric value to format (e.g., 10.5)
- * @param currency The ISO 4217 currency code (e.g., 'USD', 'JPY', 'EUR')
- * @returns The formatted string with appropriate decimal places
- *          Examples:
- *          - formatCurrency(10.5, 'USD') => '10.50'    // USD uses 2 decimal places
- *          - formatCurrency(10.5, 'JPY') => '10'       // JPY uses 0 decimal places
- *          - formatCurrency(10.523, 'BHD') => '10.523' // BHD uses 3 decimal places
- */
-export function formatCurrency(value: number, currency: string) {
-  const parts = new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency,
-  }).formatToParts(value);
-
-  const integerPart =
-    parts.find((part) => part.type === 'integer')?.value ?? '0';
-  const fractionPart =
-    parts.find((part) => part.type === 'fraction')?.value ?? '';
-
-  return `${integerPart}${fractionPart !== '' ? `.${fractionPart}` : ''}`;
-}
-
-/**
- * Applies a prefix to a value if the column should be prefixed and the value is not null
- * @param value The value to prefix
- * @param columnShouldBePrefixed Whether the column should be prefixed
- * @param prefix The prefix to apply
- * @returns The value with the prefix applied if the column should be prefixed and the value is not null
- */
-export function applyPrefixToValue<
-  Value extends string | number | null | undefined,
->(
-  value: Value,
-  columnShouldBePrefixed?: boolean,
-  prefix?: string,
-): Value | string {
-  if (
-    !columnShouldBePrefixed ||
-    prefix === undefined ||
-    value === null ||
-    value === undefined
-  ) {
-    return value;
-  }
-
-  return `${prefix}${value}`;
-}
-
-/**
- * Runs an async callback for each item in an array one at a time, in order
- * @param items Items to iterate over
- * @param callback Async function called with each item in turn
- * @returns Array of results in the same order as `items`
- */
-export async function mapSeries<Item, Result>(
-  items: readonly Item[],
-  callback: (item: Item) => Promise<Result>,
-): Promise<Result[]> {
-  const results: Result[] = [];
-
-  for (const item of items) {
-    results.push(await callback(item));
-  }
-
-  return results;
 }

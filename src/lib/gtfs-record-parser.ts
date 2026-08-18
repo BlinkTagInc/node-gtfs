@@ -9,7 +9,7 @@ import type {
 } from '../schema/compile-table.ts';
 import { isValidJSON } from './geojson-utils.ts';
 import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from './errors.ts';
-import { padLeadingZeros } from './utils.ts';
+import { padLeadingZeros } from './time-utils.ts';
 
 export type NormalizedGtfsRow = (string | number | null)[];
 

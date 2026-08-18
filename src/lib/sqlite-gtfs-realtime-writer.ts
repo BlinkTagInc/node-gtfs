@@ -5,7 +5,7 @@ import type {
   NormalizedRealtimeRow,
   RealtimeMutation,
 } from './gtfs-realtime-writer.ts';
-import { escapeIdentifier } from './utils.ts';
+import { escapeIdentifier } from './sql-clauses.ts';
 
 function rowValues(
   mutation: Extract<RealtimeMutation, { operation: 'replace' }>,

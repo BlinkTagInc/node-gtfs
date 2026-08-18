@@ -7,40 +7,26 @@ import type {
   DynamicQuery,
   RowOrderBy,
   RowQuery,
-  SelectedRow,
   SqliteQueryOptions,
 } from '../../types/query.ts';
-import type { SqlClause } from '../sql-types.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClause,
-  formatWhereClauses,
-} from '../utils.ts';
+import { selectRows } from '../sqlite-query.ts';
+import { formatWhereConditions } from '../sql-clauses.ts';
 import { shapesToGeoJSONFeature } from '../geojson-utils.ts';
 import { getAgencies } from './agencies.ts';
 import { getRoutes } from './routes.ts';
 import { getRouteAttributes } from '../gtfs-plus/route-attributes.ts';
+import { shapeIdsForTrips } from './subqueries.ts';
 
-function buildTripSubquery(query: {
-  [key: string]: string | number;
-}): SqlClause {
-  const { clause: whereClause, params } = formatWhereClauses(
-    query as DynamicQuery,
-    'trips',
-  );
-  return {
-    clause: `SELECT DISTINCT shape_id FROM trips ${whereClause}`,
-    params,
-  };
-}
-
-/*
+/**
  * Returns array of shapes that match the query parameters. A `route_id` query
  * parameter may be passed to find all shapes for a route. A `trip_id` query
  * parameter may be passed to find all shapes for a trip. A `direction_id`
  * query parameter may be passed to find all shapes for a direction.
+ * @param query Column values to match, as single values or arrays
+ * @param fields Columns to select, or every column when empty
+ * @param orderBy Column and direction pairs to sort by
+ * @param options Query options, including the database to read from
+ * @returns Matching rows, containing only `fields` when it is not empty
  */
 export function getShapes<Fields extends keyof Shape>(
   query: RowQuery<
@@ -55,61 +41,40 @@ export function getShapes<Fields extends keyof Shape>(
   orderBy: RowOrderBy<Shape> = [],
   options: SqliteQueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
   const tableName = 'shapes';
-  const selectClause = formatSelectClause(fields);
-  let whereClause = '';
-  const orderByClause = formatOrderByClause(orderBy);
-
-  const shapeQuery = omit(query, [
-    'route_id',
-    'trip_id',
-    'service_id',
-    'direction_id',
-  ]);
-  const tripQuery = pick(query, [
-    'route_id',
-    'trip_id',
-    'service_id',
-    'direction_id',
-  ]) as {
-    route_id?: string;
-    trip_id?: string;
-    service_id?: string;
-    direction_id?: number;
-  };
-
-  const whereClauses = Object.entries(shapeQuery).map(([key, value]) =>
-    formatWhereClause(key, value, tableName),
+  const tripKeys = ['route_id', 'trip_id', 'service_id', 'direction_id'];
+  const where = formatWhereConditions(
+    omit(query, tripKeys) as DynamicQuery,
+    tableName,
   );
+  const tripQuery = pick(query, tripKeys) as DynamicQuery;
 
   if (Object.values(tripQuery).length > 0) {
-    const tripSubquery = buildTripSubquery(tripQuery);
-    whereClauses.push({
-      clause: `shape_id IN (${tripSubquery.clause})`,
-      params: tripSubquery.params,
+    const shapeIds = shapeIdsForTrips(tripQuery);
+    where.push({
+      clause: `shape_id IN (${shapeIds.clause})`,
+      params: shapeIds.params,
     });
   }
 
-  if (whereClauses.length > 0) {
-    whereClause = `WHERE ${whereClauses.map(({ clause }) => clause).join(' AND ')}`;
-  }
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...whereClauses.flatMap(({ params }) => params)) as SelectedRow<
-    Shape,
-    Fields
-  >[];
+  return selectRows<Shape, Fields>(
+    tableName,
+    { fields, where, orderBy },
+    options,
+  );
 }
 
-/*
+/**
  * Returns geoJSON of the shapes that match the query parameters. A `route_id`
  * query parameter may be passed to find all shapes for a route. A `trip_id`
  * query parameter may be passed to find all shapes for a trip. A
- * `direction_id` query parameter may be passed to find all shapes for a direction.
+ * `direction_id` query parameter may be passed to find all shapes for a
+ * direction.
+ * @param query Column values to match, as single values or arrays
+ * @param options Query options, including the database to read from
+ * @returns A GeoJSON FeatureCollection with one feature per route, carrying
+ *          the route's attributes and agency name. Routes with no shapes are
+ *          omitted
  */
 export function getShapesAsGeoJSON(
   query: RowQuery<

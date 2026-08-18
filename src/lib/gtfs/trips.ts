@@ -1,23 +1,22 @@
 import { omit } from 'lodash-es';
 import type { Trip } from '../../schema/row-types.ts';
 import type {
-  QueryScalar,
+  DynamicQuery,
   RowOrderBy,
   RowQuery,
-  SelectedRow,
   SqliteQueryOptions,
 } from '../../types/query.ts';
-import { openDb } from '../db.ts';
-import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClause,
-} from '../utils.ts';
-import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from '../errors.ts';
+import { requireQueryType, selectRows } from '../sqlite-query.ts';
+import { formatWhereCondition, formatWhereConditions } from '../sql-clauses.ts';
 import { getServiceIdsByDate } from './calendars.ts';
 
-/*
+/**
  * Returns an array of all trips that match the query parameters.
+ * @param query Column values to match, as single values or arrays
+ * @param fields Columns to select, or every column when empty
+ * @param orderBy Column and direction pairs to sort by
+ * @param options Query options, including the database to read from
+ * @returns Matching rows, containing only `fields` when it is not empty
  */
 export function getTrips<Fields extends keyof Trip>(
   query: RowQuery<Trip & { date: number }> = {},
@@ -25,43 +24,21 @@ export function getTrips<Fields extends keyof Trip>(
   orderBy: RowOrderBy<Trip> = [],
   options: SqliteQueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
   const tableName = 'trips';
-  const selectClause = formatSelectClause(fields);
-  let whereClause = '';
-  const orderByClause = formatOrderByClause(orderBy);
-
-  const tripQueryOmitKeys = ['date'];
-
-  const tripQuery = omit(query, tripQueryOmitKeys);
-
-  const whereClauses = Object.entries(tripQuery).map(([key, value]) =>
-    formatWhereClause(key, value as QueryScalar, tableName),
+  const where = formatWhereConditions(
+    omit(query, ['date']) as DynamicQuery,
+    tableName,
   );
 
   if (query.date) {
-    if (typeof query.date !== 'number') {
-      throw new GtfsError('`date` must be a number in yyyymmdd format', {
-        code: GtfsErrorCode.GTFS_QUERY_INVALID,
-        category: GtfsErrorCategory.QUERY,
-        details: { field: 'date', value: query.date },
-      });
-    }
-
-    const serviceIds = getServiceIdsByDate(query.date, options);
-    whereClauses.push(formatWhereClause('service_id', serviceIds, tableName));
+    const date = requireQueryType('date', query.date, 'number', 'yyyymmdd');
+    const serviceIds = getServiceIdsByDate(date, options);
+    where.push(formatWhereCondition('service_id', serviceIds, tableName));
   }
 
-  if (whereClauses.length > 0) {
-    whereClause = `WHERE ${whereClauses.map(({ clause }) => clause).join(' AND ')}`;
-  }
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...whereClauses.flatMap(({ params }) => params)) as SelectedRow<
-    Trip,
-    Fields
-  >[];
+  return selectRows<Trip, Fields>(
+    tableName,
+    { fields, where, orderBy },
+    options,
+  );
 }

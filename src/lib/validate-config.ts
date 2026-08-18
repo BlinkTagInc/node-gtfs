@@ -1,8 +1,33 @@
 import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from './errors.ts';
 
 import type { GtfsImportConfig, GtfsRealtimeConfig } from '../types/config.ts';
+import type { ReportingOptions } from '../reporting/types.ts';
 
 type ValidatableConfig = GtfsImportConfig | GtfsRealtimeConfig;
+
+type ConfigWithDefaults<Config, Defaults> = Omit<Config, keyof Defaults> & {
+  [Key in keyof Defaults]:
+    | Defaults[Key]
+    | (Key extends keyof Config ? Exclude<Config[Key], undefined> : never);
+};
+
+/** Overlays defaults with the caller's explicitly defined options. */
+export function applyConfigDefaults<
+  Config extends ReportingOptions,
+  Defaults extends object,
+>(
+  initialConfig: Config,
+  defaults: Defaults,
+): ConfigWithDefaults<Config, Defaults> {
+  const definedConfig = Object.fromEntries(
+    Object.entries(initialConfig).filter(([, value]) => value !== undefined),
+  );
+
+  return { ...defaults, ...definedConfig } as ConfigWithDefaults<
+    Config,
+    Defaults
+  >;
+}
 
 const LOG_LEVELS = ['silent', 'error', 'warning', 'info'] as const;
 

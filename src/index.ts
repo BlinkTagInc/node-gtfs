@@ -11,10 +11,10 @@ export { updateGtfsRealtime } from './lib/import-gtfs-realtime.ts';
 export { exportGtfs } from './lib/export.ts';
 
 // Database connection functions
-export { deleteDb, openDb, closeDb } from './lib/db.ts';
+export { deleteDb, openDb, closeDb } from './lib/sqlite-db.ts';
 
 // Advanced Query
-export { advancedQuery } from './lib/advancedQuery.ts';
+export { advancedQuery } from './lib/advanced-query.ts';
 
 // Utility functions
 export {

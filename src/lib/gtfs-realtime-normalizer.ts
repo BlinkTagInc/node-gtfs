@@ -2,7 +2,8 @@ import { get } from 'lodash-es';
 
 import type { CompiledGtfsColumn } from '../schema/compile-table.ts';
 import { compiledTableRegistry } from '../schema/table-registry.ts';
-import { applyPrefixToValue, convertLongTimeToDate } from './utils.ts';
+import { applyPrefixToValue } from './feed-prefix.ts';
+import { convertLongTimeToDate } from './time-utils.ts';
 import type {
   NormalizedRealtimeEntity,
   NormalizedRealtimeRow,

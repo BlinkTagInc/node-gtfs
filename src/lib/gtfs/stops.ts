@@ -4,24 +4,21 @@ import { FeatureCollection } from 'geojson';
 import type { Stop } from '../../schema/row-types.ts';
 import type {
   DynamicQuery,
-  QueryScalar,
   RowOrderBy,
   RowQuery,
-  SelectedRow,
   StopQueryOptions,
 } from '../../types/query.ts';
-import type { SqlClause, SqliteBindValue } from '../sql-types.ts';
-import { openDb } from '../db.ts';
+import { openDb } from '../sqlite-db.ts';
+import { selectRows } from '../sqlite-query.ts';
 import {
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClause,
-  formatWhereClauseBoundingBox,
-  formatWhereClauses,
-} from '../utils.ts';
+  formatBoundingBoxCondition,
+  formatWhereConditions,
+  type SqlClause,
+} from '../sql-clauses.ts';
 import { stopsToGeoJSONFeatureCollection } from '../geojson-utils.ts';
 import { getAgencies } from './agencies.ts';
 import { getStopAttributes } from '../gtfs-plus/stop-attributes.ts';
+import { stopIdsForTrips } from './subqueries.ts';
 
 type StopQuery = RowQuery<
   Stop & {
@@ -33,25 +30,21 @@ type StopQuery = RowQuery<
   }
 >;
 
-function buildTripSubquery(query: DynamicQuery): SqlClause {
-  const { clause: whereClause, params } = formatWhereClauses(query, 'trips');
-  return { clause: `SELECT trip_id FROM trips ${whereClause}`, params };
-}
-
-function buildStoptimeSubquery(query: DynamicQuery): SqlClause {
-  const tripSubquery = buildTripSubquery(query);
-  return {
-    clause: `SELECT DISTINCT stop_id FROM stop_times WHERE trip_id IN (${tripSubquery.clause})`,
-    params: tripSubquery.params,
-  };
-}
-
-/*
+/**
  * Returns an array of stops that match the query parameters. A `route_id`
- * query parameter may be passed to find all shapes for a route. A `trip_id`
- * query parameter may be passed to find all shapes for a trip. A
- * `direction_id` query parameter may be passed to find all shapes for a
+ * query parameter may be passed to find all stops for a route. A `trip_id`
+ * query parameter may be passed to find all stops for a trip. A
+ * `direction_id` query parameter may be passed to find all stops for a
  * direction.
+ * @param query Column values to match, as single values or arrays
+ * @param fields Columns to select, or every column when empty
+ * @param orderBy Column and direction pairs to sort by
+ * @param options Query options, including the database to read from and
+ *                `bounding_box_side_m` to search a box centred on
+ *                `stop_lat`/`stop_lon`
+ * @returns Matching rows, containing only `fields` when it is not empty.
+ *          Sorted nearest-first when `bounding_box_side_m` is set and
+ *          `orderBy` is empty
  */
 export function getStops<Fields extends keyof Stop>(
   query: StopQuery = {},
@@ -59,56 +52,36 @@ export function getStops<Fields extends keyof Stop>(
   orderBy: RowOrderBy<Stop> = [],
   options: StopQueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
   const tableName = 'stops';
-  const selectClause = formatSelectClause(fields);
-  let whereClause = '';
-  let orderByClause = formatOrderByClause(orderBy);
-
-  const stopQueryOmitKeys = [
+  const tripKeys = [
     'route_id',
     'trip_id',
     'service_id',
     'direction_id',
     'shape_id',
   ];
+  const stopQueryOmitKeys = [...tripKeys];
 
   // If bounding_box_side_m is defined, search for stops inside a bounding box so omit `stop_lat` and `stop_lon`.
   if (options.bounding_box_side_m !== undefined) {
     stopQueryOmitKeys.push('stop_lat', 'stop_lon');
   }
 
-  const stopQuery = omit(query, stopQueryOmitKeys);
-
-  const tripQuery = pick(query, [
-    'route_id',
-    'trip_id',
-    'service_id',
-    'direction_id',
-    'shape_id',
-  ]) as {
-    route_id?: string;
-    trip_id?: string;
-    service_id?: string;
-    direction_id?: number;
-    shape_id?: string;
-  };
-
-  const whereClauses = Object.entries(stopQuery).map(([key, value]) =>
-    formatWhereClause(key, value as QueryScalar, tableName),
+  const where = formatWhereConditions(
+    omit(query, stopQueryOmitKeys) as DynamicQuery,
+    tableName,
   );
+  const tripQuery = pick(query, tripKeys) as DynamicQuery;
 
-  // Parameters for the ORDER BY clause bind after the WHERE parameters, since
-  // ORDER BY comes later in the statement.
-  const orderByParams: SqliteBindValue[] = [];
+  let orderByOverride: SqlClause | undefined;
 
   if (
     options.bounding_box_side_m !== undefined &&
     query.stop_lat !== undefined &&
     query.stop_lon !== undefined
   ) {
-    whereClauses.push(
-      formatWhereClauseBoundingBox(
+    where.push(
+      formatBoundingBoxCondition(
         query.stop_lat as number | string,
         query.stop_lon as number | string,
         options.bounding_box_side_m,
@@ -117,41 +90,41 @@ export function getStops<Fields extends keyof Stop>(
 
     // Add distance-based sorting if bounding_box_side_m is set and no other orderBy is set
     if (orderBy.length === 0) {
-      orderByClause =
-        'ORDER BY (((stop_lat - ?) * (stop_lat - ?)) + ((stop_lon - ?) * (stop_lon - ?))) ASC';
       const lat = Number(query.stop_lat);
       const lon = Number(query.stop_lon);
-      orderByParams.push(lat, lat, lon, lon);
+      orderByOverride = {
+        clause:
+          'ORDER BY (((stop_lat - ?) * (stop_lat - ?)) + ((stop_lon - ?) * (stop_lon - ?))) ASC',
+        params: [lat, lat, lon, lon],
+      };
     }
   }
 
   if (Object.values(tripQuery).length > 0) {
-    const stoptimeSubquery = buildStoptimeSubquery(tripQuery as DynamicQuery);
-    whereClauses.push({
-      clause: `stop_id IN (${stoptimeSubquery.clause})`,
-      params: stoptimeSubquery.params,
+    const stopIds = stopIdsForTrips(tripQuery);
+    where.push({
+      clause: `stop_id IN (${stopIds.clause})`,
+      params: stopIds.params,
     });
   }
 
-  if (whereClauses.length > 0) {
-    whereClause = `WHERE ${whereClauses.map(({ clause }) => clause).join(' AND ')}`;
-  }
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(
-      ...whereClauses.flatMap(({ params }) => params),
-      ...orderByParams,
-    ) as SelectedRow<Stop, Fields>[];
+  return selectRows<Stop, Fields>(
+    tableName,
+    { fields, where, orderBy, orderByOverride },
+    options,
+  );
 }
 
-/*
- * Returns geoJSON with stops.  A `route_id` query parameter may be passed to
- * find all shapes for a route. A `trip_id` query parameter may be passed to
- * find all shapes for a trip. A `direction_id` query parameter may be passed
- * to find all shapes for a direction.
+/**
+ * Returns geoJSON with stops. A `route_id` query parameter may be passed to
+ * find all stops for a route. A `trip_id` query parameter may be passed to
+ * find all stops for a trip. A `direction_id` query parameter may be passed
+ * to find all stops for a direction.
+ * @param query Column values to match, as single values or arrays
+ * @param options Query options, including the database to read from
+ * @returns A GeoJSON FeatureCollection of stop points, each carrying its stop
+ *          attributes, serving routes, and agency name. Stops belonging to no
+ *          route are omitted
  */
 export function getStopsAsGeoJSON(
   query: StopQuery = {},

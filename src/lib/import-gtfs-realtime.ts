@@ -1,5 +1,5 @@
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
-import { openDb } from './db.ts';
+import { openDb } from './sqlite-db.ts';
 import { log, report, status } from '../reporting/report.ts';
 import {
   formatCount,
@@ -8,7 +8,9 @@ import {
   pluralize,
 } from '../reporting/format.ts';
 import { validateConfig } from './validate-config.ts';
-import { applyConfigDefaults, escapeIdentifier, mapSeries } from './utils.ts';
+import { escapeIdentifier } from './sql-clauses.ts';
+import { mapSeries } from './map-series.ts';
+import { applyConfigDefaults } from './validate-config.ts';
 import {
   addImportError,
   formatGtfsError,

@@ -1,24 +1,24 @@
 import { omit } from 'lodash-es';
 import type { StopTime } from '../../schema/row-types.ts';
 import type {
-  QueryScalar,
+  DynamicQuery,
   RowOrderBy,
   RowQuery,
-  SelectedRow,
   SqliteQueryOptions,
 } from '../../types/query.ts';
-import { openDb } from '../db.ts';
-import {
-  calculateSecondsFromMidnight,
-  formatOrderByClause,
-  formatSelectClause,
-  formatWhereClause,
-} from '../utils.ts';
-import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from '../errors.ts';
+import { requireQueryType, selectRows } from '../sqlite-query.ts';
+import { formatWhereConditions } from '../sql-clauses.ts';
+import { calculateSecondsFromMidnight } from '../time-utils.ts';
 import { getServiceIdsByDate } from './calendars.ts';
+import { tripIdsForServiceIds } from './subqueries.ts';
 
-/*
+/**
  * Returns an array of stoptimes that match the query parameters.
+ * @param query Column values to match, as single values or arrays
+ * @param fields Columns to select, or every column when empty
+ * @param orderBy Column and direction pairs to sort by
+ * @param options Query options, including the database to read from
+ * @returns Matching rows, containing only `fields` when it is not empty
  */
 export function getStoptimes<Fields extends keyof StopTime>(
   query: RowQuery<
@@ -28,82 +28,50 @@ export function getStoptimes<Fields extends keyof StopTime>(
   orderBy: RowOrderBy<StopTime> = [],
   options: SqliteQueryOptions = {},
 ) {
-  const db = options.db ?? openDb();
   const tableName = 'stop_times';
-  const selectClause = formatSelectClause(fields);
-  let whereClause = '';
-  const orderByClause = formatOrderByClause(orderBy);
-
-  const stoptimeQueryOmitKeys = ['date', 'start_time', 'end_time'];
-
-  const stoptimeQuery = omit(query, stoptimeQueryOmitKeys);
-  const whereClauses = Object.entries(stoptimeQuery).map(([key, value]) =>
-    formatWhereClause(key, value as QueryScalar, tableName),
+  const where = formatWhereConditions(
+    omit(query, ['date', 'start_time', 'end_time']) as DynamicQuery,
+    tableName,
   );
 
   if (query.date) {
-    if (typeof query.date !== 'number') {
-      throw new GtfsError('`date` must be a number in yyyymmdd format', {
-        code: GtfsErrorCode.GTFS_QUERY_INVALID,
-        category: GtfsErrorCategory.QUERY,
-        details: { field: 'date', value: query.date },
-      });
-    }
-
-    const serviceIds = getServiceIdsByDate(query.date, options);
-    const serviceIdClause = formatWhereClause(
-      'service_id',
-      serviceIds,
-      'trips',
-    );
-    const tripSubquery = `SELECT DISTINCT trip_id FROM trips WHERE ${serviceIdClause.clause}`;
-
-    whereClauses.push({
-      clause: `trip_id IN (${tripSubquery})`,
-      params: serviceIdClause.params,
+    const date = requireQueryType('date', query.date, 'number', 'yyyymmdd');
+    const tripIds = tripIdsForServiceIds(getServiceIdsByDate(date, options));
+    where.push({
+      clause: `trip_id IN (${tripIds.clause})`,
+      params: tripIds.params,
     });
   }
 
   if (query.start_time) {
-    if (typeof query.start_time !== 'string') {
-      throw new GtfsError('`start_time` must be a string in HH:mm:ss format', {
-        code: GtfsErrorCode.GTFS_QUERY_INVALID,
-        category: GtfsErrorCategory.QUERY,
-        details: { field: 'start_time', value: query.start_time },
-      });
-    }
-
-    whereClauses.push({
+    const startTime = requireQueryType(
+      'start_time',
+      query.start_time,
+      'string',
+      'HH:mm:ss',
+    );
+    where.push({
       clause: 'arrival_timestamp >= ?',
-      params: [calculateSecondsFromMidnight(query.start_time)],
+      params: [calculateSecondsFromMidnight(startTime)],
     });
   }
 
   if (query.end_time) {
-    if (typeof query.end_time !== 'string') {
-      throw new GtfsError('`end_time` must be a string in HH:mm:ss format', {
-        code: GtfsErrorCode.GTFS_QUERY_INVALID,
-        category: GtfsErrorCategory.QUERY,
-        details: { field: 'end_time', value: query.end_time },
-      });
-    }
-
-    whereClauses.push({
+    const endTime = requireQueryType(
+      'end_time',
+      query.end_time,
+      'string',
+      'HH:mm:ss',
+    );
+    where.push({
       clause: 'departure_timestamp <= ?',
-      params: [calculateSecondsFromMidnight(query.end_time)],
+      params: [calculateSecondsFromMidnight(endTime)],
     });
   }
 
-  if (whereClauses.length > 0) {
-    whereClause = `WHERE ${whereClauses.map(({ clause }) => clause).join(' AND ')}`;
-  }
-
-  return db
-    .prepare(
-      `${selectClause} FROM ${tableName} ${whereClause} ${orderByClause};`,
-    )
-    .all(...whereClauses.flatMap(({ params }) => params)) as SelectedRow<
-    StopTime,
-    Fields
-  >[];
+  return selectRows<StopTime, Fields>(
+    tableName,
+    { fields, where, orderBy },
+    options,
+  );
 }

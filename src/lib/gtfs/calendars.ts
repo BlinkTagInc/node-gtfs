@@ -5,13 +5,18 @@ import type {
   SqliteQueryOptions,
 } from '../../types/query.ts';
 import { calendar } from '../../schema/tables/gtfs-schedule/calendar.ts';
-import { openDb } from '../db.ts';
-import { findRows } from '../find-rows.ts';
-import { getDayOfWeekFromDate } from '../utils.ts';
+import { openDb } from '../sqlite-db.ts';
+import { findRows } from '../sqlite-query.ts';
+import { getDayOfWeekFromDate } from '../time-utils.ts';
 import { GtfsError, GtfsErrorCategory, GtfsErrorCode } from '../errors.ts';
 
-/*
+/**
  * Returns an array of calendars that match the query parameters.
+ * @param query Column values to match, as single values or arrays
+ * @param fields Columns to select, or every column when empty
+ * @param orderBy Column and direction pairs to sort by
+ * @param options Query options, including the database to read from
+ * @returns Matching rows, containing only `fields` when it is not empty
  */
 export function getCalendars<Fields extends keyof Calendar>(
   query: RowQuery<Calendar> = {},
@@ -22,8 +27,12 @@ export function getCalendars<Fields extends keyof Calendar>(
   return findRows<Calendar, Fields>(calendar, query, fields, orderBy, options);
 }
 
-/*
+/**
  * Returns an array of service_ids that are active on the given date.
+ * @param date Date in `YYYYMMDD` format
+ * @param options Query options, including the database to read from
+ * @returns Service IDs running on that date, combining the weekday pattern in
+ *          calendar.txt with the exceptions in calendar_dates.txt
  */
 export function getServiceIdsByDate(
   date: number,

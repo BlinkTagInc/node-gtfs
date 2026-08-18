@@ -1,4 +1,4 @@
-import { openDb } from './db.ts';
+import { openDb } from './sqlite-db.ts';
 
 import {
   escapeIdentifier,
@@ -6,7 +6,7 @@ import {
   formatSelectClause,
   formatWhereClauses,
   formatJoinClause,
-} from './utils.ts';
+} from './sql-clauses.ts';
 
 import type {
   AdvancedQueryOptions,

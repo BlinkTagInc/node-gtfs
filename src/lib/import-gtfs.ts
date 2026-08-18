@@ -4,12 +4,8 @@ import { cp, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import { parse } from 'csv-parse';
 import Database from 'better-sqlite3';
 
-import {
-  getGtfsIndexPlan,
-  getTimestampColumnName,
-} from '../schema/compile-table.ts';
-import { compiledTables, fileBackedTables } from '../schema/table-registry.ts';
-import { openDb } from './db.ts';
+import { fileBackedTables } from '../schema/table-registry.ts';
+import { openDb } from './sqlite-db.ts';
 import { temporaryDirectory, untildify, unzip } from './file-utils.ts';
 import { parseGtfsFile } from './gtfs-record-parser.ts';
 import type { GtfsFileWriter, GtfsFileWriterOptions } from './gtfs-writer.ts';
@@ -19,7 +15,11 @@ import {
   createKyselyGtfsWriter,
   type KyselyImportOptions,
 } from './kysely-gtfs-writer.ts';
-import { createSqliteGtfsWriter } from './sqlite-gtfs-writer.ts';
+import {
+  createSqliteGtfsIndexes,
+  createSqliteGtfsTables,
+  createSqliteGtfsWriter,
+} from './sqlite-gtfs-writer.ts';
 import { getDatabaseErrorContext } from './database-error-context.ts';
 import { updateGtfsRealtimeData } from './import-gtfs-realtime.ts';
 import { log, progress, report, status } from '../reporting/report.ts';
@@ -33,7 +33,8 @@ import {
   pluralize,
 } from '../reporting/format.ts';
 import { validateConfig } from './validate-config.ts';
-import { applyConfigDefaults, escapeIdentifier, mapSeries } from './utils.ts';
+import { mapSeries } from './map-series.ts';
+import { applyConfigDefaults } from './validate-config.ts';
 import {
   addImportError,
   createImportReport,
@@ -335,168 +336,6 @@ const getSingleAgencyId = (
     createReadStream(filepath).pipe(parser);
   });
 
-const createGtfsTables = (db: Database.Database): void => {
-  for (const table of compiledTables) {
-    const sqlColumnCreateStatements = [];
-
-    for (const column of table.columns) {
-      const columnName = escapeIdentifier(column.name);
-      const checks = [];
-      if (column.sqlMinimum !== undefined && column.sqlMaximum !== undefined) {
-        checks.push(
-          `${columnName} >= ${column.sqlMinimum} AND ${columnName} <= ${column.sqlMaximum}`,
-        );
-      } else if (column.sqlMinimum !== undefined) {
-        checks.push(`${columnName} >= ${column.sqlMinimum}`);
-      } else if (column.sqlMaximum !== undefined) {
-        checks.push(`${columnName} <= ${column.sqlMaximum}`);
-      }
-
-      if (column.storageKind === 'integer') {
-        checks.push(
-          `(TYPEOF(${columnName}) = 'integer' OR ${columnName} IS NULL)`,
-        );
-      } else if (column.storageKind === 'real') {
-        checks.push(
-          `(TYPEOF(${columnName}) = 'real' OR ${columnName} IS NULL)`,
-        );
-      }
-
-      const required = column.presence === 'required' ? 'NOT NULL' : '';
-      const defaultValue =
-        column.defaultValue === null
-          ? 'NULL'
-          : typeof column.defaultValue === 'string'
-            ? `'${column.defaultValue.replaceAll("'", "''")}'`
-            : String(column.defaultValue);
-      const columnDefault =
-        column.defaultValue === undefined ? '' : `DEFAULT ${defaultValue}`;
-      const columnCollation = column.caseInsensitiveComparison
-        ? 'COLLATE NOCASE'
-        : '';
-      const checkClause =
-        checks.length > 0 ? `CHECK(${checks.join(' AND ')})` : '';
-
-      sqlColumnCreateStatements.push(
-        `${columnName} ${column.storageKind} ${checkClause} ${required} ${columnDefault} ${columnCollation}`,
-      );
-
-      // Add an additional timestamp column for time columns
-      if (column.storageKind === 'time') {
-        sqlColumnCreateStatements.push(
-          `${escapeIdentifier(getTimestampColumnName(column.name))} INTEGER GENERATED ALWAYS AS (
-            CASE
-              WHEN ${columnName} IS NULL OR ${columnName} = '' THEN NULL
-              ELSE CAST(
-                substr(${columnName}, 1, instr(${columnName}, ':') - 1) * 3600 +
-                substr(${columnName}, instr(${columnName}, ':') + 1, 2) * 60 +
-                substr(${columnName}, -2) AS INTEGER
-              )
-            END
-          ) STORED`,
-        );
-      }
-    }
-
-    // Find Primary Key fields
-    const primaryColumns = table.columns.filter((column) => column.primaryKey);
-
-    if (primaryColumns.length > 0) {
-      sqlColumnCreateStatements.push(
-        `PRIMARY KEY (${primaryColumns
-          .map(({ name }) => escapeIdentifier(name))
-          .join(', ')})`,
-      );
-    }
-
-    const tableName = escapeIdentifier(table.name);
-    db.prepare(`DROP TABLE IF EXISTS ${tableName};`).run();
-
-    db.prepare(
-      `CREATE TABLE ${tableName} (${sqlColumnCreateStatements.join(', ')});`,
-    ).run();
-  }
-};
-
-// For columns that are mostly empty, use a partial index (`WHERE column IS NOT NULL`) instead of a full index.
-const SPARSE_COLUMN_MAX_DENSITY = 0.1;
-
-const createGtfsIndex = (
-  db: Database.Database,
-  tableName: string,
-  columnName: string,
-  partial: boolean,
-): void => {
-  const escapedTableName = escapeIdentifier(tableName);
-  const escapedColumnName = escapeIdentifier(columnName);
-  const indexName = escapeIdentifier(`idx_${tableName}_${columnName}`);
-  const predicate = partial ? ` WHERE ${escapedColumnName} IS NOT NULL` : '';
-  db.prepare(
-    `CREATE INDEX ${indexName} ON ${escapedTableName} (${escapedColumnName})${predicate};`,
-  ).run();
-};
-
-const createGtfsCompositeIndex = (
-  db: Database.Database,
-  tableName: string,
-  columns: string[],
-): void => {
-  const indexName = escapeIdentifier(`idx_${tableName}_${columns.join('_')}`);
-  db.prepare(
-    `CREATE INDEX ${indexName} ON ${escapeIdentifier(tableName)} (${columns
-      .map((columnName) => escapeIdentifier(columnName))
-      .join(', ')});`,
-  ).run();
-};
-
-const createGtfsIndexes = (db: Database.Database): void => {
-  for (const table of compiledTables) {
-    const { singleColumnIndexes, compositeIndexes } = getGtfsIndexPlan(table, {
-      includeGeneratedTimeIndexes: true,
-    });
-
-    if (singleColumnIndexes.length > 0) {
-      const columnNames = singleColumnIndexes;
-      const { rowCount } = db
-        .prepare(
-          `SELECT COUNT(*) AS rowCount FROM ${escapeIdentifier(table.name)}`,
-        )
-        .get() as { rowCount: number };
-
-      if (rowCount === 0) {
-        for (const columnName of columnNames) {
-          createGtfsIndex(db, table.name, columnName, false);
-        }
-      } else {
-        const counts = db
-          .prepare(
-            `SELECT ${columnNames
-              .map(
-                (columnName, index) =>
-                  `COUNT(${escapeIdentifier(columnName)}) AS ${escapeIdentifier(`c${index}`)}`,
-              )
-              .join(', ')} FROM ${escapeIdentifier(table.name)}`,
-          )
-          .get() as Record<string, number>;
-
-        for (const [index, columnName] of columnNames.entries()) {
-          const density = counts[`c${index}`] / rowCount;
-          createGtfsIndex(
-            db,
-            table.name,
-            columnName,
-            density <= SPARSE_COLUMN_MAX_DENSITY,
-          );
-        }
-      }
-    }
-
-    for (const columns of compositeIndexes) {
-      createGtfsCompositeIndex(db, table.name, columns);
-    }
-  }
-};
-
 function createSqliteImportTarget(
   db: Database.Database,
   config: GtfsSqliteImportConfig,
@@ -507,13 +346,13 @@ function createSqliteImportTarget(
     databaseDescription: `SQLite database at ${sqlitePath}`,
     errorDetails: { sqlitePath },
     initialize() {
-      createGtfsTables(db);
+      createSqliteGtfsTables(db);
     },
     createWriter(options) {
       return createSqliteGtfsWriter({ db, sqlitePath, ...options });
     },
     finalize() {
-      createGtfsIndexes(db);
+      createSqliteGtfsIndexes(db);
     },
     async updateRealtime(task) {
       await updateGtfsRealtimeData({

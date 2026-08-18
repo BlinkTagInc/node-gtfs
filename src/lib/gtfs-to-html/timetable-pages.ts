@@ -5,8 +5,16 @@ import type {
   SqliteQueryOptions,
 } from '../../types/query.ts';
 import { timetablePages } from '../../schema/tables/gtfs-to-html/timetable-pages.ts';
-import { findRows } from '../find-rows.ts';
+import { findRows } from '../sqlite-query.ts';
 
+/**
+ * Returns an array of all timetable pages that match the query parameters.
+ * @param query Column values to match, as single values or arrays
+ * @param fields Columns to select, or every column when empty
+ * @param orderBy Column and direction pairs to sort by
+ * @param options Query options, including the database to read from
+ * @returns Matching rows, containing only `fields` when it is not empty
+ */
 export function getTimetablePages<Fields extends keyof TimetablePage>(
   query: RowQuery<TimetablePage> = {},
   fields: readonly Fields[] = [],

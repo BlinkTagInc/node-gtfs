@@ -20,7 +20,7 @@ function reporterFor(config: ReportingOptions) {
   return reporter;
 }
 
-export function getLogLevel(config: ReportingOptions): LogLevel {
+function getLogLevel(config: ReportingOptions): LogLevel {
   if (config.logLevel !== undefined) {
     return config.logLevel;
   }
