@@ -205,6 +205,22 @@ GTFS-Realtime uses protocol buffer entities rather than `.txt` files.
 | ------------------------------ | --------------------------------- |
 | `getTripsDatedVehicleJourneys` | `trips_dated_vehicle_journey.txt` |
 
+### TIDES
+
+| Function               | GTFS File                |
+| ---------------------- | ------------------------ |
+| `getDevices`           | `devices.txt`            |
+| `getFareTransactions`  | `fare_transactions.txt`  |
+| `getOperators`         | `operators.txt`          |
+| `getPassengerEvents`   | `passenger_events.txt`   |
+| `getStationActivities` | `station_activities.txt` |
+| `getStopVisits`        | `stop_visits.txt`        |
+| `getTrainCars`         | `train_cars.txt`         |
+| `getTripsPerformed`    | `trips_performed.txt`    |
+| `getVehicleLocations`  | `vehicle_locations.txt`  |
+| `getVehicleTrainCars`  | `vehicle_train_cars.txt` |
+| `getVehicles`          | `vehicles.txt`           |
+
 ## Specialized queries
 
 ### Routes by stop or service

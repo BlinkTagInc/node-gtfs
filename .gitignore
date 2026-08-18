@@ -2,6 +2,9 @@
 node_modules
 .pnpm-store/
 
+# macOS
+.DS_Store
+
 # output
 gtfs-export
 

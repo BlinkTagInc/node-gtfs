@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `logLevel`, configuration validation, and CLI `--help` and `--version`
 - Composite query indexes and cross-database integration tests
 - Focused configuration, query, realtime, and troubleshooting guides
+- Query methods for TIDES files
 
 ### Changed
 - Expanded GTFS-Realtime fields and corrected protobuf extraction

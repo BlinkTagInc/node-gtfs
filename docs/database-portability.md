@@ -4,6 +4,9 @@ This document defines the storage behavior that database writers should share.
 It describes the current contract; it does not make the synchronous query,
 export, or GTFS-Realtime APIs database-independent.
 
+> **Note:** PostgreSQL and MySQL support is new. The interface, configuration
+> options, and functions related to it may change in a future release.
+
 ## Portable source columns
 
 Every writer stores the same file-backed tables and source columns declared by

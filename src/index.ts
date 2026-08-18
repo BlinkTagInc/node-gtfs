@@ -105,4 +105,17 @@ export { getOpsLocations } from './lib/tods/ops-locations.ts';
 export { getRunEvents } from './lib/tods/run-events.ts';
 export { getRunsPieces } from './lib/tods/runs-pieces.ts';
 
+// tides
+export { getDevices } from './lib/tides/devices.ts';
+export { getFareTransactions } from './lib/tides/fare-transactions.ts';
+export { getOperators } from './lib/tides/operators.ts';
+export { getPassengerEvents } from './lib/tides/passenger-events.ts';
+export { getStationActivities } from './lib/tides/station-activities.ts';
+export { getStopVisits } from './lib/tides/stop-visits.ts';
+export { getTrainCars } from './lib/tides/train-cars.ts';
+export { getTripsPerformed } from './lib/tides/trips-performed.ts';
+export { getVehicleLocations } from './lib/tides/vehicle-locations.ts';
+export { getVehicleTrainCars } from './lib/tides/vehicle-train-cars.ts';
+export { getVehicles } from './lib/tides/vehicles.ts';
+
 export type * from './types/index.ts';

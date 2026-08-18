@@ -1,13 +1,19 @@
 {
   "name": "gtfs",
   "version": "4.20.2",
-  "description": "Import GTFS transit data into SQLite and query routes, stops, times, fares and more",
+  "description": "Import GTFS transit data into SQLite, PostgreSQL, or MySQL and query routes, stops, times and fares",
   "keywords": [
-    "transit",
     "gtfs",
+    "gtfs-realtime",
+    "transit",
     "transportation",
-    "geojson",
-    "sqlite"
+    "public-transit",
+    "sqlite",
+    "postgresql",
+    "postgres",
+    "mysql",
+    "kysely",
+    "geojson"
   ],
   "homepage": "https://github.com/BlinkTagInc/node-gtfs#readme",
   "bugs": {

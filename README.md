@@ -34,6 +34,9 @@ or the command line.
 PostgreSQL and MySQL imports use a caller-owned Kysely connection. See
 [Database portability](docs/database-portability.md) for storage details.
 
+> **Note:** PostgreSQL and MySQL support is new. The interface, configuration
+> options, and functions related to it may change in a future release.
+
 ## Requirements
 
 - [Node.js](https://nodejs.org/) 22 or newer
@@ -301,6 +304,9 @@ contain files you need to keep.
 
 `importGtfsToKysely()` imports static GTFS using a caller-owned Kysely
 connection. Install the driver for your database in addition to `gtfs`.
+
+> **Note:** PostgreSQL and MySQL support is new. The interface, configuration
+> options, and functions related to it may change in a future release.
 
 PostgreSQL example:
 
