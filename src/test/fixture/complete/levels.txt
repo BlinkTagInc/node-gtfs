@@ -1,0 +1,3 @@
+level_id,level_index,level_name
+FLEVEL1,0.0,Street Level
+FLEVEL2,1.5,Mezzanine

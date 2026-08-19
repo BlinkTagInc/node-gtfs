@@ -1,0 +1,3 @@
+fare_media_id,fare_media_name,fare_media_type
+FMEDIA1,Paper Ticket,0
+FMEDIA2,Smart Card,2

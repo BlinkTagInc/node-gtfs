@@ -1,24 +1,12 @@
-import { describe, it, beforeAll, afterAll, expect } from './test-utils.ts';
+import { describe, it, expect, withGtfsFixture } from './test-utils.ts';
 import {
   advancedQuery,
-  closeDb,
   getStops,
   getStoptimes,
   getTrips,
-  importGtfs,
-  openDb,
 } from '../../dist/index.js';
-import config from './test-config.ts';
 
-beforeAll(async () => {
-  openDb();
-  await importGtfs(config);
-});
-
-afterAll(async () => {
-  const db = openDb();
-  closeDb(db);
-});
+withGtfsFixture();
 
 describe('Query value types:', () => {
   it('should match a text column queried with a number', () => {

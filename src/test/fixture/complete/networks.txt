@@ -1,0 +1,3 @@
+network_id,network_name
+FNET1,Rail Network
+FNET2,Bus Network

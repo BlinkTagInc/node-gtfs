@@ -1,0 +1,3 @@
+area_id,area_name
+FAREA1,Downtown Area
+FAREA2,Suburban Area

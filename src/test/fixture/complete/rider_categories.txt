@@ -1,0 +1,3 @@
+rider_category_id,rider_category_name,is_default_fare_category,eligibility_url
+FRIDER1,Adult,1,https://complete.example.com/adult
+FRIDER2,Senior,0,https://complete.example.com/senior

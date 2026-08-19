@@ -1,9 +1,12 @@
-import path from 'node:path';
-import { mkdtempSync } from 'node:fs';
-import { rm, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-
-import { afterAll, beforeAll, describe, expect, it } from './test-utils.ts';
+import {
+  afterAll,
+  beforeAll,
+  createFeedFixture,
+  describe,
+  expect,
+  it,
+  type FeedFixture,
+} from './test-utils.ts';
 import {
   closeDb,
   getFareLegJoinRules,
@@ -11,29 +14,31 @@ import {
   openDb,
 } from '../../dist/index.js';
 
-const fixturePath = mkdtempSync(path.join(tmpdir(), 'gtfs-fare-leg-joins-'));
+let fixture: FeedFixture;
 
 beforeAll(async () => {
+  fixture = await createFeedFixture({
+    base: 'none',
+    extraFiles: {
+      'fare_leg_join_rules.txt': [
+        'from_network_id,to_network_id,from_stop_id,to_stop_id',
+        'network-1,network-2,stop-1,stop-2',
+        'network-2,network-3,,',
+        '',
+      ].join('\n'),
+    },
+  });
+
   openDb();
-  await writeFile(
-    path.join(fixturePath, 'fare_leg_join_rules.txt'),
-    [
-      'from_network_id,to_network_id,from_stop_id,to_stop_id',
-      'network-1,network-2,stop-1,stop-2',
-      'network-2,network-3,,',
-      '',
-    ].join('\n'),
-  );
   await importGtfs({
-    agencies: [{ path: fixturePath }],
+    agencies: [{ path: fixture.path }],
     logLevel: 'silent',
   });
 });
 
 afterAll(async () => {
-  const db = openDb();
-  closeDb(db);
-  await rm(fixturePath, { recursive: true, force: true });
+  closeDb(openDb());
+  await fixture.cleanup();
 });
 
 describe('getFareLegJoinRules():', () => {

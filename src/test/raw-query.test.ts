@@ -1,16 +1,7 @@
-import { describe, it, beforeAll, afterAll, expect } from './test-utils.ts';
-import config from './test-config.ts';
-import { openDb, closeDb, importGtfs } from '../../dist/index.js';
+import { describe, it, expect, withGtfsFixture } from './test-utils.ts';
+import { openDb } from '../../dist/index.js';
 
-beforeAll(async () => {
-  openDb();
-  await importGtfs(config);
-});
-
-afterAll(() => {
-  const db = openDb();
-  closeDb(db);
-});
+withGtfsFixture();
 
 describe('Raw Query:', () => {
   it('should DELETE a trip', () => {

@@ -1,0 +1,3 @@
+from_leg_group_id,to_leg_group_id,transfer_count,duration_limit,duration_limit_type,fare_transfer_type,fare_product_id
+FLEG1,FLEG2,1,3600,0,0,FPROD1
+FLEG2,FLEG1,-1,7200,2,1,FPROD2

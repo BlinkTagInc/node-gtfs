@@ -1,0 +1,5 @@
+trip_id,arrival_time,departure_time,location_group_id,location_id,stop_id,stop_sequence,stop_headsign,start_pickup_drop_off_window,end_pickup_drop_off_window,pickup_type,drop_off_type,continuous_pickup,continuous_drop_off,shape_dist_traveled,timepoint,pickup_booking_rule_id,drop_off_booking_rule_id
+FT1,08:00:00,08:00:30,,,FSTOP1,1,To Second Street,,,0,1,2,3,0.0,1,,
+FT1,08:10:00,08:10:30,,,FSTOP2,2,Terminus,,,1,0,3,2,1500.75,0,,
+FT2,25:30:00,25:31:00,,,FSTOP2,1,Late Night Service,,,0,0,1,1,0.0,1,,
+FT2,,,FLGROUP1,FLOC1,,2,Flex Zone,09:00:00,17:00:00,2,2,,,1500.75,0,FBOOK1,FBOOK2

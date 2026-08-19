@@ -1,73 +1,57 @@
-import { describe, it, beforeAll, afterAll, expect } from './test-utils.ts';
-import path from 'node:path';
-import { mkdtempSync } from 'node:fs';
-import { rm, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-
-import config from './test-config.ts';
 import {
-  openDb,
-  closeDb,
-  importGtfs,
-  getLocations,
-  unzip,
-  prepDirectory,
-} from '../../dist/index.js';
+  describe,
+  it,
+  beforeAll,
+  afterAll,
+  expect,
+  createFeedFixture,
+  type FeedFixture,
+} from './test-utils.ts';
+import { openDb, closeDb, importGtfs, getLocations } from '../../dist/index.js';
 
-const temporaryDir = mkdtempSync(path.join(tmpdir(), 'gtfs-'));
-
-const locationsConfig = {
-  agencies: [
+const locationsGeojson = JSON.stringify({
+  type: 'FeatureCollection',
+  features: [
     {
-      path: temporaryDir,
+      id: '1',
+      type: 'Feature',
+      properties: {
+        stop_desc: 'This is a stop for testing',
+        stop_name: 'Test Stop 1',
+      },
+      geometry: {
+        type: 'Point',
+        coordinates: [
+          [
+            [-94.7805702, 44.4560958],
+            [-94.7805608, 44.4559928],
+            [-94.7805218, 44.4559649],
+          ],
+        ],
+      },
     },
   ],
-  logLevel: 'silent' as const,
-};
+});
+
+let fixture: FeedFixture;
 
 describe('getLocations():', () => {
   beforeAll(async () => {
-    openDb();
-
-    // Add locations.geojson to test GTFS dataset
-    await prepDirectory(temporaryDir);
-    await unzip(config.agencies[0].path, temporaryDir);
-
-    const filePath = path.join(temporaryDir, 'locations.geojson');
-    const fileText = JSON.stringify({
-      type: 'FeatureCollection',
-      features: [
-        {
-          id: '1',
-          type: 'Feature',
-          properties: {
-            stop_desc: 'This is a stop for testing',
-            stop_name: 'Test Stop 1',
-          },
-          geometry: {
-            type: 'Point',
-            coordinates: [
-              [
-                [-94.7805702, 44.4560958],
-                [-94.7805608, 44.4559928],
-                [-94.7805218, 44.4559649],
-              ],
-            ],
-          },
-        },
-      ],
+    // The base feed has no locations.geojson, so it is layered on top.
+    fixture = await createFeedFixture({
+      extraFiles: { 'locations.geojson': locationsGeojson },
     });
-    await writeFile(filePath, fileText);
 
-    await importGtfs(locationsConfig);
+    openDb();
+    await importGtfs({
+      agencies: [{ path: fixture.path }],
+      logLevel: 'silent',
+    });
   });
 
-  afterAll(() => {
-    const db = openDb();
-    closeDb(db);
-
-    // Delete temporary directory
-    rm(temporaryDir, { recursive: true, force: true });
+  afterAll(async () => {
+    closeDb(openDb());
+    await fixture.cleanup();
   });
 
   it('should return a single location', () => {

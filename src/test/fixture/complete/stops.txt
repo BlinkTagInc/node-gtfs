@@ -1,0 +1,5 @@
+stop_id,stop_code,stop_name,tts_stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,stop_timezone,wheelchair_boarding,level_id,platform_code,stop_access
+FSTATION1,SC0,Central Station,Central Station,Main interchange station,37.700000,-122.400000,FZONE1,https://complete.example.com/central,1,,America/Los_Angeles,1,FLEVEL1,,
+FSTOP1,SC1,First Street Platform,First Street,Platform A at Central,37.700100,-122.400100,FZONE1,https://complete.example.com/first,0,FSTATION1,America/Los_Angeles,1,FLEVEL1,A,1
+FSTOP2,SC2,Second Street Platform,Second Street,Platform B at Central,37.710000,-122.410000,FZONE2,https://complete.example.com/second,0,FSTATION1,America/Los_Angeles,2,FLEVEL2,B,0
+FENTRANCE1,SC3,Central Entrance,Central Entrance,Street level entrance,37.699900,-122.399900,FZONE1,https://complete.example.com/entrance,2,FSTATION1,America/Los_Angeles,1,FLEVEL1,,1

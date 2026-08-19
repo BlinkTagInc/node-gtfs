@@ -1,22 +1,8 @@
-import { describe, it, beforeAll, afterAll, expect } from './test-utils.ts';
-import config from './test-config.ts';
-import {
-  openDb,
-  closeDb,
-  importGtfs,
-  getCalendarDates,
-} from '../../dist/index.js';
+import { describe, it, expect, withGtfsFixture } from './test-utils.ts';
+import { getCalendarDates } from '../../dist/index.js';
 import { sortBy } from 'lodash-es';
 
-beforeAll(async () => {
-  openDb();
-  await importGtfs(config);
-});
-
-afterAll(async () => {
-  const db = openDb();
-  closeDb(db);
-});
+withGtfsFixture();
 
 describe('getCalendarDates():', () => {
   it('should return empty array if no calendar dates exist', () => {

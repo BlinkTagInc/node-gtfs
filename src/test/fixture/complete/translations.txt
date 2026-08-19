@@ -1,0 +1,6 @@
+table_name,field_name,language,translation,record_id,record_sub_id,field_value
+stops,stop_name,es,Estación Central,FSTATION1,,
+routes,route_long_name,es,Línea Roja,FR1,,
+stop_times,stop_headsign,es,A la Segunda Calle,FT1,1,
+agency,agency_name,fr,Transit Complet,FA1,,
+stops,stop_url,de,https://complete.example.com/de/central,,,https://complete.example.com/central

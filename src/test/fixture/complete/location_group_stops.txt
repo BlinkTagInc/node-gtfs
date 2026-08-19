@@ -1,0 +1,3 @@
+location_group_id,stop_id
+FLGROUP1,FSTOP1
+FLGROUP2,FSTOP2

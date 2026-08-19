@@ -1,0 +1,3 @@
+booking_rule_id,booking_type,prior_notice_duration_min,prior_notice_duration_max,prior_notice_last_day,prior_notice_last_time,prior_notice_start_day,prior_notice_start_time,prior_notice_service_id,message,pickup_message,drop_off_message,phone_number,info_url,booking_url
+FBOOK1,1,30,1440,1,17:00:00,7,08:00:00,FS1,Book ahead,Call to arrange pickup,Call to arrange drop-off,555-0300,https://complete.example.com/booking-info,https://complete.example.com/book
+FBOOK2,2,60,2880,2,18:00:00,14,09:00:00,FS2,Book two days ahead,Pickup by request,Drop-off by request,555-0301,https://complete.example.com/booking-info-2,https://complete.example.com/book-2

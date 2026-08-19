@@ -1,0 +1,3 @@
+fare_id,route_id,origin_id,destination_id,contains_id
+FFARE1,FR1,FZONE1,FZONE2,FZONE1
+FFARE2,FR2,FZONE2,FZONE1,FZONE2

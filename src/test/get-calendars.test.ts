@@ -1,22 +1,7 @@
-import { describe, it, beforeAll, afterAll, expect } from './test-utils.ts';
-import config from './test-config.ts';
-import {
-  openDb,
-  closeDb,
-  importGtfs,
-  getCalendars,
-  getServiceIdsByDate,
-} from '../../dist/index.js';
+import { describe, it, expect, withGtfsFixture } from './test-utils.ts';
+import { getCalendars, getServiceIdsByDate } from '../../dist/index.js';
 
-beforeAll(async () => {
-  openDb();
-  await importGtfs(config);
-});
-
-afterAll(async () => {
-  const db = openDb();
-  closeDb(db);
-});
+withGtfsFixture();
 
 describe('getCalendars():', () => {
   it('should return empty array if no calendars', () => {

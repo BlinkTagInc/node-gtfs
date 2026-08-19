@@ -99,7 +99,7 @@
   "scripts": {
     "build": "tsdown",
     "build-watch": "tsdown --watch",
-    "test": "pnpm run build && node --test --test-reporter=spec src/test/**/*.test.ts",
+    "test": "pnpm run build && node --experimental-transform-types --disable-warning=ExperimentalWarning --test --test-reporter=spec src/test/**/*.test.ts",
     "typecheck": "pnpm run build && tsc --noEmit",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",

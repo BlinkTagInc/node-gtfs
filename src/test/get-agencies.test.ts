@@ -1,17 +1,8 @@
-import { describe, it, beforeAll, afterAll, expect } from './test-utils.ts';
+import { describe, it, expect, withGtfsFixture } from './test-utils.ts';
 import Database from 'better-sqlite3';
-import config from './test-config.ts';
-import { openDb, closeDb, importGtfs, getAgencies } from '../../dist/index.js';
+import { closeDb, getAgencies } from '../../dist/index.js';
 
-beforeAll(async () => {
-  openDb();
-  await importGtfs(config);
-});
-
-afterAll(async () => {
-  const db = openDb();
-  closeDb(db);
-});
+withGtfsFixture();
 
 describe('getAgencies():', () => {
   it('should query an explicitly supplied database through the shared implementation', () => {

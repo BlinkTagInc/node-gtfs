@@ -1,0 +1,3 @@
+fare_id,price,currency_type,payment_method,transfers,agency_id,transfer_duration
+FFARE1,2.50,USD,0,1,FA1,3600
+FFARE2,1.25,USD,1,0,FA1,1800

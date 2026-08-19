@@ -1,0 +1,3 @@
+attribution_id,agency_id,route_id,trip_id,organization_name,is_producer,is_operator,is_authority,attribution_url,attribution_email,attribution_phone
+FATTR1,FA1,FR1,FT1,Data Producer Inc,1,0,0,https://producer.example.com,data@producer.example.com,555-0200
+FATTR2,FA1,FR2,FT2,Transit Authority,0,1,1,https://authority.example.com,info@authority.example.com,555-0201

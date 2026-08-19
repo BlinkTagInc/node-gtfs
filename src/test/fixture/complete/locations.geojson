@@ -1,0 +1,45 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "id": "FLOC1",
+      "type": "Feature",
+      "properties": {
+        "stop_name": "Flex Service Area North",
+        "stop_desc": "Demand-responsive zone covering the northern district"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-122.42, 37.7],
+            [-122.4, 37.7],
+            [-122.4, 37.72],
+            [-122.42, 37.72],
+            [-122.42, 37.7]
+          ]
+        ]
+      }
+    },
+    {
+      "id": "FLOC2",
+      "type": "Feature",
+      "properties": {
+        "stop_name": "Flex Service Area South",
+        "stop_desc": "Demand-responsive zone covering the southern district"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-122.42, 37.68],
+            [-122.4, 37.68],
+            [-122.4, 37.7],
+            [-122.42, 37.7],
+            [-122.42, 37.68]
+          ]
+        ]
+      }
+    }
+  ]
+}

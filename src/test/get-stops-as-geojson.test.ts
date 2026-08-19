@@ -1,22 +1,9 @@
-import { describe, it, beforeAll, afterAll, expect } from './test-utils.ts';
+import { describe, it, expect, withGtfsFixture } from './test-utils.ts';
 import Database from 'better-sqlite3';
 import config from './test-config.ts';
-import {
-  openDb,
-  closeDb,
-  importGtfs,
-  getStopsAsGeoJSON,
-} from '../../dist/index.js';
+import { closeDb, importGtfs, getStopsAsGeoJSON } from '../../dist/index.js';
 
-beforeAll(async () => {
-  openDb();
-  await importGtfs(config);
-});
-
-afterAll(async () => {
-  const db = openDb();
-  closeDb(db);
-});
+withGtfsFixture();
 
 describe('getStopsAsGeoJSON(): ', () => {
   it('should return geojson with an empty features array if no stops exist', () => {

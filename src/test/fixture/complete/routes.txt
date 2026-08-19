@@ -1,0 +1,3 @@
+route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color,route_sort_order,continuous_pickup,continuous_drop_off,network_id,cemv_support
+FR1,FA1,R1,Red Line,Serves the eastern corridor,2,https://complete.example.com/r1,FF0000,FFFFFF,1,1,2,FNET1,1
+FR2,FA1,R2,Blue Line,Serves the western corridor,3,https://complete.example.com/r2,0000FF,FFFFFF,2,3,3,FNET2,2

@@ -1,16 +1,7 @@
-import { describe, it, beforeAll, afterAll, expect } from './test-utils.ts';
-import { closeDb, getTrips, importGtfs, openDb } from '../../dist/index.js';
-import config from './test-config.ts';
+import { describe, it, expect, withGtfsFixture } from './test-utils.ts';
+import { getTrips } from '../../dist/index.js';
 
-beforeAll(async () => {
-  openDb();
-  await importGtfs(config);
-});
-
-afterAll(async () => {
-  const db = openDb();
-  closeDb(db);
-});
+withGtfsFixture();
 
 describe('getTrips():', () => {
   it('should return empty array if no trips exist', () => {

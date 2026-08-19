@@ -1,0 +1,2 @@
+feed_publisher_name,feed_publisher_url,feed_lang,default_lang,feed_start_date,feed_end_date,feed_version,feed_contact_email,feed_contact_url
+Complete Publisher,https://publisher.example.com,en,en,20240101,20241231,complete-1.0.0,feed@publisher.example.com,https://publisher.example.com/contact

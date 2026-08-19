@@ -1,0 +1,3 @@
+area_id,stop_id
+FAREA1,FSTOP1
+FAREA2,FSTOP2

@@ -1,0 +1,3 @@
+fare_product_id,rider_category_id,fare_product_name,fare_media_id,amount,currency
+FPROD1,FRIDER1,Adult Single,FMEDIA1,2.50,USD
+FPROD2,FRIDER2,Senior Single,FMEDIA2,1.25,USD

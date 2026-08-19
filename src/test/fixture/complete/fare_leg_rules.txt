@@ -1,0 +1,3 @@
+leg_group_id,network_id,from_area_id,to_area_id,from_timeframe_group_id,to_timeframe_group_id,fare_product_id,rule_priority
+FLEG1,FNET1,FAREA1,FAREA2,FTF1,FTF2,FPROD1,1
+FLEG2,FNET2,FAREA2,FAREA1,FTF2,FTF1,FPROD2,2
