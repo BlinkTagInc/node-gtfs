@@ -97,3 +97,21 @@ jobs:
         env:
           GTFS_TEST_POSTGRES_URL: postgresql://postgres:postgres@127.0.0.1:5432/gtfs
           GTFS_TEST_MYSQL_URL: mysql://root:root@127.0.0.1:3306/gtfs
+
+  release-test:
+    runs-on: ubuntu-latest
+    name: Packed package and compatibility
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install
+      - run: pnpm run test:release

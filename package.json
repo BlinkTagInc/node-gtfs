@@ -100,6 +100,7 @@
     "build": "tsdown",
     "build-watch": "tsdown --watch",
     "test": "pnpm run build && node --experimental-transform-types --disable-warning=ExperimentalWarning --test --test-reporter=spec src/test/**/*.test.ts",
+    "test:release": "node --experimental-transform-types --disable-warning=ExperimentalWarning --test --test-reporter=spec src/test/release-smoke.ts",
     "typecheck": "pnpm run build && tsc --noEmit",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
@@ -107,7 +108,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "node .husky/install.mjs",
-    "prepack": "pnpm run build"
+    "prepack": "npm run build"
   },
   "exports": {
     ".": {
