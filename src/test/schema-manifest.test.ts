@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
+import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
+import { hasIn, set } from 'lodash-es';
 
 import {
   gtfsJoins,
@@ -192,6 +194,61 @@ describe('GTFS schema manifest', () => {
     );
     assert.equal(alert.fields.header_text.defaultValue, undefined);
     assert.equal(alert.fields.description_text.defaultValue, undefined);
+  });
+
+  test('uses source paths exposed by the official GTFS-Realtime bindings', () => {
+    const realtime = GtfsRealtimeBindings.transit_realtime;
+    const sourceRoots: Record<
+      string,
+      {
+        root: { fromObject(value: Record<string, unknown>): object };
+        parent?: { fromObject(value: Record<string, unknown>): object };
+      }
+    > = {
+      service_alerts: { root: realtime.FeedEntity },
+      trip_updates: { root: realtime.FeedEntity },
+      vehicle_positions: { root: realtime.FeedEntity },
+      service_alert_informed_entities: {
+        root: realtime.EntitySelector,
+        parent: realtime.FeedEntity,
+      },
+      stop_time_updates: {
+        root: realtime.TripUpdate.StopTimeUpdate,
+        parent: realtime.FeedEntity,
+      },
+    };
+
+    for (const [tableName, table] of Object.entries(gtfsManifest)) {
+      if (table.namespace !== 'gtfs-realtime') continue;
+
+      const roots = sourceRoots[tableName];
+      assert.ok(roots, `Missing protobuf source root for ${tableName}`);
+
+      for (const [fieldName, field] of Object.entries(table.fields)) {
+        if (field.sourcePath === undefined) continue;
+
+        const usesParent = field.sourcePath.startsWith('parent.');
+        const sourcePath = usesParent
+          ? field.sourcePath.slice('parent.'.length)
+          : field.sourcePath;
+        const sourceRoot = usesParent ? roots.parent : roots.root;
+
+        assert.ok(
+          sourceRoot,
+          `Missing parent protobuf source root for ${tableName}.${fieldName}`,
+        );
+
+        const sourceValue = {};
+        set(sourceValue, sourcePath, null);
+        const message = sourceRoot.fromObject(sourceValue);
+
+        assert.equal(
+          hasIn(message, sourcePath),
+          true,
+          `Invalid protobuf source path for ${tableName}.${fieldName}: ${field.sourcePath}`,
+        );
+      }
+    }
   });
 
   test('uses open enumerations only for GTFS-Realtime fields', () => {
