@@ -4,7 +4,7 @@ export type LogLevel = 'silent' | 'error' | 'warning' | 'info';
 export type LogMessageLevel = Exclude<LogLevel, 'silent'>;
 
 /** Receives non-progress log messages. */
-export type LogFunction = (level: LogMessageLevel, message: string) => void;
+export type LogFunction = (message: string, level?: LogMessageLevel) => void;
 
 export interface ReportingOptions {
   /**

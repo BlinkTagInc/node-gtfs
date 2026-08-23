@@ -20,7 +20,10 @@ describe('GTFS-Realtime reporting', () => {
       transaction: (...args: unknown[]) => (...args: unknown[]) => unknown;
     };
     const originalTransaction = databasePrototype.transaction;
-    const messages: Array<{ level: string; message: string }> = [];
+    const messages: Array<{
+      level: string | undefined;
+      message: string;
+    }> = [];
 
     try {
       await importGtfs(config);
@@ -66,7 +69,7 @@ describe('GTFS-Realtime reporting', () => {
           },
         ],
         logLevel: 'error',
-        logFunction(level, messageText) {
+        logFunction(messageText, level) {
           messages.push({ level, message: messageText });
         },
       });

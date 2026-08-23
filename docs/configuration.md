@@ -290,11 +290,14 @@ await importGtfs({
   agencies: [{ path: './data/gtfs.zip' }],
   sqlitePath: './gtfs.sqlite',
   logLevel: 'warning',
-  logFunction(level, message) {
+  logFunction(message, level) {
     console.log(`[${level}] ${message}`);
   },
 });
 ```
+
+The `level` argument is optional, so existing `logFunction(message)` callbacks
+continue to work.
 
 `verbose` remains available for compatibility. Use `logLevel` in new code.
 

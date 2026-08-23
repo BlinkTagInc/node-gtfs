@@ -91,26 +91,26 @@ function createLogFunctionReporter(logFunction: LogFunction): Reporter {
       switch (event.type) {
         case 'message':
           logFunction(
-            event.level,
             typeof event.body === 'string'
               ? event.body
               : formatErrorMessage(event.body),
+            event.level,
           );
           break;
 
         case 'run:start':
-          logFunction('info', formatRunStart(event));
+          logFunction(formatRunStart(event), 'info');
           break;
 
         case 'progress':
           break;
 
         case 'status':
-          logFunction('info', event.message);
+          logFunction(event.message, 'info');
           break;
 
         case 'run:complete':
-          logFunction('info', formatRunComplete(event));
+          logFunction(formatRunComplete(event), 'info');
           break;
       }
     },
