@@ -39,7 +39,7 @@ export interface KyselyImportOptions<DB> {
    * @defaultValue true
    */
   manageSchema?: boolean;
-  /** Write generated `*_timestamp` columns. Defaults to `manageSchema`. */
+  /** Write node-GTFS-generated columns. Defaults to `manageSchema`. */
   includeNodeGtfsExtras?: boolean;
 }
 
@@ -259,7 +259,7 @@ function buildRow(
   options: GtfsFileWriterOptions,
   capabilities: GtfsDialectCapabilities,
   includeNodeGtfsExtras: boolean,
-  managedSchema: boolean,
+  includeMysqlPrimaryKeyHash: boolean,
 ): DynamicRow {
   const result: DynamicRow = {};
   const keyValues: Array<string | number | null> = [];
@@ -290,7 +290,7 @@ function buildRow(
 
   if (
     capabilities.primaryKeyStrategy === 'hash' &&
-    managedSchema &&
+    includeMysqlPrimaryKeyHash &&
     keyValues.length > 0
   ) {
     result[MYSQL_PRIMARY_KEY_HASH] = keyValues.includes(null)
@@ -310,6 +310,8 @@ export function createKyselyGtfsWriter<DB>(
   const managedSchema = databaseOptions.manageSchema ?? true;
   const includeNodeGtfsExtras =
     databaseOptions.includeNodeGtfsExtras ?? managedSchema;
+  const includeMysqlPrimaryKeyHash =
+    managedSchema || databaseOptions.includeNodeGtfsExtras === true;
 
   return {
     async writeBatch(batch) {
@@ -327,7 +329,7 @@ export function createKyselyGtfsWriter<DB>(
             ).length
           : 0) +
         (capabilities.primaryKeyStrategy === 'hash' &&
-        managedSchema &&
+        includeMysqlPrimaryKeyHash &&
         getPrimaryKeyColumns(writerOptions.table).length > 0
           ? 1
           : 0);
@@ -351,7 +353,7 @@ export function createKyselyGtfsWriter<DB>(
                 writerOptions,
                 capabilities,
                 includeNodeGtfsExtras,
-                managedSchema,
+                includeMysqlPrimaryKeyHash,
               ),
             );
 

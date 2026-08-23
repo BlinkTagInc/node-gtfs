@@ -236,6 +236,28 @@ describe('importGtfsToKysely():', () => {
             query.startsWith('create index') && query.includes('(191)'),
         ),
       ).toBeTruthy();
+
+      queries.length = 0;
+      await importGtfsToKysely(
+        {
+          agencies: [{ path: fixturePath }],
+          logLevel: 'silent',
+        },
+        {
+          db,
+          dialect: 'mysql',
+          manageSchema: false,
+          includeNodeGtfsExtras: true,
+        },
+      );
+
+      expect(
+        queries.some(
+          (query) =>
+            query.startsWith('insert into `agency`') &&
+            query.includes('`_node_gtfs_primary_key`'),
+        ),
+      ).toBeTruthy();
     } finally {
       await db.destroy();
       await rm(fixturePath, { recursive: true, force: true });
