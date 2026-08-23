@@ -27,6 +27,7 @@ import { escapeIdentifier } from './sql-clauses.ts';
 function createTable(
   db: Database.Database,
   tableDefinition: CompiledGtfsTable,
+  dropExisting = true,
 ): void {
   const sqlColumnCreateStatements = [];
 
@@ -97,7 +98,9 @@ function createTable(
   }
 
   const tableName = escapeIdentifier(tableDefinition.name);
-  db.prepare(`DROP TABLE IF EXISTS ${tableName};`).run();
+  if (dropExisting) {
+    db.prepare(`DROP TABLE IF EXISTS ${tableName};`).run();
+  }
 
   db.prepare(
     `CREATE TABLE ${tableName} (${sqlColumnCreateStatements.join(', ')});`,
@@ -135,6 +138,166 @@ function createCompositeIndex(
   ).run();
 }
 
+function createIndexesForTable(
+  db: Database.Database,
+  table: CompiledGtfsTable,
+): void {
+  const { singleColumnIndexes, compositeIndexes } = getGtfsIndexPlan(table, {
+    includeGeneratedTimeIndexes: true,
+  });
+
+  if (singleColumnIndexes.length > 0) {
+    const { rowCount } = db
+      .prepare(
+        `SELECT COUNT(*) AS rowCount FROM ${escapeIdentifier(table.name)}`,
+      )
+      .get() as { rowCount: number };
+
+    if (rowCount === 0) {
+      for (const columnName of singleColumnIndexes) {
+        createIndex(db, table.name, columnName, false);
+      }
+    } else {
+      const counts = db
+        .prepare(
+          `SELECT ${singleColumnIndexes
+            .map(
+              (columnName, index) =>
+                `COUNT(${escapeIdentifier(columnName)}) AS ${escapeIdentifier(`c${index}`)}`,
+            )
+            .join(', ')} FROM ${escapeIdentifier(table.name)}`,
+        )
+        .get() as Record<string, number>;
+
+      for (const [index, columnName] of singleColumnIndexes.entries()) {
+        const density = counts[`c${index}`] / rowCount;
+        createIndex(
+          db,
+          table.name,
+          columnName,
+          density <= SPARSE_COLUMN_MAX_DENSITY,
+        );
+      }
+    }
+  }
+
+  for (const columns of compositeIndexes) {
+    createCompositeIndex(db, table.name, columns);
+  }
+}
+
+interface SqliteTableColumn {
+  name: string;
+  type: string;
+  pk: number;
+}
+
+function getSqliteTableColumns(
+  db: Database.Database,
+  tableName: string,
+): SqliteTableColumn[] | undefined {
+  const table = db
+    .prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?")
+    .get(tableName);
+  if (table === undefined) return undefined;
+
+  return db
+    .prepare(`PRAGMA table_info(${escapeIdentifier(tableName)})`)
+    .all() as SqliteTableColumn[];
+}
+
+function tableNeedsMigration(
+  table: CompiledGtfsTable,
+  columns: SqliteTableColumn[],
+): boolean {
+  const columnsByName = new Map(columns.map((column) => [column.name, column]));
+
+  for (const column of table.columns) {
+    const existingColumn = columnsByName.get(column.name);
+    if (
+      existingColumn === undefined ||
+      existingColumn.type.toLowerCase() !== column.storageKind
+    ) {
+      return true;
+    }
+  }
+
+  const existingPrimaryKey = columns
+    .filter((column) => column.pk > 0)
+    .sort((left, right) => left.pk - right.pk)
+    .map((column) => column.name);
+  const expectedPrimaryKey = getPrimaryKeyColumns(table).map(
+    (column) => column.name,
+  );
+
+  return existingPrimaryKey.join('\0') !== expectedPrimaryKey.join('\0');
+}
+
+function migrateTable(
+  db: Database.Database,
+  table: CompiledGtfsTable,
+  existingColumns: SqliteTableColumn[],
+): void {
+  const previousTableName = `${table.name}__node_gtfs_previous`;
+  const escapedTableName = escapeIdentifier(table.name);
+  const escapedPreviousTableName = escapeIdentifier(previousTableName);
+
+  db.prepare(
+    `ALTER TABLE ${escapedTableName} RENAME TO ${escapedPreviousTableName}`,
+  ).run();
+  createTable(db, table, false);
+
+  const existingColumnNames = new Set(
+    existingColumns.map((column) => column.name),
+  );
+  const sharedColumns = table.columns
+    .map((column) => column.name)
+    .filter((columnName) => existingColumnNames.has(columnName));
+  const missingRequiredColumn = table.columns.some(
+    (column) =>
+      !existingColumnNames.has(column.name) &&
+      column.presence === 'required' &&
+      column.defaultValue === undefined,
+  );
+
+  if (sharedColumns.length > 0 && !missingRequiredColumn) {
+    const columns = sharedColumns.map(escapeIdentifier).join(', ');
+    db.prepare(
+      `INSERT OR IGNORE INTO ${escapedTableName} (${columns}) SELECT ${columns} FROM ${escapedPreviousTableName}`,
+    ).run();
+  }
+
+  db.prepare(`DROP TABLE ${escapedPreviousTableName}`).run();
+  createIndexesForTable(db, table);
+}
+
+export function migrateSqliteGtfsRealtimeTables(db: Database.Database): void {
+  const migrations = compiledTables
+    .filter((table) => table.namespace === 'gtfs-realtime')
+    .map((table) => ({
+      table,
+      existingColumns: getSqliteTableColumns(db, table.name),
+    }))
+    .filter(
+      ({ table, existingColumns }) =>
+        existingColumns === undefined ||
+        tableNeedsMigration(table, existingColumns),
+    );
+
+  if (migrations.length === 0) return;
+
+  db.transaction(() => {
+    for (const { table, existingColumns } of migrations) {
+      if (existingColumns === undefined) {
+        createTable(db, table, false);
+        createIndexesForTable(db, table);
+      } else {
+        migrateTable(db, table, existingColumns);
+      }
+    }
+  })();
+}
+
 /** Recreates managed GTFS tables. */
 export function createSqliteGtfsTables(db: Database.Database): void {
   for (const table of compiledTables) {
@@ -145,49 +308,7 @@ export function createSqliteGtfsTables(db: Database.Database): void {
 /** Creates indexes for managed GTFS tables. */
 export function createSqliteGtfsIndexes(db: Database.Database): void {
   for (const table of compiledTables) {
-    const { singleColumnIndexes, compositeIndexes } = getGtfsIndexPlan(table, {
-      includeGeneratedTimeIndexes: true,
-    });
-
-    if (singleColumnIndexes.length > 0) {
-      const columnNames = singleColumnIndexes;
-      const { rowCount } = db
-        .prepare(
-          `SELECT COUNT(*) AS rowCount FROM ${escapeIdentifier(table.name)}`,
-        )
-        .get() as { rowCount: number };
-
-      if (rowCount === 0) {
-        for (const columnName of columnNames) {
-          createIndex(db, table.name, columnName, false);
-        }
-      } else {
-        const counts = db
-          .prepare(
-            `SELECT ${columnNames
-              .map(
-                (columnName, index) =>
-                  `COUNT(${escapeIdentifier(columnName)}) AS ${escapeIdentifier(`c${index}`)}`,
-              )
-              .join(', ')} FROM ${escapeIdentifier(table.name)}`,
-          )
-          .get() as Record<string, number>;
-
-        for (const [index, columnName] of columnNames.entries()) {
-          const density = counts[`c${index}`] / rowCount;
-          createIndex(
-            db,
-            table.name,
-            columnName,
-            density <= SPARSE_COLUMN_MAX_DENSITY,
-          );
-        }
-      }
-    }
-
-    for (const columns of compositeIndexes) {
-      createCompositeIndex(db, table.name, columns);
-    }
+    createIndexesForTable(db, table);
   }
 }
 

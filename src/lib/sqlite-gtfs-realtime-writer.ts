@@ -6,6 +6,7 @@ import type {
   RealtimeMutation,
 } from './gtfs-realtime-writer.ts';
 import { escapeIdentifier } from './sql-clauses.ts';
+import { migrateSqliteGtfsRealtimeTables } from './sqlite-gtfs-writer.ts';
 
 function rowValues(
   mutation: Extract<RealtimeMutation, { operation: 'replace' }>,
@@ -18,6 +19,8 @@ function rowValues(
 export function createSqliteGtfsRealtimeWriter(
   db: Database.Database,
 ): GtfsRealtimeWriter {
+  migrateSqliteGtfsRealtimeTables(db);
+
   const replaceStatements = new Map<string, Database.Statement>();
   const deleteStatements = new Map<string, Database.Statement>();
 

@@ -93,6 +93,7 @@ before(async () => {
       '--save-exact',
       tarballPath,
       'gtfs-v4@npm:gtfs@4.20.2',
+      'gtfs-realtime-bindings@2.2.0',
     ],
     projectPath,
   );
@@ -213,6 +214,73 @@ before(async () => {
         process.stdout.write(JSON.stringify({ tables, getters }));
       `,
     ),
+    writeFile(
+      path.join(projectPath, 'realtime-upgrade.mjs'),
+      `
+        import assert from 'node:assert/strict';
+        import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
+        import * as candidate from 'gtfs';
+        import * as baseline from 'gtfs-v4';
+
+        const [feedPath, sqlitePath] = process.argv.slice(2);
+        const staticConfig = {
+          agencies: [{ path: feedPath }],
+          sqlitePath,
+          logLevel: 'silent',
+          verbose: false,
+        };
+        await baseline.importGtfs(staticConfig);
+        baseline.closeDb(baseline.openDb(staticConfig));
+
+        const message =
+          GtfsRealtimeBindings.transit_realtime.FeedMessage.fromObject({
+            header: { gtfsRealtimeVersion: '2.0' },
+            entity: [
+              {
+                id: 'vehicle-position',
+                vehicle: {
+                  trip: { routeId: 'route-1', directionId: 1 },
+                  stopId: 'stop-1',
+                  currentStatus: 'STOPPED_AT',
+                },
+              },
+            ],
+          });
+        const payload = Buffer.from(
+          GtfsRealtimeBindings.transit_realtime.FeedMessage.encode(
+            message,
+          ).finish(),
+        );
+        globalThis.fetch = async () => new Response(payload, { status: 200 });
+
+        const realtimeConfig = {
+          agencies: [
+            {
+              realtimeVehiclePositions: {
+                url: 'https://example.test/vehicle-positions',
+              },
+            },
+          ],
+          sqlitePath,
+          logLevel: 'silent',
+        };
+        await candidate.updateGtfsRealtime(realtimeConfig);
+
+        const db = candidate.openDb(realtimeConfig);
+        const vehicle = db
+          .prepare(
+            'SELECT route_id, direction_id, stop_id, current_status FROM vehicle_positions WHERE id = ?',
+          )
+          .get('vehicle-position');
+        assert.deepEqual(vehicle, {
+          route_id: 'route-1',
+          direction_id: 1,
+          stop_id: 'stop-1',
+          current_status: 'STOPPED_AT',
+        });
+        candidate.closeDb(db);
+      `,
+    ),
   ]);
 });
 
@@ -308,4 +376,17 @@ test('candidate preserves 4.20.2 SQLite source data and getter results', () => {
       `Getter result changed for ${getterName}`,
     );
   }
+});
+
+test('candidate updates realtime tables created by 4.20.2', () => {
+  const result = run(
+    process.execPath,
+    [
+      path.join(projectPath, 'realtime-upgrade.mjs'),
+      path.join(repositoryRoot, 'src/test/fixture/caltrain_20160406.zip'),
+      path.join(workspace, 'realtime-upgrade.sqlite'),
+    ],
+    projectPath,
+  );
+  assertSuccess(result, '4.20.2 realtime schema upgrade');
 });
