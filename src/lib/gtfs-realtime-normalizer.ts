@@ -1,4 +1,5 @@
 import { get } from 'lodash-es';
+import type { transit_realtime } from 'gtfs-realtime-bindings';
 
 import type { CompiledGtfsColumn } from '../schema/compile-table.ts';
 import { compiledTableRegistry } from '../schema/table-registry.ts';
@@ -11,12 +12,7 @@ import type {
   RealtimeMutation,
 } from './gtfs-realtime-writer.ts';
 
-export interface RawRealtimeEntity {
-  id: string;
-  alert?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  tripUpdate?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  vehicle?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-}
+export type RawRealtimeEntity = transit_realtime.IFeedEntity;
 
 export type RealtimeFeedKind = 'alerts' | 'tripupdates' | 'vehiclepositions';
 
