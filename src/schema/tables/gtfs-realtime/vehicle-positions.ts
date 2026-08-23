@@ -1,5 +1,11 @@
 import { defineGtfsTable } from '../../define-table.ts';
 
+const vehicleStopStatusValues = [
+  'INCOMING_AT',
+  'STOPPED_AT',
+  'IN_TRANSIT_TO',
+] as const;
+
 export const vehiclePositions = defineGtfsTable({
   file: null,
   table: 'vehicle_positions',
@@ -129,9 +135,14 @@ export const vehiclePositions = defineGtfsTable({
       sourcePath: 'vehicle.stopId',
       applyFeedPrefix: true,
     },
+    vehicle_stop_status: {
+      kind: 'enumeration',
+      values: vehicleStopStatusValues,
+      sourcePath: 'vehicle.currentStatus',
+    },
     current_status: {
       kind: 'enumeration',
-      values: ['INCOMING_AT', 'STOPPED_AT', 'IN_TRANSIT_TO'],
+      values: vehicleStopStatusValues,
       sourcePath: 'vehicle.currentStatus',
     },
     congestion_level: {

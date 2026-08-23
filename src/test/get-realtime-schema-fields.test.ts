@@ -259,6 +259,7 @@ describe('GTFS-Realtime schema field storage', () => {
     expect(vehicle.route_id).toBe('route-vehicle');
     expect(vehicle.direction_id).toBe(1);
     expect(vehicle.stop_id).toBe('stop-vehicle');
+    expect(vehicle.vehicle_stop_status).toBe('STOPPED_AT');
     expect(vehicle.current_status).toBe('STOPPED_AT');
     expect(vehicle.odometer).toBe(12_345.5);
     expect(vehicle.vehicle_wheelchair_accessible).toBe('WHEELCHAIR_ACCESSIBLE');
