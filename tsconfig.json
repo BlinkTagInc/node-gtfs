@@ -6,6 +6,7 @@
     "moduleResolution": "NodeNext",
     "noEmit": true,
     "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "types": ["node"],

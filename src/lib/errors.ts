@@ -1,38 +1,46 @@
-export enum GtfsErrorCategory {
-  CONFIG = 'config',
-  DOWNLOAD = 'download',
-  ZIP = 'zip',
-  VALIDATION = 'validation',
-  DATABASE = 'database',
-  PARSE = 'parse',
-  QUERY = 'query',
-  INTERNAL = 'internal',
-}
+export const GtfsErrorCategory = {
+  CONFIG: 'config',
+  DOWNLOAD: 'download',
+  ZIP: 'zip',
+  VALIDATION: 'validation',
+  DATABASE: 'database',
+  PARSE: 'parse',
+  QUERY: 'query',
+  INTERNAL: 'internal',
+} as const;
+
+export type GtfsErrorCategory =
+  (typeof GtfsErrorCategory)[keyof typeof GtfsErrorCategory];
 
 /**
  * Error codes are a public API contract and must remain stable across
  * minor/patch releases.
  */
-export enum GtfsErrorCode {
-  GTFS_DOWNLOAD_HTTP = 'GTFS_DOWNLOAD_HTTP',
-  GTFS_DOWNLOAD_FAILED = 'GTFS_DOWNLOAD_FAILED',
-  GTFS_ZIP_INVALID = 'GTFS_ZIP_INVALID',
-  GTFS_REQUIRED_FIELD_MISSING = 'GTFS_REQUIRED_FIELD_MISSING',
-  GTFS_INVALID_DATE = 'GTFS_INVALID_DATE',
-  GTFS_CONFIG_INVALID = 'GTFS_CONFIG_INVALID',
-  GTFS_CONFIG_FILE_NOT_FOUND = 'GTFS_CONFIG_FILE_NOT_FOUND',
-  GTFS_CONFIG_PARSE_FAILED = 'GTFS_CONFIG_PARSE_FAILED',
-  DB_OPEN_FAILED = 'DB_OPEN_FAILED',
-  GTFS_DB_OPERATION_FAILED = 'GTFS_DB_OPERATION_FAILED',
-  GTFS_JSON_INVALID = 'GTFS_JSON_INVALID',
-  GTFS_UNSUPPORTED_FILE_TYPE = 'GTFS_UNSUPPORTED_FILE_TYPE',
-  GTFS_CSV_PARSE_FAILED = 'GTFS_CSV_PARSE_FAILED',
-  GTFS_QUERY_INVALID = 'GTFS_QUERY_INVALID',
-}
+export const GtfsErrorCode = {
+  GTFS_DOWNLOAD_HTTP: 'GTFS_DOWNLOAD_HTTP',
+  GTFS_DOWNLOAD_FAILED: 'GTFS_DOWNLOAD_FAILED',
+  GTFS_ZIP_INVALID: 'GTFS_ZIP_INVALID',
+  GTFS_REQUIRED_FIELD_MISSING: 'GTFS_REQUIRED_FIELD_MISSING',
+  GTFS_INVALID_DATE: 'GTFS_INVALID_DATE',
+  GTFS_CONFIG_INVALID: 'GTFS_CONFIG_INVALID',
+  GTFS_CONFIG_FILE_NOT_FOUND: 'GTFS_CONFIG_FILE_NOT_FOUND',
+  GTFS_CONFIG_PARSE_FAILED: 'GTFS_CONFIG_PARSE_FAILED',
+  DB_OPEN_FAILED: 'DB_OPEN_FAILED',
+  GTFS_DB_OPERATION_FAILED: 'GTFS_DB_OPERATION_FAILED',
+  GTFS_JSON_INVALID: 'GTFS_JSON_INVALID',
+  GTFS_UNSUPPORTED_FILE_TYPE: 'GTFS_UNSUPPORTED_FILE_TYPE',
+  GTFS_CSV_PARSE_FAILED: 'GTFS_CSV_PARSE_FAILED',
+  GTFS_QUERY_INVALID: 'GTFS_QUERY_INVALID',
+} as const;
 
-export enum GtfsWarningCode {
-  GTFS_DUPLICATE_PRIMARY_KEY = 'GTFS_DUPLICATE_PRIMARY_KEY',
-}
+export type GtfsErrorCode = (typeof GtfsErrorCode)[keyof typeof GtfsErrorCode];
+
+export const GtfsWarningCode = {
+  GTFS_DUPLICATE_PRIMARY_KEY: 'GTFS_DUPLICATE_PRIMARY_KEY',
+} as const;
+
+export type GtfsWarningCode =
+  (typeof GtfsWarningCode)[keyof typeof GtfsWarningCode];
 
 export interface GtfsWarning {
   code: GtfsWarningCode;
