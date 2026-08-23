@@ -9,42 +9,20 @@ import type {
   RowQuery,
   SqliteQueryOptions,
 } from '../../types/query.ts';
+import { compiledTableRegistry } from '../../schema/table-registry.ts';
 import { selectRows } from '../sqlite-query.ts';
 import { formatWhereCondition, formatWhereConditions } from '../sql-clauses.ts';
 
-// Columns that live in service_alert_informed_entities, not service_alerts.
-// Filtering by these keys must be applied to the entities query, not the
-// alerts query — otherwise SQLite throws "no such column".
-const ENTITY_COLUMNS = new Set([
-  'alert_id',
-  'agency_id',
-  'stop_id',
-  'route_id',
-  'route_type',
-  'trip_id',
-  'direction_id',
-]);
+const alertColumns = new Set(
+  compiledTableRegistry.serviceAlerts.columns.map((column) => column.name),
+);
+const entityColumns = new Set(
+  compiledTableRegistry.serviceAlertInformedEntities.columns
+    .map((column) => column.name)
+    .filter((columnName) => !alertColumns.has(columnName)),
+);
 
-/*
- * Returns an array of all service alerts that match the query parameters.
- * Each alert includes a nested `informed_entities` array containing all of
- * its related informed entities.
- *
- * Filters on informed-entity columns (stop_id, route_id, trip_id, route_type,
- * direction_id) are applied to the entities table and only alerts with at
- * least one matching entity are returned.
- */
-type ServiceAlertQuery = RowQuery<
-  ServiceAlertRow & {
-    alert_id: string;
-    agency_id: string | null;
-    stop_id: string | null;
-    route_id: string | null;
-    route_type: number | null;
-    trip_id: string | null;
-    direction_id: number | null;
-  }
->;
+type ServiceAlertQuery = RowQuery<ServiceAlertRow & ServiceAlertInformedEntity>;
 
 /**
  * Returns an array of all service alerts that match the query parameters.
@@ -67,7 +45,7 @@ export function getServiceAlerts<Fields extends keyof ServiceAlertRow>(
   const alertQuery: DynamicQuery = {};
   const entityQuery: DynamicQuery = {};
   for (const [key, value] of Object.entries(query)) {
-    if (ENTITY_COLUMNS.has(key)) {
+    if (entityColumns.has(key)) {
       entityQuery[key] = value;
     } else {
       alertQuery[key] = value;
