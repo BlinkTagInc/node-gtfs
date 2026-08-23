@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { after, before, test } from 'node:test';
@@ -72,13 +72,11 @@ before(async () => {
     repositoryRoot,
   );
   assertSuccess(packResult, 'npm pack');
-  const packOutput = JSON.parse(packResult.stdout) as
-    Array<{ filename: string }> | Record<string, { filename: string }>;
-  const packedPackages = Array.isArray(packOutput)
-    ? packOutput
-    : Object.values(packOutput);
+  const packedPackages = (await readdir(packagePath)).filter((filename) =>
+    filename.endsWith('.tgz'),
+  );
   assert.equal(packedPackages.length, 1);
-  const tarballPath = path.join(packagePath, packedPackages[0].filename);
+  const tarballPath = path.join(packagePath, packedPackages[0]);
 
   await writeFile(
     path.join(projectPath, 'package.json'),
