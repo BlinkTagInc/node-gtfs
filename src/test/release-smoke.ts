@@ -119,6 +119,7 @@ before(async () => {
       `
         import assert from 'node:assert/strict';
         import { closeDb, getRoutes, importGtfs, openDb } from 'gtfs';
+        import { routes as routesTable } from 'gtfs/models';
         import { gtfsManifest } from 'gtfs/schema';
 
         const [feedPath, sqlitePath] = process.argv.slice(2);
@@ -134,6 +135,7 @@ before(async () => {
           { route_id: 'route-1', route_short_name: '1' },
         ]);
         assert.equal(gtfsManifest.routes.file, 'routes.txt');
+        assert.equal(routesTable.file, 'routes.txt');
         closeDb(openDb(config));
         process.stdout.write(JSON.stringify({ routeCount: routes.length }));
       `,

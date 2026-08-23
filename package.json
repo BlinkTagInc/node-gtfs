@@ -119,6 +119,10 @@
       "types": "./dist/schema/index.d.ts",
       "default": "./dist/schema/index.js"
     },
+    "./models": {
+      "types": "./dist/schema/index.d.ts",
+      "default": "./dist/schema/index.js"
+    },
     "./package.json": "./package.json"
   },
   "dependencies": {

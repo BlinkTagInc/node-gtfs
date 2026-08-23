@@ -1,3 +1,6 @@
+import type { routes as modelsRoutes } from 'gtfs/models';
+import type { routes as schemaRoutes } from 'gtfs/schema';
+
 import type {
   Agency,
   BoardAlight,
@@ -50,6 +53,10 @@ type FrequencyQuery = GtfsQuery<typeof frequencies>;
 type VehiclePosition = GtfsRow<typeof vehiclePositions>;
 type EnumerationField = Extract<GtfsFieldDefinition, { kind: 'enumeration' }>;
 type ScalarField = Exclude<GtfsFieldDefinition, { kind: 'enumeration' }>;
+
+type _ModelsSubpathMatchesSchema = Assert<
+  Equal<typeof modelsRoutes, typeof schemaRoutes>
+>;
 
 type _TripIdIsRequiredString = Assert<Equal<Frequency['trip_id'], string>>;
 type _ExactTimesIsInteger = Assert<
