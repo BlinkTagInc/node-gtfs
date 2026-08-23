@@ -8,31 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Static GTFS imports to caller-owned SQLite, PostgreSQL, and MySQL Kysely databases
-- Declarative schema exports and inferred row, query, insert, and database types
-- `fare_leg_join_rules.txt` and `stop_times.end_pickup_drop_off_window`
-- `logLevel`, configuration validation, and CLI `--help` and `--version`
-- Reworked database indexes: composites for stop, route, and service-date lookups; point-lookup indexes for transfers, pathways, and fare rules; removed redundant and unused indexes.
-- Focused configuration, query, realtime, and troubleshooting guides
-- Query methods for TIDES files
+- Static GTFS imports to caller-owned SQLite, PostgreSQL, and MySQL databases through Kysely
+- Support for `fare_leg_join_rules.txt`, `stop_times.end_pickup_drop_off_window`, and TIDES CSV files and queries
+- `logLevel` config option
 
 ### Changed
-- Expanded GTFS-Realtime fields and corrected protobuf extraction
-- Organized schemas by namespace and renamed ODS to TODS
-- Split parsing and normalization from database writers
-- Simplified getters through a shared query implementation
-- Improved CLI output; `logFunction` receives `(level, message)` and omits progress events
-- Warnings and errors use stderr
-- Reorganized the README around a persistent SQLite quick start
+- Expanded GTFS-Realtime data stored for alerts, trip updates, stop-time updates, and vehicle positions
+- Organized public schemas by namespace and renamed ODS to TODS
+- Invalid configuration now produces structured errors
+- `logFunction` can receive the log level as a second argument; warnings and errors use stderr
 
 ### Fixed
-- Database selection, nested GeoJSON queries, normalized-path tracking, and explicit connection closing
-- SQL parameter binding, identifier escaping, and empty `IN` queries
-- Database error context, temporary resource cleanup, and stream cleanup
-- GTFS Flex stop-time validation and GTFS-Realtime row replacement
+- Explicit database selection and connection closingLets
+- Query handling for empty arrays and numeric or text identifier values
+- Validation of GTFS Flex stop times without `stop_id`
+- GTFS-Realtime field extraction, row replacement, and error reporting
 
 ### Deprecated
-- `verbose`; use `logLevel`
+- `verbose`; use `logLevel` config option
 
 ## [4.20.2] - 2026-08-13
 
