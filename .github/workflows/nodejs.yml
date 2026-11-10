@@ -17,6 +17,7 @@ jobs:
 
       - run: pnpm run lint
       - run: pnpm run format:check
+      - run: pnpm run generated:check
       - run: pnpm run docs:check
       - run: pnpm run typecheck
         env:
@@ -25,8 +26,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        node: [22, 24, 26]
+        include:
+          - node: 22
+            color: '0'
+          - node: 24
+            color: '1'
+          - node: 26
+            color: '1'
     name: Use Node.js ${{ matrix.node }}
     steps:
       - uses: actions/checkout@v7
@@ -38,9 +46,12 @@ jobs:
           cache: true
 
       - run: pnpm run build
-      - run: pnpm run test
         env:
           CI: true
+      - run: node scripts/run-tests.mjs
+        env:
+          CI: true
+          FORCE_COLOR: ${{ matrix.color }}
 
   database-test:
     runs-on: ubuntu-latest
@@ -80,8 +91,7 @@ jobs:
           runtime: node@22
           cache: true
 
-      - run: pnpm run build
-      - run: node --test --test-reporter=spec src/test/database-integration.test.ts
+      - run: pnpm run test:databases
         env:
           GTFS_TEST_POSTGRES_URL: postgresql://postgres:postgres@127.0.0.1:5432/gtfs
           GTFS_TEST_MYSQL_URL: mysql://root:root@127.0.0.1:3306/gtfs
@@ -99,3 +109,29 @@ jobs:
           cache: true
 
       - run: pnpm run test:release
+
+  minimum-runtime:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-15]
+    runs-on: ${{ matrix.os }}
+    name: Installed package on Node.js 22.18.0 (${{ matrix.os }})
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build with contributor tooling
+        uses: pnpm/setup@v2
+        with:
+          runtime: node@22
+          cache: true
+
+      - run: pnpm run build
+      - run: npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP"
+
+      - name: Select the exact minimum package runtime
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22.18.0
+
+      - run: node scripts/check-runtime.mjs "$RUNNER_TEMP"/gtfs-*.tgz

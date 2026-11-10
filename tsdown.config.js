@@ -3,25 +3,35 @@ import { defineConfig } from 'tsdown';
 export default defineConfig({
   entry: [
     'src/index.ts',
-    'src/bin/gtfs-export.ts',
-    'src/bin/gtfs-import.ts',
-    'src/bin/gtfsrealtime-update.ts',
+    'src/sqlite.ts',
+    'src/kysely.ts',
+    'src/bin/gtfs.ts',
     'src/schema/index.ts',
   ],
+  outDir: 'dist',
   clean: true,
-  format: ['esm'],
+  platform: 'node',
+  target: 'node22.18',
+  format: 'esm',
   fixedExtension: false,
-  splitting: false,
+  dts: true,
   sourcemap: true,
-  minify: false,
-  target: false,
+  nodeProtocol: true,
+  failOnWarn: 'ci-only',
+  suppressWarnings: [
+    // The TypeScript 7.1 declaration API is still experimental.
+    'TypeScript Go is experimental. Some options will be unavailable.',
+  ],
   deps: {
-    onlyBundle: false,
+    onlyBundle: ['@types/geojson'],
   },
-  inputOptions: {
-    onwarn(warning, warn) {
-      if (warning.code === 'SOURCEMAP_BROKEN') return;
-      warn(warning);
-    },
+  publint: {
+    enabled: 'ci-only',
+    level: 'error',
+  },
+  attw: {
+    enabled: 'ci-only',
+    profile: 'esm-only',
+    level: 'error',
   },
 });

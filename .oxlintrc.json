@@ -16,16 +16,26 @@
     "no-prototype-builtins": "error",
     "no-regex-spaces": "error",
     "no-unexpected-multiline": "error",
+    "curly": ["error", "all"],
     "preserve-caught-error": "error",
     "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/ban-ts-comment": "error",
     "@typescript-eslint/no-array-constructor": "error",
     "@typescript-eslint/no-empty-object-type": "error",
     "@typescript-eslint/no-namespace": "error",
+    "typescript/no-non-null-assertion": "error",
     "@typescript-eslint/no-require-imports": "error",
     "@typescript-eslint/no-unnecessary-type-constraint": "error",
     "@typescript-eslint/no-unsafe-function-type": "error"
   },
+  "overrides": [
+    {
+      "files": ["test/**/*.ts"],
+      "rules": {
+        "typescript/no-non-null-assertion": "off"
+      }
+    }
+  ],
   "env": {
     "es2024": true,
     "node": true

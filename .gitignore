@@ -14,3 +14,8 @@ config*.json
 
 # build files
 /dist
+
+internal
+
+# Local benchmark dependency snapshot
+/scripts/benchmark/baseline/package-lock.json

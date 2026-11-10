@@ -1,58 +1,74 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const runEvents = defineGtfsTable({
-  file: 'run_event.txt',
+export const runEvents = defineGtfsDomainTable({
+  filename: 'run_events.txt',
+  tableName: 'run_events',
+  specification: 'tods',
   presence: 'optional',
-  primaryKey: ['run_event_id'],
+  primaryKey: ['service_id', 'run_id', 'event_sequence'],
   fields: {
-    run_event_id: { kind: 'id', presence: 'required', applyFeedPrefix: true },
-    piece_id: {
+    service_id: {
       kind: 'id',
       presence: 'required',
-      references: [{ file: 'runs_pieces.txt', field: 'piece_id' }],
-      applyFeedPrefix: true,
+      references: [
+        { targetFilename: 'calendar.txt', targetField: 'service_id' },
+        { targetFilename: 'calendar_dates.txt', targetField: 'service_id' },
+        {
+          targetFilename: 'calendar_supplement.txt',
+          targetField: 'service_id',
+        },
+        {
+          targetFilename: 'calendar_dates_supplement.txt',
+          targetField: 'service_id',
+        },
+      ],
     },
-    event_type: {
-      kind: 'integer',
+    run_id: { kind: 'id', presence: 'required' },
+    event_sequence: { kind: 'integer', presence: 'required', minimum: 0 },
+    piece_id: { kind: 'id' },
+    block_id: {
+      kind: 'id',
+      references: [
+        { targetFilename: 'trips.txt', targetField: 'block_id' },
+        { targetFilename: 'trips_supplement.txt', targetField: 'block_id' },
+      ],
+    },
+    job_type: { kind: 'text' },
+    event_type: { kind: 'text', presence: 'required' },
+    trip_id: {
+      kind: 'id',
+      references: [
+        { targetFilename: 'trips.txt', targetField: 'trip_id' },
+        { targetFilename: 'trips_supplement.txt', targetField: 'trip_id' },
+      ],
+    },
+    start_location: {
+      kind: 'id',
       presence: 'required',
-      minimum: 0,
-    },
-    event_name: { kind: 'text', caseInsensitiveComparison: true },
-    event_time: { kind: 'text', presence: 'required' },
-    event_duration: { kind: 'integer', presence: 'required', minimum: 0 },
-    event_from_location_type: {
-      kind: 'integer',
-      minimum: 0,
-      maximum: 1,
-    },
-    event_from_location_id: {
-      kind: 'id',
       references: [
-        { file: 'stops.txt', field: 'stop_id' },
-        { file: 'ops_locations.txt', field: 'ops_location_id' },
+        { targetFilename: 'stops.txt', targetField: 'stop_id' },
+        { targetFilename: 'stops_supplement.txt', targetField: 'stop_id' },
       ],
-      applyFeedPrefix: true,
     },
-    event_to_location_type: {
-      kind: 'integer',
-      minimum: 0,
-      maximum: 1,
-    },
-    event_to_location_id: {
+    start_time: { kind: 'time', presence: 'required' },
+    start_mid_trip: { kind: 'enumeration', values: [0, 1, 2], closed: true },
+    end_location: {
       kind: 'id',
+      presence: 'required',
       references: [
-        { file: 'stops.txt', field: 'stop_id' },
-        { file: 'ops_locations.txt', field: 'ops_location_id' },
+        { targetFilename: 'stops.txt', targetField: 'stop_id' },
+        { targetFilename: 'stops_supplement.txt', targetField: 'stop_id' },
       ],
-      applyFeedPrefix: true,
     },
+    end_time: { kind: 'time', presence: 'required' },
+    end_mid_trip: { kind: 'enumeration', values: [0, 1, 2], closed: true },
   },
-  storage: {
-    indexes: [
-      'event_type',
-      'event_from_location_type',
-      'event_to_location_type',
-    ],
-  },
-  namespace: 'tods',
+  constraints: [
+    {
+      kind: 'range',
+      startField: 'start_time',
+      endField: 'end_time',
+      allowEqual: true,
+    },
+  ],
 });

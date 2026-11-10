@@ -1,21 +1,21 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const tripUpdates = defineGtfsTable({
-  file: null,
-  table: 'trip_updates',
+/** Current trip-update rows, scoped by their stable feed source. */
+export const tripUpdates = defineGtfsDomainTable({
+  filename: null,
+  tableName: 'trip_updates',
   presence: 'optional',
-  primaryKey: ['id'],
+  primaryKey: ['realtime_feed_id', 'entity_id'],
   fields: {
-    id: {
+    realtime_feed_id: { kind: 'id', presence: 'required' },
+    entity_id: {
       kind: 'id',
       presence: 'required',
       sourcePath: 'id',
-      applyFeedPrefix: true,
     },
     vehicle_id: {
       kind: 'id',
       sourcePath: 'tripUpdate.vehicle.id',
-      applyFeedPrefix: true,
     },
     vehicle_label: {
       kind: 'text',
@@ -37,9 +37,8 @@ export const tripUpdates = defineGtfsTable({
     },
     trip_id: {
       kind: 'id',
-      references: [{ file: 'trips.txt', field: 'trip_id' }],
+      references: [{ targetFilename: 'trips.txt', targetField: 'trip_id' }],
       sourcePath: 'tripUpdate.trip.tripId',
-      applyFeedPrefix: true,
     },
     trip_start_time: {
       kind: 'text',
@@ -53,11 +52,10 @@ export const tripUpdates = defineGtfsTable({
     },
     route_id: {
       kind: 'id',
-      references: [{ file: 'routes.txt', field: 'route_id' }],
+      references: [{ targetFilename: 'routes.txt', targetField: 'route_id' }],
       sourcePath: 'tripUpdate.trip.routeId',
-      applyFeedPrefix: true,
     },
-    start_date: {
+    trip_start_date: {
       kind: 'text',
       sourcePath: 'tripUpdate.trip.startDate',
     },
@@ -83,12 +81,10 @@ export const tripUpdates = defineGtfsTable({
     modified_trip_modifications_id: {
       kind: 'id',
       sourcePath: 'tripUpdate.trip.modifiedTrip.modificationsId',
-      applyFeedPrefix: true,
     },
     modified_trip_affected_trip_id: {
       kind: 'id',
       sourcePath: 'tripUpdate.trip.modifiedTrip.affectedTripId',
-      applyFeedPrefix: true,
     },
     modified_trip_start_time: {
       kind: 'text',
@@ -102,7 +98,6 @@ export const tripUpdates = defineGtfsTable({
     trip_properties_trip_id: {
       kind: 'id',
       sourcePath: 'tripUpdate.tripProperties.tripId',
-      applyFeedPrefix: true,
     },
     trip_properties_start_date: {
       kind: 'text',
@@ -115,7 +110,6 @@ export const tripUpdates = defineGtfsTable({
     trip_properties_shape_id: {
       kind: 'id',
       sourcePath: 'tripUpdate.tripProperties.shapeId',
-      applyFeedPrefix: true,
     },
     trip_properties_trip_headsign: {
       kind: 'text',
@@ -125,11 +119,16 @@ export const tripUpdates = defineGtfsTable({
       kind: 'text',
       sourcePath: 'tripUpdate.tripProperties.tripShortName',
     },
-    created_timestamp: { kind: 'integer', presence: 'required' },
-    expiration_timestamp: { kind: 'integer', presence: 'required' },
+    created_at_unix_seconds: {
+      kind: 'integer',
+      presence: 'required',
+      minimum: 0,
+    },
+    expires_at_unix_seconds: {
+      kind: 'integer',
+      presence: 'required',
+      minimum: 0,
+    },
   },
-  storage: {
-    indexes: ['vehicle_id', 'trip_id', 'route_id'],
-  },
-  namespace: 'gtfs-realtime',
+  specification: 'gtfs-realtime',
 });

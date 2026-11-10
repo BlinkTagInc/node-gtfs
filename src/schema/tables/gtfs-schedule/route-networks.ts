@@ -1,22 +1,23 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const routeNetworks = defineGtfsTable({
-  file: 'route_networks.txt',
-  namespace: 'gtfs-schedule',
-  presence: 'conditionallyForbidden',
+export const routeNetworks = defineGtfsDomainTable({
+  filename: 'route_networks.txt',
+  tableName: 'route_networks',
+  specification: 'gtfs-schedule',
+  presence: 'conditionally-forbidden',
   primaryKey: ['route_id'],
   fields: {
     network_id: {
       kind: 'id',
-      references: [{ file: 'networks.txt', field: 'network_id' }],
+      references: [
+        { targetFilename: 'networks.txt', targetField: 'network_id' },
+      ],
       presence: 'required',
-      applyFeedPrefix: true,
     },
     route_id: {
       kind: 'id',
-      references: [{ file: 'routes.txt', field: 'route_id' }],
+      references: [{ targetFilename: 'routes.txt', targetField: 'route_id' }],
       presence: 'required',
-      applyFeedPrefix: true,
     },
   },
 });

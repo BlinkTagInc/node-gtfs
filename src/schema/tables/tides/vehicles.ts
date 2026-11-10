@@ -1,11 +1,12 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const vehicles = defineGtfsTable({
-  file: 'vehicles.csv',
+export const vehicles = defineGtfsDomainTable({
+  filename: 'vehicles.csv',
+  tableName: 'vehicles',
   presence: 'optional',
   primaryKey: ['vehicle_id'],
   fields: {
-    vehicle_id: { kind: 'id', presence: 'required', applyFeedPrefix: true },
+    vehicle_id: { kind: 'id', presence: 'required' },
     vehicle_start: { kind: 'text' },
     vehicle_end: { kind: 'text' },
     model_name: { kind: 'text' },
@@ -16,5 +17,5 @@ export const vehicles = defineGtfsTable({
     bike_rack: { kind: 'text' },
     capacity_standing: { kind: 'integer', minimum: 0 },
   },
-  namespace: 'tides',
+  specification: 'tides',
 });

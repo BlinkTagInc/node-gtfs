@@ -1,16 +1,16 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const frequencies = defineGtfsTable({
-  file: 'frequencies.txt',
-  namespace: 'gtfs-schedule',
+export const frequencies = defineGtfsDomainTable({
+  filename: 'frequencies.txt',
+  tableName: 'frequencies',
+  specification: 'gtfs-schedule',
   presence: 'optional',
   primaryKey: ['trip_id', 'start_time'],
   fields: {
     trip_id: {
       kind: 'id',
       presence: 'required',
-      references: [{ file: 'trips.txt', field: 'trip_id' }],
-      applyFeedPrefix: true,
+      references: [{ targetFilename: 'trips.txt', targetField: 'trip_id' }],
     },
     start_time: { kind: 'time', presence: 'required' },
     end_time: { kind: 'time', presence: 'required' },

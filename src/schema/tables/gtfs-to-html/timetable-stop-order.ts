@@ -1,21 +1,22 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const timetableStopOrder = defineGtfsTable({
-  file: 'timetable_stop_order.txt',
+export const timetableStopOrder = defineGtfsDomainTable({
+  filename: 'timetable_stop_order.txt',
+  tableName: 'timetable_stop_order',
   presence: 'optional',
   primaryKey: ['timetable_id', 'stop_id', 'stop_sequence'],
   fields: {
     timetable_id: {
       kind: 'id',
       presence: 'required',
-      references: [{ file: 'timetables.txt', field: 'timetable_id' }],
-      applyFeedPrefix: true,
+      references: [
+        { targetFilename: 'timetables.txt', targetField: 'timetable_id' },
+      ],
     },
     stop_id: {
       kind: 'id',
       presence: 'required',
-      references: [{ file: 'stops.txt', field: 'stop_id' }],
-      applyFeedPrefix: true,
+      references: [{ targetFilename: 'stops.txt', targetField: 'stop_id' }],
     },
     stop_sequence: {
       kind: 'integer',
@@ -23,8 +24,5 @@ export const timetableStopOrder = defineGtfsTable({
       minimum: 0,
     },
   },
-  storage: {
-    indexes: ['stop_sequence'],
-  },
-  namespace: 'gtfs-to-html',
+  specification: 'gtfs-to-html',
 });

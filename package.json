@@ -1,13 +1,16 @@
 {
   "name": "gtfs",
   "version": "4.21.0",
-  "description": "Import GTFS transit data into SQLite, PostgreSQL, or MySQL and query routes, stops, times and fares",
+  "description": "Import, validate, query, and export GTFS Schedule and Realtime data with SQLite, PostgreSQL, and MySQL.",
   "keywords": [
     "gtfs",
+    "gtfs-schedule",
     "gtfs-realtime",
+    "gtfs-rt",
     "transit",
-    "transportation",
+    "transit-data",
     "public-transit",
+    "public-transport",
     "sqlite",
     "postgresql",
     "postgres",
@@ -24,6 +27,7 @@
     "url": "git+https://github.com/BlinkTagInc/node-gtfs.git"
   },
   "license": "MIT",
+  "sideEffects": false,
   "author": "Brendan Nee <brendan@blinktag.com>",
   "contributors": [
     "Alessio Bogon",
@@ -36,10 +40,10 @@
     "LeAnne Lis",
     "Ethan Lo <ethan@ethanlo.com>",
     "Natalie Perna",
-    "Léo Pradel",
+    "L\u00e9o Pradel",
     "Landon Reed",
     "Jason Schapiro <yono38@gmail.com>",
-    "Jean-François Vial <jeff@modulaweb.fr>",
+    "Jean-Fran\u00e7ois Vial <jeff@modulaweb.fr>",
     "wdalrymple",
     "Ivan Yulaev",
     "Ivy Rose",
@@ -47,7 +51,7 @@
     "Daniel Demidov",
     "gerlacdt",
     "Heath Shurtleff",
-    "Marcelo Muñoz Araya <ma.munoz.araya@gmail.com>",
+    "Marcelo Mu\u00f1oz Araya <ma.munoz.araya@gmail.com>",
     "David Aghassi",
     "Steven Prins",
     "W3stside",
@@ -62,7 +66,7 @@
     "Darius MARTIN",
     "Mike Brocks",
     "Matt Moran",
-    "Daniel Sörlöv",
+    "Daniel S\u00f6rl\u00f6v",
     "Ali Zarghami <alizarghami@gmail.com>",
     "David Abell",
     "Matthias Feist <matze@matf.de>",
@@ -74,7 +78,7 @@
     "b-e-b-o-o",
     "Ben Standaert",
     "mattkinnia",
-    "Théophile Helleboid <theophile.helleboid@transdev.com>",
+    "Th\u00e9ophile Helleboid <theophile.helleboid@transdev.com>",
     "mishamaliga",
     "Magnus Petersen-Paaske",
     "Patrick Steil",
@@ -85,30 +89,48 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
+    "CHANGELOG.md",
+    "CITATION.cff",
     "dist",
     "docs",
     "config-sample.json",
     "config-sample-full.json",
-    "config-sample-rtupdates.json"
+    "config-sample-realtime.json"
   ],
   "bin": {
-    "gtfs-export": "dist/bin/gtfs-export.js",
-    "gtfs-import": "dist/bin/gtfs-import.js",
-    "gtfsrealtime-update": "dist/bin/gtfsrealtime-update.js"
+    "gtfs": "dist/bin/gtfs.js"
   },
   "scripts": {
     "build": "tsdown",
     "build-watch": "tsdown --watch",
-    "test": "pnpm run build && node --disable-warning=ExperimentalWarning --test --test-reporter=spec src/test/**/*.test.ts",
-    "test:release": "node --disable-warning=ExperimentalWarning --test --test-reporter=spec src/test/release-smoke.ts",
+    "test": "pnpm run generated:check && pnpm run build && node scripts/run-tests.mjs",
+    "test:coverage": "pnpm run build && node scripts/run-test-coverage.mjs",
+    "test:release": "node --disable-warning=ExperimentalWarning --test --test-reporter=spec test/package/release-smoke.ts",
     "typecheck": "pnpm run build && tsc --noEmit",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "docs:check": "node scripts/check-docs.mjs",
+    "docs:check": "node scripts/check-docs.mjs && node --disable-warning=ExperimentalWarning scripts/check-migration.mjs",
+    "repositories:generate": "node --disable-warning=ExperimentalWarning scripts/generate-repositories.mjs",
+    "repositories:check": "node --disable-warning=ExperimentalWarning scripts/generate-repositories.mjs --check",
+    "row-types:generate": "node --disable-warning=ExperimentalWarning scripts/generate-row-types.mjs",
+    "row-types:check": "node --disable-warning=ExperimentalWarning scripts/generate-row-types.mjs --check",
+    "schema:generate": "node --disable-warning=ExperimentalWarning scripts/generate-schema-artifacts.mjs",
+    "schema:check": "node --disable-warning=ExperimentalWarning scripts/generate-schema-artifacts.mjs --check",
+    "generated:generate": "pnpm run repositories:generate && pnpm run row-types:generate && pnpm run schema:generate",
+    "generated:check": "pnpm run repositories:check && pnpm run row-types:check && pnpm run schema:check",
+    "schema:snapshot:sqlite": "node --disable-warning=ExperimentalWarning scripts/generate-sqlite-schema-snapshot.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "node .husky/install.mjs",
-    "prepack": "npm run build"
+    "prepack": "npm run build",
+    "test:unit": "node scripts/run-tests.mjs unit",
+    "test:contracts": "pnpm run build && node scripts/run-tests.mjs contracts",
+    "test:integration": "pnpm run build && node scripts/run-tests.mjs integration",
+    "test:package": "pnpm run build && node scripts/run-tests.mjs package",
+    "test:databases": "pnpm run build && node scripts/run-tests.mjs contracts --require-databases",
+    "test:types": "pnpm run typecheck",
+    "benchmark:sqlite": "node scripts/benchmark/sqlite.mjs",
+    "benchmark:concurrency": "node scripts/benchmark/concurrency.mjs"
   },
   "exports": {
     ".": {
@@ -119,53 +141,92 @@
       "types": "./dist/schema/index.d.ts",
       "default": "./dist/schema/index.js"
     },
-    "./models": {
-      "types": "./dist/schema/index.d.ts",
-      "default": "./dist/schema/index.js"
+    "./sqlite": {
+      "types": "./dist/sqlite.d.ts",
+      "default": "./dist/sqlite.js"
+    },
+    "./kysely": {
+      "types": "./dist/kysely.d.ts",
+      "default": "./dist/kysely.js"
     },
     "./package.json": "./package.json"
   },
   "dependencies": {
     "@turf/helpers": "7.4.0",
     "better-sqlite3": "13.0.3",
-    "csv-parse": "7.0.2",
-    "csv-stringify": "6.8.3",
+    "csv-parse": "7.0.3",
+    "csv-stringify": "6.9.0",
     "gtfs-realtime-bindings": "2.2.0",
-    "kysely": "0.29.5",
+    "kysely": "0.29.8",
     "lodash-es": "4.18.1",
-    "long": "5.3.2",
-    "node-stream-zip": "1.16.0",
-    "sanitize-filename": "1.6.4",
+    "sanitize-filename": "1.6.5",
+    "yauzl": "3.4.0",
     "yoctocolors": "2.2.0"
   },
   "devDependencies": {
+    "@arethetypeswrong/core": "^0.18.5",
+    "@release-it/keep-a-changelog": "^8.0.1",
     "@types/better-sqlite3": "9.6.0",
     "@types/geojson": "7946.0.16",
     "@types/lodash-es": "4.17.12",
     "@types/node": "26",
-    "@types/pg": "8.21.0",
+    "@types/pg": "8.23.1",
+    "@types/pg-cursor": "2.7.2",
+    "@types/yauzl": "3.4.0",
+    "fast-check": "4.10.2",
+    "github-slugger": "2.0.0",
     "husky": "9.1.7",
-    "lint-staged": "17.3.0",
-    "mysql2": "3.23.3",
-    "oxlint": "1.78.0",
-    "pg": "8.23.0",
-    "prettier": "3.9.6",
-    "tsdown": "0.22.14",
-    "typescript": "7.0.2"
+    "lint-staged": "17.6.0",
+    "markdown-it": "15.0.3",
+    "mysql2": "3.24.6",
+    "oxlint": "1.93.0",
+    "pg": "8.23.1",
+    "pg-cursor": "2.22.1",
+    "prettier": "3.9.10",
+    "publint": "^0.3.25",
+    "release-it": "^21.1.2",
+    "tsdown": "0.23.7",
+    "typescript": "7.1.0-beta"
   },
   "engines": {
-    "node": ">=22"
+    "node": "^22.18.0 || >=24.0.0"
   },
   "release-it": {
+    "git": {
+      "requireBranch": "main",
+      "requireCommits": true,
+      "commitMessage": "Release ${version}",
+      "tagName": "${version}",
+      "tagAnnotation": "Release ${version}"
+    },
+    "npm": {
+      "publish": true,
+      "publishPackageManager": "pnpm",
+      "publishArgs": [
+        "--no-git-checks"
+      ]
+    },
     "github": {
-      "release": true
+      "release": true,
+      "releaseName": "node-GTFS ${version}"
     },
     "plugins": {
       "@release-it/keep-a-changelog": {
-        "filename": "CHANGELOG.md"
+        "filename": "CHANGELOG.md",
+        "addUnreleased": true,
+        "addVersionUrl": true,
+        "head": "main"
       }
     },
     "hooks": {
+      "before:init": [
+        "pnpm run lint",
+        "pnpm run format:check",
+        "pnpm run docs:check",
+        "pnpm run typecheck",
+        "pnpm run test",
+        "pnpm run test:release"
+      ],
       "after:bump": "pnpm run build"
     }
   },
@@ -173,15 +234,11 @@
     "singleQuote": true
   },
   "lint-staged": {
-    "*.js": [
+    "*.{js,cjs,mjs,ts,cts,mts}": [
       "oxlint --fix",
       "prettier --write"
     ],
-    "*.ts": [
-      "oxlint --fix",
-      "prettier --write"
-    ],
-    "*.json": "prettier --write"
+    "*.{json,jsonc,md,yml,yaml}": "prettier --write"
   },
-  "packageManager": "pnpm@11.21.0"
+  "packageManager": "pnpm@12.18.0"
 }

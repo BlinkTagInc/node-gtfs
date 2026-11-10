@@ -4,15 +4,20 @@
     "lib": ["ES2023"],
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "verbatimModuleSyntax": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "erasableSyntaxOnly": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
     "types": ["node"],
     "strict": true,
-    "skipLibCheck": true,
-    "isolatedModules": true
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
   },
-  "include": ["src/**/*", "src/test"]
+  "include": ["src/**/*.ts", "test/**/*.ts"]
 }

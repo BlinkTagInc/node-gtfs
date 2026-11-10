@@ -1,30 +1,43 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const fareProducts = defineGtfsTable({
-  file: 'fare_products.txt',
-  namespace: 'gtfs-schedule',
+export const fareProducts = defineGtfsDomainTable({
+  filename: 'fare_products.txt',
+  tableName: 'fare_products',
+  specification: 'gtfs-schedule',
   presence: 'optional',
   primaryKey: ['fare_product_id', 'rider_category_id', 'fare_media_id'],
   fields: {
     fare_product_id: {
       kind: 'id',
       presence: 'required',
-      applyFeedPrefix: true,
     },
     rider_category_id: {
       kind: 'id',
       references: [
-        { file: 'rider_categories.txt', field: 'rider_category_id' },
+        {
+          targetFilename: 'rider_categories.txt',
+          targetField: 'rider_category_id',
+        },
       ],
-      applyFeedPrefix: true,
     },
-    fare_product_name: { kind: 'text', caseInsensitiveComparison: true },
+    fare_product_name: {
+      kind: 'text',
+      supportsCaseInsensitiveComparison: true,
+    },
     fare_media_id: {
       kind: 'id',
-      references: [{ file: 'fare_media.txt', field: 'fare_media_id' }],
-      applyFeedPrefix: true,
+      references: [
+        { targetFilename: 'fare_media.txt', targetField: 'fare_media_id' },
+      ],
     },
-    amount: { kind: 'real', presence: 'required' },
+    amount: {
+      kind: 'real',
+      presence: 'required',
+      monetary: {
+        currencyField: 'currency',
+        publicRepresentation: 'decimal-string',
+      },
+    },
     currency: { kind: 'text', presence: 'required' },
   },
 });

@@ -1,0 +1,5 @@
+stop_id,stop_name,stop_lat,stop_lon,stop_desc,custom_stop
+stop-1,"Main, ""Central""
+Station",37.77,-122.42,,"naïve, café"
+stop-2,東京駅,35.6812,139.7671,"Line one
+Line two",雪

@@ -1,0 +1,535 @@
+{
+  "calendar_attributes.txt": [
+    {
+      "service_id": "FS1",
+      "service_description": "service_description: Café \"北\", 2"
+    }
+  ],
+  "directions.txt": [
+    {
+      "route_id": "FR1",
+      "direction_id": 0,
+      "direction": "direction: Café \"北\", 5"
+    }
+  ],
+  "route_attributes.txt": [
+    {
+      "route_id": "FR1",
+      "category": 7,
+      "subcategory": 101,
+      "running_way": 9
+    }
+  ],
+  "stop_attributes.txt": [
+    {
+      "stop_id": "FSTOP1",
+      "accessibility_id": 11,
+      "cardinal_direction": "N",
+      "relative_position": "near-side",
+      "stop_city": "stop_city: Café \"北\", 14"
+    }
+  ],
+  "board_alight.txt": [
+    {
+      "trip_id": "FT1",
+      "stop_id": "FSTOP1",
+      "stop_sequence": 1,
+      "record_use": 0,
+      "schedule_relationship": 8,
+      "boardings": 20,
+      "alightings": 21,
+      "current_load": 22,
+      "load_count": 23,
+      "load_type": 0,
+      "rack_down": 1,
+      "bike_boardings": 26,
+      "bike_alightings": 27,
+      "ramp_used": 0,
+      "ramp_boardings": 29,
+      "ramp_alightings": 30,
+      "service_date": 20240615,
+      "service_arrival_time": "25:10:00",
+      "service_departure_time": "25:10:30",
+      "source": 4
+    }
+  ],
+  "ride_feed_info.txt": [
+    {
+      "ride_files": 6,
+      "ride_start_date": 20240615,
+      "ride_end_date": 20240615,
+      "gtfs_feed_date": 20240615,
+      "default_currency_type": "USD",
+      "ride_feed_version": "ride_feed_version: Café \"北\", 40"
+    }
+  ],
+  "rider_trip.txt": [
+    {
+      "rider_id": "ext-rider_id",
+      "agency_id": "FA1",
+      "trip_id": "FT1",
+      "boarding_stop_id": "FSTOP1",
+      "boarding_stop_sequence": 1,
+      "alighting_stop_id": "FSTOP2",
+      "alighting_stop_sequence": 2,
+      "service_date": 20240615,
+      "boarding_time": "25:10:00",
+      "alighting_time": "26:20:00",
+      "rider_type": 13,
+      "rider_type_description": "rider_type_description: Café \"北\", 52",
+      "fare_paid": 53.25,
+      "transaction_type": 8,
+      "fare_media": 9,
+      "accompanying_device": 6,
+      "transfer_status": 1
+    }
+  ],
+  "ridership.txt": [
+    {
+      "total_boardings": 58,
+      "total_alightings": 59,
+      "ridership_start_date": 20240615,
+      "ridership_end_date": 20240615,
+      "ridership_start_time": "25:10:00",
+      "ridership_end_time": "26:20:00",
+      "service_id": "FS1",
+      "monday": 1,
+      "tuesday": 0,
+      "wednesday": 1,
+      "thursday": 0,
+      "friday": 1,
+      "saturday": 0,
+      "sunday": 1,
+      "agency_id": "FA1",
+      "route_id": "FR1",
+      "direction_id": 0,
+      "trip_id": "FT1",
+      "stop_id": "FSTOP1"
+    }
+  ],
+  "trip_capacity.txt": [
+    {
+      "agency_id": "FA1",
+      "trip_id": "FT1",
+      "service_date": 20240615,
+      "vehicle_description": "vehicle_description: Café \"北\", 80",
+      "seated_capacity": 81,
+      "standing_capacity": 82,
+      "wheelchair_capacity": 83,
+      "bike_capacity": 84
+    }
+  ],
+  "timetable_notes.txt": [
+    {
+      "note_id": "ext-note_id",
+      "symbol": "symbol: Café \"北\", 86",
+      "note": "note: Café \"北\", 87",
+      "scope": "stop",
+      "timetable_id": "ext-timetable_id",
+      "route_id": "FR1",
+      "trip_id": "FT1",
+      "stop_id": "FSTOP1",
+      "stop_sequence": 1
+    }
+  ],
+  "timetable_notes_references.txt": [
+    {
+      "note_id": "ext-note_id",
+      "timetable_id": "ext-timetable_id",
+      "route_id": "FR1",
+      "trip_id": "FT1",
+      "stop_id": "FSTOP1",
+      "stop_sequence": 1,
+      "show_on_stoptime": 0
+    }
+  ],
+  "timetable_pages.txt": [
+    {
+      "timetable_page_id": "ext-timetable_page_id",
+      "timetable_page_label": "timetable_page_label: Café \"北\", 102",
+      "filename": "filename: Café \"北\", 103"
+    }
+  ],
+  "timetable_stop_order.txt": [
+    {
+      "timetable_id": "ext-timetable_id",
+      "stop_id": "FSTOP1",
+      "stop_sequence": 1
+    }
+  ],
+  "timetables.txt": [
+    {
+      "timetable_id": "ext-timetable_id",
+      "route_id": "FR1",
+      "direction_id": 1,
+      "start_date": 20240615,
+      "end_date": 20240615,
+      "monday": 0,
+      "tuesday": 1,
+      "wednesday": 0,
+      "thursday": 1,
+      "friday": 0,
+      "saturday": 1,
+      "sunday": 0,
+      "start_time": "25:10:00",
+      "end_time": "26:20:00",
+      "timetable_label": "timetable_label: Café \"北\", 121",
+      "service_notes": "service_notes: Café \"北\", 122",
+      "orientation": "vertical",
+      "timetable_page_id": "ext-timetable_page_id",
+      "timetable_sequence": 125,
+      "direction_name": "direction_name: Café \"北\", 126",
+      "include_exceptions": 1,
+      "show_trip_continuation": 0
+    }
+  ],
+  "devices.csv": [
+    {
+      "device_id": "ext-device_id",
+      "stop_id": "FSTOP1",
+      "vehicle_id": "ext-vehicle_id",
+      "train_car_id": "ext-train_car_id",
+      "device_type": "device_type: Café \"北\", 176",
+      "device_vendor": "device_vendor: Café \"北\", 177",
+      "device_model": "device_model: Café \"北\", 178",
+      "device_location": "device_location: Café \"北\", 179"
+    }
+  ],
+  "fare_transactions.csv": [
+    {
+      "transaction_id": "ext-transaction_id",
+      "service_date": 20240615,
+      "event_timestamp": "2024-06-16T01:10:30-07:00",
+      "location_ping_id": "ext-location_ping_id",
+      "amount": "12.34",
+      "currency_type": "USD",
+      "fare_action": "purchase",
+      "trip_id_performed": "trip_id_performed: Café \"北\", 273",
+      "trip_id_scheduled": "FT1",
+      "pattern_id": "ext-pattern_id",
+      "trip_stop_sequence": 190,
+      "scheduled_stop_sequence": 1,
+      "vehicle_id": "ext-vehicle_id",
+      "device_id": "ext-device_id",
+      "fare_id": "FFARE1",
+      "stop_id": "FSTOP1",
+      "num_riders": 196,
+      "fare_media_id": "ext-fare_media_id",
+      "rider_category": "rider_category: Café \"北\", 198",
+      "fare_product": "fare_product: Café \"北\", 199",
+      "fare_period": "fare_period: Café \"北\", 200",
+      "fare_capped": "false",
+      "token_id": "ext-token_id",
+      "balance": "9876.50"
+    }
+  ],
+  "operators.csv": [
+    {
+      "operator_id": "ext-operator_id"
+    }
+  ],
+  "passenger_events.csv": [
+    {
+      "passenger_event_id": "ext-passenger_event_id",
+      "service_date": 20240615,
+      "event_timestamp": "2024-06-16T01:10:30-07:00",
+      "location_ping_id": "ext-location_ping_id",
+      "trip_id_performed": "trip_id_performed: Café \"北\", 273",
+      "trip_id_scheduled": "FT1",
+      "trip_stop_sequence": 211,
+      "scheduled_stop_sequence": 1,
+      "event_type": "event_type: Café \"北\", 213",
+      "vehicle_id": "ext-vehicle_id",
+      "device_id": "ext-device_id",
+      "train_car_id": "ext-train_car_id",
+      "stop_id": "FSTOP1",
+      "pattern_id": "ext-pattern_id",
+      "event_count": 219
+    }
+  ],
+  "station_activities.csv": [
+    {
+      "service_date": 20240615,
+      "stop_id": "FSTOP1",
+      "time_period_start": "01:00:00",
+      "time_period_end": "02:00:00",
+      "time_period_category": "time_period_category: Café \"北\", 224",
+      "total_entries": 225,
+      "total_exits": 226,
+      "number_of_transactions": 227,
+      "bike_entries": 228,
+      "bike_exits": 229,
+      "ramp_entries": 230,
+      "ramp_exits": 231
+    }
+  ],
+  "stop_visits.csv": [
+    {
+      "service_date": 20240615,
+      "trip_id_performed": "trip_id_performed: Café \"北\", 273",
+      "trip_stop_sequence": 234,
+      "scheduled_stop_sequence": 1,
+      "pattern_id": "ext-pattern_id",
+      "vehicle_id": "ext-vehicle_id",
+      "dwell": 238,
+      "stop_id": "FSTOP1",
+      "timepoint": "timepoint: Café \"北\", 240",
+      "schedule_arrival_time": "schedule_arrival_time: Café \"北\", 241",
+      "schedule_departure_time": "schedule_departure_time: Café \"北\", 242",
+      "actual_arrival_time": "actual_arrival_time: Café \"北\", 243",
+      "actual_departure_time": "actual_departure_time: Café \"北\", 244",
+      "distance": 245,
+      "boarding_1": 246,
+      "alighting_1": 247,
+      "boarding_2": 248,
+      "alighting_2": 249,
+      "departure_load": 250,
+      "door_open": "door_open: Café \"北\", 251",
+      "door_close": "door_close: Café \"北\", 252",
+      "door_status": "door_status: Café \"北\", 253",
+      "ramp_deployed_time": 254.25,
+      "ramp_failure": "ramp_failure: Café \"北\", 255",
+      "kneel_deployed_time": 256.25,
+      "lift_deployed_time": 257.25,
+      "bike_rack_deployed": "bike_rack_deployed: Café \"北\", 258",
+      "bike_load": 259,
+      "revenue": 260.25,
+      "number_of_transactions": 261,
+      "schedule_relationship": "schedule_relationship: Café \"北\", 262"
+    }
+  ],
+  "train_cars.csv": [
+    {
+      "train_car_id": "ext-train_car_id",
+      "model_name": "model_name: Café \"北\", 264",
+      "facility_name": "facility_name: Café \"北\", 265",
+      "capacity_seated": 266,
+      "capacity_wheelchair": 267,
+      "capacity_bike": 268,
+      "bike_rack": "bike_rack: Café \"北\", 269",
+      "capacity_standing": 270,
+      "train_car_type": "train_car_type: Café \"北\", 271"
+    }
+  ],
+  "trips_performed.csv": [
+    {
+      "service_date": 20240615,
+      "trip_id_performed": "trip_id_performed: Café \"北\", 273",
+      "vehicle_id": "ext-vehicle_id",
+      "trip_id_scheduled": "FT1",
+      "route_id": "FR1",
+      "route_type": "route_type: Café \"北\", 277",
+      "ntd_mode": "ntd_mode: Café \"北\", 278",
+      "route_type_agency": "route_type_agency: Café \"北\", 279",
+      "shape_id": "FSHAPE1",
+      "pattern_id": "ext-pattern_id",
+      "direction_id": 0,
+      "operator_id": "ext-operator_id",
+      "block_id": "FBLOCK1",
+      "trip_start_stop_id": "FSTOP1",
+      "trip_end_stop_id": "FSTOP2",
+      "schedule_trip_start": "schedule_trip_start: Café \"北\", 287",
+      "schedule_trip_end": "schedule_trip_end: Café \"北\", 288",
+      "actual_trip_start": "actual_trip_start: Café \"北\", 289",
+      "actual_trip_end": "actual_trip_end: Café \"北\", 290",
+      "trip_type": "trip_type: Café \"北\", 291",
+      "schedule_relationship": "schedule_relationship: Café \"北\", 292"
+    }
+  ],
+  "vehicle_locations.csv": [
+    {
+      "location_ping_id": "ext-location_ping_id",
+      "service_date": 20240615,
+      "event_timestamp": "2024-06-16T01:10:30-07:00",
+      "trip_id_performed": "trip_id_performed: Café \"北\", 273",
+      "trip_id_scheduled": "FT1",
+      "trip_stop_sequence": 298,
+      "scheduled_stop_sequence": 1,
+      "vehicle_id": "ext-vehicle_id",
+      "device_id": "ext-device_id",
+      "pattern_id": "ext-pattern_id",
+      "stop_id": "FSTOP1",
+      "current_status": "current_status: Café \"北\", 304",
+      "latitude": 37.712345,
+      "longitude": -122.412345,
+      "gps_quality": "gps_quality: Café \"北\", 307",
+      "heading": 308.25,
+      "speed": 309.25,
+      "odometer": 310.25,
+      "schedule_deviation": 311,
+      "headway_deviation": 312,
+      "trip_type": "trip_type: Café \"北\", 313",
+      "schedule_relationship": "schedule_relationship: Café \"北\", 314"
+    }
+  ],
+  "vehicle_train_cars.csv": [
+    {
+      "vehicle_id": "ext-vehicle_id",
+      "train_car_id": "ext-train_car_id",
+      "train_car_order": 317,
+      "operator_id": "ext-operator_id"
+    }
+  ],
+  "vehicles.csv": [
+    {
+      "vehicle_id": "ext-vehicle_id",
+      "vehicle_start": "vehicle_start: Café \"北\", 320",
+      "vehicle_end": "vehicle_end: Café \"北\", 321",
+      "model_name": "model_name: Café \"北\", 322",
+      "facility_name": "facility_name: Café \"北\", 323",
+      "capacity_seated": 324,
+      "capacity_wheelchair": 325,
+      "capacity_bike": 326,
+      "bike_rack": "bike_rack: Café \"北\", 327",
+      "capacity_standing": 328
+    }
+  ],
+  "calendar_dates_supplement.txt": [
+    {
+      "service_id": "FS1",
+      "date": 20240704,
+      "exception_type": 2,
+      "holiday_name": "Independence Day",
+      "TODS_delete": 1
+    }
+  ],
+  "calendar_supplement.txt": [
+    {
+      "service_id": "FS1",
+      "monday": 1,
+      "tuesday": 1,
+      "wednesday": 1,
+      "thursday": 1,
+      "friday": 1,
+      "saturday": 0,
+      "sunday": 0,
+      "start_date": 20240101,
+      "end_date": 20241231,
+      "TODS_delete": 1
+    }
+  ],
+  "employee_run_dates.txt": [
+    {
+      "date": 20240615,
+      "service_id": "FS1",
+      "run_id": "RUN1",
+      "employee_id": "EMP1"
+    }
+  ],
+  "routes_supplement.txt": [
+    {
+      "route_id": "FR1",
+      "agency_id": "FA1",
+      "route_short_name": "R1",
+      "route_long_name": "Red Line",
+      "route_desc": "Serves the eastern corridor",
+      "route_type": 2,
+      "route_url": "https://complete.example.com/r1",
+      "route_color": "FF0000",
+      "route_text_color": "FFFFFF",
+      "route_sort_order": 1,
+      "continuous_pickup": 1,
+      "continuous_drop_off": 2,
+      "network_id": "FNET1",
+      "cemv_support": 1,
+      "TODS_delete": 1
+    }
+  ],
+  "run_events.txt": [
+    {
+      "service_id": "FS1",
+      "run_id": "RUN1",
+      "event_sequence": 1,
+      "piece_id": "PIECE1",
+      "block_id": "FBLOCK1",
+      "job_type": "Operator, Café \"北\"",
+      "event_type": "Revenue trip",
+      "trip_id": "FT1",
+      "start_location": "FSTOP1",
+      "start_time": "25:10:00",
+      "start_mid_trip": 1,
+      "end_location": "FSTOP2",
+      "end_time": "26:10:00",
+      "end_mid_trip": 2
+    }
+  ],
+  "stop_times_supplement.txt": [
+    {
+      "trip_id": "FT2",
+      "arrival_time": "25:10:00",
+      "departure_time": "25:10:00",
+      "location_group_id": "FLGROUP1",
+      "location_id": "FLOC1",
+      "stop_id": "stop_id: Café \"北\", 1",
+      "stop_sequence": 2,
+      "stop_headsign": "Flex Zone",
+      "start_pickup_drop_off_window": "09:00:00",
+      "end_pickup_drop_off_window": "17:00:00",
+      "pickup_type": 2,
+      "drop_off_type": 2,
+      "continuous_pickup": 0,
+      "continuous_drop_off": 0,
+      "shape_dist_traveled": 1500.75,
+      "timepoint": 0,
+      "pickup_booking_rule_id": "FBOOK1",
+      "drop_off_booking_rule_id": "FBOOK2",
+      "TODS_delete": 1
+    }
+  ],
+  "stops_supplement.txt": [
+    {
+      "stop_id": "FSTOP1",
+      "stop_code": "SC1",
+      "stop_name": "First Street Platform",
+      "tts_stop_name": "First Street",
+      "stop_desc": "Platform A at Central",
+      "stop_lat": 37.7001,
+      "stop_lon": -122.4001,
+      "zone_id": "FZONE1",
+      "stop_url": "https://complete.example.com/first",
+      "location_type": 0,
+      "parent_station": "FSTATION1",
+      "stop_timezone": "America/Los_Angeles",
+      "wheelchair_boarding": 1,
+      "level_id": "FLEVEL1",
+      "platform_code": "A",
+      "stop_access": 1,
+      "TODS_delete": 1,
+      "TODS_location_type": "TODS_location_type: Café \"北\", 1"
+    }
+  ],
+  "vehicles.txt": [
+    {
+      "vehicle_id": "TODS-BUS1",
+      "vehicle_label": "Bus, \"北\"",
+      "license_plate": "CA-123"
+    }
+  ],
+  "trips_supplement.txt": [
+    {
+      "route_id": "FR1",
+      "service_id": "FS1",
+      "trip_id": "FT1",
+      "trip_headsign": "Northbound",
+      "trip_short_name": "T1",
+      "direction_id": 0,
+      "block_id": "FBLOCK1",
+      "shape_id": "FSHAPE1",
+      "wheelchair_accessible": 1,
+      "bikes_allowed": 1,
+      "cars_allowed": 1,
+      "safe_duration_factor": 1.25,
+      "safe_duration_offset": 3.5,
+      "TODS_delete": 1,
+      "TODS_trip_type": "TODS_trip_type: Café \"北\", 1"
+    }
+  ],
+  "vehicle_assignments.txt": [
+    {
+      "date": 20240615,
+      "service_id": "FS1",
+      "block_id": "FBLOCK1",
+      "vehicle_id": "TODS-BUS1"
+    }
+  ]
+}

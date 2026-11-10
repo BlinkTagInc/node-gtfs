@@ -1,20 +1,22 @@
-/** Output threshold for a run. */
-export type LogLevel = 'silent' | 'error' | 'warning' | 'info';
+import type { GtfsReportEvent } from './events.ts';
 
-export type LogMessageLevel = Exclude<LogLevel, 'silent'>;
+/** Output threshold for a reporter. */
+export type GtfsReportingLevel = 'silent' | 'error' | 'warn' | 'info';
 
-/** Receives non-progress log messages. */
-export type LogFunction = (message: string, level?: LogMessageLevel) => void;
+export type GtfsLogMessageLevel = Exclude<GtfsReportingLevel, 'silent'>;
 
-export interface ReportingOptions {
-  /**
-   * Whether to print progress output.
-   *
-   * @deprecated Use `logLevel`. `false` maps to `warning`.
-   */
-  verbose?: boolean;
-  /** How much to print. Defaults to `info`. */
-  logLevel?: LogLevel;
-  /** Optional destination for non-progress log messages. */
-  logFunction?: LogFunction;
+/** Receives one immutable structured event synchronously. */
+export type GtfsReporter = (event: GtfsReportEvent) => void;
+
+export interface GtfsReportingConfig<ReporterValue = GtfsReporter> {
+  /** How much to deliver to `reporter`. Defaults to `info` when supplied. */
+  readonly level?: GtfsReportingLevel;
+  /** Optional synchronous structured event destination. Libraries are otherwise silent. */
+  readonly reporter?: ReporterValue;
 }
+
+export type {
+  GtfsOperationName,
+  GtfsReportEvent,
+  GtfsReportedError,
+} from './events.ts';

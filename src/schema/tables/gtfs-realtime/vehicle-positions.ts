@@ -1,33 +1,32 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-const vehicleStopStatusValues = [
+const currentStatusValues = [
   'INCOMING_AT',
   'STOPPED_AT',
   'IN_TRANSIT_TO',
 ] as const;
 
-export const vehiclePositions = defineGtfsTable({
-  file: null,
-  table: 'vehicle_positions',
+/** Current vehicle-position rows, scoped by their stable feed source. */
+export const vehiclePositions = defineGtfsDomainTable({
+  filename: null,
+  tableName: 'vehicle_positions',
   presence: 'optional',
-  primaryKey: ['id'],
+  primaryKey: ['realtime_feed_id', 'entity_id'],
   fields: {
-    id: {
+    realtime_feed_id: { kind: 'id', presence: 'required' },
+    entity_id: {
       kind: 'id',
       presence: 'required',
       sourcePath: 'id',
-      applyFeedPrefix: true,
     },
     trip_id: {
       kind: 'id',
-      references: [{ file: 'trips.txt', field: 'trip_id' }],
+      references: [{ targetFilename: 'trips.txt', targetField: 'trip_id' }],
       sourcePath: 'vehicle.trip.tripId',
-      applyFeedPrefix: true,
     },
     route_id: {
       kind: 'id',
       sourcePath: 'vehicle.trip.routeId',
-      applyFeedPrefix: true,
     },
     direction_id: {
       kind: 'integer',
@@ -60,12 +59,10 @@ export const vehiclePositions = defineGtfsTable({
     modified_trip_modifications_id: {
       kind: 'id',
       sourcePath: 'vehicle.trip.modifiedTrip.modificationsId',
-      applyFeedPrefix: true,
     },
     modified_trip_affected_trip_id: {
       kind: 'id',
       sourcePath: 'vehicle.trip.modifiedTrip.affectedTripId',
-      applyFeedPrefix: true,
     },
     modified_trip_start_time: {
       kind: 'text',
@@ -78,7 +75,6 @@ export const vehiclePositions = defineGtfsTable({
     vehicle_id: {
       kind: 'id',
       sourcePath: 'vehicle.vehicle.id',
-      applyFeedPrefix: true,
     },
     vehicle_label: {
       kind: 'text',
@@ -133,16 +129,10 @@ export const vehiclePositions = defineGtfsTable({
     stop_id: {
       kind: 'id',
       sourcePath: 'vehicle.stopId',
-      applyFeedPrefix: true,
-    },
-    vehicle_stop_status: {
-      kind: 'enumeration',
-      values: vehicleStopStatusValues,
-      sourcePath: 'vehicle.currentStatus',
     },
     current_status: {
       kind: 'enumeration',
-      values: vehicleStopStatusValues,
+      values: currentStatusValues,
       sourcePath: 'vehicle.currentStatus',
     },
     congestion_level: {
@@ -185,11 +175,16 @@ export const vehiclePositions = defineGtfsTable({
       minimum: 0,
       sourcePath: 'vehicle.timestamp',
     },
-    created_timestamp: { kind: 'integer', presence: 'required' },
-    expiration_timestamp: { kind: 'integer', presence: 'required' },
+    created_at_unix_seconds: {
+      kind: 'integer',
+      presence: 'required',
+      minimum: 0,
+    },
+    expires_at_unix_seconds: {
+      kind: 'integer',
+      presence: 'required',
+      minimum: 0,
+    },
   },
-  storage: {
-    indexes: ['trip_id', 'trip_start_date', 'trip_start_time', 'vehicle_id'],
-  },
-  namespace: 'gtfs-realtime',
+  specification: 'gtfs-realtime',
 });

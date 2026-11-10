@@ -1,11 +1,12 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const operators = defineGtfsTable({
-  file: 'operators.csv',
+export const operators = defineGtfsDomainTable({
+  filename: 'operators.csv',
+  tableName: 'operators',
   presence: 'optional',
   primaryKey: ['operator_id'],
   fields: {
-    operator_id: { kind: 'id', presence: 'required', applyFeedPrefix: true },
+    operator_id: { kind: 'id', presence: 'required' },
   },
-  namespace: 'tides',
+  specification: 'tides',
 });

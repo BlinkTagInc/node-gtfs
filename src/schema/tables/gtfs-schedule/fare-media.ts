@@ -1,13 +1,14 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const fareMedia = defineGtfsTable({
-  file: 'fare_media.txt',
-  namespace: 'gtfs-schedule',
+export const fareMedia = defineGtfsDomainTable({
+  filename: 'fare_media.txt',
+  tableName: 'fare_media',
+  specification: 'gtfs-schedule',
   presence: 'optional',
   primaryKey: ['fare_media_id'],
   fields: {
-    fare_media_id: { kind: 'id', presence: 'required', applyFeedPrefix: true },
-    fare_media_name: { kind: 'text', caseInsensitiveComparison: true },
+    fare_media_id: { kind: 'id', presence: 'required' },
+    fare_media_name: { kind: 'text', supportsCaseInsensitiveComparison: true },
     fare_media_type: {
       kind: 'integer',
       presence: 'required',

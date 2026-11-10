@@ -1,26 +1,39 @@
-export { defineGtfsTable, gtfsNamespaces } from './define-table.ts';
+export {
+  defineGtfsTable,
+  gtfsExtensions,
+  gtfsSpecifications,
+} from './define-table.ts';
 export type {
   GtfsDatabaseFromTables,
+  GtfsConditionValue,
+  GtfsConditionalPresenceConstraint,
+  GtfsConditionalNormalization,
+  GtfsDefaultRow,
+  GtfsDerivedFieldDefinition,
   GtfsEnumerationValue,
   GtfsFieldDefinition,
   GtfsFieldKind,
   GtfsFieldOptions,
-  GtfsInsert,
-  GtfsNamespace,
+  GtfsInsertRow,
+  GtfsMonetaryDefinition,
+  GtfsExtension,
+  GtfsKeyStrategy,
   GtfsPresence,
-  GtfsQuery,
+  GtfsStoredRowFilter,
   GtfsRangeConstraint,
   GtfsReference,
-  GtfsRow,
+  GtfsRowCondition,
+  GtfsNormalizedRow,
+  GtfsSelectableRow,
   GtfsSemanticConstraint,
-  GtfsStorageDefinition,
+  GtfsSpecification,
   GtfsStoredRow,
   GtfsTableDefinition,
   GtfsTableName,
-  GtfsValuePresence,
 } from './define-table.ts';
 export type {
   GtfsDatabase,
+  GtfsFileBackedFilename,
   GtfsFileBackedTableName,
   GtfsScheduleTableName,
 } from './database.ts';
@@ -31,6 +44,10 @@ export {
   gtfsScheduleReferenceRevision,
 } from './manifest.ts';
 
-export * from './tables/index.ts';
-export * as tables from './tables/index.ts';
+export * from './managed-tables.ts';
+export * as tables from './managed-tables.ts';
 export type { GtfsJoinDefinition, GtfsManifestEntry } from './manifest.ts';
+export type {
+  GtfsCoordinateBounds,
+  GtfsRepositoryQueryExtensionRow,
+} from './repository-query-extensions.ts';

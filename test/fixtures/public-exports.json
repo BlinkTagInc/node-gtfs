@@ -1,0 +1,36 @@
+{
+  "root": [
+    "DEFAULT_GTFS_EXTENSIONS",
+    "GTFS_SCHEDULE_CORE",
+    "GTFS_SCHEMA_MODES",
+    "Gtfs",
+    "GtfsError",
+    "GtfsErrorCategory",
+    "GtfsErrorCode",
+    "GtfsValidationNoticeCode",
+    "SQLITE_DURABILITY_MODES",
+    "createConsoleReporter",
+    "exportGtfs",
+    "formatGtfsError",
+    "importGtfs",
+    "isGtfsError",
+    "refreshGtfsRealtime"
+  ],
+  "sqlite": [
+    "GTFS_SCHEMA_MODES",
+    "SQLITE_DURABILITY_MODES",
+    "closeSqliteDatabase",
+    "createSqliteGtfsIndexes",
+    "createSqliteGtfsTables",
+    "deleteSqliteDatabase",
+    "inspectSqliteGtfsSchema",
+    "openSqliteDatabase"
+  ],
+  "kysely": [
+    "cleanupGtfsRealtime",
+    "createKyselyGtfsIndexes",
+    "createKyselyGtfsTables",
+    "foldGtfsText",
+    "inspectKyselyGtfsSchema"
+  ]
+}

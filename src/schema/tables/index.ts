@@ -33,9 +33,16 @@ export { translations } from './gtfs-schedule/translations.ts';
 export { trips } from './gtfs-schedule/trips.ts';
 
 // gtfs-realtime
-export { serviceAlertInformedEntities } from './gtfs-realtime/service-alert-informed_entities.ts';
-export { serviceAlerts } from './gtfs-realtime/service-alerts.ts';
-export { stopTimeUpdates } from './gtfs-realtime/stop-time-updates.ts';
+export { alertEntitySelectors } from './gtfs-realtime/alert-entity-selectors.ts';
+export { alertTimeRanges } from './gtfs-realtime/alert-time-ranges.ts';
+export { alerts } from './gtfs-realtime/alerts.ts';
+export { realtimeFeedEntities } from './gtfs-realtime/realtime-feed-entities.ts';
+export { realtimeFeeds } from './gtfs-realtime/realtime-feeds.ts';
+export { realtimeShapes } from './gtfs-realtime/realtime-shapes.ts';
+export { realtimeSnapshots } from './gtfs-realtime/realtime-snapshots.ts';
+export { realtimeStops } from './gtfs-realtime/realtime-stops.ts';
+export { tripModifications } from './gtfs-realtime/trip-modifications.ts';
+export { tripUpdateStopTimeUpdates } from './gtfs-realtime/trip-update-stop-time-updates.ts';
 export { tripUpdates } from './gtfs-realtime/trip-updates.ts';
 export { vehiclePositions } from './gtfs-realtime/vehicle-positions.ts';
 
@@ -59,15 +66,24 @@ export { timetablePages } from './gtfs-to-html/timetable-pages.ts';
 export { timetableStopOrder } from './gtfs-to-html/timetable-stop-order.ts';
 export { timetables } from './gtfs-to-html/timetables.ts';
 
-// noptis
-export { tripsDatedVehicleJourney } from './noptis/trips-dated-vehicle-journey.ts';
-
 // tods
-export { deadheadTimes } from './tods/deadhead-times.ts';
-export { deadheads } from './tods/deadheads.ts';
-export { opsLocations } from './tods/ops-locations.ts';
+export { calendarSupplement } from './tods/calendar-supplement.ts';
+export { calendarDatesSupplement } from './tods/calendar-dates-supplement.ts';
+export { routesSupplement } from './tods/routes-supplement.ts';
+export { stopsSupplement } from './tods/stops-supplement.ts';
+export { stopTimesSupplement } from './tods/stop-times-supplement.ts';
+export { tripsSupplement } from './tods/trips-supplement.ts';
 export { runEvents } from './tods/run-events.ts';
-export { runsPieces } from './tods/runs-pieces.ts';
+export { employeeRunDates } from './tods/employee-run-dates.ts';
+export { todsVehicles } from './tods/vehicles.ts';
+export { vehicleAssignments } from './tods/vehicle-assignments.ts';
+
+// tods-v1
+export { deadheadTimes } from './tods-v1/deadhead-times.ts';
+export { deadheads } from './tods-v1/deadheads.ts';
+export { opsLocations } from './tods-v1/ops-locations.ts';
+export { runEvent } from './tods-v1/run-event.ts';
+export { runsPieces } from './tods-v1/runs-pieces.ts';
 
 // tides
 export { devices } from './tides/devices.ts';

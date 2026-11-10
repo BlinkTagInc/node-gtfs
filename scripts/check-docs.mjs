@@ -1,23 +1,20 @@
+/**
+ * Checks published Markdown and configuration samples for broken links, invalid
+ * fenced examples, and stale package references. Called by `pnpm docs:check`
+ * locally and in CI.
+ */
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { markdownFiles, parseMarkdown } from './lib/documentation.mjs';
 
 const root = process.cwd();
 
-function markdownFiles(directory) {
-  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
-    const entryPath = path.join(directory, entry.name);
-
-    if (entry.isDirectory()) {
-      return markdownFiles(entryPath);
-    }
-
-    return entry.isFile() && entry.name.endsWith('.md') ? [entryPath] : [];
-  });
-}
-
 const files = [
-  path.join(root, 'README.md'),
+  ...readdirSync(root)
+    .filter((filename) => filename.endsWith('.md'))
+    .map((filename) => path.join(root, filename)),
   ...markdownFiles(path.join(root, 'docs')),
 ];
 const jsonSampleFiles = readdirSync(root)
@@ -25,16 +22,17 @@ const jsonSampleFiles = readdirSync(root)
   .map((filename) => path.join(root, filename));
 const errors = [];
 const javascriptBlocks = [];
+const documents = new Map();
 
-function checkCodeBlocks(file, contents) {
-  const fencePattern = /^```([^\n]*)\n([\s\S]*?)^```\s*$/gm;
-  let match;
+function readDocument(file) {
+  if (!documents.has(file)) {
+    documents.set(file, parseMarkdown(readFileSync(file, 'utf8')));
+  }
+  return documents.get(file);
+}
 
-  while ((match = fencePattern.exec(contents)) !== null) {
-    const language = match[1].trim().toLowerCase();
-    const code = match[2];
-    const line = contents.slice(0, match.index).split('\n').length;
-
+function checkCodeBlocks(file, blocks) {
+  for (const { language, code, line } of blocks) {
     if (language === 'json') {
       try {
         JSON.parse(code);
@@ -92,37 +90,49 @@ function checkJavaScriptBlocks() {
   }
 }
 
-function checkLocalLinks(file, contents) {
-  const linkPattern = /!?\[[^\]]*\]\(([^)]+)\)/g;
-  let match;
-
-  while ((match = linkPattern.exec(contents)) !== null) {
-    const target = match[1].trim().replace(/^<|>$/g, '');
-
+function checkLocalLinks(file, links) {
+  for (const { target, line } of links) {
     if (
       target === '' ||
-      target.startsWith('#') ||
+      target.startsWith('//') ||
       /^[a-z][a-z\d+.-]*:/i.test(target)
     ) {
       continue;
     }
 
-    const decodedTarget = decodeURIComponent(target.split('#')[0]);
-    const resolved = path.resolve(path.dirname(file), decodedTarget);
+    let resolved;
+    let anchor;
+    try {
+      const url = new URL(target, pathToFileURL(file));
+      resolved = fileURLToPath(url);
+      anchor = decodeURIComponent(url.hash.slice(1));
+    } catch {
+      errors.push(
+        `${path.relative(root, file)}:${line}: invalid local link ${target}`,
+      );
+      continue;
+    }
 
     if (!existsSync(resolved) || !statSync(resolved).isFile()) {
-      const line = contents.slice(0, match.index).split('\n').length;
       errors.push(
         `${path.relative(root, file)}:${line}: missing local link target ${target}`,
+      );
+    } else if (
+      anchor &&
+      path.extname(resolved) === '.md' &&
+      !readDocument(resolved).anchors.has(anchor)
+    ) {
+      errors.push(
+        `${path.relative(root, file)}:${line}: missing heading anchor ${target}`,
       );
     }
   }
 }
 
 for (const file of files) {
-  const contents = readFileSync(file, 'utf8');
-  checkCodeBlocks(file, contents);
-  checkLocalLinks(file, contents);
+  const { codeBlocks, links } = readDocument(file);
+  checkCodeBlocks(file, codeBlocks);
+  checkLocalLinks(file, links);
 }
 
 for (const file of jsonSampleFiles) {

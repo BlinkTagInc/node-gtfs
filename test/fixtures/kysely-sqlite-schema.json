@@ -1,0 +1,945 @@
+{
+  "formatVersion": 1,
+  "scheduleReferenceRevision": "2026-09-16",
+  "adapter": "kysely",
+  "dialect": "sqlite",
+  "verification": "sql-compilation",
+  "variants": [
+    {
+      "name": "current",
+      "extensions": [
+        "gtfs-realtime",
+        "gtfs-plus",
+        "gtfs-ride",
+        "gtfs-to-html",
+        "tods",
+        "tides"
+      ],
+      "tables": [
+        "_node_gtfs_source_state",
+        "agency",
+        "areas",
+        "attributions",
+        "booking_rules",
+        "calendar",
+        "calendar_dates",
+        "fare_attributes",
+        "fare_leg_join_rules",
+        "fare_leg_rules",
+        "fare_media",
+        "fare_products",
+        "fare_rules",
+        "fare_transfer_rules",
+        "feed_info",
+        "frequencies",
+        "levels",
+        "location_group_stops",
+        "location_groups",
+        "locations",
+        "networks",
+        "pathways",
+        "rider_categories",
+        "route_networks",
+        "routes",
+        "shapes",
+        "stop_areas",
+        "stop_times",
+        "stops",
+        "timeframes",
+        "transfers",
+        "translations",
+        "trips",
+        "alert_entity_selectors",
+        "alert_time_ranges",
+        "alerts",
+        "realtime_feed_entities",
+        "realtime_feeds",
+        "realtime_shapes",
+        "realtime_snapshots",
+        "realtime_stops",
+        "trip_modifications",
+        "trip_update_stop_time_updates",
+        "trip_updates",
+        "vehicle_positions",
+        "calendar_attributes",
+        "directions",
+        "route_attributes",
+        "stop_attributes",
+        "board_alight",
+        "ride_feed_info",
+        "rider_trip",
+        "ridership",
+        "trip_capacity",
+        "timetable_notes",
+        "timetable_notes_references",
+        "timetable_pages",
+        "timetable_stop_order",
+        "timetables",
+        "calendar_dates_supplement",
+        "calendar_supplement",
+        "employee_run_dates",
+        "routes_supplement",
+        "run_events",
+        "stop_times_supplement",
+        "stops_supplement",
+        "tods_vehicles",
+        "trips_supplement",
+        "vehicle_assignments",
+        "devices",
+        "fare_transactions",
+        "operators",
+        "passenger_events",
+        "station_activities",
+        "stop_visits",
+        "train_cars",
+        "trips_performed",
+        "vehicle_locations",
+        "vehicle_train_cars",
+        "vehicles"
+      ],
+      "statements": [
+        {
+          "sql": "create table \"_node_gtfs_source_state\" (\"source_id\" text collate BINARY not null, \"schedule_revision\" text collate BINARY, \"_unknown_fields\" text, constraint \"primary__node_gtfs_source_state\" primary key (\"source_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"agency\" (\"source_id\" text collate BINARY not null, \"agency_id\" text collate BINARY, \"agency_name\" text collate BINARY not null, \"_node_gtfs_casefold_agency_name\" text collate BINARY, \"agency_url\" text collate BINARY not null, \"agency_timezone\" text collate BINARY not null, \"agency_lang\" text collate BINARY, \"_node_gtfs_casefold_agency_lang\" text collate BINARY, \"agency_phone\" text collate BINARY, \"_node_gtfs_casefold_agency_phone\" text collate BINARY, \"agency_fare_url\" text collate BINARY, \"agency_email\" text collate BINARY, \"_node_gtfs_casefold_agency_email\" text collate BINARY, \"cemv_support\" integer, \"_unknown_fields\" text, \"_node_gtfs_key\" varchar(64) not null, constraint \"check_agency_cemv_support\" check (\"cemv_support\" >= 0 and \"cemv_support\" <= 2), constraint \"check_agency__node_gtfs_key\" check (length(\"_node_gtfs_key\") = 64), constraint \"unique_agency__node_gtfs_key\" unique (\"_node_gtfs_key\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"areas\" (\"source_id\" text collate BINARY not null, \"area_id\" text collate BINARY not null, \"area_name\" text collate BINARY, \"_node_gtfs_casefold_area_name\" text collate BINARY, \"_unknown_fields\" text, constraint \"primary_areas\" primary key (\"source_id\", \"area_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"attributions\" (\"source_id\" text collate BINARY not null, \"attribution_id\" text collate BINARY, \"agency_id\" text collate BINARY, \"route_id\" text collate BINARY, \"trip_id\" text collate BINARY, \"organization_name\" text collate BINARY not null, \"_node_gtfs_casefold_organization_name\" text collate BINARY, \"is_producer\" integer, \"is_operator\" integer, \"is_authority\" integer, \"attribution_url\" text collate BINARY, \"attribution_email\" text collate BINARY, \"_node_gtfs_casefold_attribution_email\" text collate BINARY, \"attribution_phone\" text collate BINARY, \"_node_gtfs_casefold_attribution_phone\" text collate BINARY, \"_unknown_fields\" text, \"_node_gtfs_key\" varchar(64) not null, constraint \"check_attributions_is_producer\" check (\"is_producer\" >= 0 and \"is_producer\" <= 1), constraint \"check_attributions_is_operator\" check (\"is_operator\" >= 0 and \"is_operator\" <= 1), constraint \"check_attributions_is_authority\" check (\"is_authority\" >= 0 and \"is_authority\" <= 1), constraint \"check_attributions__node_gtfs_key\" check (length(\"_node_gtfs_key\") = 64), constraint \"unique_attributions__node_gtfs_key\" unique (\"_node_gtfs_key\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"booking_rules\" (\"source_id\" text collate BINARY not null, \"booking_rule_id\" text collate BINARY not null, \"booking_type\" integer not null, \"prior_notice_duration_min\" integer, \"prior_notice_duration_max\" integer, \"prior_notice_last_day\" integer, \"prior_notice_last_time\" text collate BINARY, \"prior_notice_last_service_day_seconds\" integer, \"prior_notice_start_day\" integer, \"prior_notice_start_time\" text collate BINARY, \"prior_notice_start_service_day_seconds\" integer, \"prior_notice_service_id\" text collate BINARY, \"message\" text collate BINARY, \"_node_gtfs_casefold_message\" text collate BINARY, \"pickup_message\" text collate BINARY, \"_node_gtfs_casefold_pickup_message\" text collate BINARY, \"drop_off_message\" text collate BINARY, \"_node_gtfs_casefold_drop_off_message\" text collate BINARY, \"phone_number\" text collate BINARY, \"_node_gtfs_casefold_phone_number\" text collate BINARY, \"info_url\" text collate BINARY, \"booking_url\" text collate BINARY, \"_unknown_fields\" text, constraint \"check_booking_rules_booking_type\" check (\"booking_type\" >= 0 and \"booking_type\" <= 2), constraint \"primary_booking_rules\" primary key (\"source_id\", \"booking_rule_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"calendar\" (\"source_id\" text collate BINARY not null, \"service_id\" text collate BINARY not null, \"monday\" integer not null, \"tuesday\" integer not null, \"wednesday\" integer not null, \"thursday\" integer not null, \"friday\" integer not null, \"saturday\" integer not null, \"sunday\" integer not null, \"start_date\" integer not null, \"end_date\" integer not null, \"_unknown_fields\" text, constraint \"check_calendar_monday\" check (\"monday\" >= 0 and \"monday\" <= 1), constraint \"check_calendar_tuesday\" check (\"tuesday\" >= 0 and \"tuesday\" <= 1), constraint \"check_calendar_wednesday\" check (\"wednesday\" >= 0 and \"wednesday\" <= 1), constraint \"check_calendar_thursday\" check (\"thursday\" >= 0 and \"thursday\" <= 1), constraint \"check_calendar_friday\" check (\"friday\" >= 0 and \"friday\" <= 1), constraint \"check_calendar_saturday\" check (\"saturday\" >= 0 and \"saturday\" <= 1), constraint \"check_calendar_sunday\" check (\"sunday\" >= 0 and \"sunday\" <= 1), constraint \"primary_calendar\" primary key (\"source_id\", \"service_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"calendar_dates\" (\"source_id\" text collate BINARY not null, \"service_id\" text collate BINARY not null, \"date\" integer not null, \"exception_type\" integer not null, \"holiday_name\" text collate BINARY, \"_node_gtfs_casefold_holiday_name\" text collate BINARY, \"_unknown_fields\" text, constraint \"check_calendar_dates_exception_type\" check (\"exception_type\" >= 1 and \"exception_type\" <= 2), constraint \"primary_calendar_dates\" primary key (\"source_id\", \"service_id\", \"date\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"fare_attributes\" (\"source_id\" text collate BINARY not null, \"fare_id\" text collate BINARY not null, \"price\" bigint not null, \"currency_type\" text collate BINARY not null, \"payment_method\" integer not null, \"transfers\" integer, \"agency_id\" text collate BINARY, \"transfer_duration\" integer, \"_unknown_fields\" text, constraint \"check_fare_attributes_price\" check (\"price\" >= 0), constraint \"check_fare_attributes_payment_method\" check (\"payment_method\" >= 0 and \"payment_method\" <= 1), constraint \"check_fare_attributes_transfers\" check (\"transfers\" >= 0 and \"transfers\" <= 2), constraint \"check_fare_attributes_transfer_duration\" check (\"transfer_duration\" >= 0), constraint \"primary_fare_attributes\" primary key (\"source_id\", \"fare_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"fare_leg_join_rules\" (\"source_id\" text collate BINARY not null, \"from_network_id\" text collate BINARY not null, \"to_network_id\" text collate BINARY not null, \"from_stop_id\" text collate BINARY, \"to_stop_id\" text collate BINARY, \"_unknown_fields\" text, \"_node_gtfs_key\" varchar(64) not null, constraint \"check_fare_leg_join_rules__node_gtfs_key\" check (length(\"_node_gtfs_key\") = 64), constraint \"unique_fare_leg_join_rules__node_gtfs_key\" unique (\"_node_gtfs_key\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"fare_leg_rules\" (\"source_id\" text collate BINARY not null, \"leg_group_id\" text collate BINARY, \"network_id\" text collate BINARY, \"from_area_id\" text collate BINARY, \"to_area_id\" text collate BINARY, \"from_timeframe_group_id\" text collate BINARY, \"to_timeframe_group_id\" text collate BINARY, \"fare_product_id\" text collate BINARY not null, \"rule_priority\" integer, \"_unknown_fields\" text, \"_node_gtfs_key\" varchar(64) not null, constraint \"check_fare_leg_rules_rule_priority\" check (\"rule_priority\" >= 0), constraint \"check_fare_leg_rules__node_gtfs_key\" check (length(\"_node_gtfs_key\") = 64), constraint \"unique_fare_leg_rules__node_gtfs_key\" unique (\"_node_gtfs_key\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"fare_media\" (\"source_id\" text collate BINARY not null, \"fare_media_id\" text collate BINARY not null, \"fare_media_name\" text collate BINARY, \"_node_gtfs_casefold_fare_media_name\" text collate BINARY, \"fare_media_type\" integer not null, \"_unknown_fields\" text, constraint \"check_fare_media_fare_media_type\" check (\"fare_media_type\" >= 0 and \"fare_media_type\" <= 4), constraint \"primary_fare_media\" primary key (\"source_id\", \"fare_media_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"fare_products\" (\"source_id\" text collate BINARY not null, \"fare_product_id\" text collate BINARY not null, \"rider_category_id\" text collate BINARY, \"fare_product_name\" text collate BINARY, \"_node_gtfs_casefold_fare_product_name\" text collate BINARY, \"fare_media_id\" text collate BINARY, \"amount\" bigint not null, \"currency\" text collate BINARY not null, \"_unknown_fields\" text, \"_node_gtfs_key\" varchar(64) not null, constraint \"check_fare_products__node_gtfs_key\" check (length(\"_node_gtfs_key\") = 64), constraint \"unique_fare_products__node_gtfs_key\" unique (\"_node_gtfs_key\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"fare_rules\" (\"source_id\" text collate BINARY not null, \"fare_id\" text collate BINARY not null, \"route_id\" text collate BINARY, \"origin_id\" text collate BINARY, \"destination_id\" text collate BINARY, \"contains_id\" text collate BINARY, \"_unknown_fields\" text, \"_node_gtfs_key\" varchar(64) not null, constraint \"check_fare_rules__node_gtfs_key\" check (length(\"_node_gtfs_key\") = 64), constraint \"unique_fare_rules__node_gtfs_key\" unique (\"_node_gtfs_key\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"fare_transfer_rules\" (\"source_id\" text collate BINARY not null, \"from_leg_group_id\" text collate BINARY, \"to_leg_group_id\" text collate BINARY, \"transfer_count\" integer, \"duration_limit\" integer, \"duration_limit_type\" integer, \"fare_transfer_type\" integer not null, \"fare_product_id\" text collate BINARY, \"_unknown_fields\" text, \"_node_gtfs_key\" varchar(64) not null, constraint \"check_fare_transfer_rules_transfer_count\" check (\"transfer_count\" >= -1), constraint \"check_fare_transfer_rules_duration_limit\" check (\"duration_limit\" >= 1), constraint \"check_fare_transfer_rules_duration_limit_type\" check (\"duration_limit_type\" >= 0 and \"duration_limit_type\" <= 3), constraint \"check_fare_transfer_rules_fare_transfer_type\" check (\"fare_transfer_type\" >= 0 and \"fare_transfer_type\" <= 2), constraint \"check_fare_transfer_rules__node_gtfs_key\" check (length(\"_node_gtfs_key\") = 64), constraint \"unique_fare_transfer_rules__node_gtfs_key\" unique (\"_node_gtfs_key\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"feed_info\" (\"source_id\" text collate BINARY not null, \"feed_publisher_name\" text collate BINARY not null, \"_node_gtfs_casefold_feed_publisher_name\" text collate BINARY, \"feed_publisher_url\" text collate BINARY not null, \"feed_lang\" text collate BINARY not null, \"default_lang\" text collate BINARY, \"_node_gtfs_casefold_default_lang\" text collate BINARY, \"feed_start_date\" integer, \"feed_end_date\" integer, \"feed_version\" text collate BINARY, \"feed_contact_email\" text collate BINARY, \"_node_gtfs_casefold_feed_contact_email\" text collate BINARY, \"feed_contact_url\" text collate BINARY, \"_unknown_fields\" text, constraint \"primary_feed_info\" primary key (\"source_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"frequencies\" (\"source_id\" text collate BINARY not null, \"trip_id\" text collate BINARY not null, \"start_time\" text collate BINARY not null, \"start_service_day_seconds\" integer, \"end_time\" text collate BINARY not null, \"end_service_day_seconds\" integer, \"headway_secs\" integer not null, \"exact_times\" integer, \"_unknown_fields\" text, constraint \"check_frequencies_headway_secs\" check (\"headway_secs\" >= 1), constraint \"check_frequencies_exact_times\" check (\"exact_times\" >= 0 and \"exact_times\" <= 1), constraint \"primary_frequencies\" primary key (\"source_id\", \"trip_id\", \"start_time\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"levels\" (\"source_id\" text collate BINARY not null, \"level_id\" text collate BINARY not null, \"level_index\" double precision not null, \"level_name\" text collate BINARY, \"_node_gtfs_casefold_level_name\" text collate BINARY, \"_unknown_fields\" text, constraint \"primary_levels\" primary key (\"source_id\", \"level_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"location_group_stops\" (\"source_id\" text collate BINARY not null, \"location_group_id\" text collate BINARY not null, \"stop_id\" text collate BINARY not null, \"_unknown_fields\" text, constraint \"primary_location_group_stops\" primary key (\"source_id\", \"location_group_id\", \"stop_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"location_groups\" (\"source_id\" text collate BINARY not null, \"location_group_id\" text collate BINARY not null, \"location_group_name\" text collate BINARY, \"_node_gtfs_casefold_location_group_name\" text collate BINARY, \"_unknown_fields\" text, constraint \"primary_location_groups\" primary key (\"source_id\", \"location_group_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"locations\" (\"source_id\" text collate BINARY not null, \"id\" text collate BINARY not null, \"stop_name\" text collate BINARY, \"stop_desc\" text collate BINARY, \"geometry\" text collate BINARY not null, \"_unknown_fields\" text, constraint \"primary_locations\" primary key (\"source_id\", \"id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"networks\" (\"source_id\" text collate BINARY not null, \"network_id\" text collate BINARY not null, \"network_name\" text collate BINARY, \"_node_gtfs_casefold_network_name\" text collate BINARY, \"_unknown_fields\" text, constraint \"primary_networks\" primary key (\"source_id\", \"network_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"pathways\" (\"source_id\" text collate BINARY not null, \"pathway_id\" text collate BINARY not null, \"from_stop_id\" text collate BINARY not null, \"to_stop_id\" text collate BINARY not null, \"pathway_mode\" integer not null, \"is_bidirectional\" integer not null, \"length\" double precision, \"traversal_time\" integer, \"stair_count\" integer, \"max_slope\" double precision, \"min_width\" double precision, \"signposted_as\" text collate BINARY, \"_node_gtfs_casefold_signposted_as\" text collate BINARY, \"reversed_signposted_as\" text collate BINARY, \"_node_gtfs_casefold_reversed_signposted_as\" text collate BINARY, \"_unknown_fields\" text, constraint \"check_pathways_pathway_mode\" check (\"pathway_mode\" >= 1 and \"pathway_mode\" <= 7), constraint \"check_pathways_is_bidirectional\" check (\"is_bidirectional\" >= 0 and \"is_bidirectional\" <= 1), constraint \"check_pathways_length\" check (\"length\" >= 0), constraint \"check_pathways_traversal_time\" check (\"traversal_time\" >= 1), constraint \"check_pathways_min_width\" check (\"min_width\" >= 0), constraint \"primary_pathways\" primary key (\"source_id\", \"pathway_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"rider_categories\" (\"source_id\" text collate BINARY not null, \"rider_category_id\" text collate BINARY not null, \"rider_category_name\" text collate BINARY not null, \"_node_gtfs_casefold_rider_category_name\" text collate BINARY, \"is_default_fare_category\" integer default 0, \"eligibility_url\" text collate BINARY, \"_unknown_fields\" text, constraint \"check_rider_categories_is_default_fare_category\" check (\"is_default_fare_category\" >= 0 and \"is_default_fare_category\" <= 1), constraint \"primary_rider_categories\" primary key (\"source_id\", \"rider_category_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"route_networks\" (\"source_id\" text collate BINARY not null, \"network_id\" text collate BINARY not null, \"route_id\" text collate BINARY not null, \"_unknown_fields\" text, constraint \"primary_route_networks\" primary key (\"source_id\", \"route_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"routes\" (\"source_id\" text collate BINARY not null, \"route_id\" text collate BINARY not null, \"agency_id\" text collate BINARY, \"route_short_name\" text collate BINARY, \"_node_gtfs_casefold_route_short_name\" text collate BINARY, \"route_long_name\" text collate BINARY, \"_node_gtfs_casefold_route_long_name\" text collate BINARY, \"route_desc\" text collate BINARY, \"_node_gtfs_casefold_route_desc\" text collate BINARY, \"route_type\" integer not null, \"route_url\" text collate BINARY, \"route_color\" text collate BINARY, \"_node_gtfs_casefold_route_color\" text collate BINARY, \"route_text_color\" text collate BINARY, \"_node_gtfs_casefold_route_text_color\" text collate BINARY, \"route_sort_order\" integer, \"continuous_pickup\" integer, \"continuous_drop_off\" integer, \"network_id\" text collate BINARY, \"cemv_support\" integer, \"_unknown_fields\" text, constraint \"check_routes_route_type\" check (\"route_type\" >= 0), constraint \"check_routes_route_sort_order\" check (\"route_sort_order\" >= 0), constraint \"check_routes_continuous_pickup\" check (\"continuous_pickup\" >= 0 and \"continuous_pickup\" <= 3), constraint \"check_routes_continuous_drop_off\" check (\"continuous_drop_off\" >= 0 and \"continuous_drop_off\" <= 3), constraint \"check_routes_cemv_support\" check (\"cemv_support\" >= 0 and \"cemv_support\" <= 2), constraint \"primary_routes\" primary key (\"source_id\", \"route_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"shapes\" (\"source_id\" text collate BINARY not null, \"shape_id\" text collate BINARY not null, \"shape_pt_lat\" double precision not null, \"shape_pt_lon\" double precision not null, \"shape_pt_sequence\" integer not null, \"shape_dist_traveled\" double precision, \"_unknown_fields\" text, constraint \"check_shapes_shape_pt_lat\" check (\"shape_pt_lat\" >= -90 and \"shape_pt_lat\" <= 90), constraint \"check_shapes_shape_pt_lon\" check (\"shape_pt_lon\" >= -180 and \"shape_pt_lon\" <= 180), constraint \"check_shapes_shape_pt_sequence\" check (\"shape_pt_sequence\" >= 0), constraint \"check_shapes_shape_dist_traveled\" check (\"shape_dist_traveled\" >= 0), constraint \"primary_shapes\" primary key (\"source_id\", \"shape_id\", \"shape_pt_sequence\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"stop_areas\" (\"source_id\" text collate BINARY not null, \"area_id\" text collate BINARY not null, \"stop_id\" text collate BINARY not null, \"_unknown_fields\" text, constraint \"primary_stop_areas\" primary key (\"source_id\", \"area_id\", \"stop_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"stop_times\" (\"source_id\" text collate BINARY not null, \"trip_id\" text collate BINARY not null, \"arrival_time\" text collate BINARY, \"arrival_service_day_seconds\" integer, \"departure_time\" text collate BINARY, \"departure_service_day_seconds\" integer, \"location_group_id\" text collate BINARY, \"location_id\" text collate BINARY, \"stop_id\" text collate BINARY, \"stop_sequence\" integer not null, \"stop_headsign\" text collate BINARY, \"_node_gtfs_casefold_stop_headsign\" text collate BINARY, \"start_pickup_drop_off_window\" text collate BINARY, \"start_pickup_drop_off_window_service_day_seconds\" integer, \"end_pickup_drop_off_window\" text collate BINARY, \"end_pickup_drop_off_window_service_day_seconds\" integer, \"pickup_type\" integer, \"drop_off_type\" integer, \"continuous_pickup\" integer, \"continuous_drop_off\" integer, \"shape_dist_traveled\" double precision, \"timepoint\" integer, \"pickup_booking_rule_id\" text collate BINARY, \"drop_off_booking_rule_id\" text collate BINARY, \"_unknown_fields\" text, constraint \"check_stop_times_stop_sequence\" check (\"stop_sequence\" >= 0), constraint \"check_stop_times_pickup_type\" check (\"pickup_type\" >= 0 and \"pickup_type\" <= 3), constraint \"check_stop_times_drop_off_type\" check (\"drop_off_type\" >= 0 and \"drop_off_type\" <= 3), constraint \"check_stop_times_continuous_pickup\" check (\"continuous_pickup\" >= 0 and \"continuous_pickup\" <= 3), constraint \"check_stop_times_continuous_drop_off\" check (\"continuous_drop_off\" >= 0 and \"continuous_drop_off\" <= 3), constraint \"check_stop_times_shape_dist_traveled\" check (\"shape_dist_traveled\" >= 0), constraint \"check_stop_times_timepoint\" check (\"timepoint\" >= 0 and \"timepoint\" <= 1), constraint \"primary_stop_times\" primary key (\"source_id\", \"trip_id\", \"stop_sequence\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"stops\" (\"source_id\" text collate BINARY not null, \"stop_id\" text collate BINARY not null, \"stop_code\" text collate BINARY, \"stop_name\" text collate BINARY, \"_node_gtfs_casefold_stop_name\" text collate BINARY, \"tts_stop_name\" text collate BINARY, \"_node_gtfs_casefold_tts_stop_name\" text collate BINARY, \"stop_desc\" text collate BINARY, \"_node_gtfs_casefold_stop_desc\" text collate BINARY, \"stop_lat\" double precision, \"stop_lon\" double precision, \"zone_id\" text collate BINARY, \"stop_url\" text collate BINARY, \"location_type\" integer, \"parent_station\" text collate BINARY, \"stop_timezone\" text collate BINARY, \"wheelchair_boarding\" integer, \"level_id\" text collate BINARY, \"platform_code\" text collate BINARY, \"stop_access\" integer, \"_unknown_fields\" text, constraint \"check_stops_stop_lat\" check (\"stop_lat\" >= -90 and \"stop_lat\" <= 90), constraint \"check_stops_stop_lon\" check (\"stop_lon\" >= -180 and \"stop_lon\" <= 180), constraint \"check_stops_location_type\" check (\"location_type\" >= 0 and \"location_type\" <= 4), constraint \"check_stops_wheelchair_boarding\" check (\"wheelchair_boarding\" >= 0 and \"wheelchair_boarding\" <= 2), constraint \"check_stops_stop_access\" check (\"stop_access\" >= 0 and \"stop_access\" <= 1), constraint \"primary_stops\" primary key (\"source_id\", \"stop_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"timeframes\" (\"source_id\" text collate BINARY not null, \"timeframe_group_id\" text collate BINARY not null, \"start_time\" text collate BINARY, \"start_service_day_seconds\" integer, \"end_time\" text collate BINARY, \"end_service_day_seconds\" integer, \"service_id\" text collate BINARY not null, \"_unknown_fields\" text, \"_node_gtfs_key\" varchar(64) not null, constraint \"check_timeframes__node_gtfs_key\" check (length(\"_node_gtfs_key\") = 64), constraint \"unique_timeframes__node_gtfs_key\" unique (\"_node_gtfs_key\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"transfers\" (\"source_id\" text collate BINARY not null, \"from_stop_id\" text collate BINARY, \"to_stop_id\" text collate BINARY, \"from_route_id\" text collate BINARY, \"to_route_id\" text collate BINARY, \"from_trip_id\" text collate BINARY, \"to_trip_id\" text collate BINARY, \"transfer_type\" integer default 0, \"min_transfer_time\" integer, \"_unknown_fields\" text, \"_node_gtfs_key\" varchar(64) not null, constraint \"check_transfers_transfer_type\" check (\"transfer_type\" >= 0 and \"transfer_type\" <= 5), constraint \"check_transfers_min_transfer_time\" check (\"min_transfer_time\" >= 0), constraint \"check_transfers__node_gtfs_key\" check (length(\"_node_gtfs_key\") = 64), constraint \"unique_transfers__node_gtfs_key\" unique (\"_node_gtfs_key\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"translations\" (\"source_id\" text collate BINARY not null, \"table_name\" text collate BINARY not null, \"field_name\" text collate BINARY not null, \"language\" text collate BINARY not null, \"translation\" text collate BINARY not null, \"record_id\" text collate BINARY, \"record_sub_id\" text collate BINARY, \"field_value\" text collate BINARY, \"_unknown_fields\" text, \"_node_gtfs_key\" varchar(64) not null, constraint \"check_translations__node_gtfs_key\" check (length(\"_node_gtfs_key\") = 64), constraint \"unique_translations__node_gtfs_key\" unique (\"_node_gtfs_key\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"trips\" (\"source_id\" text collate BINARY not null, \"route_id\" text collate BINARY not null, \"service_id\" text collate BINARY not null, \"trip_id\" text collate BINARY not null, \"trip_headsign\" text collate BINARY, \"_node_gtfs_casefold_trip_headsign\" text collate BINARY, \"trip_short_name\" text collate BINARY, \"_node_gtfs_casefold_trip_short_name\" text collate BINARY, \"direction_id\" integer, \"block_id\" text collate BINARY, \"shape_id\" text collate BINARY, \"wheelchair_accessible\" integer, \"bikes_allowed\" integer, \"cars_allowed\" integer, \"safe_duration_factor\" double precision, \"safe_duration_offset\" double precision, \"_unknown_fields\" text, constraint \"check_trips_direction_id\" check (\"direction_id\" >= 0 and \"direction_id\" <= 1), constraint \"check_trips_wheelchair_accessible\" check (\"wheelchair_accessible\" >= 0 and \"wheelchair_accessible\" <= 2), constraint \"check_trips_bikes_allowed\" check (\"bikes_allowed\" >= 0 and \"bikes_allowed\" <= 2), constraint \"check_trips_cars_allowed\" check (\"cars_allowed\" >= 0 and \"cars_allowed\" <= 2), constraint \"primary_trips\" primary key (\"source_id\", \"trip_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"alert_entity_selectors\" (\"source_id\" text collate BINARY not null, \"realtime_feed_id\" text collate BINARY not null, \"alert_id\" text collate BINARY not null, \"selector_ordinal\" integer not null, \"agency_id\" text collate BINARY, \"stop_id\" text collate BINARY, \"route_id\" text collate BINARY, \"route_type\" integer, \"trip_id\" text collate BINARY, \"trip_route_id\" text collate BINARY, \"trip_direction_id\" integer, \"trip_start_time\" text collate BINARY, \"trip_start_date\" text collate BINARY, \"trip_schedule_relationship\" text collate BINARY, \"trip_modified_trip_modifications_id\" text collate BINARY, \"trip_modified_trip_affected_trip_id\" text collate BINARY, \"trip_modified_trip_start_time\" text collate BINARY, \"trip_modified_trip_start_date\" text collate BINARY, \"direction_id\" integer, \"created_at_unix_seconds\" integer not null, \"expires_at_unix_seconds\" integer not null, \"_unknown_fields\" text, constraint \"check_alert_entity_selectors_selector_ordinal\" check (\"selector_ordinal\" >= 0), constraint \"check_alert_entity_selectors_route_type\" check (\"route_type\" >= 0), constraint \"check_alert_entity_selectors_trip_direction_id\" check (\"trip_direction_id\" >= 0 and \"trip_direction_id\" <= 1), constraint \"check_alert_entity_selectors_direction_id\" check (\"direction_id\" >= 0 and \"direction_id\" <= 1), constraint \"check_alert_entity_selectors_created_at_unix_seconds\" check (\"created_at_unix_seconds\" >= 0), constraint \"check_alert_entity_selectors_expires_at_unix_seconds\" check (\"expires_at_unix_seconds\" >= 0), constraint \"primary_alert_entity_selectors\" primary key (\"source_id\", \"realtime_feed_id\", \"alert_id\", \"selector_ordinal\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"alert_time_ranges\" (\"source_id\" text collate BINARY not null, \"realtime_feed_id\" text collate BINARY not null, \"alert_id\" text collate BINARY not null, \"range_kind\" text collate BINARY not null, \"range_ordinal\" integer not null, \"start_unix_seconds\" integer, \"end_unix_seconds\" integer, \"is_valid\" integer not null, \"created_at_unix_seconds\" integer not null, \"expires_at_unix_seconds\" integer not null, \"_unknown_fields\" text, constraint \"check_alert_time_ranges_range_kind\" check (\"range_kind\" in ('communication', 'impact', 'active')), constraint \"check_alert_time_ranges_range_ordinal\" check (\"range_ordinal\" >= 0), constraint \"check_alert_time_ranges_start_unix_seconds\" check (\"start_unix_seconds\" >= 0), constraint \"check_alert_time_ranges_end_unix_seconds\" check (\"end_unix_seconds\" >= 0), constraint \"check_alert_time_ranges_is_valid\" check (\"is_valid\" >= 0 and \"is_valid\" <= 1), constraint \"check_alert_time_ranges_created_at_unix_seconds\" check (\"created_at_unix_seconds\" >= 0), constraint \"check_alert_time_ranges_expires_at_unix_seconds\" check (\"expires_at_unix_seconds\" >= 0), constraint \"primary_alert_time_ranges\" primary key (\"source_id\", \"realtime_feed_id\", \"alert_id\", \"range_kind\", \"range_ordinal\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"alerts\" (\"source_id\" text collate BINARY not null, \"realtime_feed_id\" text collate BINARY not null, \"entity_id\" text collate BINARY not null, \"active_period\" text collate BINARY, \"communication_period\" text collate BINARY, \"impact_period\" text collate BINARY, \"cause\" text collate BINARY, \"effect\" text collate BINARY, \"url\" text collate BINARY, \"url_translations\" text collate BINARY, \"header_text\" text collate BINARY not null, \"header_text_translations\" text collate BINARY, \"description_text\" text collate BINARY not null, \"description_text_translations\" text collate BINARY, \"tts_header_text\" text collate BINARY, \"tts_header_text_translations\" text collate BINARY, \"tts_description_text\" text collate BINARY, \"tts_description_text_translations\" text collate BINARY, \"severity_level\" text collate BINARY, \"image\" text collate BINARY, \"image_alternative_text\" text collate BINARY, \"image_alternative_text_translations\" text collate BINARY, \"cause_detail\" text collate BINARY, \"cause_detail_translations\" text collate BINARY, \"effect_detail\" text collate BINARY, \"effect_detail_translations\" text collate BINARY, \"created_at_unix_seconds\" integer not null, \"expires_at_unix_seconds\" integer not null, \"_unknown_fields\" text, constraint \"check_alerts_created_at_unix_seconds\" check (\"created_at_unix_seconds\" >= 0), constraint \"check_alerts_expires_at_unix_seconds\" check (\"expires_at_unix_seconds\" >= 0), constraint \"primary_alerts\" primary key (\"source_id\", \"realtime_feed_id\", \"entity_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"realtime_feed_entities\" (\"source_id\" text collate BINARY not null, \"realtime_feed_id\" text collate BINARY not null, \"snapshot_id\" text collate BINARY not null, \"entity_ordinal\" integer not null, \"entity_id\" text collate BINARY, \"entity_type\" text collate BINARY not null, \"is_deleted\" integer default 0 not null, \"entity_json\" text collate BINARY not null, \"recorded_at_unix_seconds\" integer not null, \"retention_expires_at_unix_seconds\" integer, \"_unknown_fields\" text, constraint \"check_realtime_feed_entities_entity_ordinal\" check (\"entity_ordinal\" >= 0), constraint \"check_realtime_feed_entities_is_deleted\" check (\"is_deleted\" >= 0 and \"is_deleted\" <= 1), constraint \"check_realtime_feed_entities_recorded_at_unix_seconds\" check (\"recorded_at_unix_seconds\" >= 0), constraint \"check_realtime_feed_entities_retention_expires_at_unix_seconds\" check (\"retention_expires_at_unix_seconds\" >= 0), constraint \"primary_realtime_feed_entities\" primary key (\"source_id\", \"realtime_feed_id\", \"snapshot_id\", \"entity_ordinal\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"realtime_feeds\" (\"source_id\" text collate BINARY not null, \"realtime_feed_id\" text collate BINARY not null, \"feed_type\" text collate BINARY not null, \"feed_url\" text collate BINARY not null, \"source_metadata\" text collate BINARY, \"created_at_unix_seconds\" integer not null, \"updated_at_unix_seconds\" integer not null, \"_unknown_fields\" text, constraint \"check_realtime_feeds_feed_type\" check (\"feed_type\" in ('alerts', 'tripUpdates', 'vehiclePositions', 'shapes', 'stops', 'tripModifications', 'mixed')), constraint \"check_realtime_feeds_created_at_unix_seconds\" check (\"created_at_unix_seconds\" >= 0), constraint \"check_realtime_feeds_updated_at_unix_seconds\" check (\"updated_at_unix_seconds\" >= 0), constraint \"primary_realtime_feeds\" primary key (\"source_id\", \"realtime_feed_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"realtime_shapes\" (\"source_id\" text collate BINARY not null, \"realtime_feed_id\" text collate BINARY not null, \"entity_id\" text collate BINARY not null, \"shape_id\" text collate BINARY not null, \"encoded_polyline\" text collate BINARY not null, \"created_at_unix_seconds\" integer not null, \"expires_at_unix_seconds\" integer not null, \"_unknown_fields\" text, constraint \"check_realtime_shapes_created_at_unix_seconds\" check (\"created_at_unix_seconds\" >= 0), constraint \"check_realtime_shapes_expires_at_unix_seconds\" check (\"expires_at_unix_seconds\" >= 0), constraint \"primary_realtime_shapes\" primary key (\"source_id\", \"realtime_feed_id\", \"entity_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"realtime_snapshots\" (\"source_id\" text collate BINARY not null, \"realtime_feed_id\" text collate BINARY not null, \"snapshot_id\" text collate BINARY not null, \"fetched_at_unix_seconds\" integer not null, \"http_status\" integer, \"http_headers\" text collate BINARY, \"content_type\" text collate BINARY, \"feed_header_version\" text collate BINARY, \"feed_header_incrementality\" text collate BINARY, \"feed_header_unix_seconds\" integer, \"entity_count\" integer not null, \"payload_sha256\" text collate BINARY not null, \"raw_payload\" text collate BINARY not null, \"raw_payload_encoding\" text collate BINARY not null, \"retention_expires_at_unix_seconds\" integer, \"_unknown_fields\" text, constraint \"check_realtime_snapshots_fetched_at_unix_seconds\" check (\"fetched_at_unix_seconds\" >= 0), constraint \"check_realtime_snapshots_http_status\" check (\"http_status\" >= 100 and \"http_status\" <= 599), constraint \"check_realtime_snapshots_feed_header_unix_seconds\" check (\"feed_header_unix_seconds\" >= 0), constraint \"check_realtime_snapshots_entity_count\" check (\"entity_count\" >= 0), constraint \"check_realtime_snapshots_raw_payload_encoding\" check (\"raw_payload_encoding\" in ('base64')), constraint \"check_realtime_snapshots_retention_expires_at_unix_seconds\" check (\"retention_expires_at_unix_seconds\" >= 0), constraint \"primary_realtime_snapshots\" primary key (\"source_id\", \"realtime_feed_id\", \"snapshot_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"realtime_stops\" (\"source_id\" text collate BINARY not null, \"realtime_feed_id\" text collate BINARY not null, \"entity_id\" text collate BINARY not null, \"stop_id\" text collate BINARY not null, \"stop_code\" text collate BINARY, \"stop_code_translations\" text collate BINARY, \"stop_name\" text collate BINARY, \"stop_name_translations\" text collate BINARY, \"tts_stop_name\" text collate BINARY, \"tts_stop_name_translations\" text collate BINARY, \"stop_desc\" text collate BINARY, \"stop_desc_translations\" text collate BINARY, \"stop_lat\" double precision, \"stop_lon\" double precision, \"zone_id\" text collate BINARY, \"stop_url\" text collate BINARY, \"stop_url_translations\" text collate BINARY, \"parent_station\" text collate BINARY, \"stop_timezone\" text collate BINARY, \"wheelchair_boarding\" text collate BINARY, \"level_id\" text collate BINARY, \"platform_code\" text collate BINARY, \"platform_code_translations\" text collate BINARY, \"created_at_unix_seconds\" integer not null, \"expires_at_unix_seconds\" integer not null, \"_unknown_fields\" text, constraint \"check_realtime_stops_stop_lat\" check (\"stop_lat\" >= -90 and \"stop_lat\" <= 90), constraint \"check_realtime_stops_stop_lon\" check (\"stop_lon\" >= -180 and \"stop_lon\" <= 180), constraint \"check_realtime_stops_created_at_unix_seconds\" check (\"created_at_unix_seconds\" >= 0), constraint \"check_realtime_stops_expires_at_unix_seconds\" check (\"expires_at_unix_seconds\" >= 0), constraint \"primary_realtime_stops\" primary key (\"source_id\", \"realtime_feed_id\", \"entity_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"trip_modifications\" (\"source_id\" text collate BINARY not null, \"realtime_feed_id\" text collate BINARY not null, \"entity_id\" text collate BINARY not null, \"selected_trips\" text collate BINARY, \"start_times\" text collate BINARY, \"service_dates\" text collate BINARY, \"modifications\" text collate BINARY, \"created_at_unix_seconds\" integer not null, \"expires_at_unix_seconds\" integer not null, \"_unknown_fields\" text, constraint \"check_trip_modifications_created_at_unix_seconds\" check (\"created_at_unix_seconds\" >= 0), constraint \"check_trip_modifications_expires_at_unix_seconds\" check (\"expires_at_unix_seconds\" >= 0), constraint \"primary_trip_modifications\" primary key (\"source_id\", \"realtime_feed_id\", \"entity_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"trip_update_stop_time_updates\" (\"source_id\" text collate BINARY not null, \"realtime_feed_id\" text collate BINARY not null, \"trip_update_id\" text collate BINARY not null, \"stop_time_update_ordinal\" integer not null, \"trip_id\" text collate BINARY, \"trip_start_time\" text collate BINARY, \"trip_start_date\" text collate BINARY, \"direction_id\" integer, \"route_id\" text collate BINARY, \"trip_schedule_relationship\" text collate BINARY, \"stop_id\" text collate BINARY, \"stop_sequence\" integer, \"arrival_delay\" integer, \"arrival_unix_seconds\" integer, \"arrival_uncertainty\" integer, \"arrival_scheduled_unix_seconds\" integer, \"departure_delay\" integer, \"departure_unix_seconds\" integer, \"departure_uncertainty\" integer, \"departure_scheduled_unix_seconds\" integer, \"departure_occupancy_status\" text collate BINARY, \"schedule_relationship\" text collate BINARY, \"assigned_stop_id\" text collate BINARY, \"stop_headsign\" text collate BINARY, \"pickup_type\" text collate BINARY, \"drop_off_type\" text collate BINARY, \"created_at_unix_seconds\" integer not null, \"expires_at_unix_seconds\" integer not null, \"_unknown_fields\" text, constraint \"check_trip_update_stop_time_updates_stop_time_update_ordinal\" check (\"stop_time_update_ordinal\" >= 0), constraint \"check_trip_update_stop_time_updates_direction_id\" check (\"direction_id\" >= 0 and \"direction_id\" <= 1), constraint \"check_trip_update_stop_time_updates_stop_sequence\" check (\"stop_sequence\" >= 0), constraint \"check_trip_update_stop_time_updates_arrival_uncertainty\" check (\"arrival_uncertainty\" >= 0), constraint \"check_trip_update_stop_time_updates_departure_uncertainty\" check (\"departure_uncertainty\" >= 0), constraint \"check_trip_update_stop_time_updates_created_at_unix_seconds\" check (\"created_at_unix_seconds\" >= 0), constraint \"check_trip_update_stop_time_updates_expires_at_unix_seconds\" check (\"expires_at_unix_seconds\" >= 0), constraint \"primary_trip_update_stop_time_updates\" primary key (\"source_id\", \"realtime_feed_id\", \"trip_update_id\", \"stop_time_update_ordinal\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"trip_updates\" (\"source_id\" text collate BINARY not null, \"realtime_feed_id\" text collate BINARY not null, \"entity_id\" text collate BINARY not null, \"vehicle_id\" text collate BINARY, \"vehicle_label\" text collate BINARY, \"vehicle_license_plate\" text collate BINARY, \"vehicle_wheelchair_accessible\" text collate BINARY, \"trip_id\" text collate BINARY, \"trip_start_time\" text collate BINARY, \"direction_id\" integer, \"route_id\" text collate BINARY, \"trip_start_date\" text collate BINARY, \"timestamp\" integer, \"schedule_relationship\" text collate BINARY, \"modified_trip_modifications_id\" text collate BINARY, \"modified_trip_affected_trip_id\" text collate BINARY, \"modified_trip_start_time\" text collate BINARY, \"modified_trip_start_date\" text collate BINARY, \"delay\" integer, \"trip_properties_trip_id\" text collate BINARY, \"trip_properties_start_date\" text collate BINARY, \"trip_properties_start_time\" text collate BINARY, \"trip_properties_shape_id\" text collate BINARY, \"trip_properties_trip_headsign\" text collate BINARY, \"trip_properties_trip_short_name\" text collate BINARY, \"created_at_unix_seconds\" integer not null, \"expires_at_unix_seconds\" integer not null, \"_unknown_fields\" text, constraint \"check_trip_updates_direction_id\" check (\"direction_id\" >= 0 and \"direction_id\" <= 1), constraint \"check_trip_updates_timestamp\" check (\"timestamp\" >= 0), constraint \"check_trip_updates_created_at_unix_seconds\" check (\"created_at_unix_seconds\" >= 0), constraint \"check_trip_updates_expires_at_unix_seconds\" check (\"expires_at_unix_seconds\" >= 0), constraint \"primary_trip_updates\" primary key (\"source_id\", \"realtime_feed_id\", \"entity_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"vehicle_positions\" (\"source_id\" text collate BINARY not null, \"realtime_feed_id\" text collate BINARY not null, \"entity_id\" text collate BINARY not null, \"trip_id\" text collate BINARY, \"route_id\" text collate BINARY, \"direction_id\" integer, \"trip_start_time\" text collate BINARY, \"trip_start_date\" text collate BINARY, \"schedule_relationship\" text collate BINARY, \"modified_trip_modifications_id\" text collate BINARY, \"modified_trip_affected_trip_id\" text collate BINARY, \"modified_trip_start_time\" text collate BINARY, \"modified_trip_start_date\" text collate BINARY, \"vehicle_id\" text collate BINARY, \"vehicle_label\" text collate BINARY, \"vehicle_license_plate\" text collate BINARY, \"vehicle_wheelchair_accessible\" text collate BINARY, \"bearing\" double precision, \"latitude\" double precision, \"longitude\" double precision, \"speed\" double precision, \"odometer\" double precision, \"current_stop_sequence\" integer, \"stop_id\" text collate BINARY, \"current_status\" text collate BINARY, \"congestion_level\" text collate BINARY, \"occupancy_status\" text collate BINARY, \"occupancy_percentage\" integer, \"multi_carriage_details\" text collate BINARY, \"timestamp\" integer, \"created_at_unix_seconds\" integer not null, \"expires_at_unix_seconds\" integer not null, \"_unknown_fields\" text, constraint \"check_vehicle_positions_direction_id\" check (\"direction_id\" >= 0 and \"direction_id\" <= 1), constraint \"check_vehicle_positions_bearing\" check (\"bearing\" >= 0), constraint \"check_vehicle_positions_latitude\" check (\"latitude\" >= -90 and \"latitude\" <= 90), constraint \"check_vehicle_positions_longitude\" check (\"longitude\" >= -180 and \"longitude\" <= 180), constraint \"check_vehicle_positions_speed\" check (\"speed\" >= 0), constraint \"check_vehicle_positions_odometer\" check (\"odometer\" >= 0), constraint \"check_vehicle_positions_current_stop_sequence\" check (\"current_stop_sequence\" >= 0), constraint \"check_vehicle_positions_occupancy_percentage\" check (\"occupancy_percentage\" >= 0), constraint \"check_vehicle_positions_timestamp\" check (\"timestamp\" >= 0), constraint \"check_vehicle_positions_created_at_unix_seconds\" check (\"created_at_unix_seconds\" >= 0), constraint \"check_vehicle_positions_expires_at_unix_seconds\" check (\"expires_at_unix_seconds\" >= 0), constraint \"primary_vehicle_positions\" primary key (\"source_id\", \"realtime_feed_id\", \"entity_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"calendar_attributes\" (\"source_id\" text collate BINARY not null, \"service_id\" text collate BINARY not null, \"service_description\" text collate BINARY not null, \"_node_gtfs_casefold_service_description\" text collate BINARY, \"_unknown_fields\" text, constraint \"primary_calendar_attributes\" primary key (\"source_id\", \"service_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"directions\" (\"source_id\" text collate BINARY not null, \"route_id\" text collate BINARY not null, \"direction_id\" integer not null, \"direction\" text collate BINARY not null, \"_unknown_fields\" text, constraint \"check_directions_direction_id\" check (\"direction_id\" >= 0 and \"direction_id\" <= 1), constraint \"primary_directions\" primary key (\"source_id\", \"route_id\", \"direction_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"route_attributes\" (\"source_id\" text collate BINARY not null, \"route_id\" text collate BINARY not null, \"category\" integer not null, \"subcategory\" integer not null, \"running_way\" integer not null, \"_unknown_fields\" text, constraint \"check_route_attributes_category\" check (\"category\" >= 0), constraint \"check_route_attributes_subcategory\" check (\"subcategory\" >= 101), constraint \"check_route_attributes_running_way\" check (\"running_way\" >= 1), constraint \"primary_route_attributes\" primary key (\"source_id\", \"route_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"stop_attributes\" (\"source_id\" text collate BINARY not null, \"stop_id\" text collate BINARY not null, \"accessibility_id\" integer, \"cardinal_direction\" text collate BINARY, \"relative_position\" text collate BINARY, \"stop_city\" text collate BINARY, \"_node_gtfs_casefold_stop_city\" text collate BINARY, \"_unknown_fields\" text, constraint \"check_stop_attributes_accessibility_id\" check (\"accessibility_id\" >= 0), constraint \"primary_stop_attributes\" primary key (\"source_id\", \"stop_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"board_alight\" (\"source_id\" text collate BINARY not null, \"trip_id\" text collate BINARY not null, \"stop_id\" text collate BINARY not null, \"stop_sequence\" integer not null, \"record_use\" integer not null, \"schedule_relationship\" integer, \"boardings\" integer, \"alightings\" integer, \"current_load\" integer, \"load_count\" integer, \"load_type\" integer, \"rack_down\" integer, \"bike_boardings\" integer, \"bike_alightings\" integer, \"ramp_used\" integer, \"ramp_boardings\" integer, \"ramp_alightings\" integer, \"service_date\" integer, \"service_arrival_time\" text collate BINARY, \"service_arrival_service_day_seconds\" integer, \"service_departure_time\" text collate BINARY, \"service_departure_service_day_seconds\" integer, \"source\" integer, \"_unknown_fields\" text, constraint \"check_board_alight_stop_sequence\" check (\"stop_sequence\" >= 0), constraint \"check_board_alight_record_use\" check (\"record_use\" >= 0 and \"record_use\" <= 1), constraint \"check_board_alight_schedule_relationship\" check (\"schedule_relationship\" >= 0 and \"schedule_relationship\" <= 8), constraint \"check_board_alight_boardings\" check (\"boardings\" >= 0), constraint \"check_board_alight_alightings\" check (\"alightings\" >= 0), constraint \"check_board_alight_current_load\" check (\"current_load\" >= 0), constraint \"check_board_alight_load_count\" check (\"load_count\" >= 0), constraint \"check_board_alight_load_type\" check (\"load_type\" >= 0 and \"load_type\" <= 1), constraint \"check_board_alight_rack_down\" check (\"rack_down\" >= 0 and \"rack_down\" <= 1), constraint \"check_board_alight_bike_boardings\" check (\"bike_boardings\" >= 0), constraint \"check_board_alight_bike_alightings\" check (\"bike_alightings\" >= 0), constraint \"check_board_alight_ramp_used\" check (\"ramp_used\" >= 0 and \"ramp_used\" <= 1), constraint \"check_board_alight_ramp_boardings\" check (\"ramp_boardings\" >= 0), constraint \"check_board_alight_ramp_alightings\" check (\"ramp_alightings\" >= 0), constraint \"check_board_alight_source\" check (\"source\" >= 0 and \"source\" <= 4))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"ride_feed_info\" (\"source_id\" text collate BINARY not null, \"ride_files\" integer not null, \"ride_start_date\" integer, \"ride_end_date\" integer, \"gtfs_feed_date\" integer, \"default_currency_type\" text collate BINARY, \"ride_feed_version\" text collate BINARY, \"_unknown_fields\" text, constraint \"check_ride_feed_info_ride_files\" check (\"ride_files\" >= 0 and \"ride_files\" <= 6), constraint \"primary_ride_feed_info\" primary key (\"source_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"rider_trip\" (\"source_id\" text collate BINARY not null, \"rider_id\" text collate BINARY not null, \"agency_id\" text collate BINARY, \"trip_id\" text collate BINARY, \"boarding_stop_id\" text collate BINARY, \"boarding_stop_sequence\" integer, \"alighting_stop_id\" text collate BINARY, \"alighting_stop_sequence\" integer, \"service_date\" integer, \"boarding_time\" text collate BINARY, \"boarding_service_day_seconds\" integer, \"alighting_time\" text collate BINARY, \"alighting_service_day_seconds\" integer, \"rider_type\" integer, \"rider_type_description\" text collate BINARY, \"fare_paid\" double precision, \"transaction_type\" integer, \"fare_media\" integer, \"accompanying_device\" integer, \"transfer_status\" integer, \"_unknown_fields\" text, constraint \"check_rider_trip_boarding_stop_sequence\" check (\"boarding_stop_sequence\" >= 0), constraint \"check_rider_trip_alighting_stop_sequence\" check (\"alighting_stop_sequence\" >= 0), constraint \"check_rider_trip_rider_type\" check (\"rider_type\" >= 0 and \"rider_type\" <= 13), constraint \"check_rider_trip_transaction_type\" check (\"transaction_type\" >= 0 and \"transaction_type\" <= 8), constraint \"check_rider_trip_fare_media\" check (\"fare_media\" >= 0 and \"fare_media\" <= 9), constraint \"check_rider_trip_accompanying_device\" check (\"accompanying_device\" >= 0 and \"accompanying_device\" <= 6), constraint \"check_rider_trip_transfer_status\" check (\"transfer_status\" >= 0 and \"transfer_status\" <= 1), constraint \"primary_rider_trip\" primary key (\"source_id\", \"rider_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"ridership\" (\"source_id\" text collate BINARY not null, \"total_boardings\" integer not null, \"total_alightings\" integer not null, \"ridership_start_date\" integer, \"ridership_end_date\" integer, \"ridership_start_time\" text collate BINARY, \"ridership_start_service_day_seconds\" integer, \"ridership_end_time\" text collate BINARY, \"ridership_end_service_day_seconds\" integer, \"service_id\" text collate BINARY, \"monday\" integer, \"tuesday\" integer, \"wednesday\" integer, \"thursday\" integer, \"friday\" integer, \"saturday\" integer, \"sunday\" integer, \"agency_id\" text collate BINARY, \"route_id\" text collate BINARY, \"direction_id\" integer, \"trip_id\" text collate BINARY, \"stop_id\" text collate BINARY, \"_unknown_fields\" text, constraint \"check_ridership_total_boardings\" check (\"total_boardings\" >= 0), constraint \"check_ridership_total_alightings\" check (\"total_alightings\" >= 0), constraint \"check_ridership_monday\" check (\"monday\" >= 0 and \"monday\" <= 1), constraint \"check_ridership_tuesday\" check (\"tuesday\" >= 0 and \"tuesday\" <= 1), constraint \"check_ridership_wednesday\" check (\"wednesday\" >= 0 and \"wednesday\" <= 1), constraint \"check_ridership_thursday\" check (\"thursday\" >= 0 and \"thursday\" <= 1), constraint \"check_ridership_friday\" check (\"friday\" >= 0 and \"friday\" <= 1), constraint \"check_ridership_saturday\" check (\"saturday\" >= 0 and \"saturday\" <= 1), constraint \"check_ridership_sunday\" check (\"sunday\" >= 0 and \"sunday\" <= 1), constraint \"check_ridership_direction_id\" check (\"direction_id\" >= 0 and \"direction_id\" <= 1))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"trip_capacity\" (\"source_id\" text collate BINARY not null, \"agency_id\" text collate BINARY, \"trip_id\" text collate BINARY, \"service_date\" integer, \"vehicle_description\" text collate BINARY, \"seated_capacity\" integer, \"standing_capacity\" integer, \"wheelchair_capacity\" integer, \"bike_capacity\" integer, \"_unknown_fields\" text, constraint \"check_trip_capacity_seated_capacity\" check (\"seated_capacity\" >= 0), constraint \"check_trip_capacity_standing_capacity\" check (\"standing_capacity\" >= 0), constraint \"check_trip_capacity_wheelchair_capacity\" check (\"wheelchair_capacity\" >= 0), constraint \"check_trip_capacity_bike_capacity\" check (\"bike_capacity\" >= 0))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"timetable_notes\" (\"source_id\" text collate BINARY not null, \"note_id\" text collate BINARY not null, \"symbol\" text collate BINARY, \"note\" text collate BINARY, \"_node_gtfs_casefold_note\" text collate BINARY, \"scope\" text collate BINARY, \"timetable_id\" text collate BINARY, \"route_id\" text collate BINARY, \"trip_id\" text collate BINARY, \"stop_id\" text collate BINARY, \"stop_sequence\" integer, \"_unknown_fields\" text, \"_node_gtfs_key\" varchar(64) not null, constraint \"check_timetable_notes_stop_sequence\" check (\"stop_sequence\" >= 0), constraint \"check_timetable_notes__node_gtfs_key\" check (length(\"_node_gtfs_key\") = 64), constraint \"unique_timetable_notes__node_gtfs_key\" unique (\"_node_gtfs_key\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"timetable_notes_references\" (\"source_id\" text collate BINARY not null, \"note_id\" text collate BINARY not null, \"timetable_id\" text collate BINARY, \"route_id\" text collate BINARY, \"trip_id\" text collate BINARY, \"stop_id\" text collate BINARY, \"stop_sequence\" integer, \"show_on_stoptime\" integer, \"_unknown_fields\" text, \"_node_gtfs_key\" varchar(64) not null, constraint \"check_timetable_notes_references_stop_sequence\" check (\"stop_sequence\" >= 0), constraint \"check_timetable_notes_references_show_on_stoptime\" check (\"show_on_stoptime\" >= 0 and \"show_on_stoptime\" <= 1), constraint \"check_timetable_notes_references__node_gtfs_key\" check (length(\"_node_gtfs_key\") = 64), constraint \"unique_timetable_notes_references__node_gtfs_key\" unique (\"_node_gtfs_key\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"timetable_pages\" (\"source_id\" text collate BINARY not null, \"timetable_page_id\" text collate BINARY not null, \"timetable_page_label\" text collate BINARY, \"_node_gtfs_casefold_timetable_page_label\" text collate BINARY, \"filename\" text collate BINARY, \"_unknown_fields\" text, constraint \"primary_timetable_pages\" primary key (\"source_id\", \"timetable_page_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"timetable_stop_order\" (\"source_id\" text collate BINARY not null, \"timetable_id\" text collate BINARY not null, \"stop_id\" text collate BINARY not null, \"stop_sequence\" integer not null, \"_unknown_fields\" text, constraint \"check_timetable_stop_order_stop_sequence\" check (\"stop_sequence\" >= 0), constraint \"primary_timetable_stop_order\" primary key (\"source_id\", \"timetable_id\", \"stop_id\", \"stop_sequence\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"timetables\" (\"source_id\" text collate BINARY not null, \"timetable_id\" text collate BINARY not null, \"route_id\" text collate BINARY not null, \"direction_id\" integer, \"start_date\" integer, \"end_date\" integer, \"monday\" integer not null, \"tuesday\" integer not null, \"wednesday\" integer not null, \"thursday\" integer not null, \"friday\" integer not null, \"saturday\" integer not null, \"sunday\" integer not null, \"start_time\" text collate BINARY, \"start_service_day_seconds\" integer, \"end_time\" text collate BINARY, \"end_service_day_seconds\" integer, \"timetable_label\" text collate BINARY, \"_node_gtfs_casefold_timetable_label\" text collate BINARY, \"service_notes\" text collate BINARY, \"_node_gtfs_casefold_service_notes\" text collate BINARY, \"orientation\" text collate BINARY, \"timetable_page_id\" text collate BINARY, \"timetable_sequence\" integer, \"direction_name\" text collate BINARY, \"include_exceptions\" integer, \"show_trip_continuation\" integer, \"_unknown_fields\" text, constraint \"check_timetables_direction_id\" check (\"direction_id\" >= 0 and \"direction_id\" <= 1), constraint \"check_timetables_monday\" check (\"monday\" >= 0 and \"monday\" <= 1), constraint \"check_timetables_tuesday\" check (\"tuesday\" >= 0 and \"tuesday\" <= 1), constraint \"check_timetables_wednesday\" check (\"wednesday\" >= 0 and \"wednesday\" <= 1), constraint \"check_timetables_thursday\" check (\"thursday\" >= 0 and \"thursday\" <= 1), constraint \"check_timetables_friday\" check (\"friday\" >= 0 and \"friday\" <= 1), constraint \"check_timetables_saturday\" check (\"saturday\" >= 0 and \"saturday\" <= 1), constraint \"check_timetables_sunday\" check (\"sunday\" >= 0 and \"sunday\" <= 1), constraint \"check_timetables_timetable_sequence\" check (\"timetable_sequence\" >= 0), constraint \"check_timetables_include_exceptions\" check (\"include_exceptions\" >= 0 and \"include_exceptions\" <= 1), constraint \"check_timetables_show_trip_continuation\" check (\"show_trip_continuation\" >= 0 and \"show_trip_continuation\" <= 1), constraint \"primary_timetables\" primary key (\"source_id\", \"timetable_id\", \"route_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"calendar_dates_supplement\" (\"source_id\" text collate BINARY not null, \"service_id\" text collate BINARY not null, \"date\" integer not null, \"exception_type\" integer, \"holiday_name\" text collate BINARY, \"_node_gtfs_casefold_holiday_name\" text collate BINARY, \"TODS_delete\" integer, \"_unknown_fields\" text, constraint \"check_calendar_dates_supplement_exception_type\" check (\"exception_type\" >= 1 and \"exception_type\" <= 2), constraint \"check_calendar_dates_supplement_TODS_delete\" check (\"TODS_delete\" in (1)), constraint \"primary_calendar_dates_supplement\" primary key (\"source_id\", \"service_id\", \"date\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"calendar_supplement\" (\"source_id\" text collate BINARY not null, \"service_id\" text collate BINARY not null, \"monday\" integer, \"tuesday\" integer, \"wednesday\" integer, \"thursday\" integer, \"friday\" integer, \"saturday\" integer, \"sunday\" integer, \"start_date\" integer, \"end_date\" integer, \"TODS_delete\" integer, \"_unknown_fields\" text, constraint \"check_calendar_supplement_monday\" check (\"monday\" >= 0 and \"monday\" <= 1), constraint \"check_calendar_supplement_tuesday\" check (\"tuesday\" >= 0 and \"tuesday\" <= 1), constraint \"check_calendar_supplement_wednesday\" check (\"wednesday\" >= 0 and \"wednesday\" <= 1), constraint \"check_calendar_supplement_thursday\" check (\"thursday\" >= 0 and \"thursday\" <= 1), constraint \"check_calendar_supplement_friday\" check (\"friday\" >= 0 and \"friday\" <= 1), constraint \"check_calendar_supplement_saturday\" check (\"saturday\" >= 0 and \"saturday\" <= 1), constraint \"check_calendar_supplement_sunday\" check (\"sunday\" >= 0 and \"sunday\" <= 1), constraint \"check_calendar_supplement_TODS_delete\" check (\"TODS_delete\" in (1)), constraint \"primary_calendar_supplement\" primary key (\"source_id\", \"service_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"employee_run_dates\" (\"source_id\" text collate BINARY not null, \"date\" integer not null, \"service_id\" text collate BINARY not null, \"run_id\" text collate BINARY not null, \"employee_id\" text collate BINARY not null, \"_unknown_fields\" text, constraint \"primary_employee_run_dates\" primary key (\"source_id\", \"date\", \"service_id\", \"run_id\", \"employee_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"routes_supplement\" (\"source_id\" text collate BINARY not null, \"route_id\" text collate BINARY not null, \"agency_id\" text collate BINARY, \"route_short_name\" text collate BINARY, \"_node_gtfs_casefold_route_short_name\" text collate BINARY, \"route_long_name\" text collate BINARY, \"_node_gtfs_casefold_route_long_name\" text collate BINARY, \"route_desc\" text collate BINARY, \"_node_gtfs_casefold_route_desc\" text collate BINARY, \"route_type\" integer, \"route_url\" text collate BINARY, \"route_color\" text collate BINARY, \"_node_gtfs_casefold_route_color\" text collate BINARY, \"route_text_color\" text collate BINARY, \"_node_gtfs_casefold_route_text_color\" text collate BINARY, \"route_sort_order\" integer, \"continuous_pickup\" integer, \"continuous_drop_off\" integer, \"network_id\" text collate BINARY, \"cemv_support\" integer, \"TODS_delete\" integer, \"_unknown_fields\" text, constraint \"check_routes_supplement_route_type\" check (\"route_type\" >= 0), constraint \"check_routes_supplement_route_sort_order\" check (\"route_sort_order\" >= 0), constraint \"check_routes_supplement_continuous_pickup\" check (\"continuous_pickup\" >= 0 and \"continuous_pickup\" <= 3), constraint \"check_routes_supplement_continuous_drop_off\" check (\"continuous_drop_off\" >= 0 and \"continuous_drop_off\" <= 3), constraint \"check_routes_supplement_cemv_support\" check (\"cemv_support\" >= 0 and \"cemv_support\" <= 2), constraint \"check_routes_supplement_TODS_delete\" check (\"TODS_delete\" in (1)), constraint \"primary_routes_supplement\" primary key (\"source_id\", \"route_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"run_events\" (\"source_id\" text collate BINARY not null, \"service_id\" text collate BINARY not null, \"run_id\" text collate BINARY not null, \"event_sequence\" integer not null, \"piece_id\" text collate BINARY, \"block_id\" text collate BINARY, \"job_type\" text collate BINARY, \"event_type\" text collate BINARY not null, \"trip_id\" text collate BINARY, \"start_location\" text collate BINARY not null, \"start_time\" text collate BINARY not null, \"start_service_day_seconds\" integer, \"start_mid_trip\" integer, \"end_location\" text collate BINARY not null, \"end_time\" text collate BINARY not null, \"end_service_day_seconds\" integer, \"end_mid_trip\" integer, \"_unknown_fields\" text, constraint \"check_run_events_event_sequence\" check (\"event_sequence\" >= 0), constraint \"check_run_events_start_mid_trip\" check (\"start_mid_trip\" in (0, 1, 2)), constraint \"check_run_events_end_mid_trip\" check (\"end_mid_trip\" in (0, 1, 2)), constraint \"primary_run_events\" primary key (\"source_id\", \"service_id\", \"run_id\", \"event_sequence\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"stop_times_supplement\" (\"source_id\" text collate BINARY not null, \"trip_id\" text collate BINARY not null, \"arrival_time\" text collate BINARY, \"arrival_service_day_seconds\" integer, \"departure_time\" text collate BINARY, \"departure_service_day_seconds\" integer, \"location_group_id\" text collate BINARY, \"location_id\" text collate BINARY, \"stop_id\" text collate BINARY, \"stop_sequence\" integer not null, \"stop_headsign\" text collate BINARY, \"_node_gtfs_casefold_stop_headsign\" text collate BINARY, \"start_pickup_drop_off_window\" text collate BINARY, \"start_pickup_drop_off_window_service_day_seconds\" integer, \"end_pickup_drop_off_window\" text collate BINARY, \"end_pickup_drop_off_window_service_day_seconds\" integer, \"pickup_type\" integer, \"drop_off_type\" integer, \"continuous_pickup\" integer, \"continuous_drop_off\" integer, \"shape_dist_traveled\" double precision, \"timepoint\" integer, \"pickup_booking_rule_id\" text collate BINARY, \"drop_off_booking_rule_id\" text collate BINARY, \"TODS_delete\" integer, \"_unknown_fields\" text, constraint \"check_stop_times_supplement_stop_sequence\" check (\"stop_sequence\" >= 0), constraint \"check_stop_times_supplement_pickup_type\" check (\"pickup_type\" >= 0 and \"pickup_type\" <= 3), constraint \"check_stop_times_supplement_drop_off_type\" check (\"drop_off_type\" >= 0 and \"drop_off_type\" <= 3), constraint \"check_stop_times_supplement_continuous_pickup\" check (\"continuous_pickup\" >= 0 and \"continuous_pickup\" <= 3), constraint \"check_stop_times_supplement_continuous_drop_off\" check (\"continuous_drop_off\" >= 0 and \"continuous_drop_off\" <= 3), constraint \"check_stop_times_supplement_shape_dist_traveled\" check (\"shape_dist_traveled\" >= 0), constraint \"check_stop_times_supplement_timepoint\" check (\"timepoint\" >= 0 and \"timepoint\" <= 1), constraint \"check_stop_times_supplement_TODS_delete\" check (\"TODS_delete\" in (1)), constraint \"primary_stop_times_supplement\" primary key (\"source_id\", \"trip_id\", \"stop_sequence\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"stops_supplement\" (\"source_id\" text collate BINARY not null, \"stop_id\" text collate BINARY not null, \"stop_code\" text collate BINARY, \"stop_name\" text collate BINARY, \"_node_gtfs_casefold_stop_name\" text collate BINARY, \"tts_stop_name\" text collate BINARY, \"_node_gtfs_casefold_tts_stop_name\" text collate BINARY, \"stop_desc\" text collate BINARY, \"_node_gtfs_casefold_stop_desc\" text collate BINARY, \"stop_lat\" double precision, \"stop_lon\" double precision, \"zone_id\" text collate BINARY, \"stop_url\" text collate BINARY, \"location_type\" integer, \"parent_station\" text collate BINARY, \"stop_timezone\" text collate BINARY, \"wheelchair_boarding\" integer, \"level_id\" text collate BINARY, \"platform_code\" text collate BINARY, \"stop_access\" integer, \"TODS_delete\" integer, \"TODS_location_type\" text collate BINARY, \"_unknown_fields\" text, constraint \"check_stops_supplement_stop_lat\" check (\"stop_lat\" >= -90 and \"stop_lat\" <= 90), constraint \"check_stops_supplement_stop_lon\" check (\"stop_lon\" >= -180 and \"stop_lon\" <= 180), constraint \"check_stops_supplement_location_type\" check (\"location_type\" >= 0 and \"location_type\" <= 4), constraint \"check_stops_supplement_wheelchair_boarding\" check (\"wheelchair_boarding\" >= 0 and \"wheelchair_boarding\" <= 2), constraint \"check_stops_supplement_stop_access\" check (\"stop_access\" >= 0 and \"stop_access\" <= 1), constraint \"check_stops_supplement_TODS_delete\" check (\"TODS_delete\" in (1)), constraint \"primary_stops_supplement\" primary key (\"source_id\", \"stop_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"tods_vehicles\" (\"source_id\" text collate BINARY not null, \"vehicle_id\" text collate BINARY not null, \"vehicle_label\" text collate BINARY, \"license_plate\" text collate BINARY, \"_unknown_fields\" text, constraint \"primary_tods_vehicles\" primary key (\"source_id\", \"vehicle_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"trips_supplement\" (\"source_id\" text collate BINARY not null, \"route_id\" text collate BINARY, \"service_id\" text collate BINARY, \"trip_id\" text collate BINARY not null, \"trip_headsign\" text collate BINARY, \"_node_gtfs_casefold_trip_headsign\" text collate BINARY, \"trip_short_name\" text collate BINARY, \"_node_gtfs_casefold_trip_short_name\" text collate BINARY, \"direction_id\" integer, \"block_id\" text collate BINARY, \"shape_id\" text collate BINARY, \"wheelchair_accessible\" integer, \"bikes_allowed\" integer, \"cars_allowed\" integer, \"safe_duration_factor\" double precision, \"safe_duration_offset\" double precision, \"TODS_delete\" integer, \"TODS_trip_type\" text collate BINARY, \"_unknown_fields\" text, constraint \"check_trips_supplement_direction_id\" check (\"direction_id\" >= 0 and \"direction_id\" <= 1), constraint \"check_trips_supplement_wheelchair_accessible\" check (\"wheelchair_accessible\" >= 0 and \"wheelchair_accessible\" <= 2), constraint \"check_trips_supplement_bikes_allowed\" check (\"bikes_allowed\" >= 0 and \"bikes_allowed\" <= 2), constraint \"check_trips_supplement_cars_allowed\" check (\"cars_allowed\" >= 0 and \"cars_allowed\" <= 2), constraint \"check_trips_supplement_TODS_delete\" check (\"TODS_delete\" in (1)), constraint \"primary_trips_supplement\" primary key (\"source_id\", \"trip_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"vehicle_assignments\" (\"source_id\" text collate BINARY not null, \"date\" integer not null, \"service_id\" text collate BINARY, \"block_id\" text collate BINARY not null, \"vehicle_id\" text collate BINARY not null, \"_unknown_fields\" text, \"_node_gtfs_key\" varchar(64) not null, constraint \"check_vehicle_assignments__node_gtfs_key\" check (length(\"_node_gtfs_key\") = 64), constraint \"unique_vehicle_assignments__node_gtfs_key\" unique (\"_node_gtfs_key\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"devices\" (\"source_id\" text collate BINARY not null, \"device_id\" text collate BINARY not null, \"stop_id\" text collate BINARY, \"vehicle_id\" text collate BINARY, \"train_car_id\" text collate BINARY, \"device_type\" text collate BINARY, \"device_vendor\" text collate BINARY, \"device_model\" text collate BINARY, \"device_location\" text collate BINARY, \"_unknown_fields\" text, constraint \"primary_devices\" primary key (\"source_id\", \"device_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"fare_transactions\" (\"source_id\" text collate BINARY not null, \"transaction_id\" text collate BINARY not null, \"service_date\" integer not null, \"event_timestamp\" text collate BINARY not null, \"location_ping_id\" text collate BINARY, \"amount\" bigint not null, \"currency_type\" text collate BINARY, \"fare_action\" text collate BINARY not null, \"trip_id_performed\" text collate BINARY, \"trip_id_scheduled\" text collate BINARY, \"pattern_id\" text collate BINARY, \"trip_stop_sequence\" integer, \"scheduled_stop_sequence\" integer, \"vehicle_id\" text collate BINARY, \"device_id\" text collate BINARY, \"fare_id\" text collate BINARY, \"stop_id\" text collate BINARY, \"num_riders\" integer, \"fare_media_id\" text collate BINARY, \"rider_category\" text collate BINARY, \"fare_product\" text collate BINARY, \"fare_period\" text collate BINARY, \"fare_capped\" text collate BINARY not null, \"token_id\" text collate BINARY, \"balance\" bigint, \"_unknown_fields\" text, constraint \"check_fare_transactions_trip_stop_sequence\" check (\"trip_stop_sequence\" >= 1), constraint \"check_fare_transactions_scheduled_stop_sequence\" check (\"scheduled_stop_sequence\" >= 0), constraint \"check_fare_transactions_num_riders\" check (\"num_riders\" >= 0), constraint \"primary_fare_transactions\" primary key (\"source_id\", \"transaction_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"operators\" (\"source_id\" text collate BINARY not null, \"operator_id\" text collate BINARY not null, \"_unknown_fields\" text, constraint \"primary_operators\" primary key (\"source_id\", \"operator_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"passenger_events\" (\"source_id\" text collate BINARY not null, \"passenger_event_id\" text collate BINARY not null, \"service_date\" integer not null, \"event_timestamp\" text collate BINARY not null, \"location_ping_id\" text collate BINARY, \"trip_id_performed\" text collate BINARY, \"trip_id_scheduled\" text collate BINARY, \"trip_stop_sequence\" integer not null, \"scheduled_stop_sequence\" integer, \"event_type\" text collate BINARY not null, \"vehicle_id\" text collate BINARY not null, \"device_id\" text collate BINARY, \"train_car_id\" text collate BINARY, \"stop_id\" text collate BINARY, \"pattern_id\" text collate BINARY, \"event_count\" integer, \"_unknown_fields\" text, constraint \"check_passenger_events_trip_stop_sequence\" check (\"trip_stop_sequence\" >= 1), constraint \"check_passenger_events_scheduled_stop_sequence\" check (\"scheduled_stop_sequence\" >= 0), constraint \"check_passenger_events_event_count\" check (\"event_count\" >= 0), constraint \"primary_passenger_events\" primary key (\"source_id\", \"passenger_event_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"station_activities\" (\"source_id\" text collate BINARY not null, \"service_date\" integer not null, \"stop_id\" text collate BINARY not null, \"time_period_start\" text collate BINARY not null, \"time_period_end\" text collate BINARY not null, \"time_period_category\" text collate BINARY, \"total_entries\" integer, \"total_exits\" integer, \"number_of_transactions\" integer, \"bike_entries\" integer, \"bike_exits\" integer, \"ramp_entries\" integer, \"ramp_exits\" integer, \"_unknown_fields\" text, constraint \"check_station_activities_total_entries\" check (\"total_entries\" >= 0), constraint \"check_station_activities_total_exits\" check (\"total_exits\" >= 0), constraint \"check_station_activities_number_of_transactions\" check (\"number_of_transactions\" >= 0), constraint \"check_station_activities_bike_entries\" check (\"bike_entries\" >= 0), constraint \"check_station_activities_bike_exits\" check (\"bike_exits\" >= 0), constraint \"check_station_activities_ramp_entries\" check (\"ramp_entries\" >= 0), constraint \"check_station_activities_ramp_exits\" check (\"ramp_exits\" >= 0), constraint \"primary_station_activities\" primary key (\"source_id\", \"service_date\", \"stop_id\", \"time_period_start\", \"time_period_end\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"stop_visits\" (\"source_id\" text collate BINARY not null, \"service_date\" integer not null, \"trip_id_performed\" text collate BINARY not null, \"trip_stop_sequence\" integer not null, \"scheduled_stop_sequence\" integer, \"pattern_id\" text collate BINARY, \"vehicle_id\" text collate BINARY, \"dwell\" integer, \"stop_id\" text collate BINARY, \"timepoint\" text collate BINARY, \"schedule_arrival_time\" text collate BINARY, \"schedule_departure_time\" text collate BINARY, \"actual_arrival_time\" text collate BINARY, \"actual_departure_time\" text collate BINARY, \"distance\" integer, \"boarding_1\" integer, \"alighting_1\" integer, \"boarding_2\" integer, \"alighting_2\" integer, \"departure_load\" integer, \"door_open\" text collate BINARY, \"door_close\" text collate BINARY, \"door_status\" text collate BINARY, \"ramp_deployed_time\" double precision, \"ramp_failure\" text collate BINARY, \"kneel_deployed_time\" double precision, \"lift_deployed_time\" double precision, \"bike_rack_deployed\" text collate BINARY, \"bike_load\" integer, \"revenue\" double precision, \"number_of_transactions\" integer, \"schedule_relationship\" text collate BINARY, \"_unknown_fields\" text, constraint \"check_stop_visits_trip_stop_sequence\" check (\"trip_stop_sequence\" >= 1), constraint \"check_stop_visits_scheduled_stop_sequence\" check (\"scheduled_stop_sequence\" >= 0), constraint \"check_stop_visits_dwell\" check (\"dwell\" >= 0), constraint \"check_stop_visits_distance\" check (\"distance\" >= 0), constraint \"check_stop_visits_boarding_1\" check (\"boarding_1\" >= 0), constraint \"check_stop_visits_alighting_1\" check (\"alighting_1\" >= 0), constraint \"check_stop_visits_boarding_2\" check (\"boarding_2\" >= 0), constraint \"check_stop_visits_alighting_2\" check (\"alighting_2\" >= 0), constraint \"check_stop_visits_departure_load\" check (\"departure_load\" >= 0), constraint \"check_stop_visits_ramp_deployed_time\" check (\"ramp_deployed_time\" >= 0), constraint \"check_stop_visits_kneel_deployed_time\" check (\"kneel_deployed_time\" >= 0), constraint \"check_stop_visits_lift_deployed_time\" check (\"lift_deployed_time\" >= 0), constraint \"check_stop_visits_bike_load\" check (\"bike_load\" >= 0), constraint \"check_stop_visits_number_of_transactions\" check (\"number_of_transactions\" >= 0), constraint \"primary_stop_visits\" primary key (\"source_id\", \"service_date\", \"trip_id_performed\", \"trip_stop_sequence\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"train_cars\" (\"source_id\" text collate BINARY not null, \"train_car_id\" text collate BINARY not null, \"model_name\" text collate BINARY, \"facility_name\" text collate BINARY, \"capacity_seated\" integer, \"capacity_wheelchair\" integer, \"capacity_bike\" integer, \"bike_rack\" text collate BINARY, \"capacity_standing\" integer, \"train_car_type\" text collate BINARY, \"_unknown_fields\" text, constraint \"check_train_cars_capacity_seated\" check (\"capacity_seated\" >= 0), constraint \"check_train_cars_capacity_wheelchair\" check (\"capacity_wheelchair\" >= 0), constraint \"check_train_cars_capacity_bike\" check (\"capacity_bike\" >= 0), constraint \"check_train_cars_capacity_standing\" check (\"capacity_standing\" >= 0), constraint \"primary_train_cars\" primary key (\"source_id\", \"train_car_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"trips_performed\" (\"source_id\" text collate BINARY not null, \"service_date\" integer not null, \"trip_id_performed\" text collate BINARY not null, \"vehicle_id\" text collate BINARY not null, \"trip_id_scheduled\" text collate BINARY, \"route_id\" text collate BINARY, \"route_type\" text collate BINARY, \"ntd_mode\" text collate BINARY, \"route_type_agency\" text collate BINARY, \"shape_id\" text collate BINARY, \"pattern_id\" text collate BINARY, \"direction_id\" integer, \"operator_id\" text collate BINARY, \"block_id\" text collate BINARY, \"trip_start_stop_id\" text collate BINARY, \"trip_end_stop_id\" text collate BINARY, \"schedule_trip_start\" text collate BINARY, \"schedule_trip_end\" text collate BINARY, \"actual_trip_start\" text collate BINARY, \"actual_trip_end\" text collate BINARY, \"trip_type\" text collate BINARY, \"schedule_relationship\" text collate BINARY, \"_unknown_fields\" text, constraint \"check_trips_performed_direction_id\" check (\"direction_id\" >= 0 and \"direction_id\" <= 1), constraint \"primary_trips_performed\" primary key (\"source_id\", \"service_date\", \"trip_id_performed\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"vehicle_locations\" (\"source_id\" text collate BINARY not null, \"location_ping_id\" text collate BINARY not null, \"service_date\" integer, \"event_timestamp\" text collate BINARY not null, \"trip_id_performed\" text collate BINARY, \"trip_id_scheduled\" text collate BINARY, \"trip_stop_sequence\" integer, \"scheduled_stop_sequence\" integer, \"vehicle_id\" text collate BINARY not null, \"device_id\" text collate BINARY, \"pattern_id\" text collate BINARY, \"stop_id\" text collate BINARY, \"current_status\" text collate BINARY, \"latitude\" double precision, \"longitude\" double precision, \"gps_quality\" text collate BINARY, \"heading\" double precision, \"speed\" double precision, \"odometer\" double precision, \"schedule_deviation\" integer, \"headway_deviation\" integer, \"trip_type\" text collate BINARY, \"schedule_relationship\" text collate BINARY, \"_unknown_fields\" text, constraint \"check_vehicle_locations_trip_stop_sequence\" check (\"trip_stop_sequence\" >= 1), constraint \"check_vehicle_locations_scheduled_stop_sequence\" check (\"scheduled_stop_sequence\" >= 0), constraint \"check_vehicle_locations_latitude\" check (\"latitude\" >= -90 and \"latitude\" <= 90), constraint \"check_vehicle_locations_longitude\" check (\"longitude\" >= -180 and \"longitude\" <= 180), constraint \"check_vehicle_locations_heading\" check (\"heading\" >= 0 and \"heading\" <= 360), constraint \"check_vehicle_locations_speed\" check (\"speed\" >= 0), constraint \"check_vehicle_locations_odometer\" check (\"odometer\" >= 0), constraint \"primary_vehicle_locations\" primary key (\"source_id\", \"location_ping_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"vehicle_train_cars\" (\"source_id\" text collate BINARY not null, \"vehicle_id\" text collate BINARY not null, \"train_car_id\" text collate BINARY not null, \"train_car_order\" integer, \"operator_id\" text collate BINARY, \"_unknown_fields\" text, constraint \"check_vehicle_train_cars_train_car_order\" check (\"train_car_order\" >= 0), constraint \"primary_vehicle_train_cars\" primary key (\"source_id\", \"vehicle_id\", \"train_car_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"vehicles\" (\"source_id\" text collate BINARY not null, \"vehicle_id\" text collate BINARY not null, \"vehicle_start\" text collate BINARY, \"vehicle_end\" text collate BINARY, \"model_name\" text collate BINARY, \"facility_name\" text collate BINARY, \"capacity_seated\" integer, \"capacity_wheelchair\" integer, \"capacity_bike\" integer, \"bike_rack\" text collate BINARY, \"capacity_standing\" integer, \"_unknown_fields\" text, constraint \"check_vehicles_capacity_seated\" check (\"capacity_seated\" >= 0), constraint \"check_vehicles_capacity_wheelchair\" check (\"capacity_wheelchair\" >= 0), constraint \"check_vehicles_capacity_bike\" check (\"capacity_bike\" >= 0), constraint \"check_vehicles_capacity_standing\" check (\"capacity_standing\" >= 0), constraint \"primary_vehicles\" primary key (\"source_id\", \"vehicle_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_agency_source_id\" on \"agency\" (\"source_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_attributions_source_id\" on \"attributions\" (\"source_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_calendar_start_date\" on \"calendar\" (\"start_date\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_calendar_end_date\" on \"calendar\" (\"end_date\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_calendar_dates_date_exception_type_service_id\" on \"calendar_dates\" (\"date\", \"exception_type\", \"service_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_fare_leg_join_rules_source_id\" on \"fare_leg_join_rules\" (\"source_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_fare_leg_rules_source_id\" on \"fare_leg_rules\" (\"source_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_fare_products_source_id\" on \"fare_products\" (\"source_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_fare_rules_route_id\" on \"fare_rules\" (\"route_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_fare_rules_source_id\" on \"fare_rules\" (\"source_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_fare_transfer_rules_source_id\" on \"fare_transfer_rules\" (\"source_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_location_group_stops_stop_id\" on \"location_group_stops\" (\"stop_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_pathways_from_stop_id\" on \"pathways\" (\"from_stop_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_pathways_to_stop_id\" on \"pathways\" (\"to_stop_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_route_networks_network_id\" on \"route_networks\" (\"network_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_routes_agency_id\" on \"routes\" (\"agency_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_stop_areas_stop_id\" on \"stop_areas\" (\"stop_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_stop_times_location_group_id\" on \"stop_times\" (\"location_group_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_stop_times_location_id\" on \"stop_times\" (\"location_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_stop_times_pickup_booking_rule_id\" on \"stop_times\" (\"pickup_booking_rule_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_stop_times_drop_off_booking_rule_id\" on \"stop_times\" (\"drop_off_booking_rule_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_stop_times_stop_id_arrival_service_day_seconds\" on \"stop_times\" (\"stop_id\", \"arrival_service_day_seconds\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_stops_stop_code\" on \"stops\" (\"stop_code\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_stops_parent_station\" on \"stops\" (\"parent_station\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_stops_level_id\" on \"stops\" (\"level_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_stops_source_id_stop_lat_stop_lon\" on \"stops\" (\"source_id\", \"stop_lat\", \"stop_lon\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_timeframes_service_id\" on \"timeframes\" (\"service_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_timeframes_source_id\" on \"timeframes\" (\"source_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_transfers_to_stop_id\" on \"transfers\" (\"to_stop_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_transfers_source_id\" on \"transfers\" (\"source_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_translations_source_id\" on \"translations\" (\"source_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_trips_service_id\" on \"trips\" (\"service_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_trips_block_id\" on \"trips\" (\"block_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_trips_shape_id\" on \"trips\" (\"shape_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_trips_route_id_service_id_trip_id\" on \"trips\" (\"route_id\", \"service_id\", \"trip_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_alert_entity_selectors_source_id_agency_id\" on \"alert_entity_selectors\" (\"source_id\", \"agency_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_alert_entity_selectors_source_id_route_id\" on \"alert_entity_selectors\" (\"source_id\", \"route_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_alert_entity_selectors_source_id_stop_id\" on \"alert_entity_selectors\" (\"source_id\", \"stop_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_alert_entity_selectors_source_id_trip_id\" on \"alert_entity_selectors\" (\"source_id\", \"trip_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_alert_entity_selectors_source_id_expires_at_unix_seconds\" on \"alert_entity_selectors\" (\"source_id\", \"expires_at_unix_seconds\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_alert_time_ranges_source_id_realtime_feed_id_alert_id_range_kind_start_unix_seconds_end_unix_seconds\" on \"alert_time_ranges\" (\"source_id\", \"realtime_feed_id\", \"alert_id\", \"range_kind\", \"start_unix_seconds\", \"end_unix_seconds\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_alert_time_ranges_source_id_range_kind_start_unix_seconds_end_unix_seconds\" on \"alert_time_ranges\" (\"source_id\", \"range_kind\", \"start_unix_seconds\", \"end_unix_seconds\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_alert_time_ranges_source_id_expires_at_unix_seconds\" on \"alert_time_ranges\" (\"source_id\", \"expires_at_unix_seconds\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_alerts_source_id_expires_at_unix_seconds\" on \"alerts\" (\"source_id\", \"expires_at_unix_seconds\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_realtime_feed_entities_source_id_realtime_feed_id_entity_type_entity_id\" on \"realtime_feed_entities\" (\"source_id\", \"realtime_feed_id\", \"entity_type\", \"entity_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_realtime_feed_entities_source_id_entity_id\" on \"realtime_feed_entities\" (\"source_id\", \"entity_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_realtime_feed_entities_source_id_retention_expires_at_unix_seconds\" on \"realtime_feed_entities\" (\"source_id\", \"retention_expires_at_unix_seconds\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_realtime_feeds_source_id_feed_type\" on \"realtime_feeds\" (\"source_id\", \"feed_type\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_realtime_shapes_source_id_shape_id\" on \"realtime_shapes\" (\"source_id\", \"shape_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_realtime_shapes_source_id_expires_at_unix_seconds\" on \"realtime_shapes\" (\"source_id\", \"expires_at_unix_seconds\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_realtime_snapshots_source_id_realtime_feed_id_fetched_at_unix_seconds\" on \"realtime_snapshots\" (\"source_id\", \"realtime_feed_id\", \"fetched_at_unix_seconds\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_realtime_snapshots_source_id_feed_header_unix_seconds\" on \"realtime_snapshots\" (\"source_id\", \"feed_header_unix_seconds\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_realtime_snapshots_source_id_retention_expires_at_unix_seconds\" on \"realtime_snapshots\" (\"source_id\", \"retention_expires_at_unix_seconds\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_realtime_snapshots_source_id_payload_sha256\" on \"realtime_snapshots\" (\"source_id\", \"payload_sha256\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_realtime_stops_source_id_stop_id\" on \"realtime_stops\" (\"source_id\", \"stop_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_realtime_stops_source_id_parent_station\" on \"realtime_stops\" (\"source_id\", \"parent_station\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_realtime_stops_source_id_expires_at_unix_seconds\" on \"realtime_stops\" (\"source_id\", \"expires_at_unix_seconds\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_trip_modifications_source_id_expires_at_unix_seconds\" on \"trip_modifications\" (\"source_id\", \"expires_at_unix_seconds\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_trip_update_stop_time_updates_source_id_trip_id\" on \"trip_update_stop_time_updates\" (\"source_id\", \"trip_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_trip_update_stop_time_updates_source_id_route_id\" on \"trip_update_stop_time_updates\" (\"source_id\", \"route_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_trip_update_stop_time_updates_source_id_stop_id\" on \"trip_update_stop_time_updates\" (\"source_id\", \"stop_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_trip_update_stop_time_updates_source_id_expires_at_unix_seconds\" on \"trip_update_stop_time_updates\" (\"source_id\", \"expires_at_unix_seconds\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_trip_updates_source_id_vehicle_id\" on \"trip_updates\" (\"source_id\", \"vehicle_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_trip_updates_source_id_trip_id\" on \"trip_updates\" (\"source_id\", \"trip_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_trip_updates_source_id_route_id\" on \"trip_updates\" (\"source_id\", \"route_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_trip_updates_source_id_expires_at_unix_seconds\" on \"trip_updates\" (\"source_id\", \"expires_at_unix_seconds\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_vehicle_positions_source_id_trip_id\" on \"vehicle_positions\" (\"source_id\", \"trip_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_vehicle_positions_source_id_route_id\" on \"vehicle_positions\" (\"source_id\", \"route_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_vehicle_positions_source_id_stop_id\" on \"vehicle_positions\" (\"source_id\", \"stop_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_vehicle_positions_source_id_vehicle_id\" on \"vehicle_positions\" (\"source_id\", \"vehicle_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_vehicle_positions_source_id_trip_start_date_trip_start_time\" on \"vehicle_positions\" (\"source_id\", \"trip_start_date\", \"trip_start_time\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_vehicle_positions_source_id_expires_at_unix_seconds\" on \"vehicle_positions\" (\"source_id\", \"expires_at_unix_seconds\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_board_alight_trip_id\" on \"board_alight\" (\"trip_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_board_alight_stop_id\" on \"board_alight\" (\"stop_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_board_alight_stop_sequence\" on \"board_alight\" (\"stop_sequence\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_board_alight_record_use\" on \"board_alight\" (\"record_use\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_board_alight_service_date\" on \"board_alight\" (\"service_date\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_board_alight_source_id\" on \"board_alight\" (\"source_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_ride_feed_info_ride_start_date\" on \"ride_feed_info\" (\"ride_start_date\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_ride_feed_info_ride_end_date\" on \"ride_feed_info\" (\"ride_end_date\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_ride_feed_info_gtfs_feed_date\" on \"ride_feed_info\" (\"gtfs_feed_date\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_rider_trip_agency_id\" on \"rider_trip\" (\"agency_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_rider_trip_trip_id\" on \"rider_trip\" (\"trip_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_rider_trip_boarding_stop_id\" on \"rider_trip\" (\"boarding_stop_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_rider_trip_boarding_stop_sequence\" on \"rider_trip\" (\"boarding_stop_sequence\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_rider_trip_alighting_stop_id\" on \"rider_trip\" (\"alighting_stop_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_rider_trip_alighting_stop_sequence\" on \"rider_trip\" (\"alighting_stop_sequence\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_rider_trip_service_date\" on \"rider_trip\" (\"service_date\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_ridership_ridership_start_date\" on \"ridership\" (\"ridership_start_date\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_ridership_ridership_end_date\" on \"ridership\" (\"ridership_end_date\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_ridership_service_id\" on \"ridership\" (\"service_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_ridership_agency_id\" on \"ridership\" (\"agency_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_ridership_route_id\" on \"ridership\" (\"route_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_ridership_direction_id\" on \"ridership\" (\"direction_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_ridership_source_id\" on \"ridership\" (\"source_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_trip_capacity_agency_id\" on \"trip_capacity\" (\"agency_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_trip_capacity_trip_id\" on \"trip_capacity\" (\"trip_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_trip_capacity_service_date\" on \"trip_capacity\" (\"service_date\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_trip_capacity_source_id\" on \"trip_capacity\" (\"source_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_timetable_notes_source_id\" on \"timetable_notes\" (\"source_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_timetable_notes_references_source_id\" on \"timetable_notes_references\" (\"source_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_timetable_stop_order_stop_sequence\" on \"timetable_stop_order\" (\"stop_sequence\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_timetables_timetable_sequence\" on \"timetables\" (\"timetable_sequence\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_run_events_trip_id\" on \"run_events\" (\"trip_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_run_events_block_id\" on \"run_events\" (\"block_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_vehicle_assignments_source_id\" on \"vehicle_assignments\" (\"source_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_fare_transactions_transaction_id\" on \"fare_transactions\" (\"transaction_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_passenger_events_passenger_event_id\" on \"passenger_events\" (\"passenger_event_id\")",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "name": "tods-v1",
+      "extensions": ["tods-v1"],
+      "tables": [
+        "deadhead_times",
+        "deadheads",
+        "ops_locations",
+        "run_event",
+        "runs_pieces"
+      ],
+      "statements": [
+        {
+          "sql": "create table \"deadhead_times\" (\"source_id\" text collate BINARY not null, \"deadhead_id\" text collate BINARY not null, \"arrival_time\" text collate BINARY not null, \"arrival_service_day_seconds\" integer, \"departure_time\" text collate BINARY not null, \"departure_service_day_seconds\" integer, \"ops_location_id\" text collate BINARY, \"stop_id\" text collate BINARY, \"location_sequence\" integer not null, \"shape_dist_traveled\" double precision, \"_unknown_fields\" text, constraint \"check_deadhead_times_location_sequence\" check (\"location_sequence\" >= 0), constraint \"check_deadhead_times_shape_dist_traveled\" check (\"shape_dist_traveled\" >= 0), constraint \"primary_deadhead_times\" primary key (\"source_id\", \"deadhead_id\", \"location_sequence\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"deadheads\" (\"source_id\" text collate BINARY not null, \"deadhead_id\" text collate BINARY not null, \"service_id\" text collate BINARY not null, \"block_id\" text collate BINARY not null, \"shape_id\" text collate BINARY, \"to_trip_id\" text collate BINARY, \"from_trip_id\" text collate BINARY, \"to_deadhead_id\" text collate BINARY, \"from_deadhead_id\" text collate BINARY, \"_unknown_fields\" text, constraint \"primary_deadheads\" primary key (\"source_id\", \"deadhead_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"ops_locations\" (\"source_id\" text collate BINARY not null, \"ops_location_id\" text collate BINARY not null, \"ops_location_code\" text collate BINARY, \"ops_location_name\" text collate BINARY not null, \"_node_gtfs_casefold_ops_location_name\" text collate BINARY, \"ops_location_desc\" text collate BINARY, \"_node_gtfs_casefold_ops_location_desc\" text collate BINARY, \"ops_location_lat\" double precision not null, \"ops_location_lon\" double precision not null, \"_unknown_fields\" text, constraint \"check_ops_locations_ops_location_lat\" check (\"ops_location_lat\" >= -90 and \"ops_location_lat\" <= 90), constraint \"check_ops_locations_ops_location_lon\" check (\"ops_location_lon\" >= -180 and \"ops_location_lon\" <= 180), constraint \"primary_ops_locations\" primary key (\"source_id\", \"ops_location_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"run_event\" (\"source_id\" text collate BINARY not null, \"run_event_id\" text collate BINARY not null, \"piece_id\" text collate BINARY not null, \"event_type\" integer not null, \"event_name\" text collate BINARY, \"_node_gtfs_casefold_event_name\" text collate BINARY, \"event_time\" text collate BINARY not null, \"event_duration\" integer not null, \"event_from_location_type\" integer, \"event_from_location_id\" text collate BINARY, \"event_to_location_type\" integer, \"event_to_location_id\" text collate BINARY, \"_unknown_fields\" text, constraint \"check_run_event_event_type\" check (\"event_type\" >= 0), constraint \"check_run_event_event_duration\" check (\"event_duration\" >= 0), constraint \"check_run_event_event_from_location_type\" check (\"event_from_location_type\" >= 0 and \"event_from_location_type\" <= 1), constraint \"check_run_event_event_to_location_type\" check (\"event_to_location_type\" >= 0 and \"event_to_location_type\" <= 1), constraint \"primary_run_event\" primary key (\"source_id\", \"run_event_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create table \"runs_pieces\" (\"source_id\" text collate BINARY not null, \"run_id\" text collate BINARY not null, \"piece_id\" text collate BINARY not null, \"start_type\" integer not null, \"start_trip_id\" text collate BINARY not null, \"start_trip_position\" integer, \"end_type\" integer not null, \"end_trip_id\" text collate BINARY not null, \"end_trip_position\" integer, \"_unknown_fields\" text, constraint \"check_runs_pieces_start_type\" check (\"start_type\" >= 0 and \"start_type\" <= 2), constraint \"check_runs_pieces_start_trip_position\" check (\"start_trip_position\" >= 0), constraint \"check_runs_pieces_end_type\" check (\"end_type\" >= 0 and \"end_type\" <= 2), constraint \"check_runs_pieces_end_trip_position\" check (\"end_trip_position\" >= 0), constraint \"primary_runs_pieces\" primary key (\"source_id\", \"piece_id\"))",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_deadhead_times_location_sequence\" on \"deadhead_times\" (\"location_sequence\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_deadheads_block_id\" on \"deadheads\" (\"block_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_deadheads_shape_id\" on \"deadheads\" (\"shape_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_deadheads_to_trip_id\" on \"deadheads\" (\"to_trip_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_deadheads_from_trip_id\" on \"deadheads\" (\"from_trip_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_deadheads_to_deadhead_id\" on \"deadheads\" (\"to_deadhead_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_deadheads_from_deadhead_id\" on \"deadheads\" (\"from_deadhead_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_run_event_event_type\" on \"run_event\" (\"event_type\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_run_event_event_from_location_type\" on \"run_event\" (\"event_from_location_type\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_run_event_event_to_location_type\" on \"run_event\" (\"event_to_location_type\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_runs_pieces_start_type\" on \"runs_pieces\" (\"start_type\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_runs_pieces_start_trip_id\" on \"runs_pieces\" (\"start_trip_id\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_runs_pieces_end_type\" on \"runs_pieces\" (\"end_type\")",
+          "parameters": []
+        },
+        {
+          "sql": "create index \"idx_runs_pieces_end_trip_id\" on \"runs_pieces\" (\"end_trip_id\")",
+          "parameters": []
+        }
+      ]
+    }
+  ]
+}

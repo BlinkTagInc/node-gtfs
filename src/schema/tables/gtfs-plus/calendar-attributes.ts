@@ -1,16 +1,17 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const calendarAttributes = defineGtfsTable({
-  file: 'calendar_attributes.txt',
+export const calendarAttributes = defineGtfsDomainTable({
+  filename: 'calendar_attributes.txt',
+  tableName: 'calendar_attributes',
   presence: 'optional',
   primaryKey: ['service_id'],
   fields: {
-    service_id: { kind: 'id', applyFeedPrefix: true },
+    service_id: { kind: 'id', presence: 'required' },
     service_description: {
       kind: 'text',
       presence: 'required',
-      caseInsensitiveComparison: true,
+      supportsCaseInsensitiveComparison: true,
     },
   },
-  namespace: 'gtfs-plus',
+  specification: 'gtfs-plus',
 });

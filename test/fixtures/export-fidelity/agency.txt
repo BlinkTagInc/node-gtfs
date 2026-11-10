@@ -1,0 +1,4 @@
+agency_id,agency_name,agency_url,agency_timezone,agency_lang,custom_note
+north,"Metro, ""North""
+Transit",https://north.example.test,America/Los_Angeles,en,"Quoted ""note"", café"
+south,南線 🚋,https://south.example.test,Asia/Tokyo,ja,

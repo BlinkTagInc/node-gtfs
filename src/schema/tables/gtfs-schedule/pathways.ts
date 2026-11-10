@@ -1,23 +1,22 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const pathways = defineGtfsTable({
-  file: 'pathways.txt',
-  namespace: 'gtfs-schedule',
+export const pathways = defineGtfsDomainTable({
+  filename: 'pathways.txt',
+  tableName: 'pathways',
+  specification: 'gtfs-schedule',
   presence: 'optional',
   primaryKey: ['pathway_id'],
   fields: {
-    pathway_id: { kind: 'id', presence: 'required', applyFeedPrefix: true },
+    pathway_id: { kind: 'id', presence: 'required' },
     from_stop_id: {
       kind: 'id',
-      references: [{ file: 'stops.txt', field: 'stop_id' }],
+      references: [{ targetFilename: 'stops.txt', targetField: 'stop_id' }],
       presence: 'required',
-      applyFeedPrefix: true,
     },
     to_stop_id: {
       kind: 'id',
-      references: [{ file: 'stops.txt', field: 'stop_id' }],
+      references: [{ targetFilename: 'stops.txt', targetField: 'stop_id' }],
       presence: 'required',
-      applyFeedPrefix: true,
     },
     pathway_mode: {
       kind: 'integer',
@@ -36,10 +35,10 @@ export const pathways = defineGtfsTable({
     stair_count: { kind: 'integer' },
     max_slope: { kind: 'real' },
     min_width: { kind: 'real', minimum: 0 },
-    signposted_as: { kind: 'text', caseInsensitiveComparison: true },
-    reversed_signposted_as: { kind: 'text', caseInsensitiveComparison: true },
-  },
-  storage: {
-    indexes: ['from_stop_id', 'to_stop_id'],
+    signposted_as: { kind: 'text', supportsCaseInsensitiveComparison: true },
+    reversed_signposted_as: {
+      kind: 'text',
+      supportsCaseInsensitiveComparison: true,
+    },
   },
 });

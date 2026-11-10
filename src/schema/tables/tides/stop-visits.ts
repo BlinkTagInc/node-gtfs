@@ -1,7 +1,8 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const stopVisits = defineGtfsTable({
-  file: 'stop_visits.csv',
+export const stopVisits = defineGtfsDomainTable({
+  filename: 'stop_visits.csv',
+  tableName: 'stop_visits',
   presence: 'optional',
   primaryKey: ['service_date', 'trip_id_performed', 'trip_stop_sequence'],
   fields: {
@@ -9,22 +10,26 @@ export const stopVisits = defineGtfsTable({
     trip_id_performed: {
       kind: 'text',
       presence: 'required',
-      references: [{ file: 'trips_performed.csv', field: 'trip_id_performed' }],
-      applyFeedPrefix: true,
+      references: [
+        {
+          targetFilename: 'trips_performed.csv',
+          targetField: 'trip_id_performed',
+        },
+      ],
     },
     trip_stop_sequence: { kind: 'integer', presence: 'required', minimum: 1 },
     scheduled_stop_sequence: { kind: 'integer', minimum: 0 },
-    pattern_id: { kind: 'id', applyFeedPrefix: true },
+    pattern_id: { kind: 'id' },
     vehicle_id: {
       kind: 'id',
-      references: [{ file: 'vehicles.csv', field: 'vehicle_id' }],
-      applyFeedPrefix: true,
+      references: [
+        { targetFilename: 'vehicles.csv', targetField: 'vehicle_id' },
+      ],
     },
     dwell: { kind: 'integer', minimum: 0 },
     stop_id: {
       kind: 'id',
-      references: [{ file: 'stops.txt', field: 'stop_id' }],
-      applyFeedPrefix: true,
+      references: [{ targetFilename: 'stops.txt', targetField: 'stop_id' }],
     },
     timepoint: { kind: 'text' },
     schedule_arrival_time: { kind: 'text' },
@@ -50,5 +55,5 @@ export const stopVisits = defineGtfsTable({
     number_of_transactions: { kind: 'integer', minimum: 0 },
     schedule_relationship: { kind: 'text' },
   },
-  namespace: 'tides',
+  specification: 'tides',
 });

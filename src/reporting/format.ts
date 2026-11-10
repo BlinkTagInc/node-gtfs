@@ -1,29 +1,31 @@
 import * as colors from 'yoctocolors';
 
-import { formatGtfsError, isGtfsError } from '../lib/errors.ts';
+import { formatGtfsError, isGtfsError } from '../diagnostics/errors.ts';
 
-import type { ReportEvent, TaskName } from './events.ts';
+import type { GtfsOperationName, GtfsReportEvent } from './events.ts';
 
-export type ErrorVerbosity = 'user' | 'developer';
+type ErrorAudience = 'user' | 'developer';
 
-const TASK_LABEL: Record<TaskName, string> = {
+const OPERATION_LABEL: Record<GtfsOperationName, string> = {
+  cleanup: 'GTFS-Realtime cleanup',
   import: 'GTFS import',
   export: 'GTFS export',
   realtime: 'GTFS-Realtime refresh',
+  validation: 'GTFS validation',
 };
 
-export function errorVerbosity(error: unknown): ErrorVerbosity {
+export function inferErrorAudience(error: unknown): ErrorAudience {
   return isGtfsError(error) ? 'user' : 'developer';
 }
 
 export function formatErrorMessage(
   error: unknown,
-  options: { verbosity?: ErrorVerbosity } = {},
+  options: { audience?: ErrorAudience } = {},
 ) {
-  const verbosity = options.verbosity ?? errorVerbosity(error);
+  const audience = options.audience ?? inferErrorAudience(error);
 
   if (isGtfsError(error)) {
-    return `[GTFS] ${formatGtfsError(error, { verbosity })}`;
+    return `[GTFS] ${formatGtfsError(error, { audience })}`;
   }
 
   return error instanceof Error ? error.message : String(error);
@@ -31,14 +33,14 @@ export function formatErrorMessage(
 
 export function formatError(
   error: unknown,
-  options: { verbosity?: ErrorVerbosity } = {},
+  options: { audience?: ErrorAudience } = {},
 ) {
-  const message = formatErrorMessage(error, options).replace('Error: ', '');
-  return colors.red(`${colors.underline('Error')}: ${message}`);
+  const message = formatErrorMessage(error, options).replace(/^Error: /u, '');
+  return `${colors.red('Error:')} ${message}`;
 }
 
 export function formatWarning(text: string) {
-  return colors.yellow(`${colors.underline('Warning')}: ${text}`);
+  return `${colors.yellow('Warning:')} ${text}`;
 }
 
 export function formatStackTrace(error: unknown): string {
@@ -46,12 +48,13 @@ export function formatStackTrace(error: unknown): string {
 }
 
 // Matches common credential fragments in query parameter names.
-const SENSITIVE_PARAMETERS = [
+const SENSITIVE_PARAMETER_FRAGMENTS = [
   'key',
   'secret',
   'token',
   'password',
   'passwd',
+  'passphrase',
   'pwd',
   'credential',
   'auth',
@@ -59,13 +62,34 @@ const SENSITIVE_PARAMETERS = [
   'session',
 ];
 
+// Match ambiguous or abbreviated names exactly: "sig" must not hide
+// "signal" or "assigned_stop_id", and "code" must not hide "stop_code".
+const SENSITIVE_PARAMETER_NAMES = new Set([
+  'sig',
+  'hmac',
+  'jwt',
+  'bearer',
+  'policy',
+  'googleaccessid',
+  'code',
+  'assertion',
+  'ticket',
+  'samlrequest',
+  'samlresponse',
+  'hdnts',
+  'hdntl',
+]);
+
 function isSensitiveParameter(name: string) {
   const lowered = name.toLowerCase();
 
-  return SENSITIVE_PARAMETERS.some((fragment) => lowered.includes(fragment));
+  return (
+    SENSITIVE_PARAMETER_NAMES.has(lowered) ||
+    SENSITIVE_PARAMETER_FRAGMENTS.some((fragment) => lowered.includes(fragment))
+  );
 }
 
-export function formatUrl(url: string): string {
+export function redactUrlForReporting(url: string): string {
   let parsed;
 
   try {
@@ -74,16 +98,12 @@ export function formatUrl(url: string): string {
     return url;
   }
 
-  // Updating URLSearchParams while iterating can skip entries.
-  const keys = Array.from(parsed.searchParams.keys());
-
-  for (const key of keys) {
-    if (isSensitiveParameter(key)) {
-      parsed.searchParams.set(key, '***');
-    }
+  const parameters = new URLSearchParams();
+  for (const [name, value] of parsed.searchParams) {
+    parameters.append(name, isSensitiveParameter(name) ? '***' : value);
   }
 
-  const query = parsed.searchParams.toString().replaceAll('%2A%2A%2A', '***');
+  const query = parameters.toString().replaceAll('%2A%2A%2A', '***');
 
   return `${parsed.origin}${parsed.pathname}${query === '' ? '' : `?${query}`}`;
 }
@@ -109,26 +129,34 @@ export function pluralize(singular: string, plural: string, count: number) {
   return `${formatCount(count)} ${count === 1 ? singular : plural}`;
 }
 
-export function formatRunStart(
-  event: Extract<ReportEvent, { type: 'run:start' }>,
+export function formatOperationStart(
+  event: Pick<
+    Extract<GtfsReportEvent, { type: 'operation:start' }>,
+    'databaseDescription' | 'operation' | 'sourceCount'
+  >,
 ) {
-  const databaseDescription =
-    event.databaseDescription ?? `SQLite database at ${event.sqlitePath}`;
-  return `Starting ${TASK_LABEL[event.task]} for ${pluralize('agency', 'agencies', event.agencyCount)} using ${databaseDescription}`;
+  const sources =
+    event.sourceCount === undefined
+      ? ''
+      : ` for ${pluralize('source', 'sources', event.sourceCount)}`;
+  return `Starting ${OPERATION_LABEL[event.operation]}${sources}${event.databaseDescription === undefined ? '' : ` using ${event.databaseDescription}`}`;
 }
 
-export function formatRunComplete(
-  event: Extract<ReportEvent, { type: 'run:complete' }>,
+export function formatOperationComplete(
+  event: Pick<
+    Extract<GtfsReportEvent, { type: 'operation:complete' }>,
+    'destination' | 'durationMs' | 'operation' | 'summary'
+  >,
 ) {
-  const seconds = `${event.elapsedSeconds.toFixed(1)} seconds`;
+  const duration = `${(event.durationMs / 1000).toFixed(1)} seconds`;
   const what =
     event.destination === undefined
-      ? TASK_LABEL[event.task]
-      : `${TASK_LABEL[event.task]} to ${event.destination}`;
+      ? OPERATION_LABEL[event.operation]
+      : `${OPERATION_LABEL[event.operation]} to ${event.destination}`;
 
   return event.summary === undefined
-    ? `Completed ${what} in ${seconds}`
-    : `Completed ${what}: ${event.summary}, ${seconds}`;
+    ? `Completed ${what} in ${duration}`
+    : `Completed ${what}: ${event.summary}, ${duration}`;
 }
 
 // Fixed width prevents live progress output from shifting between files.
@@ -140,11 +168,7 @@ export function formatFileCount(filename: string, count: number) {
   return `  ${filename.padEnd(FILENAME_WIDTH)}  ${formatCount(count).padStart(COUNT_WIDTH)}`;
 }
 
-export function formatFileNote(filename: string, note: string) {
-  return `  ${filename.padEnd(FILENAME_WIDTH)}  ${note.padStart(COUNT_WIDTH)}`;
-}
-
-export function formatFileList(label: string, filenames: string[]) {
+export function formatFileList(label: string, filenames: readonly string[]) {
   const prefix = `  ${label} (${filenames.length}): `;
   const lines: string[] = [];
   let line = prefix;

@@ -1,0 +1,3 @@
+route_id,agency_id,route_short_name,route_long_name,route_type,custom_route
+north-route,north,N,"North, Crosstown",3,"uses ""quotes"""
+south-route,south,南,南線,3,

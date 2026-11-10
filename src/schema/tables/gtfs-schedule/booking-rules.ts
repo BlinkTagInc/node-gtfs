@@ -1,15 +1,15 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const bookingRules = defineGtfsTable({
-  file: 'booking_rules.txt',
-  namespace: 'gtfs-schedule',
+export const bookingRules = defineGtfsDomainTable({
+  filename: 'booking_rules.txt',
+  tableName: 'booking_rules',
+  specification: 'gtfs-schedule',
   presence: 'optional',
   primaryKey: ['booking_rule_id'],
   fields: {
     booking_rule_id: {
       kind: 'id',
       presence: 'required',
-      applyFeedPrefix: true,
     },
     booking_type: {
       kind: 'integer',
@@ -19,35 +19,39 @@ export const bookingRules = defineGtfsTable({
     },
     prior_notice_duration_min: {
       kind: 'integer',
-      presence: 'conditionallyRequired',
+      presence: 'conditionally-required',
     },
     prior_notice_duration_max: {
       kind: 'integer',
-      presence: 'conditionallyForbidden',
+      presence: 'conditionally-forbidden',
     },
     prior_notice_last_day: {
       kind: 'integer',
-      presence: 'conditionallyRequired',
+      presence: 'conditionally-required',
     },
-    prior_notice_last_time: { kind: 'time', presence: 'conditionallyRequired' },
+    prior_notice_last_time: {
+      kind: 'time',
+      presence: 'conditionally-required',
+    },
     prior_notice_start_day: {
       kind: 'integer',
-      presence: 'conditionallyForbidden',
+      presence: 'conditionally-forbidden',
     },
     prior_notice_start_time: {
       kind: 'time',
-      presence: 'conditionallyRequired',
+      presence: 'conditionally-required',
     },
     prior_notice_service_id: {
       kind: 'id',
-      presence: 'conditionallyForbidden',
-      references: [{ file: 'calendar.txt', field: 'service_id' }],
-      applyFeedPrefix: true,
+      presence: 'conditionally-forbidden',
+      references: [
+        { targetFilename: 'calendar.txt', targetField: 'service_id' },
+      ],
     },
-    message: { kind: 'text', caseInsensitiveComparison: true },
-    pickup_message: { kind: 'text', caseInsensitiveComparison: true },
-    drop_off_message: { kind: 'text', caseInsensitiveComparison: true },
-    phone_number: { kind: 'text', caseInsensitiveComparison: true },
+    message: { kind: 'text', supportsCaseInsensitiveComparison: true },
+    pickup_message: { kind: 'text', supportsCaseInsensitiveComparison: true },
+    drop_off_message: { kind: 'text', supportsCaseInsensitiveComparison: true },
+    phone_number: { kind: 'text', supportsCaseInsensitiveComparison: true },
     info_url: { kind: 'text' },
     booking_url: { kind: 'text' },
   },

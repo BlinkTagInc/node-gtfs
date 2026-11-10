@@ -1,9 +1,9 @@
-import { errorVerbosity, formatError, formatStackTrace } from './format.ts';
+import { formatError, formatStackTrace, inferErrorAudience } from './format.ts';
 
 function formatFatalError(error: unknown = 'Unknown Error'): string {
   const lines = [`\n${formatError(error)}`];
 
-  if (errorVerbosity(error) === 'developer') {
+  if (inferErrorAudience(error) === 'developer') {
     lines.push(formatStackTrace(error));
   }
 

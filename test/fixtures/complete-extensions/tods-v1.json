@@ -1,0 +1,61 @@
+{
+  "deadhead_times.txt": [
+    {
+      "deadhead_id": "ext-deadhead_id",
+      "arrival_time": "25:10:00",
+      "departure_time": "25:10:30",
+      "ops_location_id": "ext-ops_location_id",
+      "stop_id": "FSTOP1",
+      "location_sequence": 138,
+      "shape_dist_traveled": 139.25
+    }
+  ],
+  "deadheads.txt": [
+    {
+      "deadhead_id": "ext-deadhead_id",
+      "service_id": "FS1",
+      "block_id": "FBLOCK1",
+      "shape_id": "FSHAPE1",
+      "to_trip_id": "FT1",
+      "from_trip_id": "FT2",
+      "to_deadhead_id": "ext-deadhead_id",
+      "from_deadhead_id": "ext-deadhead_id"
+    }
+  ],
+  "ops_locations.txt": [
+    {
+      "ops_location_id": "ext-ops_location_id",
+      "ops_location_code": "ops_location_code: Café \"北\", 149",
+      "ops_location_name": "ops_location_name: Café \"北\", 150",
+      "ops_location_desc": "ops_location_desc: Café \"北\", 151",
+      "ops_location_lat": 37.701234,
+      "ops_location_lon": -122.401234
+    }
+  ],
+  "run_event.txt": [
+    {
+      "run_event_id": "ext-run_event_id",
+      "piece_id": "ext-piece_id",
+      "event_type": 156,
+      "event_name": "event_name: Café \"北\", 157",
+      "event_time": "25:15:30",
+      "event_duration": 159,
+      "event_from_location_type": 0,
+      "event_from_location_id": "FSTOP1",
+      "event_to_location_type": 0,
+      "event_to_location_id": "FSTOP1"
+    }
+  ],
+  "runs_pieces.txt": [
+    {
+      "run_id": "ext-run_id",
+      "piece_id": "ext-piece_id",
+      "start_type": 2,
+      "start_trip_id": "FT1",
+      "start_trip_position": 168,
+      "end_type": 2,
+      "end_trip_id": "FT2",
+      "end_trip_position": 171
+    }
+  ]
+}

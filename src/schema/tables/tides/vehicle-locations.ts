@@ -1,45 +1,52 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const vehicleLocations = defineGtfsTable({
-  file: 'vehicle_locations.csv',
+export const vehicleLocations = defineGtfsDomainTable({
+  filename: 'vehicle_locations.csv',
+  tableName: 'vehicle_locations',
   presence: 'optional',
   primaryKey: ['location_ping_id'],
   fields: {
     location_ping_id: {
       kind: 'id',
       presence: 'required',
-      applyFeedPrefix: true,
     },
     service_date: { kind: 'date' },
     event_timestamp: { kind: 'text', presence: 'required' },
     trip_id_performed: {
       kind: 'text',
-      references: [{ file: 'trips_performed.csv', field: 'trip_id_performed' }],
-      applyFeedPrefix: true,
+      references: [
+        {
+          targetFilename: 'trips_performed.csv',
+          targetField: 'trip_id_performed',
+        },
+      ],
     },
     trip_id_scheduled: {
       kind: 'text',
-      references: [{ file: 'trips_performed.csv', field: 'trip_id_scheduled' }],
-      applyFeedPrefix: true,
+      references: [
+        {
+          targetFilename: 'trips_performed.csv',
+          targetField: 'trip_id_scheduled',
+        },
+      ],
     },
     trip_stop_sequence: { kind: 'integer', minimum: 1 },
     scheduled_stop_sequence: { kind: 'integer', minimum: 0 },
     vehicle_id: {
       kind: 'id',
       presence: 'required',
-      references: [{ file: 'vehicles.csv', field: 'vehicle_id' }],
-      applyFeedPrefix: true,
+      references: [
+        { targetFilename: 'vehicles.csv', targetField: 'vehicle_id' },
+      ],
     },
     device_id: {
       kind: 'id',
-      references: [{ file: 'devices.csv', field: 'device_id' }],
-      applyFeedPrefix: true,
+      references: [{ targetFilename: 'devices.csv', targetField: 'device_id' }],
     },
-    pattern_id: { kind: 'id', applyFeedPrefix: true },
+    pattern_id: { kind: 'id' },
     stop_id: {
       kind: 'id',
-      references: [{ file: 'stops.txt', field: 'stop_id' }],
-      applyFeedPrefix: true,
+      references: [{ targetFilename: 'stops.txt', targetField: 'stop_id' }],
     },
     current_status: { kind: 'text' },
     latitude: { kind: 'real', minimum: -90, maximum: 90 },
@@ -53,5 +60,5 @@ export const vehicleLocations = defineGtfsTable({
     trip_type: { kind: 'text' },
     schedule_relationship: { kind: 'text' },
   },
-  namespace: 'tides',
+  specification: 'tides',
 });

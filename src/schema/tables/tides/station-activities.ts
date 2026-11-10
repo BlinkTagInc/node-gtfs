@@ -1,7 +1,8 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const stationActivities = defineGtfsTable({
-  file: 'station_activities.csv',
+export const stationActivities = defineGtfsDomainTable({
+  filename: 'station_activities.csv',
+  tableName: 'station_activities',
   presence: 'optional',
   primaryKey: [
     'service_date',
@@ -14,8 +15,7 @@ export const stationActivities = defineGtfsTable({
     stop_id: {
       kind: 'id',
       presence: 'required',
-      references: [{ file: 'stops.txt', field: 'stop_id' }],
-      applyFeedPrefix: true,
+      references: [{ targetFilename: 'stops.txt', targetField: 'stop_id' }],
     },
     time_period_start: { kind: 'text', presence: 'required' },
     time_period_end: { kind: 'text', presence: 'required' },
@@ -28,5 +28,5 @@ export const stationActivities = defineGtfsTable({
     ramp_entries: { kind: 'integer', minimum: 0 },
     ramp_exits: { kind: 'integer', minimum: 0 },
   },
-  namespace: 'tides',
+  specification: 'tides',
 });

@@ -1,126 +1,144 @@
-import { clearLine, cursorTo } from 'node:readline';
+import * as colors from 'yoctocolors';
 
+import { formatError, formatWarning } from './format.ts';
+import { formatProgressLines } from './console-progress.ts';
+import { createConsoleAnimation } from './console-animation.ts';
 import {
-  formatError,
-  formatErrorMessage,
-  formatRunComplete,
-  formatRunStart,
-  formatWarning,
-} from './format.ts';
+  GtfsError,
+  GtfsErrorCategory,
+  GtfsErrorCode,
+} from '../diagnostics/errors.ts';
+import { assertConfigOptionKeys } from '../config/options.ts';
 
-import type { ReportEvent } from './events.ts';
-import type {
-  LogFunction,
-  LogMessageLevel,
-  ReportingOptions,
-} from './types.ts';
+import type { GtfsReportEvent } from './events.ts';
+import type { GtfsReporter } from './types.ts';
 
-export interface Reporter {
-  report(event: ReportEvent): void;
+export interface GtfsConsoleReporterOptions {
+  /** Diagnostic destination. Defaults to process.stderr. */
+  readonly stream?: NodeJS.WritableStream;
+  /** Animate progress in place. Defaults to true only for a TTY stream. */
+  readonly animateProgress?: boolean;
 }
 
-function createConsoleReporter(animate: boolean): Reporter {
-  let lineHeld = false;
+function formatInformationalEvent(event: GtfsReportEvent): string {
+  if (
+    (event.type === 'progress' || event.type === 'status') &&
+    event.progressBar === false &&
+    !(
+      event.type === 'status' &&
+      event.phase === 'start' &&
+      event.heading === true
+    )
+  ) {
+    return event.type === 'status' && event.phase === 'complete'
+      ? `${colors.green('✔')} ${event.message}`
+      : event.message;
+  }
+  if (event.type === 'status' && event.heading === false) {
+    return event.message;
+  }
+  if (event.type === 'status' && event.phase === undefined) {
+    return `Info: ${event.message}`;
+  }
+  const completed =
+    event.type === 'operation:complete' ||
+    (event.type === 'status' && event.phase === 'complete');
+  const prefix = completed
+    ? `${colors.green('✔')}   `
+    : `${colors.blue('==>')} `;
+  const continuationIndent = ' '.repeat(4);
+  const [firstLine = '', ...remainingLines] = event.message.split('\n');
 
-  const drawProgress = (message: string) => {
-    if (!animate) {
+  return [
+    `${prefix}${completed ? firstLine.trimStart() : colors.bold(firstLine.trimStart())}`,
+    ...remainingLines.map((line) => `${continuationIndent}${line}`),
+    ...(event.type === 'status' && event.databaseDescription !== undefined
+      ? [`Using ${event.databaseDescription}`]
+      : []),
+    ...(event.type === 'operation:complete' &&
+    event.databaseDescription !== undefined
+      ? [event.databaseDescription]
+      : []),
+  ].join('\n');
+}
+
+export function createConsoleReporter(
+  options: GtfsConsoleReporterOptions = {},
+): GtfsReporter {
+  assertConfigOptionKeys(options, {
+    name: 'createConsoleReporter()',
+    keys: ['stream', 'animateProgress'],
+  });
+  if (
+    options.animateProgress !== undefined &&
+    typeof options.animateProgress !== 'boolean'
+  ) {
+    throw new GtfsError(
+      'The `createConsoleReporter()` option `animateProgress` must be a boolean',
+      {
+        code: GtfsErrorCode.CONFIG_INVALID,
+        category: GtfsErrorCategory.CONFIG,
+      },
+    );
+  }
+  const stream = options.stream ?? process.stderr;
+  const animateProgress =
+    options.animateProgress ??
+    (stream as NodeJS.WritableStream & { isTTY?: boolean }).isTTY === true;
+  const animation = createConsoleAnimation(stream);
+
+  return (event: GtfsReportEvent) => {
+    if (event.type === 'operation:start' && event.operation === 'import') {
+      return;
+    }
+    const isActiveStatus = event.type === 'status' && event.phase === 'start';
+    if (
+      animateProgress &&
+      event.level === 'info' &&
+      (event.type === 'progress' || isActiveStatus)
+    ) {
+      if (isActiveStatus) {
+        if (
+          event.filename === undefined &&
+          event.heading !== false &&
+          (event.progressBar !== false || event.heading === true)
+        ) {
+          animation.writeLine(formatInformationalEvent(event));
+        } else {
+          animation.stop();
+        }
+      }
+      animation.animate(({ columns, spinnerFrame, tick }) =>
+        formatProgressLines({ event, columns, spinnerFrame, tick }).slice(
+          0,
+          (event.type === 'status' || event.type === 'progress') &&
+            event.progressBar === false
+            ? 1
+            : 2,
+        ),
+      );
       return;
     }
 
-    clearLine(process.stdout, 0);
-    cursorTo(process.stdout, 0);
-    process.stdout.write(message);
-    lineHeld = true;
-  };
-
-  const writeLine = (
-    text: string,
-    stream: NodeJS.WritableStream = process.stdout,
-  ) => {
-    if (lineHeld) {
-      clearLine(process.stdout, 0);
-      cursorTo(process.stdout, 0);
-      lineHeld = false;
-    }
-
-    stream.write(`${text}\n`);
-  };
-
-  const writeMessage = (level: LogMessageLevel, body: string | Error) => {
-    const text = typeof body === 'string' ? body : formatErrorMessage(body);
-
-    if (level === 'error') {
-      writeLine(formatError(body), process.stderr);
-    } else if (level === 'warning') {
-      writeLine(formatWarning(text), process.stderr);
+    if (event.level === 'error') {
+      animation.writeLine(formatError(event.message));
+    } else if (event.level === 'warn') {
+      animation.writeLine(formatWarning(event.message));
+    } else if (
+      animateProgress &&
+      event.type === 'status' &&
+      event.progressBar !== false &&
+      event.phase === 'complete'
+    ) {
+      animation.writeLine(
+        formatProgressLines({
+          event,
+          columns: animation.getColumns(),
+          completed: true,
+        }).join('\n'),
+      );
     } else {
-      writeLine(text);
+      animation.writeLine(formatInformationalEvent(event));
     }
   };
-
-  return {
-    report(event: ReportEvent) {
-      switch (event.type) {
-        case 'message':
-          writeMessage(event.level, event.body);
-          break;
-
-        case 'run:start':
-          writeLine(formatRunStart(event));
-          break;
-
-        case 'progress':
-          drawProgress(event.message);
-          break;
-
-        case 'status':
-          writeLine(event.message);
-          break;
-
-        case 'run:complete':
-          writeLine(formatRunComplete(event));
-          break;
-      }
-    },
-  };
-}
-
-function createLogFunctionReporter(logFunction: LogFunction): Reporter {
-  return {
-    report(event: ReportEvent) {
-      switch (event.type) {
-        case 'message':
-          logFunction(
-            typeof event.body === 'string'
-              ? event.body
-              : formatErrorMessage(event.body),
-            event.level,
-          );
-          break;
-
-        case 'run:start':
-          logFunction(formatRunStart(event), 'info');
-          break;
-
-        case 'progress':
-          break;
-
-        case 'status':
-          logFunction(event.message, 'info');
-          break;
-
-        case 'run:complete':
-          logFunction(formatRunComplete(event), 'info');
-          break;
-      }
-    },
-  };
-}
-
-export function createReporter(config: ReportingOptions): Reporter {
-  if (config.logFunction) {
-    return createLogFunctionReporter(config.logFunction);
-  }
-
-  return createConsoleReporter(process.stdout.isTTY === true);
 }

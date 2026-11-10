@@ -1,330 +1,127 @@
-# Configuration reference
+# Configure node-GTFS
 
-node-GTFS accepts configuration objects in JavaScript and JSON configuration
-files on the command line. Relative paths are resolved from the directory where
-the process is started.
+[All guides](README.md)
 
-The repository includes three starting points:
+A configuration describes where your data comes from and where it should be
+stored. Most users need only a database path and one Schedule source.
 
-- [`config-sample.json`](../config-sample.json) for a minimal static import
-- [`config-sample-full.json`](../config-sample-full.json) for every current,
-  recommended JSON option
-- [`config-sample-rtupdates.json`](../config-sample-rtupdates.json) for a
-  realtime-only update
+For every option's accepted values and defaults, see the
+[configuration reference](reference/configuration.md).
 
-Replace the example URLs, credentials, and paths before using the full samples.
-The `db` and `logFunction` options are JavaScript values and cannot be stored in
-JSON. The deprecated `verbose` option is omitted; use `logLevel` instead.
+## A small config file
 
-Below is a minimal configuration:
+Save this as `config.json`:
 
 ```json
 {
-  "agencies": [
-    {
-      "path": "./data/gtfs.zip"
-    }
-  ],
-  "sqlitePath": "./data/gtfs.sqlite"
+  "database": { "path": "./transit.sqlite" },
+  "sources": [{ "schedule": { "path": "./feed.zip" } }]
 }
 ```
 
-`agencies` is required for static imports. `sqlitePath` is strongly recommended
-for command-line use because the default is an in-memory database.
+Then run `gtfs import --config ./config.json`. Relative paths are relative to
+the terminal’s current folder, not the folder containing the config file.
 
-> **Warning:** A static import drops and recreates the GTFS tables in its
-> destination database. It does not preserve changes made directly to those
-> tables. Use a new database or create a backup before importing.
+JavaScript accepts the same structure, with additional support for database
+clients and reporter functions. Unknown configuration keys are rejected.
 
-## Top-level options
+## Sample configuration files
 
-| Option                          | Type                      | Default    | Used by                      | Description                                   |
-| ------------------------------- | ------------------------- | ---------- | ---------------------------- | --------------------------------------------- |
-| `agencies`                      | array                     | required   | import, realtime             | GTFS feeds to process                         |
-| `sqlitePath`                    | string                    | `:memory:` | SQLite operations            | SQLite database path                          |
-| `db`                            | `better-sqlite3` database | none       | JavaScript SQLite operations | Existing connection to use                    |
-| `csvOptions`                    | object                    | `{}`       | static import                | Options passed to `csv-parse`                 |
-| `downloadTimeout`               | number                    | `30000`    | import, realtime             | Download timeout in milliseconds              |
-| `exportPath`                    | string                    | generated  | export                       | Directory for exported files                  |
-| `gtfsRealtimeExpirationSeconds` | number                    | `0`        | realtime                     | Age at which old realtime rows may be deleted |
-| `ignoreDuplicates`              | boolean                   | `false`    | static import                | Skip rows that violate a unique key           |
-| `ignoreErrors`                  | boolean                   | `false`    | import, realtime             | Log an error and continue where supported     |
-| `includeImportReport`           | boolean                   | `false`    | static import                | Return an `ImportReport` from JavaScript      |
-| `logLevel`                      | string                    | `info`     | all operations               | `silent`, `error`, `warning`, or `info`       |
-| `logFunction`                   | function                  | console    | JavaScript operations        | Receive non-progress log messages             |
-| `verbose`                       | boolean                   | none       | all operations               | Deprecated; use `logLevel`                    |
+You can start with the small example above or copy one of these templates:
 
-You can add your own unrelated config options - unknown
-keys are ignored, although likely misspellings of known options produce a
-warning.
+| Sample                                                        | What it includes                                                                         |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [config-sample.json](../config-sample.json)                   | A local Schedule ZIP and three GTFS-Realtime feeds, using SQLite.                        |
+| [config-sample-realtime.json](../config-sample-realtime.json) | GTFS-Realtime-only setup with authentication, a request timeout, and retention settings. |
+| [config-sample-full.json](../config-sample-full.json)         | Multiple sources, download and import settings, GTFS-Realtime, and export settings.      |
 
-## Feed options
+Open a sample and copy its JSON into a new `config.json` in your working
+folder. Replace the example paths, URLs, and tokens with your own, and remove
+settings you do not need. For Schedule-only use, remove each source’s
+`realtime` section and remove `"gtfs-realtime"` from `extensions`.
 
-Each static feed must have exactly one `url` or `path`.
+The full sample illustrates optional choices, not just defaults—for example,
+it excludes `shapes.txt` from one source. Review it before importing.
 
-| Option                     | Type         | Description                                             |
-| -------------------------- | ------------ | ------------------------------------------------------- |
-| `url`                      | string       | URL of a GTFS ZIP file                                  |
-| `path`                     | string       | Local ZIP file or directory containing GTFS files       |
-| `headers`                  | object       | HTTP request headers for the static feed                |
-| `prefix`                   | string       | Prefix applied to identifiers when feeds are merged     |
-| `exclude`                  | string array | Database table names to skip, without `.txt`            |
-| `fillEmptyAgencyId`        | boolean      | Fill missing `agency_id` values in a single-agency feed |
-| `agencyId`                 | string       | Fallback ID used with `fillEmptyAgencyId`               |
-| `realtimeAlerts`           | object       | Alert endpoint and optional headers                     |
-| `realtimeTripUpdates`      | object       | Trip update endpoint and optional headers               |
-| `realtimeVehiclePositions` | object       | Vehicle position endpoint and optional headers          |
+Run the command for the data you configured:
 
-### Import from a URL
-
-```json
-{
-  "agencies": [
-    {
-      "url": "https://www.bart.gov/dev/schedules/google_transit.zip"
-    }
-  ],
-  "sqlitePath": "./gtfs.sqlite"
-}
+```sh
+gtfs import --config ./config.json
 ```
 
-### Import from a ZIP file or directory
+For GTFS-Realtime, use `gtfs realtime refresh --config ./config.json` instead.
+The CLI also finds `config.json` automatically in your current folder, so
+you can omit `--config` when using that filename. Sample filenames are not
+loaded automatically.
+
+All three samples are included in the npm package. With a local
+`npm install gtfs`, you can also find them in `node_modules/gtfs/`.
+
+## A more detailed example
+
+This example keeps the normal source-replacement behavior, retains the first
+row for duplicate keys, and enables GTFS-Realtime:
 
 ```json
 {
-  "agencies": [
+  "database": { "path": "./transit.sqlite" },
+  "extensions": ["gtfs-realtime"],
+  "sources": [
     {
-      "path": "./data/gtfs.zip"
-    }
-  ],
-  "sqlitePath": "./data/gtfs.sqlite"
-}
-```
-
-Change `path` to a directory such as `./data/unzipped-gtfs` when the feed has
-already been extracted.
-
-### Send HTTP headers
-
-```json
-{
-  "agencies": [
-    {
-      "url": "https://example.com/gtfs.zip",
-      "headers": {
-        "Authorization": "Bearer replace-with-your-token"
+      "sourceId": "metro",
+      "schedule": {
+        "url": "https://example.com/gtfs.zip",
+        "timeoutMs": 60000,
+        "import": {
+          "validation": { "onDuplicateKey": "keep-first" }
+        }
+      },
+      "realtime": {
+        "feeds": [
+          { "type": "alerts", "url": "https://example.com/alerts.pb" },
+          { "type": "tripUpdates", "url": "https://example.com/trips.pb" },
+          {
+            "type": "vehiclePositions",
+            "url": "https://example.com/vehicles.pb"
+          }
+        ]
       }
     }
   ],
-  "sqlitePath": "./gtfs.sqlite"
-}
-```
-
-Do not commit credentials to source control. Load configuration from a secure
-location in production.
-
-### Merge multiple feeds
-
-Use a different prefix for each feed when their identifiers may overlap:
-
-```json
-{
-  "agencies": [
-    {
-      "path": "./data/north.zip",
-      "prefix": "north"
-    },
-    {
-      "path": "./data/south.zip",
-      "prefix": "south"
-    }
-  ],
-  "sqlitePath": "./regional.sqlite"
-}
-```
-
-Only schema fields marked `applyFeedPrefix` are changed. The prefix is also
-applied to corresponding references.
-
-### Exclude large or unused tables
-
-`exclude` uses database table names, not filenames:
-
-```json
-{
-  "agencies": [
-    {
-      "path": "./data/gtfs.zip",
-      "exclude": ["shapes", "fare_attributes"]
-    }
-  ],
-  "sqlitePath": "./gtfs.sqlite"
-}
-```
-
-### Fill empty agency IDs
-
-Some valid single-agency feeds leave `agency_id` blank throughout the GTFS.
-Set `fillEmptyAgencyId` to fill those values:
-
-```json
-{
-  "agencies": [
-    {
-      "path": "./data/gtfs.zip",
-      "fillEmptyAgencyId": true,
-      "agencyId": "metro-transit"
-    }
-  ],
-  "sqlitePath": "./gtfs.sqlite"
-}
-```
-
-An ID found in `agency.txt` takes precedence over `agencyId`.
-
-### Import GTFS-realtime data too
-
-```json
-{
-  "agencies": [
-    {
-      "url": "https://svc.metrotransit.org/mtgtfs/gtfs.zip",
-      "realtimeAlerts": {
-        "url": "https://svc.metrotransit.org/mtgtfs/alerts.pb"
-      },
-      "realtimeTripUpdates": {
-        "url": "https://svc.metrotransit.org/mtgtfs/tripupdates.pb"
-      },
-      "realtimeVehiclePositions": {
-        "url": "https://svc.metrotransit.org/mtgtfs/vehiclepositions.pb"
-      }
-    }
-  ],
-  "sqlitePath": "./gtfs.sqlite"
-}
-```
-
-See the [GTFS-Realtime guide](realtime.md) for more details.
-
-## Existing SQLite connection
-
-Pass a caller-owned `better-sqlite3` connection with `db`. This is available
-only from JavaScript, not JSON:
-
-```js
-import Database from 'better-sqlite3';
-import { importGtfs } from 'gtfs';
-
-const db = new Database('./data/gtfs.sqlite');
-
-try {
-  await importGtfs({
-    agencies: [{ path: './data/gtfs.zip' }],
-    db,
-  });
-} finally {
-  db.close();
-}
-```
-
-The caller remains responsible for the connection lifecycle.
-
-## CSV parser options
-
-`csvOptions` is passed to [`csv-parse`](https://csv.js.org/parse/options/).
-For example:
-
-```json
-{
-  "agencies": [{ "path": "./data/gtfs.zip" }],
-  "sqlitePath": "./gtfs.sqlite",
-  "csvOptions": {
-    "skip_empty_lines": true
-  }
-}
-```
-
-Parser options can change which data is accepted. Validate the resulting
-record counts when relaxing parsing behavior.
-
-## Error handling
-
-With `ignoreErrors: false`, an import stops at the first error. With
-`ignoreErrors: true`, node-GTFS logs errors and continues with later work where
-possible. A parser or database error can cause the rest of the current file or
-batch to be skipped, and previously committed batches remain in the database.
-The result may therefore be partial.
-
-Use `includeImportReport` in JavaScript to inspect the result:
-
-```js
-import { importGtfs } from 'gtfs';
-
-const report = await importGtfs({
-  agencies: [{ path: './data/gtfs.zip' }],
-  sqlitePath: './gtfs.sqlite',
-  ignoreErrors: true,
-  includeImportReport: true,
-});
-
-console.log(report.errors);
-```
-
-In TypeScript, the literal `includeImportReport: true` changes the return type
-to `Promise<ImportReport>`.
-
-`ignoreDuplicates` skips records that violate a declared unique key. It does
-not make other parse or database errors non-fatal.
-
-## Logging
-
-`logLevel` accepts `silent`, `error`, `warning`, or `info`. Errors and warnings
-use stderr; normal status output uses stdout.
-
-JavaScript applications can redirect non-progress messages:
-
-```js
-import { importGtfs } from 'gtfs';
-
-await importGtfs({
-  agencies: [{ path: './data/gtfs.zip' }],
-  sqlitePath: './gtfs.sqlite',
-  logLevel: 'warning',
-  logFunction(message, level) {
-    console.log(`[${level}] ${message}`);
+  "realtime": {
+    "retention": { "currentEntitiesSeconds": 30, "snapshotsSeconds": 86400 }
   },
-});
-```
-
-The `level` argument is optional, so existing `logFunction(message)` callbacks
-continue to work.
-
-`verbose` remains available for compatibility. Use `logLevel` in new code.
-
-## Export path
-
-If `exportPath` is omitted, exports go to
-`gtfs-export/<first-agency-name>` under the current directory. The export
-directory is cleared before files are written.
-
-```json
-{
-  "sqlitePath": "./gtfs.sqlite",
-  "exportPath": "./output/gtfs"
+  "export": { "outputDirectory": "./exported-feed" },
+  "reporting": { "level": "info" }
 }
 ```
 
-## Command-line precedence
+Replace the example URLs. The CLI supplies a console reporter. JavaScript
+programs must supply a reporter to receive logs.
 
-The commands look for `./config.json` in the current working directory unless
-`--configPath` is supplied. Direct command-line options override values with
-the same name in the selected configuration file.
+## Instance operation options
 
-```bash
-npx gtfs-import \
-  --configPath ./config.json \
-  --sqlitePath ./temporary.sqlite \
-  --logLevel warning
-```
+An instance keeps its database connection, enabled extensions, and source scope
+for its lifetime. Calls to `gtfs.import()`, `gtfs.export()`, and
+`gtfs.realtime.refresh()` use its configured defaults. Pass an options object to
+change one operation without changing future defaults.
 
-Run a command with `--help` for its current options.
+Overrides depend on the setting: a source list replaces the complete input list,
+validation and retention merge specified fields, export settings override
+individually, and reporting replaces both the reporter and level. A scoped
+instance can select fewer sources, but cannot add source identities.
+
+See the [operation option reference](reference/configuration.md#instance-operation-options)
+for accepted options and exact replacement rules. The
+[import](import.md#choose-inputs-per-call), [export](export.md#javascript), and
+[GTFS-Realtime](realtime.md#configure-and-refresh) guides show per-call examples.
+
+## Next steps
+
+- [Look up all configuration options and defaults](reference/configuration.md).
+- [Use your configuration from the command line](cli.md).
+- [Set up SQLite, PostgreSQL, or MySQL](databases.md).
+- [Import and update your static GTFS feed](import.md).
+- [Refresh GTFS-Realtime feeds](realtime.md).
+- [Export a source to GTFS files](export.md).
+- [Investigate configuration errors](troubleshooting.md#my-configuration-is-rejected).

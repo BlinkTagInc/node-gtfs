@@ -1,8 +1,9 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const fareRules = defineGtfsTable({
-  file: 'fare_rules.txt',
-  namespace: 'gtfs-schedule',
+export const fareRules = defineGtfsDomainTable({
+  filename: 'fare_rules.txt',
+  tableName: 'fare_rules',
+  specification: 'gtfs-schedule',
   presence: 'optional',
   primaryKey: [
     'fare_id',
@@ -14,32 +15,26 @@ export const fareRules = defineGtfsTable({
   fields: {
     fare_id: {
       kind: 'id',
-      references: [{ file: 'fare_attributes.txt', field: 'fare_id' }],
+      references: [
+        { targetFilename: 'fare_attributes.txt', targetField: 'fare_id' },
+      ],
       presence: 'required',
-      applyFeedPrefix: true,
     },
     route_id: {
       kind: 'id',
-      references: [{ file: 'routes.txt', field: 'route_id' }],
-      applyFeedPrefix: true,
+      references: [{ targetFilename: 'routes.txt', targetField: 'route_id' }],
     },
     origin_id: {
       kind: 'id',
-      references: [{ file: 'stops.txt', field: 'zone_id' }],
-      applyFeedPrefix: true,
+      references: [{ targetFilename: 'stops.txt', targetField: 'zone_id' }],
     },
     destination_id: {
       kind: 'id',
-      references: [{ file: 'stops.txt', field: 'zone_id' }],
-      applyFeedPrefix: true,
+      references: [{ targetFilename: 'stops.txt', targetField: 'zone_id' }],
     },
     contains_id: {
       kind: 'id',
-      references: [{ file: 'stops.txt', field: 'zone_id' }],
-      applyFeedPrefix: true,
+      references: [{ targetFilename: 'stops.txt', targetField: 'zone_id' }],
     },
-  },
-  storage: {
-    indexes: ['route_id'],
   },
 });

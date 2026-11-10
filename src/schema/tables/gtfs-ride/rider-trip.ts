@@ -1,16 +1,17 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const riderTrip = defineGtfsTable({
-  file: 'rider_trip.txt',
+export const riderTrip = defineGtfsDomainTable({
+  filename: 'rider_trip.txt',
+  tableName: 'rider_trip',
   presence: 'optional',
   primaryKey: ['rider_id'],
   fields: {
-    rider_id: { kind: 'id', applyFeedPrefix: true },
-    agency_id: { kind: 'id', applyFeedPrefix: true },
-    trip_id: { kind: 'id', applyFeedPrefix: true },
-    boarding_stop_id: { kind: 'id', applyFeedPrefix: true },
+    rider_id: { kind: 'id', presence: 'required' },
+    agency_id: { kind: 'id' },
+    trip_id: { kind: 'id' },
+    boarding_stop_id: { kind: 'id' },
     boarding_stop_sequence: { kind: 'integer', minimum: 0 },
-    alighting_stop_id: { kind: 'id', applyFeedPrefix: true },
+    alighting_stop_id: { kind: 'id' },
     alighting_stop_sequence: { kind: 'integer', minimum: 0 },
     service_date: { kind: 'date' },
     boarding_time: { kind: 'time' },
@@ -23,16 +24,5 @@ export const riderTrip = defineGtfsTable({
     accompanying_device: { kind: 'integer', minimum: 0, maximum: 6 },
     transfer_status: { kind: 'integer', minimum: 0, maximum: 1 },
   },
-  storage: {
-    indexes: [
-      'agency_id',
-      'trip_id',
-      'boarding_stop_id',
-      'boarding_stop_sequence',
-      'alighting_stop_id',
-      'alighting_stop_sequence',
-      'service_date',
-    ],
-  },
-  namespace: 'gtfs-ride',
+  specification: 'gtfs-ride',
 });

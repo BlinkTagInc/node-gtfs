@@ -1,8 +1,9 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const fareTransferRules = defineGtfsTable({
-  file: 'fare_transfer_rules.txt',
-  namespace: 'gtfs-schedule',
+export const fareTransferRules = defineGtfsDomainTable({
+  filename: 'fare_transfer_rules.txt',
+  tableName: 'fare_transfer_rules',
+  specification: 'gtfs-schedule',
   presence: 'optional',
   primaryKey: [
     'from_leg_group_id',
@@ -14,23 +15,25 @@ export const fareTransferRules = defineGtfsTable({
   fields: {
     from_leg_group_id: {
       kind: 'id',
-      references: [{ file: 'fare_leg_rules.txt', field: 'leg_group_id' }],
-      applyFeedPrefix: true,
+      references: [
+        { targetFilename: 'fare_leg_rules.txt', targetField: 'leg_group_id' },
+      ],
     },
     to_leg_group_id: {
       kind: 'id',
-      references: [{ file: 'fare_leg_rules.txt', field: 'leg_group_id' }],
-      applyFeedPrefix: true,
+      references: [
+        { targetFilename: 'fare_leg_rules.txt', targetField: 'leg_group_id' },
+      ],
     },
     transfer_count: {
       kind: 'integer',
-      presence: 'conditionallyForbidden',
+      presence: 'conditionally-forbidden',
       minimum: -1,
     },
     duration_limit: { kind: 'integer', minimum: 1 },
     duration_limit_type: {
       kind: 'integer',
-      presence: 'conditionallyRequired',
+      presence: 'conditionally-required',
       minimum: 0,
       maximum: 3,
     },
@@ -42,8 +45,9 @@ export const fareTransferRules = defineGtfsTable({
     },
     fare_product_id: {
       kind: 'id',
-      references: [{ file: 'fare_products.txt', field: 'fare_product_id' }],
-      applyFeedPrefix: true,
+      references: [
+        { targetFilename: 'fare_products.txt', targetField: 'fare_product_id' },
+      ],
     },
   },
 });

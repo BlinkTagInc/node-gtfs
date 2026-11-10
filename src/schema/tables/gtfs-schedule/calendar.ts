@@ -1,12 +1,13 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const calendar = defineGtfsTable({
-  file: 'calendar.txt',
-  namespace: 'gtfs-schedule',
-  presence: 'conditionallyRequired',
+export const calendar = defineGtfsDomainTable({
+  filename: 'calendar.txt',
+  tableName: 'calendar',
+  specification: 'gtfs-schedule',
+  presence: 'conditionally-required',
   primaryKey: ['service_id'],
   fields: {
-    service_id: { kind: 'id', presence: 'required', applyFeedPrefix: true },
+    service_id: { kind: 'id', presence: 'required' },
     monday: { kind: 'integer', presence: 'required', minimum: 0, maximum: 1 },
     tuesday: { kind: 'integer', presence: 'required', minimum: 0, maximum: 1 },
     wednesday: {
@@ -21,8 +22,5 @@ export const calendar = defineGtfsTable({
     sunday: { kind: 'integer', presence: 'required', minimum: 0, maximum: 1 },
     start_date: { kind: 'date', presence: 'required' },
     end_date: { kind: 'date', presence: 'required' },
-  },
-  storage: {
-    indexes: ['start_date', 'end_date'],
   },
 });

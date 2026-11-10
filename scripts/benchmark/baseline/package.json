@@ -1,0 +1,8 @@
+{
+  "name": "node-gtfs-v4-benchmark-baseline",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "gtfs": "4.21.0"
+  }
+}

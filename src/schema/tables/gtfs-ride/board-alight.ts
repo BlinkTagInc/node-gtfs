@@ -1,18 +1,17 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const boardAlight = defineGtfsTable({
-  file: 'board_alight.txt',
+export const boardAlight = defineGtfsDomainTable({
+  filename: 'board_alight.txt',
+  tableName: 'board_alight',
   presence: 'optional',
   fields: {
     trip_id: {
       kind: 'id',
       presence: 'required',
-      applyFeedPrefix: true,
     },
     stop_id: {
       kind: 'id',
       presence: 'required',
-      applyFeedPrefix: true,
     },
     stop_sequence: {
       kind: 'integer',
@@ -42,14 +41,5 @@ export const boardAlight = defineGtfsTable({
     service_departure_time: { kind: 'time' },
     source: { kind: 'integer', minimum: 0, maximum: 4 },
   },
-  storage: {
-    indexes: [
-      'trip_id',
-      'stop_id',
-      'stop_sequence',
-      'record_use',
-      'service_date',
-    ],
-  },
-  namespace: 'gtfs-ride',
+  specification: 'gtfs-ride',
 });

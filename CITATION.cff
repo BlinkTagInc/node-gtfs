@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: 'If you use node-GTFS in research, please cite it using the metadata below.'
+title: 'node-GTFS'
+type: software
+authors:
+  - family-names: 'Nee'
+    given-names: 'Brendan'
+    affiliation: 'BlinkTag Inc'
+repository-code: 'https://github.com/BlinkTagInc/node-gtfs'
+url: 'https://www.npmjs.com/package/gtfs'
+license: 'MIT'

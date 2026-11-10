@@ -1,12 +1,13 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const areas = defineGtfsTable({
-  file: 'areas.txt',
-  namespace: 'gtfs-schedule',
+export const areas = defineGtfsDomainTable({
+  filename: 'areas.txt',
+  tableName: 'areas',
+  specification: 'gtfs-schedule',
   presence: 'optional',
   primaryKey: ['area_id'],
   fields: {
-    area_id: { kind: 'id', presence: 'required', applyFeedPrefix: true },
-    area_name: { kind: 'text', caseInsensitiveComparison: true },
+    area_id: { kind: 'id', presence: 'required' },
+    area_name: { kind: 'text', supportsCaseInsensitiveComparison: true },
   },
 });

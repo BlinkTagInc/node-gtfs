@@ -1,0 +1,39 @@
+{
+  "database": {
+    "path": "./gtfs.sqlite"
+  },
+  "reporting": {
+    "level": "info"
+  },
+  "extensions": ["gtfs-realtime"],
+  "sources": [
+    {
+      "realtime": {
+        "feeds": [
+          {
+            "type": "alerts",
+            "url": "https://example.com/realtime/alerts",
+            "requestHeaders": {
+              "Authorization": "Bearer replace-with-your-token"
+            },
+            "timeoutMs": 30000
+          },
+          {
+            "type": "tripUpdates",
+            "url": "https://example.com/realtime/trip-updates"
+          },
+          {
+            "type": "vehiclePositions",
+            "url": "https://example.com/realtime/vehicle-positions"
+          }
+        ]
+      }
+    }
+  ],
+  "realtime": {
+    "retention": {
+      "currentEntitiesSeconds": 30,
+      "snapshotsSeconds": 86400
+    }
+  }
+}

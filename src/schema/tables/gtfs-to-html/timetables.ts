@@ -1,16 +1,16 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const timetables = defineGtfsTable({
-  file: 'timetables.txt',
+export const timetables = defineGtfsDomainTable({
+  filename: 'timetables.txt',
+  tableName: 'timetables',
   presence: 'optional',
   primaryKey: ['timetable_id', 'route_id'],
   fields: {
-    timetable_id: { kind: 'id', presence: 'required', applyFeedPrefix: true },
+    timetable_id: { kind: 'id', presence: 'required' },
     route_id: {
       kind: 'id',
       presence: 'required',
-      references: [{ file: 'routes.txt', field: 'route_id' }],
-      applyFeedPrefix: true,
+      references: [{ targetFilename: 'routes.txt', targetField: 'route_id' }],
     },
     direction_id: { kind: 'integer', minimum: 0, maximum: 1 },
     start_date: { kind: 'date' },
@@ -29,21 +29,22 @@ export const timetables = defineGtfsTable({
     sunday: { kind: 'integer', presence: 'required', minimum: 0, maximum: 1 },
     start_time: { kind: 'time' },
     end_time: { kind: 'time' },
-    timetable_label: { kind: 'text', caseInsensitiveComparison: true },
-    service_notes: { kind: 'text', caseInsensitiveComparison: true },
+    timetable_label: { kind: 'text', supportsCaseInsensitiveComparison: true },
+    service_notes: { kind: 'text', supportsCaseInsensitiveComparison: true },
     orientation: { kind: 'text' },
     timetable_page_id: {
       kind: 'id',
-      references: [{ file: 'timetable_pages.txt', field: 'timetable_page_id' }],
-      applyFeedPrefix: true,
+      references: [
+        {
+          targetFilename: 'timetable_pages.txt',
+          targetField: 'timetable_page_id',
+        },
+      ],
     },
     timetable_sequence: { kind: 'integer', minimum: 0 },
     direction_name: { kind: 'text' },
     include_exceptions: { kind: 'integer', minimum: 0, maximum: 1 },
     show_trip_continuation: { kind: 'integer', minimum: 0, maximum: 1 },
   },
-  storage: {
-    indexes: ['timetable_sequence'],
-  },
-  namespace: 'gtfs-to-html',
+  specification: 'gtfs-to-html',
 });

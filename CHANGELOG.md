@@ -5,6 +5,52 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+> [!WARNING]
+> **V5 is a complete rewrite with extensive breaking changes. It is not a drop-in upgrade from v4.**
+>
+> Nearly every public interface has changed: configuration, APIs, CLI commands,
+> query results, and database schemas. Overall, the rewrite standardizes naming
+> and configuration, adds full PostgreSQL and MySQL support, and makes it easier
+> to manage multiple static GTFS feeds safely. Expect to migrate existing applications,
+> scripts, and configuration files before upgrading. Follow the
+> [v4-to-v5 migration guide](docs/migrating-to-v5.md) before switching over.
+>
+> **Create a fresh database and reimport the original static GTFS feeds.** V4 databases are
+> incompatible, and there is no in-place database migration.
+
+### Changed
+
+- Renamed all config options, methods and cli commands.
+- The CLI uses `gtfs import`, `gtfs export`, and `gtfs realtime refresh`.
+- Replaced global database/getter APIs with asynchronous `Gtfs` instances,
+  immutable readers, explicit array/stream terminals, domain queries and typed
+  Kysely access. Configuration uses nested database, source and reporting groups.
+- New `source_id` field to track multiple GTFS imports in to the same database.
+- Schedule replacement is atomic per source and also clears its GTFS-Realtime state.
+- Normalize monetary values as exact decimal strings in public rows and integer
+  minor units in storage
+- Select generated service-day seconds explicitly.
+- GTFS-Realtime improvements: stable feed identities, separate current/history records,
+  differential updates, alert time ranges and explicit retention cleanup.
+- Import/export/GTFS-Realtime operations have per-call inputs and cancellation.
+  Pooled server reads can overlap; connection ownership and shutdown are explicit.
+- SQLite defaults to safe WAL/FULL durability.
+- Node.js support is now 22.18+ (22.x), 24, or 26+ (`^22.18.0 || >=24.0.0`).
+- Export function returns a summary and requires explicit permission to overwrite existing files.
+
+### Added
+
+- Optional strict/permissive validation
+- Preserve unknown columns in database
+- Full support for PostgreSQL and MySQL 
+- Explicit GTFS extension selection
+
+### Fixed
+
+- Consistent warning and error wording that avoids echoing parser excerpts or raw command arguments in ordinary reports.
+
 ## [4.21.0] - 2026-08-22
 
 ### Added

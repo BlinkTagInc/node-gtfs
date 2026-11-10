@@ -1,13 +1,22 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const fareAttributes = defineGtfsTable({
-  file: 'fare_attributes.txt',
-  namespace: 'gtfs-schedule',
+export const fareAttributes = defineGtfsDomainTable({
+  filename: 'fare_attributes.txt',
+  tableName: 'fare_attributes',
+  specification: 'gtfs-schedule',
   presence: 'optional',
   primaryKey: ['fare_id'],
   fields: {
-    fare_id: { kind: 'id', presence: 'required', applyFeedPrefix: true },
-    price: { kind: 'real', presence: 'required', minimum: 0 },
+    fare_id: { kind: 'id', presence: 'required' },
+    price: {
+      kind: 'real',
+      presence: 'required',
+      minimum: 0,
+      monetary: {
+        currencyField: 'currency_type',
+        publicRepresentation: 'decimal-string',
+      },
+    },
     currency_type: { kind: 'text', presence: 'required' },
     payment_method: {
       kind: 'integer',
@@ -18,9 +27,8 @@ export const fareAttributes = defineGtfsTable({
     transfers: { kind: 'integer', minimum: 0, maximum: 2 },
     agency_id: {
       kind: 'id',
-      presence: 'conditionallyRequired',
-      references: [{ file: 'agency.txt', field: 'agency_id' }],
-      applyFeedPrefix: true,
+      presence: 'conditionally-required',
+      references: [{ targetFilename: 'agency.txt', targetField: 'agency_id' }],
     },
     transfer_duration: { kind: 'integer', minimum: 0 },
   },

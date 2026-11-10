@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="260" viewBox="0 0 1040 260" role="img" aria-labelledby="title description">
+  <title id="title">From transit data to useful data</title>
+  <desc id="description">Agency data, including GTFS Schedule, GTFS-Realtime, TIDES, TODS, GTFS+ and more, are imported into a searchable SQLite, PostgreSQL, or MySQL database. Use that data for maps, service analysis, applications, and GTFS export.</desc>
+  <rect width="1040" height="260" rx="16" fill="#f6f8fb"/>
+  <g font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <g transform="translate(24 28)">
+      <rect width="296" height="204" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+      <rect x="20" y="22" width="34" height="40" rx="4" fill="#e0f2fe" stroke="#0369a1" stroke-width="2"/>
+      <path d="M28 32h18v2H28zm0 9h18v2H28zm0 9h12v2H28z" fill="#0369a1"/>
+      <text x="68" y="49" font-size="21" font-weight="650" fill="#0f172a">Agency data</text>
+      <text x="20" y="101" font-size="17" fill="#334155">GTFS Schedule</text>
+      <text x="20" y="132" font-size="17" fill="#334155">GTFS-Realtime</text>
+      <text x="20" y="168" font-size="16" fill="#475569">TIDES, TODS, GTFS+ and more</text>
+    </g>
+    <g fill="#64748b">
+      <path d="M333 129h14v-5l7 6-7 6v-5h-14z"/>
+      <path d="M688 129h14v-5l7 6-7 6v-5h-14z"/>
+    </g>
+    <g transform="translate(368 28)">
+      <rect width="304" height="204" rx="12" fill="#ecfdf5" stroke="#6ee7b7"/>
+      <path d="M20 33v27c0 9 38 9 38 0V33" fill="#047857"/>
+      <ellipse cx="39" cy="33" rx="19" ry="7" fill="#047857"/>
+      <ellipse cx="39" cy="33" rx="16" ry="4" fill="#d1fae5"/>
+      <path d="M23 46c5 5 27 5 32 0v3c-5 5-27 5-32 0z" fill="#d1fae5"/>
+      <text x="72" y="49" font-size="21" font-weight="650" fill="#064e3b">node-GTFS</text>
+      <text x="20" y="101" font-size="17" font-weight="600" fill="#065f46">A searchable database</text>
+      <text x="20" y="132" font-size="16" fill="#065f46">SQLite · PostgreSQL · MySQL</text>
+      <text x="20" y="168" font-size="16" fill="#065f46">Import, check, and query</text>
+    </g>
+    <g transform="translate(720 28)">
+      <rect width="296" height="204" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+      <path d="m20 60 10-22 14 10 14-23 3 2-16 27-13-10-9 18z" fill="#6d28d9"/>
+      <circle cx="31" cy="41" r="4" fill="#6d28d9"/>
+      <circle cx="45" cy="51" r="4" fill="#6d28d9"/>
+      <text x="72" y="49" font-size="21" font-weight="650" fill="#0f172a">Make it useful</text>
+      <text x="20" y="101" font-size="17" fill="#334155">Maps and service analysis</text>
+      <text x="20" y="132" font-size="17" fill="#334155">Your transit application</text>
+      <text x="20" y="168" font-size="17" fill="#334155">Exported GTFS files</text>
+    </g>
+  </g>
+</svg>

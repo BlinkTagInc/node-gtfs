@@ -1,7 +1,8 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const rideFeedInfo = defineGtfsTable({
-  file: 'ride_feed_info.txt',
+export const rideFeedInfo = defineGtfsDomainTable({
+  filename: 'ride_feed_info.txt',
+  tableName: 'ride_feed_info',
   presence: 'optional',
   fields: {
     ride_files: {
@@ -16,8 +17,5 @@ export const rideFeedInfo = defineGtfsTable({
     default_currency_type: { kind: 'text' },
     ride_feed_version: { kind: 'text' },
   },
-  storage: {
-    indexes: ['ride_start_date', 'ride_end_date', 'gtfs_feed_date'],
-  },
-  namespace: 'gtfs-ride',
+  specification: 'gtfs-ride',
 });

@@ -1,7 +1,8 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const timetableNotes = defineGtfsTable({
-  file: 'timetable_notes.txt',
+export const timetableNotes = defineGtfsDomainTable({
+  filename: 'timetable_notes.txt',
+  tableName: 'timetable_notes',
   presence: 'optional',
   primaryKey: [
     'note_id',
@@ -13,31 +14,29 @@ export const timetableNotes = defineGtfsTable({
     'stop_sequence',
   ],
   fields: {
-    note_id: { kind: 'id', presence: 'required', applyFeedPrefix: true },
+    note_id: { kind: 'id', presence: 'required' },
     symbol: { kind: 'text' },
-    note: { kind: 'text', caseInsensitiveComparison: true },
+    note: { kind: 'text', supportsCaseInsensitiveComparison: true },
     scope: { kind: 'text' },
     timetable_id: {
       kind: 'id',
-      references: [{ file: 'timetables.txt', field: 'timetable_id' }],
-      applyFeedPrefix: true,
+      references: [
+        { targetFilename: 'timetables.txt', targetField: 'timetable_id' },
+      ],
     },
     route_id: {
       kind: 'id',
-      references: [{ file: 'routes.txt', field: 'route_id' }],
-      applyFeedPrefix: true,
+      references: [{ targetFilename: 'routes.txt', targetField: 'route_id' }],
     },
     trip_id: {
       kind: 'id',
-      references: [{ file: 'trips.txt', field: 'trip_id' }],
-      applyFeedPrefix: true,
+      references: [{ targetFilename: 'trips.txt', targetField: 'trip_id' }],
     },
     stop_id: {
       kind: 'id',
-      references: [{ file: 'stops.txt', field: 'stop_id' }],
-      applyFeedPrefix: true,
+      references: [{ targetFilename: 'stops.txt', targetField: 'stop_id' }],
     },
     stop_sequence: { kind: 'integer', minimum: 0 },
   },
-  namespace: 'gtfs-to-html',
+  specification: 'gtfs-to-html',
 });

@@ -1,124 +1,196 @@
-/** Canonical namespace order used by schema declarations and public exports. */
-export const gtfsNamespaces = [
-  'gtfs-schedule',
+import { validateDomainFields } from './domain-table.ts';
+import type { GtfsDomainFields } from './domain-table.ts';
+import { assertConfigOptionKeys } from '../config/options.ts';
+import {
+  validateStorageKeyDefinition,
+  validateIndexDefinitions,
+} from '../database/storage/validate-policy.ts';
+
+/** Canonical order for optional GTFS extensions. */
+export const gtfsExtensions = [
   'gtfs-realtime',
   'gtfs-plus',
   'gtfs-ride',
   'gtfs-to-html',
-  'noptis',
   'tods',
+  'tods-v1',
   'tides',
 ] as const;
 
-export type GtfsNamespace = (typeof gtfsNamespaces)[number];
+export type GtfsExtension = (typeof gtfsExtensions)[number];
+
+/** Canonical order for every supported GTFS specification. */
+export const gtfsSpecifications = ['gtfs-schedule', ...gtfsExtensions] as const;
+
+export type GtfsSpecification = (typeof gtfsSpecifications)[number];
 
 export type GtfsPresence =
   | 'required'
   | 'optional'
-  | 'conditionallyRequired'
-  | 'conditionallyForbidden'
+  | 'conditionally-required'
+  | 'conditionally-forbidden'
   | 'recommended';
 
-/** Whether a field value is required in each record. */
-export type GtfsValuePresence = GtfsPresence;
+export type GtfsConditionValue = string | number | boolean | null;
+
+/** A declarative predicate evaluated against another value in the same row. */
+export interface GtfsRowCondition {
+  readonly field: string;
+  readonly equals?: GtfsConditionValue;
+  readonly in?: readonly GtfsConditionValue[];
+}
 
 export type GtfsFieldKind =
   'id' | 'text' | 'integer' | 'real' | 'date' | 'time' | 'json' | 'enumeration';
 
 /** Reference to a field in another GTFS source file. */
 export interface GtfsReference {
-  file: string;
-  field: string;
+  readonly targetFilename: string;
+  readonly targetField: string;
+  /** Narrows a conditional or polymorphic reference using another row field. */
+  readonly when?: GtfsRowCondition;
+  /** References are validation metadata and never imply a database foreign key. */
+  readonly relationship?:
+    'advisory' | 'conditional' | 'polymorphic' | 'unambiguous';
+}
+
+export interface GtfsMonetaryDefinition {
+  /** Field containing the ISO 4217 currency code for this amount. */
+  readonly currencyField: string;
+  readonly publicRepresentation: 'decimal-string';
+  readonly storageRepresentation: 'minor-units';
+}
+
+export interface GtfsConditionalNormalization {
+  /** Treat the value as a source-scoped reference only when `when` matches. */
+  readonly kind: 'source-reference';
+  readonly when: GtfsRowCondition;
 }
 
 export interface GtfsFieldOptions {
   /** Whether every record must contain a non-empty value. */
-  presence?: GtfsValuePresence;
+  readonly presence?: GtfsPresence;
   /** Alternative GTFS source fields that this value may identify. */
-  references?: readonly GtfsReference[];
-  /** Apply the configured feed prefix to this field while merging feeds. */
-  applyFeedPrefix?: boolean;
+  readonly references?: readonly GtfsReference[];
   /** Value supplied during normalization when the source value is empty. */
-  defaultValue?: string | number | null;
-  /** Request case-insensitive database comparison where supported. */
-  caseInsensitiveComparison?: boolean;
+  readonly defaultValue?: string | number | null;
+  /** Enable explicit insensitive queries without changing default comparisons. */
+  readonly supportsCaseInsensitiveComparison?: boolean;
   /** Dot-separated path used to extract this field from a source object. */
-  sourcePath?: string;
+  readonly sourcePath?: string;
   /** Inclusive numeric lower bound. */
-  minimum?: number;
+  readonly minimum?: number;
   /** Inclusive numeric upper bound. */
-  maximum?: number;
+  readonly maximum?: number;
+  /** Exact currency semantics for a numeric source field. */
+  readonly monetary?: GtfsMonetaryDefinition;
+  /** Row-dependent normalization metadata. Rules do not install constraints. */
+  readonly normalization?: readonly GtfsConditionalNormalization[];
 }
 
 export type GtfsFieldDefinition =
   | (GtfsFieldOptions & {
-      kind: Exclude<GtfsFieldKind, 'enumeration'>;
-      values?: never;
+      readonly kind: Exclude<GtfsFieldKind, 'enumeration'>;
+      readonly values?: never;
     })
   | (GtfsFieldOptions & {
-      kind: 'enumeration';
+      readonly kind: 'enumeration';
       /** Whether values outside `values` are semantically invalid. Defaults to false. */
-      closed?: boolean;
-      values: readonly [string | number, ...(string | number)[]];
+      readonly closed?: boolean;
+      readonly values: readonly [string | number, ...(string | number)[]];
     });
 
 export interface GtfsRangeConstraint {
-  kind: 'range';
-  startField: string;
-  endField: string;
-  allowEqual: boolean;
+  readonly kind: 'range';
+  readonly startField: string;
+  readonly endField: string;
+  readonly allowEqual: boolean;
 }
 
-export type GtfsSemanticConstraint = GtfsRangeConstraint;
-
-export interface GtfsStorageDefinition {
-  /** Single-column names or ordered composite-index column lists. */
-  indexes?: readonly (string | readonly string[])[];
+export interface GtfsConditionalPresenceConstraint {
+  readonly kind: 'conditional-presence';
+  readonly field: string;
+  readonly presence: 'required' | 'forbidden';
+  readonly when: GtfsRowCondition;
 }
 
-type GtfsFields = Record<string, GtfsFieldDefinition>;
+export type GtfsSemanticConstraint =
+  GtfsRangeConstraint | GtfsConditionalPresenceConstraint;
+
+export type GtfsKeyStrategy = 'columns' | 'canonical' | 'none';
+
+export interface GtfsDerivedFieldDefinition {
+  readonly kind: 'integer';
+  readonly sourceField: string;
+  readonly expression: 'service-day-seconds';
+  readonly selectedByDefault: false;
+}
+
+type GtfsFields = Readonly<Record<string, GtfsFieldDefinition>>;
 
 interface GtfsTableMetadata<Fields extends GtfsFields> {
-  namespace: GtfsNamespace;
-  presence: GtfsPresence;
-  primaryKey?: readonly Extract<keyof Fields, string>[];
-  fields: Fields;
-  constraints?: readonly GtfsSemanticConstraint[];
-  storage?: GtfsStorageDefinition;
+  readonly specification: GtfsSpecification;
+  /** Exact GTFS source filename, or null for a derived/non-file table. */
+  readonly filename: string | null;
+  /** Canonical database table name. */
+  readonly tableName: string;
+  readonly presence: GtfsPresence;
+  /** Fields identified as the primary key by the governing specification. */
+  readonly primaryKey?: readonly Extract<keyof Fields, string>[];
+  /** Effective node-GTFS identity, including source provenance. */
+  readonly storageKey?:
+    readonly ['source_id', ...Extract<keyof Fields, string>[]] | null;
+  /** Portable strategy used to enforce the source-scoped storage key. */
+  readonly keyStrategy: GtfsKeyStrategy;
+  /** Single-column names or ordered composite-index column lists. */
+  readonly indexes?: readonly (string | readonly string[])[];
+  readonly fields: Fields;
+  readonly constraints?: readonly GtfsSemanticConstraint[];
 }
 
-export type GtfsTableDefinition<Fields extends GtfsFields = GtfsFields> =
-  GtfsTableMetadata<Fields> &
-    (
-      | {
-          /** Static GTFS source filename, including its extension. */
-          file: string;
-          table?: never;
-        }
-      | {
-          /** Non-file-backed data, such as GTFS-Realtime entities. */
-          file: null;
-          table: string;
-        }
-    );
+export type GtfsTableDefinition<Fields extends GtfsFields = GtfsFields> = Omit<
+  GtfsTableMetadata<Fields>,
+  'primaryKey' | 'storageKey' | 'keyStrategy'
+> & {
+  readonly primaryKey: readonly Extract<keyof Fields, string>[];
+  readonly storageKey:
+    readonly ['source_id', ...Extract<keyof Fields, string>[]] | null;
+  readonly keyStrategy: GtfsKeyStrategy;
+};
+
+type GtfsTableInput<Fields extends GtfsFields> = GtfsTableMetadata<Fields>;
 
 export type GtfsTableName<Definition> = Definition extends {
-  file: null;
-  table: infer TableName extends string;
+  tableName: infer TableName extends string;
 }
   ? TableName
-  : Definition extends { file: infer File extends string }
-    ? File extends `${infer TableName}.${string}`
-      ? TableName
-      : File
-    : never;
+  : never;
 
 function validateDefinition<Fields extends GtfsFields>(
-  definition: GtfsTableDefinition<Fields>,
+  definition: GtfsTableInput<Fields>,
 ): void {
-  const tableName = definition.file ?? definition.table;
+  assertConfigOptionKeys(definition, {
+    name: 'defineGtfsTable()',
+    keys: [
+      'specification',
+      'filename',
+      'tableName',
+      'presence',
+      'primaryKey',
+      'storageKey',
+      'keyStrategy',
+      'indexes',
+      'fields',
+      'constraints',
+    ],
+    removed: {
+      file: 'filename',
+      table: 'tableName',
+      storage: 'indexes',
+    },
+  });
+  const tableName = definition.tableName;
   const fieldNames = new Set(Object.keys(definition.fields));
-
   for (const primaryField of definition.primaryKey ?? []) {
     if (!fieldNames.has(primaryField)) {
       throw new Error(
@@ -127,46 +199,47 @@ function validateDefinition<Fields extends GtfsFields>(
     }
   }
 
-  for (const constraint of definition.constraints ?? []) {
-    if (
-      !fieldNames.has(constraint.startField) ||
-      !fieldNames.has(constraint.endField)
-    ) {
-      throw new Error(
-        `Invalid GTFS table ${tableName}: range constraint references an unknown field`,
-      );
-    }
-  }
-
-  for (const configuredIndex of definition.storage?.indexes ?? []) {
-    const indexColumns =
-      typeof configuredIndex === 'string' ? [configuredIndex] : configuredIndex;
-    for (const column of indexColumns) {
-      const isGeneratedTimestamp = Object.entries(definition.fields).some(
-        ([fieldName, field]) =>
-          field.kind === 'time' &&
-          (fieldName.endsWith('_time')
-            ? `${fieldName}stamp`
-            : `${fieldName}_timestamp`) === column,
-      );
-      if (!fieldNames.has(column) && !isGeneratedTimestamp) {
-        throw new Error(
-          `Invalid GTFS table ${tableName}: index field ${column} is not defined`,
-        );
-      }
-    }
-  }
+  validateDomainFields(definition, fieldNames);
+  validateStorageKeyDefinition(definition, fieldNames);
+  validateIndexDefinitions(definition, fieldNames);
 }
 
-/**
- * Defines and validates one canonical GTFS table manifest.
- */
 export function defineGtfsTable<
-  const Fields extends GtfsFields,
-  const Definition extends GtfsTableDefinition<Fields>,
->(definition: Definition): Definition {
+  const Definition extends GtfsTableInput<GtfsFields>,
+>(
+  definition: Definition,
+): Definition & {
+  readonly primaryKey: Definition extends {
+    readonly primaryKey: infer Key extends readonly string[];
+  }
+    ? Key
+    : readonly [];
+  readonly storageKey: Definition extends {
+    readonly storageKey: infer Key extends readonly string[] | null;
+  }
+    ? Key
+    : readonly [
+        'source_id',
+        ...(Definition extends {
+          readonly primaryKey: infer Key extends readonly string[];
+        }
+          ? Key
+          : readonly []),
+      ];
+  readonly keyStrategy: Definition['keyStrategy'];
+} {
   validateDefinition(definition);
-  return definition;
+  const primaryKey = definition.primaryKey ?? [];
+  const storageKey =
+    definition.storageKey === undefined
+      ? (['source_id', ...primaryKey] as const)
+      : definition.storageKey;
+  return {
+    ...definition,
+    primaryKey,
+    storageKey,
+    keyStrategy: definition.keyStrategy,
+  } as never;
 }
 
 /** A standards-defined enumeration that retains known-value autocomplete. */
@@ -181,82 +254,121 @@ export type GtfsEnumerationValue<
       ? KnownValue | (number & Record<never, never>)
       : never;
 
-type ValueForKind<Field extends GtfsFieldDefinition> = Field extends {
-  kind: 'enumeration';
-  values: readonly (infer Value extends string | number)[];
+type ValueForKind<Field extends GtfsDomainFields[string]> = Field extends {
+  monetary: { readonly currencyField: string };
 }
-  ? GtfsEnumerationValue<Value, Field extends { closed: true } ? true : false>
-  : Field['kind'] extends 'integer' | 'real' | 'date'
-    ? number
-    : string;
+  ? string
+  : Field extends {
+        kind: 'enumeration';
+        values: readonly (infer Value extends string | number)[];
+      }
+    ? GtfsEnumerationValue<Value, Field extends { closed: true } ? true : false>
+    : Field['kind'] extends 'integer' | 'real' | 'date'
+      ? number
+      : string;
 
 type NullableUnlessRequired<
   Value,
   Definition extends { presence?: GtfsPresence },
 > = Definition['presence'] extends 'required' ? Value : Value | null;
 
-type RowFromFields<Fields extends GtfsFields> = {
-  [Name in keyof Fields]: NullableUnlessRequired<
+type RowFromFields<Fields extends GtfsDomainFields> = {
+  -readonly [Name in keyof Fields]: NullableUnlessRequired<
     ValueForKind<Fields[Name]>,
     Fields[Name]
   >;
 };
 
-/** Normalized row inferred from a table definition. */
-export type GtfsRow<Table> = Table extends { fields: infer Fields }
-  ? Fields extends GtfsFields
+export type GtfsNormalizedRow<Table> = Table extends { fields: infer Fields }
+  ? Fields extends GtfsDomainFields
     ? RowFromFields<Fields>
     : never
   : never;
 
-type GeneratedTimestampName<Name extends string> = Name extends `${string}_time`
-  ? `${Name}stamp`
-  : `${Name}_timestamp`;
+type StoredUnknownFields = { _unknown_fields: string | null };
+type StoredSourceFields = { source_id: string };
 
-type StoredTimestampFields<Fields extends GtfsFields> = {
-  [
+type PublicServiceDaySecondsName<Name extends string> =
+  Name extends `${infer BaseName}_time`
+    ? `${BaseName}_service_day_seconds`
+    : `${Name}_service_day_seconds`;
+
+type PublicDerivedFields<Fields extends GtfsDomainFields> = {
+  -readonly [
     Name in keyof Fields as Fields[Name]['kind'] extends 'time'
-      ? GeneratedTimestampName<Extract<Name, string>>
+      ? PublicServiceDaySecondsName<Extract<Name, string>>
       : never
   ]: Fields[Name]['presence'] extends 'required' ? number : number | null;
 };
 
-/** Database row, including node-gtfs generated timestamp columns. */
-export type GtfsStoredRow<Table> = Table extends { fields: infer Fields }
-  ? Fields extends GtfsFields
-    ? RowFromFields<Fields> & StoredTimestampFields<Fields>
+/** Stable default public row: source identity plus manifest input fields. */
+export type GtfsDefaultRow<Table> = Table extends {
+  fields: infer Fields;
+}
+  ? Fields extends GtfsDomainFields
+    ? StoredSourceFields & RowFromFields<Fields>
     : never
   : never;
 
-type RequiredFieldNames<Fields extends GtfsFields> = {
+/** Every selectable public field, including explicit service-day seconds. */
+export type GtfsSelectableRow<Table> = Table extends {
+  fields: infer Fields;
+}
+  ? Fields extends GtfsDomainFields
+    ? GtfsDefaultRow<Table> & PublicDerivedFields<Fields>
+    : never
+  : never;
+
+type StoredRowFromFields<Fields extends GtfsDomainFields> = {
+  -readonly [Name in keyof Fields]: NullableUnlessRequired<
+    Fields[Name] extends { monetary: { readonly currencyField: string } }
+      ? number | bigint | string
+      : ValueForKind<Fields[Name]>,
+    Fields[Name]
+  >;
+};
+
+/** Database row, including generated service-day seconds and unknown fields. */
+export type GtfsStoredRow<Table> = Table extends { fields: infer Fields }
+  ? Fields extends GtfsDomainFields
+    ? StoredRowFromFields<Fields> &
+        PublicDerivedFields<Fields> &
+        StoredSourceFields &
+        StoredUnknownFields
+    : never
+  : never;
+
+type RequiredFieldNames<Fields extends GtfsDomainFields> = {
   [Name in keyof Fields]: Fields[Name]['presence'] extends 'required'
     ? Name
     : never;
 }[keyof Fields];
 
-type InsertFromFields<Fields extends GtfsFields> = {
-  [Name in RequiredFieldNames<Fields>]: ValueForKind<Fields[Name]>;
+type InsertFromFields<Fields extends GtfsDomainFields> = {
+  -readonly [Name in RequiredFieldNames<Fields>]: ValueForKind<Fields[Name]>;
 } & {
-  [Name in Exclude<keyof Fields, RequiredFieldNames<Fields>>]?: ValueForKind<
-    Fields[Name]
-  > | null;
+  -readonly [
+    Name in Exclude<keyof Fields, RequiredFieldNames<Fields>>
+  ]?: ValueForKind<Fields[Name]> | null;
 };
 
-/** Insert object inferred from a rich table manifest. */
-export type GtfsInsert<Table> = Table extends { fields: infer Fields }
-  ? Fields extends GtfsFields
-    ? InsertFromFields<Fields>
+export type GtfsInsertRow<Table> = Table extends { fields: infer Fields }
+  ? Fields extends GtfsDomainFields
+    ? InsertFromFields<Fields> & StoredSourceFields
     : never
   : never;
 
 /** Equality/IN query object inferred from a table manifest. */
-export type GtfsQuery<Table> = {
-  [Name in keyof GtfsStoredRow<Table>]?:
+export type GtfsStoredRowFilter<Table> = {
+  readonly [Name in keyof GtfsStoredRow<Table>]?:
     GtfsStoredRow<Table>[Name] | readonly GtfsStoredRow<Table>[Name][];
 };
 
 export type GtfsDatabaseFromTables<
-  Tables extends Record<string, GtfsTableDefinition>,
+  Tables extends Record<
+    string,
+    { readonly tableName: string; readonly fields: GtfsDomainFields }
+  >,
 > = {
   [Table in Tables[keyof Tables] as GtfsTableName<Table>]: GtfsStoredRow<Table>;
 };

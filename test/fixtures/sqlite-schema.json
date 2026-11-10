@@ -1,0 +1,1134 @@
+{
+  "formatVersion": 1,
+  "scheduleReferenceRevision": "2026-09-16",
+  "statements": [
+    {
+      "type": "table",
+      "name": "_node_gtfs_source_state",
+      "tableName": "_node_gtfs_source_state",
+      "sql": "CREATE TABLE \"_node_gtfs_source_state\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"schedule_revision\" text COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_agency_source_id",
+      "tableName": "agency",
+      "sql": "CREATE INDEX \"idx_agency_source_id\" ON \"agency\" (\"source_id\")"
+    },
+    {
+      "type": "table",
+      "name": "agency",
+      "tableName": "agency",
+      "sql": "CREATE TABLE \"agency\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"agency_id\" text COLLATE BINARY, \"agency_name\" text NOT NULL COLLATE BINARY, \"_node_gtfs_casefold_agency_name\" TEXT COLLATE BINARY, \"agency_url\" text NOT NULL COLLATE BINARY, \"agency_timezone\" text NOT NULL COLLATE BINARY, \"agency_lang\" text COLLATE BINARY, \"_node_gtfs_casefold_agency_lang\" TEXT COLLATE BINARY, \"agency_phone\" text COLLATE BINARY, \"_node_gtfs_casefold_agency_phone\" TEXT COLLATE BINARY, \"agency_fare_url\" text COLLATE BINARY, \"agency_email\" text COLLATE BINARY, \"_node_gtfs_casefold_agency_email\" TEXT COLLATE BINARY, \"cemv_support\" integer CHECK(\"cemv_support\" >= 0 AND \"cemv_support\" <= 2 AND (TYPEOF(\"cemv_support\") = 'integer' OR \"cemv_support\" IS NULL)) , \"_unknown_fields\" JSON, \"_node_gtfs_key\" TEXT NOT NULL CHECK(length(\"_node_gtfs_key\") = 64), UNIQUE (\"_node_gtfs_key\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_alert_entity_selectors_source_id_agency_id",
+      "tableName": "alert_entity_selectors",
+      "sql": "CREATE INDEX \"idx_alert_entity_selectors_source_id_agency_id\" ON \"alert_entity_selectors\" (\"source_id\", \"agency_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_alert_entity_selectors_source_id_expires_at_unix_seconds",
+      "tableName": "alert_entity_selectors",
+      "sql": "CREATE INDEX \"idx_alert_entity_selectors_source_id_expires_at_unix_seconds\" ON \"alert_entity_selectors\" (\"source_id\", \"expires_at_unix_seconds\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_alert_entity_selectors_source_id_route_id",
+      "tableName": "alert_entity_selectors",
+      "sql": "CREATE INDEX \"idx_alert_entity_selectors_source_id_route_id\" ON \"alert_entity_selectors\" (\"source_id\", \"route_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_alert_entity_selectors_source_id_stop_id",
+      "tableName": "alert_entity_selectors",
+      "sql": "CREATE INDEX \"idx_alert_entity_selectors_source_id_stop_id\" ON \"alert_entity_selectors\" (\"source_id\", \"stop_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_alert_entity_selectors_source_id_trip_id",
+      "tableName": "alert_entity_selectors",
+      "sql": "CREATE INDEX \"idx_alert_entity_selectors_source_id_trip_id\" ON \"alert_entity_selectors\" (\"source_id\", \"trip_id\")"
+    },
+    {
+      "type": "table",
+      "name": "alert_entity_selectors",
+      "tableName": "alert_entity_selectors",
+      "sql": "CREATE TABLE \"alert_entity_selectors\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"realtime_feed_id\" text NOT NULL COLLATE BINARY, \"alert_id\" text NOT NULL COLLATE BINARY, \"selector_ordinal\" integer CHECK(\"selector_ordinal\" >= 0 AND (TYPEOF(\"selector_ordinal\") = 'integer' OR \"selector_ordinal\" IS NULL)) NOT NULL , \"agency_id\" text COLLATE BINARY, \"stop_id\" text COLLATE BINARY, \"route_id\" text COLLATE BINARY, \"route_type\" integer CHECK(\"route_type\" >= 0 AND (TYPEOF(\"route_type\") = 'integer' OR \"route_type\" IS NULL)) , \"trip_id\" text COLLATE BINARY, \"trip_route_id\" text COLLATE BINARY, \"trip_direction_id\" integer CHECK(\"trip_direction_id\" >= 0 AND \"trip_direction_id\" <= 1 AND (TYPEOF(\"trip_direction_id\") = 'integer' OR \"trip_direction_id\" IS NULL)) , \"trip_start_time\" text COLLATE BINARY, \"trip_start_date\" text COLLATE BINARY, \"trip_schedule_relationship\" text COLLATE BINARY, \"trip_modified_trip_modifications_id\" text COLLATE BINARY, \"trip_modified_trip_affected_trip_id\" text COLLATE BINARY, \"trip_modified_trip_start_time\" text COLLATE BINARY, \"trip_modified_trip_start_date\" text COLLATE BINARY, \"direction_id\" integer CHECK(\"direction_id\" >= 0 AND \"direction_id\" <= 1 AND (TYPEOF(\"direction_id\") = 'integer' OR \"direction_id\" IS NULL)) , \"created_at_unix_seconds\" integer CHECK(\"created_at_unix_seconds\" >= 0 AND (TYPEOF(\"created_at_unix_seconds\") = 'integer' OR \"created_at_unix_seconds\" IS NULL)) NOT NULL , \"expires_at_unix_seconds\" integer CHECK(\"expires_at_unix_seconds\" >= 0 AND (TYPEOF(\"expires_at_unix_seconds\") = 'integer' OR \"expires_at_unix_seconds\" IS NULL)) NOT NULL , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"realtime_feed_id\", \"alert_id\", \"selector_ordinal\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_alert_time_ranges_source_id_expires_at_unix_seconds",
+      "tableName": "alert_time_ranges",
+      "sql": "CREATE INDEX \"idx_alert_time_ranges_source_id_expires_at_unix_seconds\" ON \"alert_time_ranges\" (\"source_id\", \"expires_at_unix_seconds\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_alert_time_ranges_source_id_range_kind_start_unix_seconds_end_unix_seconds",
+      "tableName": "alert_time_ranges",
+      "sql": "CREATE INDEX \"idx_alert_time_ranges_source_id_range_kind_start_unix_seconds_end_unix_seconds\" ON \"alert_time_ranges\" (\"source_id\", \"range_kind\", \"start_unix_seconds\", \"end_unix_seconds\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_alert_time_ranges_source_id_realtime_feed_id_alert_id_range_kind_start_unix_seconds_end_unix_seconds",
+      "tableName": "alert_time_ranges",
+      "sql": "CREATE INDEX \"idx_alert_time_ranges_source_id_realtime_feed_id_alert_id_range_kind_start_unix_seconds_end_unix_seconds\" ON \"alert_time_ranges\" (\"source_id\", \"realtime_feed_id\", \"alert_id\", \"range_kind\", \"start_unix_seconds\", \"end_unix_seconds\")"
+    },
+    {
+      "type": "table",
+      "name": "alert_time_ranges",
+      "tableName": "alert_time_ranges",
+      "sql": "CREATE TABLE \"alert_time_ranges\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"realtime_feed_id\" text NOT NULL COLLATE BINARY, \"alert_id\" text NOT NULL COLLATE BINARY, \"range_kind\" text CHECK(\"range_kind\" IN ('communication', 'impact', 'active')) NOT NULL COLLATE BINARY, \"range_ordinal\" integer CHECK(\"range_ordinal\" >= 0 AND (TYPEOF(\"range_ordinal\") = 'integer' OR \"range_ordinal\" IS NULL)) NOT NULL , \"start_unix_seconds\" integer CHECK(\"start_unix_seconds\" >= 0 AND (TYPEOF(\"start_unix_seconds\") = 'integer' OR \"start_unix_seconds\" IS NULL)) , \"end_unix_seconds\" integer CHECK(\"end_unix_seconds\" >= 0 AND (TYPEOF(\"end_unix_seconds\") = 'integer' OR \"end_unix_seconds\" IS NULL)) , \"is_valid\" integer CHECK(\"is_valid\" >= 0 AND \"is_valid\" <= 1 AND (TYPEOF(\"is_valid\") = 'integer' OR \"is_valid\" IS NULL)) NOT NULL , \"created_at_unix_seconds\" integer CHECK(\"created_at_unix_seconds\" >= 0 AND (TYPEOF(\"created_at_unix_seconds\") = 'integer' OR \"created_at_unix_seconds\" IS NULL)) NOT NULL , \"expires_at_unix_seconds\" integer CHECK(\"expires_at_unix_seconds\" >= 0 AND (TYPEOF(\"expires_at_unix_seconds\") = 'integer' OR \"expires_at_unix_seconds\" IS NULL)) NOT NULL , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"realtime_feed_id\", \"alert_id\", \"range_kind\", \"range_ordinal\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_alerts_source_id_expires_at_unix_seconds",
+      "tableName": "alerts",
+      "sql": "CREATE INDEX \"idx_alerts_source_id_expires_at_unix_seconds\" ON \"alerts\" (\"source_id\", \"expires_at_unix_seconds\")"
+    },
+    {
+      "type": "table",
+      "name": "alerts",
+      "tableName": "alerts",
+      "sql": "CREATE TABLE \"alerts\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"realtime_feed_id\" text NOT NULL COLLATE BINARY, \"entity_id\" text NOT NULL COLLATE BINARY, \"active_period\" json COLLATE BINARY, \"communication_period\" json COLLATE BINARY, \"impact_period\" json COLLATE BINARY, \"cause\" text COLLATE BINARY, \"effect\" text COLLATE BINARY, \"url\" text COLLATE BINARY, \"url_translations\" json COLLATE BINARY, \"header_text\" text NOT NULL COLLATE BINARY, \"header_text_translations\" json COLLATE BINARY, \"description_text\" text NOT NULL COLLATE BINARY, \"description_text_translations\" json COLLATE BINARY, \"tts_header_text\" text COLLATE BINARY, \"tts_header_text_translations\" json COLLATE BINARY, \"tts_description_text\" text COLLATE BINARY, \"tts_description_text_translations\" json COLLATE BINARY, \"severity_level\" text COLLATE BINARY, \"image\" json COLLATE BINARY, \"image_alternative_text\" text COLLATE BINARY, \"image_alternative_text_translations\" json COLLATE BINARY, \"cause_detail\" text COLLATE BINARY, \"cause_detail_translations\" json COLLATE BINARY, \"effect_detail\" text COLLATE BINARY, \"effect_detail_translations\" json COLLATE BINARY, \"created_at_unix_seconds\" integer CHECK(\"created_at_unix_seconds\" >= 0 AND (TYPEOF(\"created_at_unix_seconds\") = 'integer' OR \"created_at_unix_seconds\" IS NULL)) NOT NULL , \"expires_at_unix_seconds\" integer CHECK(\"expires_at_unix_seconds\" >= 0 AND (TYPEOF(\"expires_at_unix_seconds\") = 'integer' OR \"expires_at_unix_seconds\" IS NULL)) NOT NULL , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"realtime_feed_id\", \"entity_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "areas",
+      "tableName": "areas",
+      "sql": "CREATE TABLE \"areas\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"area_id\" text NOT NULL COLLATE BINARY, \"area_name\" text COLLATE BINARY, \"_node_gtfs_casefold_area_name\" TEXT COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"area_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_attributions_source_id",
+      "tableName": "attributions",
+      "sql": "CREATE INDEX \"idx_attributions_source_id\" ON \"attributions\" (\"source_id\")"
+    },
+    {
+      "type": "table",
+      "name": "attributions",
+      "tableName": "attributions",
+      "sql": "CREATE TABLE \"attributions\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"attribution_id\" text COLLATE BINARY, \"agency_id\" text COLLATE BINARY, \"route_id\" text COLLATE BINARY, \"trip_id\" text COLLATE BINARY, \"organization_name\" text NOT NULL COLLATE BINARY, \"_node_gtfs_casefold_organization_name\" TEXT COLLATE BINARY, \"is_producer\" integer CHECK(\"is_producer\" >= 0 AND \"is_producer\" <= 1 AND (TYPEOF(\"is_producer\") = 'integer' OR \"is_producer\" IS NULL)) , \"is_operator\" integer CHECK(\"is_operator\" >= 0 AND \"is_operator\" <= 1 AND (TYPEOF(\"is_operator\") = 'integer' OR \"is_operator\" IS NULL)) , \"is_authority\" integer CHECK(\"is_authority\" >= 0 AND \"is_authority\" <= 1 AND (TYPEOF(\"is_authority\") = 'integer' OR \"is_authority\" IS NULL)) , \"attribution_url\" text COLLATE BINARY, \"attribution_email\" text COLLATE BINARY, \"_node_gtfs_casefold_attribution_email\" TEXT COLLATE BINARY, \"attribution_phone\" text COLLATE BINARY, \"_node_gtfs_casefold_attribution_phone\" TEXT COLLATE BINARY, \"_unknown_fields\" JSON, \"_node_gtfs_key\" TEXT NOT NULL CHECK(length(\"_node_gtfs_key\") = 64), UNIQUE (\"_node_gtfs_key\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_board_alight_record_use",
+      "tableName": "board_alight",
+      "sql": "CREATE INDEX \"idx_board_alight_record_use\" ON \"board_alight\" (\"record_use\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_board_alight_service_date",
+      "tableName": "board_alight",
+      "sql": "CREATE INDEX \"idx_board_alight_service_date\" ON \"board_alight\" (\"service_date\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_board_alight_source_id",
+      "tableName": "board_alight",
+      "sql": "CREATE INDEX \"idx_board_alight_source_id\" ON \"board_alight\" (\"source_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_board_alight_stop_id",
+      "tableName": "board_alight",
+      "sql": "CREATE INDEX \"idx_board_alight_stop_id\" ON \"board_alight\" (\"stop_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_board_alight_stop_sequence",
+      "tableName": "board_alight",
+      "sql": "CREATE INDEX \"idx_board_alight_stop_sequence\" ON \"board_alight\" (\"stop_sequence\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_board_alight_trip_id",
+      "tableName": "board_alight",
+      "sql": "CREATE INDEX \"idx_board_alight_trip_id\" ON \"board_alight\" (\"trip_id\")"
+    },
+    {
+      "type": "table",
+      "name": "board_alight",
+      "tableName": "board_alight",
+      "sql": "CREATE TABLE \"board_alight\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"trip_id\" text NOT NULL COLLATE BINARY, \"stop_id\" text NOT NULL COLLATE BINARY, \"stop_sequence\" integer CHECK(\"stop_sequence\" >= 0 AND (TYPEOF(\"stop_sequence\") = 'integer' OR \"stop_sequence\" IS NULL)) NOT NULL , \"record_use\" integer CHECK(\"record_use\" >= 0 AND \"record_use\" <= 1 AND (TYPEOF(\"record_use\") = 'integer' OR \"record_use\" IS NULL)) NOT NULL , \"schedule_relationship\" integer CHECK(\"schedule_relationship\" >= 0 AND \"schedule_relationship\" <= 8 AND (TYPEOF(\"schedule_relationship\") = 'integer' OR \"schedule_relationship\" IS NULL)) , \"boardings\" integer CHECK(\"boardings\" >= 0 AND (TYPEOF(\"boardings\") = 'integer' OR \"boardings\" IS NULL)) , \"alightings\" integer CHECK(\"alightings\" >= 0 AND (TYPEOF(\"alightings\") = 'integer' OR \"alightings\" IS NULL)) , \"current_load\" integer CHECK(\"current_load\" >= 0 AND (TYPEOF(\"current_load\") = 'integer' OR \"current_load\" IS NULL)) , \"load_count\" integer CHECK(\"load_count\" >= 0 AND (TYPEOF(\"load_count\") = 'integer' OR \"load_count\" IS NULL)) , \"load_type\" integer CHECK(\"load_type\" >= 0 AND \"load_type\" <= 1 AND (TYPEOF(\"load_type\") = 'integer' OR \"load_type\" IS NULL)) , \"rack_down\" integer CHECK(\"rack_down\" >= 0 AND \"rack_down\" <= 1 AND (TYPEOF(\"rack_down\") = 'integer' OR \"rack_down\" IS NULL)) , \"bike_boardings\" integer CHECK(\"bike_boardings\" >= 0 AND (TYPEOF(\"bike_boardings\") = 'integer' OR \"bike_boardings\" IS NULL)) , \"bike_alightings\" integer CHECK(\"bike_alightings\" >= 0 AND (TYPEOF(\"bike_alightings\") = 'integer' OR \"bike_alightings\" IS NULL)) , \"ramp_used\" integer CHECK(\"ramp_used\" >= 0 AND \"ramp_used\" <= 1 AND (TYPEOF(\"ramp_used\") = 'integer' OR \"ramp_used\" IS NULL)) , \"ramp_boardings\" integer CHECK(\"ramp_boardings\" >= 0 AND (TYPEOF(\"ramp_boardings\") = 'integer' OR \"ramp_boardings\" IS NULL)) , \"ramp_alightings\" integer CHECK(\"ramp_alightings\" >= 0 AND (TYPEOF(\"ramp_alightings\") = 'integer' OR \"ramp_alightings\" IS NULL)) , \"service_date\" date , \"service_arrival_time\" time COLLATE BINARY, \"service_arrival_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"service_arrival_time\" IS NULL OR \"service_arrival_time\" = '' THEN NULL ELSE CAST( substr(\"service_arrival_time\", 1, instr(\"service_arrival_time\", ':') - 1) * 3600 + substr(\"service_arrival_time\", instr(\"service_arrival_time\", ':') + 1, 2) * 60 + substr(\"service_arrival_time\", -2) AS INTEGER ) END ) STORED, \"service_departure_time\" time COLLATE BINARY, \"service_departure_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"service_departure_time\" IS NULL OR \"service_departure_time\" = '' THEN NULL ELSE CAST( substr(\"service_departure_time\", 1, instr(\"service_departure_time\", ':') - 1) * 3600 + substr(\"service_departure_time\", instr(\"service_departure_time\", ':') + 1, 2) * 60 + substr(\"service_departure_time\", -2) AS INTEGER ) END ) STORED, \"source\" integer CHECK(\"source\" >= 0 AND \"source\" <= 4 AND (TYPEOF(\"source\") = 'integer' OR \"source\" IS NULL)) , \"_unknown_fields\" JSON)"
+    },
+    {
+      "type": "table",
+      "name": "booking_rules",
+      "tableName": "booking_rules",
+      "sql": "CREATE TABLE \"booking_rules\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"booking_rule_id\" text NOT NULL COLLATE BINARY, \"booking_type\" integer CHECK(\"booking_type\" >= 0 AND \"booking_type\" <= 2 AND (TYPEOF(\"booking_type\") = 'integer' OR \"booking_type\" IS NULL)) NOT NULL , \"prior_notice_duration_min\" integer CHECK((TYPEOF(\"prior_notice_duration_min\") = 'integer' OR \"prior_notice_duration_min\" IS NULL)) , \"prior_notice_duration_max\" integer CHECK((TYPEOF(\"prior_notice_duration_max\") = 'integer' OR \"prior_notice_duration_max\" IS NULL)) , \"prior_notice_last_day\" integer CHECK((TYPEOF(\"prior_notice_last_day\") = 'integer' OR \"prior_notice_last_day\" IS NULL)) , \"prior_notice_last_time\" time COLLATE BINARY, \"prior_notice_last_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"prior_notice_last_time\" IS NULL OR \"prior_notice_last_time\" = '' THEN NULL ELSE CAST( substr(\"prior_notice_last_time\", 1, instr(\"prior_notice_last_time\", ':') - 1) * 3600 + substr(\"prior_notice_last_time\", instr(\"prior_notice_last_time\", ':') + 1, 2) * 60 + substr(\"prior_notice_last_time\", -2) AS INTEGER ) END ) STORED, \"prior_notice_start_day\" integer CHECK((TYPEOF(\"prior_notice_start_day\") = 'integer' OR \"prior_notice_start_day\" IS NULL)) , \"prior_notice_start_time\" time COLLATE BINARY, \"prior_notice_start_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"prior_notice_start_time\" IS NULL OR \"prior_notice_start_time\" = '' THEN NULL ELSE CAST( substr(\"prior_notice_start_time\", 1, instr(\"prior_notice_start_time\", ':') - 1) * 3600 + substr(\"prior_notice_start_time\", instr(\"prior_notice_start_time\", ':') + 1, 2) * 60 + substr(\"prior_notice_start_time\", -2) AS INTEGER ) END ) STORED, \"prior_notice_service_id\" text COLLATE BINARY, \"message\" text COLLATE BINARY, \"_node_gtfs_casefold_message\" TEXT COLLATE BINARY, \"pickup_message\" text COLLATE BINARY, \"_node_gtfs_casefold_pickup_message\" TEXT COLLATE BINARY, \"drop_off_message\" text COLLATE BINARY, \"_node_gtfs_casefold_drop_off_message\" TEXT COLLATE BINARY, \"phone_number\" text COLLATE BINARY, \"_node_gtfs_casefold_phone_number\" TEXT COLLATE BINARY, \"info_url\" text COLLATE BINARY, \"booking_url\" text COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"booking_rule_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_calendar_end_date",
+      "tableName": "calendar",
+      "sql": "CREATE INDEX \"idx_calendar_end_date\" ON \"calendar\" (\"end_date\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_calendar_start_date",
+      "tableName": "calendar",
+      "sql": "CREATE INDEX \"idx_calendar_start_date\" ON \"calendar\" (\"start_date\")"
+    },
+    {
+      "type": "table",
+      "name": "calendar",
+      "tableName": "calendar",
+      "sql": "CREATE TABLE \"calendar\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"service_id\" text NOT NULL COLLATE BINARY, \"monday\" integer CHECK(\"monday\" >= 0 AND \"monday\" <= 1 AND (TYPEOF(\"monday\") = 'integer' OR \"monday\" IS NULL)) NOT NULL , \"tuesday\" integer CHECK(\"tuesday\" >= 0 AND \"tuesday\" <= 1 AND (TYPEOF(\"tuesday\") = 'integer' OR \"tuesday\" IS NULL)) NOT NULL , \"wednesday\" integer CHECK(\"wednesday\" >= 0 AND \"wednesday\" <= 1 AND (TYPEOF(\"wednesday\") = 'integer' OR \"wednesday\" IS NULL)) NOT NULL , \"thursday\" integer CHECK(\"thursday\" >= 0 AND \"thursday\" <= 1 AND (TYPEOF(\"thursday\") = 'integer' OR \"thursday\" IS NULL)) NOT NULL , \"friday\" integer CHECK(\"friday\" >= 0 AND \"friday\" <= 1 AND (TYPEOF(\"friday\") = 'integer' OR \"friday\" IS NULL)) NOT NULL , \"saturday\" integer CHECK(\"saturday\" >= 0 AND \"saturday\" <= 1 AND (TYPEOF(\"saturday\") = 'integer' OR \"saturday\" IS NULL)) NOT NULL , \"sunday\" integer CHECK(\"sunday\" >= 0 AND \"sunday\" <= 1 AND (TYPEOF(\"sunday\") = 'integer' OR \"sunday\" IS NULL)) NOT NULL , \"start_date\" date NOT NULL , \"end_date\" date NOT NULL , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"service_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "calendar_attributes",
+      "tableName": "calendar_attributes",
+      "sql": "CREATE TABLE \"calendar_attributes\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"service_id\" text NOT NULL COLLATE BINARY, \"service_description\" text NOT NULL COLLATE BINARY, \"_node_gtfs_casefold_service_description\" TEXT COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"service_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_calendar_dates_date_exception_type_service_id",
+      "tableName": "calendar_dates",
+      "sql": "CREATE INDEX \"idx_calendar_dates_date_exception_type_service_id\" ON \"calendar_dates\" (\"date\", \"exception_type\", \"service_id\")"
+    },
+    {
+      "type": "table",
+      "name": "calendar_dates",
+      "tableName": "calendar_dates",
+      "sql": "CREATE TABLE \"calendar_dates\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"service_id\" text NOT NULL COLLATE BINARY, \"date\" date NOT NULL , \"exception_type\" integer CHECK(\"exception_type\" >= 1 AND \"exception_type\" <= 2 AND (TYPEOF(\"exception_type\") = 'integer' OR \"exception_type\" IS NULL)) NOT NULL , \"holiday_name\" text COLLATE BINARY, \"_node_gtfs_casefold_holiday_name\" TEXT COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"service_id\", \"date\"))"
+    },
+    {
+      "type": "table",
+      "name": "calendar_dates_supplement",
+      "tableName": "calendar_dates_supplement",
+      "sql": "CREATE TABLE \"calendar_dates_supplement\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"service_id\" text NOT NULL COLLATE BINARY, \"date\" date NOT NULL , \"exception_type\" integer CHECK(\"exception_type\" >= 1 AND \"exception_type\" <= 2 AND (TYPEOF(\"exception_type\") = 'integer' OR \"exception_type\" IS NULL)) , \"holiday_name\" text COLLATE BINARY, \"_node_gtfs_casefold_holiday_name\" TEXT COLLATE BINARY, \"TODS_delete\" integer CHECK(\"TODS_delete\" IN (1) AND (TYPEOF(\"TODS_delete\") = 'integer' OR \"TODS_delete\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"service_id\", \"date\"))"
+    },
+    {
+      "type": "table",
+      "name": "calendar_supplement",
+      "tableName": "calendar_supplement",
+      "sql": "CREATE TABLE \"calendar_supplement\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"service_id\" text NOT NULL COLLATE BINARY, \"monday\" integer CHECK(\"monday\" >= 0 AND \"monday\" <= 1 AND (TYPEOF(\"monday\") = 'integer' OR \"monday\" IS NULL)) , \"tuesday\" integer CHECK(\"tuesday\" >= 0 AND \"tuesday\" <= 1 AND (TYPEOF(\"tuesday\") = 'integer' OR \"tuesday\" IS NULL)) , \"wednesday\" integer CHECK(\"wednesday\" >= 0 AND \"wednesday\" <= 1 AND (TYPEOF(\"wednesday\") = 'integer' OR \"wednesday\" IS NULL)) , \"thursday\" integer CHECK(\"thursday\" >= 0 AND \"thursday\" <= 1 AND (TYPEOF(\"thursday\") = 'integer' OR \"thursday\" IS NULL)) , \"friday\" integer CHECK(\"friday\" >= 0 AND \"friday\" <= 1 AND (TYPEOF(\"friday\") = 'integer' OR \"friday\" IS NULL)) , \"saturday\" integer CHECK(\"saturday\" >= 0 AND \"saturday\" <= 1 AND (TYPEOF(\"saturday\") = 'integer' OR \"saturday\" IS NULL)) , \"sunday\" integer CHECK(\"sunday\" >= 0 AND \"sunday\" <= 1 AND (TYPEOF(\"sunday\") = 'integer' OR \"sunday\" IS NULL)) , \"start_date\" date , \"end_date\" date , \"TODS_delete\" integer CHECK(\"TODS_delete\" IN (1) AND (TYPEOF(\"TODS_delete\") = 'integer' OR \"TODS_delete\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"service_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "devices",
+      "tableName": "devices",
+      "sql": "CREATE TABLE \"devices\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"device_id\" text NOT NULL COLLATE BINARY, \"stop_id\" text COLLATE BINARY, \"vehicle_id\" text COLLATE BINARY, \"train_car_id\" text COLLATE BINARY, \"device_type\" text COLLATE BINARY, \"device_vendor\" text COLLATE BINARY, \"device_model\" text COLLATE BINARY, \"device_location\" text COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"device_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "directions",
+      "tableName": "directions",
+      "sql": "CREATE TABLE \"directions\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"route_id\" text NOT NULL COLLATE BINARY, \"direction_id\" integer CHECK(\"direction_id\" >= 0 AND \"direction_id\" <= 1 AND (TYPEOF(\"direction_id\") = 'integer' OR \"direction_id\" IS NULL)) NOT NULL , \"direction\" text NOT NULL COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"route_id\", \"direction_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "employee_run_dates",
+      "tableName": "employee_run_dates",
+      "sql": "CREATE TABLE \"employee_run_dates\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"date\" date NOT NULL , \"service_id\" text NOT NULL COLLATE BINARY, \"run_id\" text NOT NULL COLLATE BINARY, \"employee_id\" text NOT NULL COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"date\", \"service_id\", \"run_id\", \"employee_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "fare_attributes",
+      "tableName": "fare_attributes",
+      "sql": "CREATE TABLE \"fare_attributes\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"fare_id\" text NOT NULL COLLATE BINARY, \"price\" integer CHECK(\"price\" >= 0 AND (TYPEOF(\"price\") = 'integer' OR \"price\" IS NULL)) NOT NULL , \"currency_type\" text NOT NULL COLLATE BINARY, \"payment_method\" integer CHECK(\"payment_method\" >= 0 AND \"payment_method\" <= 1 AND (TYPEOF(\"payment_method\") = 'integer' OR \"payment_method\" IS NULL)) NOT NULL , \"transfers\" integer CHECK(\"transfers\" >= 0 AND \"transfers\" <= 2 AND (TYPEOF(\"transfers\") = 'integer' OR \"transfers\" IS NULL)) , \"agency_id\" text COLLATE BINARY, \"transfer_duration\" integer CHECK(\"transfer_duration\" >= 0 AND (TYPEOF(\"transfer_duration\") = 'integer' OR \"transfer_duration\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"fare_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_fare_leg_join_rules_source_id",
+      "tableName": "fare_leg_join_rules",
+      "sql": "CREATE INDEX \"idx_fare_leg_join_rules_source_id\" ON \"fare_leg_join_rules\" (\"source_id\")"
+    },
+    {
+      "type": "table",
+      "name": "fare_leg_join_rules",
+      "tableName": "fare_leg_join_rules",
+      "sql": "CREATE TABLE \"fare_leg_join_rules\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"from_network_id\" text NOT NULL COLLATE BINARY, \"to_network_id\" text NOT NULL COLLATE BINARY, \"from_stop_id\" text COLLATE BINARY, \"to_stop_id\" text COLLATE BINARY, \"_unknown_fields\" JSON, \"_node_gtfs_key\" TEXT NOT NULL CHECK(length(\"_node_gtfs_key\") = 64), UNIQUE (\"_node_gtfs_key\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_fare_leg_rules_source_id",
+      "tableName": "fare_leg_rules",
+      "sql": "CREATE INDEX \"idx_fare_leg_rules_source_id\" ON \"fare_leg_rules\" (\"source_id\")"
+    },
+    {
+      "type": "table",
+      "name": "fare_leg_rules",
+      "tableName": "fare_leg_rules",
+      "sql": "CREATE TABLE \"fare_leg_rules\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"leg_group_id\" text COLLATE BINARY, \"network_id\" text COLLATE BINARY, \"from_area_id\" text COLLATE BINARY, \"to_area_id\" text COLLATE BINARY, \"from_timeframe_group_id\" text COLLATE BINARY, \"to_timeframe_group_id\" text COLLATE BINARY, \"fare_product_id\" text NOT NULL COLLATE BINARY, \"rule_priority\" integer CHECK(\"rule_priority\" >= 0 AND (TYPEOF(\"rule_priority\") = 'integer' OR \"rule_priority\" IS NULL)) , \"_unknown_fields\" JSON, \"_node_gtfs_key\" TEXT NOT NULL CHECK(length(\"_node_gtfs_key\") = 64), UNIQUE (\"_node_gtfs_key\"))"
+    },
+    {
+      "type": "table",
+      "name": "fare_media",
+      "tableName": "fare_media",
+      "sql": "CREATE TABLE \"fare_media\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"fare_media_id\" text NOT NULL COLLATE BINARY, \"fare_media_name\" text COLLATE BINARY, \"_node_gtfs_casefold_fare_media_name\" TEXT COLLATE BINARY, \"fare_media_type\" integer CHECK(\"fare_media_type\" >= 0 AND \"fare_media_type\" <= 4 AND (TYPEOF(\"fare_media_type\") = 'integer' OR \"fare_media_type\" IS NULL)) NOT NULL , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"fare_media_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_fare_products_source_id",
+      "tableName": "fare_products",
+      "sql": "CREATE INDEX \"idx_fare_products_source_id\" ON \"fare_products\" (\"source_id\")"
+    },
+    {
+      "type": "table",
+      "name": "fare_products",
+      "tableName": "fare_products",
+      "sql": "CREATE TABLE \"fare_products\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"fare_product_id\" text NOT NULL COLLATE BINARY, \"rider_category_id\" text COLLATE BINARY, \"fare_product_name\" text COLLATE BINARY, \"_node_gtfs_casefold_fare_product_name\" TEXT COLLATE BINARY, \"fare_media_id\" text COLLATE BINARY, \"amount\" integer CHECK((TYPEOF(\"amount\") = 'integer' OR \"amount\" IS NULL)) NOT NULL , \"currency\" text NOT NULL COLLATE BINARY, \"_unknown_fields\" JSON, \"_node_gtfs_key\" TEXT NOT NULL CHECK(length(\"_node_gtfs_key\") = 64), UNIQUE (\"_node_gtfs_key\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_fare_rules_route_id",
+      "tableName": "fare_rules",
+      "sql": "CREATE INDEX \"idx_fare_rules_route_id\" ON \"fare_rules\" (\"route_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_fare_rules_source_id",
+      "tableName": "fare_rules",
+      "sql": "CREATE INDEX \"idx_fare_rules_source_id\" ON \"fare_rules\" (\"source_id\")"
+    },
+    {
+      "type": "table",
+      "name": "fare_rules",
+      "tableName": "fare_rules",
+      "sql": "CREATE TABLE \"fare_rules\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"fare_id\" text NOT NULL COLLATE BINARY, \"route_id\" text COLLATE BINARY, \"origin_id\" text COLLATE BINARY, \"destination_id\" text COLLATE BINARY, \"contains_id\" text COLLATE BINARY, \"_unknown_fields\" JSON, \"_node_gtfs_key\" TEXT NOT NULL CHECK(length(\"_node_gtfs_key\") = 64), UNIQUE (\"_node_gtfs_key\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_fare_transactions_transaction_id",
+      "tableName": "fare_transactions",
+      "sql": "CREATE INDEX \"idx_fare_transactions_transaction_id\" ON \"fare_transactions\" (\"transaction_id\")"
+    },
+    {
+      "type": "table",
+      "name": "fare_transactions",
+      "tableName": "fare_transactions",
+      "sql": "CREATE TABLE \"fare_transactions\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"transaction_id\" text NOT NULL COLLATE BINARY, \"service_date\" date NOT NULL , \"event_timestamp\" text NOT NULL COLLATE BINARY, \"location_ping_id\" text COLLATE BINARY, \"amount\" integer CHECK((TYPEOF(\"amount\") = 'integer' OR \"amount\" IS NULL)) NOT NULL , \"currency_type\" text COLLATE BINARY, \"fare_action\" text NOT NULL COLLATE BINARY, \"trip_id_performed\" text COLLATE BINARY, \"trip_id_scheduled\" text COLLATE BINARY, \"pattern_id\" text COLLATE BINARY, \"trip_stop_sequence\" integer CHECK(\"trip_stop_sequence\" >= 1 AND (TYPEOF(\"trip_stop_sequence\") = 'integer' OR \"trip_stop_sequence\" IS NULL)) , \"scheduled_stop_sequence\" integer CHECK(\"scheduled_stop_sequence\" >= 0 AND (TYPEOF(\"scheduled_stop_sequence\") = 'integer' OR \"scheduled_stop_sequence\" IS NULL)) , \"vehicle_id\" text COLLATE BINARY, \"device_id\" text COLLATE BINARY, \"fare_id\" text COLLATE BINARY, \"stop_id\" text COLLATE BINARY, \"num_riders\" integer CHECK(\"num_riders\" >= 0 AND (TYPEOF(\"num_riders\") = 'integer' OR \"num_riders\" IS NULL)) , \"fare_media_id\" text COLLATE BINARY, \"rider_category\" text COLLATE BINARY, \"fare_product\" text COLLATE BINARY, \"fare_period\" text COLLATE BINARY, \"fare_capped\" text NOT NULL COLLATE BINARY, \"token_id\" text COLLATE BINARY, \"balance\" integer CHECK((TYPEOF(\"balance\") = 'integer' OR \"balance\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"transaction_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_fare_transfer_rules_source_id",
+      "tableName": "fare_transfer_rules",
+      "sql": "CREATE INDEX \"idx_fare_transfer_rules_source_id\" ON \"fare_transfer_rules\" (\"source_id\")"
+    },
+    {
+      "type": "table",
+      "name": "fare_transfer_rules",
+      "tableName": "fare_transfer_rules",
+      "sql": "CREATE TABLE \"fare_transfer_rules\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"from_leg_group_id\" text COLLATE BINARY, \"to_leg_group_id\" text COLLATE BINARY, \"transfer_count\" integer CHECK(\"transfer_count\" >= -1 AND (TYPEOF(\"transfer_count\") = 'integer' OR \"transfer_count\" IS NULL)) , \"duration_limit\" integer CHECK(\"duration_limit\" >= 1 AND (TYPEOF(\"duration_limit\") = 'integer' OR \"duration_limit\" IS NULL)) , \"duration_limit_type\" integer CHECK(\"duration_limit_type\" >= 0 AND \"duration_limit_type\" <= 3 AND (TYPEOF(\"duration_limit_type\") = 'integer' OR \"duration_limit_type\" IS NULL)) , \"fare_transfer_type\" integer CHECK(\"fare_transfer_type\" >= 0 AND \"fare_transfer_type\" <= 2 AND (TYPEOF(\"fare_transfer_type\") = 'integer' OR \"fare_transfer_type\" IS NULL)) NOT NULL , \"fare_product_id\" text COLLATE BINARY, \"_unknown_fields\" JSON, \"_node_gtfs_key\" TEXT NOT NULL CHECK(length(\"_node_gtfs_key\") = 64), UNIQUE (\"_node_gtfs_key\"))"
+    },
+    {
+      "type": "table",
+      "name": "feed_info",
+      "tableName": "feed_info",
+      "sql": "CREATE TABLE \"feed_info\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"feed_publisher_name\" text NOT NULL COLLATE BINARY, \"_node_gtfs_casefold_feed_publisher_name\" TEXT COLLATE BINARY, \"feed_publisher_url\" text NOT NULL COLLATE BINARY, \"feed_lang\" text NOT NULL COLLATE BINARY, \"default_lang\" text COLLATE BINARY, \"_node_gtfs_casefold_default_lang\" TEXT COLLATE BINARY, \"feed_start_date\" date , \"feed_end_date\" date , \"feed_version\" text COLLATE BINARY, \"feed_contact_email\" text COLLATE BINARY, \"_node_gtfs_casefold_feed_contact_email\" TEXT COLLATE BINARY, \"feed_contact_url\" text COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "frequencies",
+      "tableName": "frequencies",
+      "sql": "CREATE TABLE \"frequencies\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"trip_id\" text NOT NULL COLLATE BINARY, \"start_time\" time NOT NULL COLLATE BINARY, \"start_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"start_time\" IS NULL OR \"start_time\" = '' THEN NULL ELSE CAST( substr(\"start_time\", 1, instr(\"start_time\", ':') - 1) * 3600 + substr(\"start_time\", instr(\"start_time\", ':') + 1, 2) * 60 + substr(\"start_time\", -2) AS INTEGER ) END ) STORED, \"end_time\" time NOT NULL COLLATE BINARY, \"end_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"end_time\" IS NULL OR \"end_time\" = '' THEN NULL ELSE CAST( substr(\"end_time\", 1, instr(\"end_time\", ':') - 1) * 3600 + substr(\"end_time\", instr(\"end_time\", ':') + 1, 2) * 60 + substr(\"end_time\", -2) AS INTEGER ) END ) STORED, \"headway_secs\" integer CHECK(\"headway_secs\" >= 1 AND (TYPEOF(\"headway_secs\") = 'integer' OR \"headway_secs\" IS NULL)) NOT NULL , \"exact_times\" integer CHECK(\"exact_times\" >= 0 AND \"exact_times\" <= 1 AND (TYPEOF(\"exact_times\") = 'integer' OR \"exact_times\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"trip_id\", \"start_time\"))"
+    },
+    {
+      "type": "table",
+      "name": "levels",
+      "tableName": "levels",
+      "sql": "CREATE TABLE \"levels\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"level_id\" text NOT NULL COLLATE BINARY, \"level_index\" real CHECK((TYPEOF(\"level_index\") = 'real' OR \"level_index\" IS NULL)) NOT NULL , \"level_name\" text COLLATE BINARY, \"_node_gtfs_casefold_level_name\" TEXT COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"level_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_location_group_stops_stop_id",
+      "tableName": "location_group_stops",
+      "sql": "CREATE INDEX \"idx_location_group_stops_stop_id\" ON \"location_group_stops\" (\"stop_id\")"
+    },
+    {
+      "type": "table",
+      "name": "location_group_stops",
+      "tableName": "location_group_stops",
+      "sql": "CREATE TABLE \"location_group_stops\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"location_group_id\" text NOT NULL COLLATE BINARY, \"stop_id\" text NOT NULL COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"location_group_id\", \"stop_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "location_groups",
+      "tableName": "location_groups",
+      "sql": "CREATE TABLE \"location_groups\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"location_group_id\" text NOT NULL COLLATE BINARY, \"location_group_name\" text COLLATE BINARY, \"_node_gtfs_casefold_location_group_name\" TEXT COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"location_group_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "locations",
+      "tableName": "locations",
+      "sql": "CREATE TABLE \"locations\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"id\" text NOT NULL COLLATE BINARY, \"stop_name\" text COLLATE BINARY, \"stop_desc\" text COLLATE BINARY, \"geometry\" json NOT NULL COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"id\"))"
+    },
+    {
+      "type": "table",
+      "name": "networks",
+      "tableName": "networks",
+      "sql": "CREATE TABLE \"networks\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"network_id\" text NOT NULL COLLATE BINARY, \"network_name\" text COLLATE BINARY, \"_node_gtfs_casefold_network_name\" TEXT COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"network_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "operators",
+      "tableName": "operators",
+      "sql": "CREATE TABLE \"operators\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"operator_id\" text NOT NULL COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"operator_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_passenger_events_passenger_event_id",
+      "tableName": "passenger_events",
+      "sql": "CREATE INDEX \"idx_passenger_events_passenger_event_id\" ON \"passenger_events\" (\"passenger_event_id\")"
+    },
+    {
+      "type": "table",
+      "name": "passenger_events",
+      "tableName": "passenger_events",
+      "sql": "CREATE TABLE \"passenger_events\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"passenger_event_id\" text NOT NULL COLLATE BINARY, \"service_date\" date NOT NULL , \"event_timestamp\" text NOT NULL COLLATE BINARY, \"location_ping_id\" text COLLATE BINARY, \"trip_id_performed\" text COLLATE BINARY, \"trip_id_scheduled\" text COLLATE BINARY, \"trip_stop_sequence\" integer CHECK(\"trip_stop_sequence\" >= 1 AND (TYPEOF(\"trip_stop_sequence\") = 'integer' OR \"trip_stop_sequence\" IS NULL)) NOT NULL , \"scheduled_stop_sequence\" integer CHECK(\"scheduled_stop_sequence\" >= 0 AND (TYPEOF(\"scheduled_stop_sequence\") = 'integer' OR \"scheduled_stop_sequence\" IS NULL)) , \"event_type\" text NOT NULL COLLATE BINARY, \"vehicle_id\" text NOT NULL COLLATE BINARY, \"device_id\" text COLLATE BINARY, \"train_car_id\" text COLLATE BINARY, \"stop_id\" text COLLATE BINARY, \"pattern_id\" text COLLATE BINARY, \"event_count\" integer CHECK(\"event_count\" >= 0 AND (TYPEOF(\"event_count\") = 'integer' OR \"event_count\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"passenger_event_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_pathways_from_stop_id",
+      "tableName": "pathways",
+      "sql": "CREATE INDEX \"idx_pathways_from_stop_id\" ON \"pathways\" (\"from_stop_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_pathways_to_stop_id",
+      "tableName": "pathways",
+      "sql": "CREATE INDEX \"idx_pathways_to_stop_id\" ON \"pathways\" (\"to_stop_id\")"
+    },
+    {
+      "type": "table",
+      "name": "pathways",
+      "tableName": "pathways",
+      "sql": "CREATE TABLE \"pathways\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"pathway_id\" text NOT NULL COLLATE BINARY, \"from_stop_id\" text NOT NULL COLLATE BINARY, \"to_stop_id\" text NOT NULL COLLATE BINARY, \"pathway_mode\" integer CHECK(\"pathway_mode\" >= 1 AND \"pathway_mode\" <= 7 AND (TYPEOF(\"pathway_mode\") = 'integer' OR \"pathway_mode\" IS NULL)) NOT NULL , \"is_bidirectional\" integer CHECK(\"is_bidirectional\" >= 0 AND \"is_bidirectional\" <= 1 AND (TYPEOF(\"is_bidirectional\") = 'integer' OR \"is_bidirectional\" IS NULL)) NOT NULL , \"length\" real CHECK(\"length\" >= 0 AND (TYPEOF(\"length\") = 'real' OR \"length\" IS NULL)) , \"traversal_time\" integer CHECK(\"traversal_time\" >= 1 AND (TYPEOF(\"traversal_time\") = 'integer' OR \"traversal_time\" IS NULL)) , \"stair_count\" integer CHECK((TYPEOF(\"stair_count\") = 'integer' OR \"stair_count\" IS NULL)) , \"max_slope\" real CHECK((TYPEOF(\"max_slope\") = 'real' OR \"max_slope\" IS NULL)) , \"min_width\" real CHECK(\"min_width\" >= 0 AND (TYPEOF(\"min_width\") = 'real' OR \"min_width\" IS NULL)) , \"signposted_as\" text COLLATE BINARY, \"_node_gtfs_casefold_signposted_as\" TEXT COLLATE BINARY, \"reversed_signposted_as\" text COLLATE BINARY, \"_node_gtfs_casefold_reversed_signposted_as\" TEXT COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"pathway_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_realtime_feed_entities_source_id_entity_id",
+      "tableName": "realtime_feed_entities",
+      "sql": "CREATE INDEX \"idx_realtime_feed_entities_source_id_entity_id\" ON \"realtime_feed_entities\" (\"source_id\", \"entity_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_realtime_feed_entities_source_id_realtime_feed_id_entity_type_entity_id",
+      "tableName": "realtime_feed_entities",
+      "sql": "CREATE INDEX \"idx_realtime_feed_entities_source_id_realtime_feed_id_entity_type_entity_id\" ON \"realtime_feed_entities\" (\"source_id\", \"realtime_feed_id\", \"entity_type\", \"entity_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_realtime_feed_entities_source_id_retention_expires_at_unix_seconds",
+      "tableName": "realtime_feed_entities",
+      "sql": "CREATE INDEX \"idx_realtime_feed_entities_source_id_retention_expires_at_unix_seconds\" ON \"realtime_feed_entities\" (\"source_id\", \"retention_expires_at_unix_seconds\")"
+    },
+    {
+      "type": "table",
+      "name": "realtime_feed_entities",
+      "tableName": "realtime_feed_entities",
+      "sql": "CREATE TABLE \"realtime_feed_entities\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"realtime_feed_id\" text NOT NULL COLLATE BINARY, \"snapshot_id\" text NOT NULL COLLATE BINARY, \"entity_ordinal\" integer CHECK(\"entity_ordinal\" >= 0 AND (TYPEOF(\"entity_ordinal\") = 'integer' OR \"entity_ordinal\" IS NULL)) NOT NULL , \"entity_id\" text COLLATE BINARY, \"entity_type\" text NOT NULL COLLATE BINARY, \"is_deleted\" integer CHECK(\"is_deleted\" >= 0 AND \"is_deleted\" <= 1 AND (TYPEOF(\"is_deleted\") = 'integer' OR \"is_deleted\" IS NULL)) NOT NULL DEFAULT 0 , \"entity_json\" json NOT NULL COLLATE BINARY, \"recorded_at_unix_seconds\" integer CHECK(\"recorded_at_unix_seconds\" >= 0 AND (TYPEOF(\"recorded_at_unix_seconds\") = 'integer' OR \"recorded_at_unix_seconds\" IS NULL)) NOT NULL , \"retention_expires_at_unix_seconds\" integer CHECK(\"retention_expires_at_unix_seconds\" >= 0 AND (TYPEOF(\"retention_expires_at_unix_seconds\") = 'integer' OR \"retention_expires_at_unix_seconds\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"realtime_feed_id\", \"snapshot_id\", \"entity_ordinal\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_realtime_feeds_source_id_feed_type",
+      "tableName": "realtime_feeds",
+      "sql": "CREATE INDEX \"idx_realtime_feeds_source_id_feed_type\" ON \"realtime_feeds\" (\"source_id\", \"feed_type\")"
+    },
+    {
+      "type": "table",
+      "name": "realtime_feeds",
+      "tableName": "realtime_feeds",
+      "sql": "CREATE TABLE \"realtime_feeds\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"realtime_feed_id\" text NOT NULL COLLATE BINARY, \"feed_type\" text CHECK(\"feed_type\" IN ('alerts', 'tripUpdates', 'vehiclePositions', 'shapes', 'stops', 'tripModifications', 'mixed')) NOT NULL COLLATE BINARY, \"feed_url\" text NOT NULL COLLATE BINARY, \"source_metadata\" json COLLATE BINARY, \"created_at_unix_seconds\" integer CHECK(\"created_at_unix_seconds\" >= 0 AND (TYPEOF(\"created_at_unix_seconds\") = 'integer' OR \"created_at_unix_seconds\" IS NULL)) NOT NULL , \"updated_at_unix_seconds\" integer CHECK(\"updated_at_unix_seconds\" >= 0 AND (TYPEOF(\"updated_at_unix_seconds\") = 'integer' OR \"updated_at_unix_seconds\" IS NULL)) NOT NULL , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"realtime_feed_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_realtime_shapes_source_id_expires_at_unix_seconds",
+      "tableName": "realtime_shapes",
+      "sql": "CREATE INDEX \"idx_realtime_shapes_source_id_expires_at_unix_seconds\" ON \"realtime_shapes\" (\"source_id\", \"expires_at_unix_seconds\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_realtime_shapes_source_id_shape_id",
+      "tableName": "realtime_shapes",
+      "sql": "CREATE INDEX \"idx_realtime_shapes_source_id_shape_id\" ON \"realtime_shapes\" (\"source_id\", \"shape_id\")"
+    },
+    {
+      "type": "table",
+      "name": "realtime_shapes",
+      "tableName": "realtime_shapes",
+      "sql": "CREATE TABLE \"realtime_shapes\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"realtime_feed_id\" text NOT NULL COLLATE BINARY, \"entity_id\" text NOT NULL COLLATE BINARY, \"shape_id\" text NOT NULL COLLATE BINARY, \"encoded_polyline\" text NOT NULL COLLATE BINARY, \"created_at_unix_seconds\" integer CHECK(\"created_at_unix_seconds\" >= 0 AND (TYPEOF(\"created_at_unix_seconds\") = 'integer' OR \"created_at_unix_seconds\" IS NULL)) NOT NULL , \"expires_at_unix_seconds\" integer CHECK(\"expires_at_unix_seconds\" >= 0 AND (TYPEOF(\"expires_at_unix_seconds\") = 'integer' OR \"expires_at_unix_seconds\" IS NULL)) NOT NULL , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"realtime_feed_id\", \"entity_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_realtime_snapshots_source_id_feed_header_unix_seconds",
+      "tableName": "realtime_snapshots",
+      "sql": "CREATE INDEX \"idx_realtime_snapshots_source_id_feed_header_unix_seconds\" ON \"realtime_snapshots\" (\"source_id\", \"feed_header_unix_seconds\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_realtime_snapshots_source_id_payload_sha256",
+      "tableName": "realtime_snapshots",
+      "sql": "CREATE INDEX \"idx_realtime_snapshots_source_id_payload_sha256\" ON \"realtime_snapshots\" (\"source_id\", \"payload_sha256\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_realtime_snapshots_source_id_realtime_feed_id_fetched_at_unix_seconds",
+      "tableName": "realtime_snapshots",
+      "sql": "CREATE INDEX \"idx_realtime_snapshots_source_id_realtime_feed_id_fetched_at_unix_seconds\" ON \"realtime_snapshots\" (\"source_id\", \"realtime_feed_id\", \"fetched_at_unix_seconds\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_realtime_snapshots_source_id_retention_expires_at_unix_seconds",
+      "tableName": "realtime_snapshots",
+      "sql": "CREATE INDEX \"idx_realtime_snapshots_source_id_retention_expires_at_unix_seconds\" ON \"realtime_snapshots\" (\"source_id\", \"retention_expires_at_unix_seconds\")"
+    },
+    {
+      "type": "table",
+      "name": "realtime_snapshots",
+      "tableName": "realtime_snapshots",
+      "sql": "CREATE TABLE \"realtime_snapshots\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"realtime_feed_id\" text NOT NULL COLLATE BINARY, \"snapshot_id\" text NOT NULL COLLATE BINARY, \"fetched_at_unix_seconds\" integer CHECK(\"fetched_at_unix_seconds\" >= 0 AND (TYPEOF(\"fetched_at_unix_seconds\") = 'integer' OR \"fetched_at_unix_seconds\" IS NULL)) NOT NULL , \"http_status\" integer CHECK(\"http_status\" >= 100 AND \"http_status\" <= 599 AND (TYPEOF(\"http_status\") = 'integer' OR \"http_status\" IS NULL)) , \"http_headers\" json COLLATE BINARY, \"content_type\" text COLLATE BINARY, \"feed_header_version\" text COLLATE BINARY, \"feed_header_incrementality\" text COLLATE BINARY, \"feed_header_unix_seconds\" integer CHECK(\"feed_header_unix_seconds\" >= 0 AND (TYPEOF(\"feed_header_unix_seconds\") = 'integer' OR \"feed_header_unix_seconds\" IS NULL)) , \"entity_count\" integer CHECK(\"entity_count\" >= 0 AND (TYPEOF(\"entity_count\") = 'integer' OR \"entity_count\" IS NULL)) NOT NULL , \"payload_sha256\" text NOT NULL COLLATE BINARY, \"raw_payload\" text NOT NULL COLLATE BINARY, \"raw_payload_encoding\" text CHECK(\"raw_payload_encoding\" IN ('base64')) NOT NULL COLLATE BINARY, \"retention_expires_at_unix_seconds\" integer CHECK(\"retention_expires_at_unix_seconds\" >= 0 AND (TYPEOF(\"retention_expires_at_unix_seconds\") = 'integer' OR \"retention_expires_at_unix_seconds\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"realtime_feed_id\", \"snapshot_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_realtime_stops_source_id_expires_at_unix_seconds",
+      "tableName": "realtime_stops",
+      "sql": "CREATE INDEX \"idx_realtime_stops_source_id_expires_at_unix_seconds\" ON \"realtime_stops\" (\"source_id\", \"expires_at_unix_seconds\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_realtime_stops_source_id_parent_station",
+      "tableName": "realtime_stops",
+      "sql": "CREATE INDEX \"idx_realtime_stops_source_id_parent_station\" ON \"realtime_stops\" (\"source_id\", \"parent_station\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_realtime_stops_source_id_stop_id",
+      "tableName": "realtime_stops",
+      "sql": "CREATE INDEX \"idx_realtime_stops_source_id_stop_id\" ON \"realtime_stops\" (\"source_id\", \"stop_id\")"
+    },
+    {
+      "type": "table",
+      "name": "realtime_stops",
+      "tableName": "realtime_stops",
+      "sql": "CREATE TABLE \"realtime_stops\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"realtime_feed_id\" text NOT NULL COLLATE BINARY, \"entity_id\" text NOT NULL COLLATE BINARY, \"stop_id\" text NOT NULL COLLATE BINARY, \"stop_code\" text COLLATE BINARY, \"stop_code_translations\" json COLLATE BINARY, \"stop_name\" text COLLATE BINARY, \"stop_name_translations\" json COLLATE BINARY, \"tts_stop_name\" text COLLATE BINARY, \"tts_stop_name_translations\" json COLLATE BINARY, \"stop_desc\" text COLLATE BINARY, \"stop_desc_translations\" json COLLATE BINARY, \"stop_lat\" real CHECK(\"stop_lat\" >= -90 AND \"stop_lat\" <= 90 AND (TYPEOF(\"stop_lat\") = 'real' OR \"stop_lat\" IS NULL)) , \"stop_lon\" real CHECK(\"stop_lon\" >= -180 AND \"stop_lon\" <= 180 AND (TYPEOF(\"stop_lon\") = 'real' OR \"stop_lon\" IS NULL)) , \"zone_id\" text COLLATE BINARY, \"stop_url\" text COLLATE BINARY, \"stop_url_translations\" json COLLATE BINARY, \"parent_station\" text COLLATE BINARY, \"stop_timezone\" text COLLATE BINARY, \"wheelchair_boarding\" text COLLATE BINARY, \"level_id\" text COLLATE BINARY, \"platform_code\" text COLLATE BINARY, \"platform_code_translations\" json COLLATE BINARY, \"created_at_unix_seconds\" integer CHECK(\"created_at_unix_seconds\" >= 0 AND (TYPEOF(\"created_at_unix_seconds\") = 'integer' OR \"created_at_unix_seconds\" IS NULL)) NOT NULL , \"expires_at_unix_seconds\" integer CHECK(\"expires_at_unix_seconds\" >= 0 AND (TYPEOF(\"expires_at_unix_seconds\") = 'integer' OR \"expires_at_unix_seconds\" IS NULL)) NOT NULL , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"realtime_feed_id\", \"entity_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_ride_feed_info_gtfs_feed_date",
+      "tableName": "ride_feed_info",
+      "sql": "CREATE INDEX \"idx_ride_feed_info_gtfs_feed_date\" ON \"ride_feed_info\" (\"gtfs_feed_date\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_ride_feed_info_ride_end_date",
+      "tableName": "ride_feed_info",
+      "sql": "CREATE INDEX \"idx_ride_feed_info_ride_end_date\" ON \"ride_feed_info\" (\"ride_end_date\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_ride_feed_info_ride_start_date",
+      "tableName": "ride_feed_info",
+      "sql": "CREATE INDEX \"idx_ride_feed_info_ride_start_date\" ON \"ride_feed_info\" (\"ride_start_date\")"
+    },
+    {
+      "type": "table",
+      "name": "ride_feed_info",
+      "tableName": "ride_feed_info",
+      "sql": "CREATE TABLE \"ride_feed_info\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"ride_files\" integer CHECK(\"ride_files\" >= 0 AND \"ride_files\" <= 6 AND (TYPEOF(\"ride_files\") = 'integer' OR \"ride_files\" IS NULL)) NOT NULL , \"ride_start_date\" date , \"ride_end_date\" date , \"gtfs_feed_date\" date , \"default_currency_type\" text COLLATE BINARY, \"ride_feed_version\" text COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "rider_categories",
+      "tableName": "rider_categories",
+      "sql": "CREATE TABLE \"rider_categories\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"rider_category_id\" text NOT NULL COLLATE BINARY, \"rider_category_name\" text NOT NULL COLLATE BINARY, \"_node_gtfs_casefold_rider_category_name\" TEXT COLLATE BINARY, \"is_default_fare_category\" integer CHECK(\"is_default_fare_category\" >= 0 AND \"is_default_fare_category\" <= 1 AND (TYPEOF(\"is_default_fare_category\") = 'integer' OR \"is_default_fare_category\" IS NULL)) DEFAULT 0 , \"eligibility_url\" text COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"rider_category_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_rider_trip_agency_id",
+      "tableName": "rider_trip",
+      "sql": "CREATE INDEX \"idx_rider_trip_agency_id\" ON \"rider_trip\" (\"agency_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_rider_trip_alighting_stop_id",
+      "tableName": "rider_trip",
+      "sql": "CREATE INDEX \"idx_rider_trip_alighting_stop_id\" ON \"rider_trip\" (\"alighting_stop_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_rider_trip_alighting_stop_sequence",
+      "tableName": "rider_trip",
+      "sql": "CREATE INDEX \"idx_rider_trip_alighting_stop_sequence\" ON \"rider_trip\" (\"alighting_stop_sequence\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_rider_trip_boarding_stop_id",
+      "tableName": "rider_trip",
+      "sql": "CREATE INDEX \"idx_rider_trip_boarding_stop_id\" ON \"rider_trip\" (\"boarding_stop_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_rider_trip_boarding_stop_sequence",
+      "tableName": "rider_trip",
+      "sql": "CREATE INDEX \"idx_rider_trip_boarding_stop_sequence\" ON \"rider_trip\" (\"boarding_stop_sequence\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_rider_trip_service_date",
+      "tableName": "rider_trip",
+      "sql": "CREATE INDEX \"idx_rider_trip_service_date\" ON \"rider_trip\" (\"service_date\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_rider_trip_trip_id",
+      "tableName": "rider_trip",
+      "sql": "CREATE INDEX \"idx_rider_trip_trip_id\" ON \"rider_trip\" (\"trip_id\")"
+    },
+    {
+      "type": "table",
+      "name": "rider_trip",
+      "tableName": "rider_trip",
+      "sql": "CREATE TABLE \"rider_trip\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"rider_id\" text NOT NULL COLLATE BINARY, \"agency_id\" text COLLATE BINARY, \"trip_id\" text COLLATE BINARY, \"boarding_stop_id\" text COLLATE BINARY, \"boarding_stop_sequence\" integer CHECK(\"boarding_stop_sequence\" >= 0 AND (TYPEOF(\"boarding_stop_sequence\") = 'integer' OR \"boarding_stop_sequence\" IS NULL)) , \"alighting_stop_id\" text COLLATE BINARY, \"alighting_stop_sequence\" integer CHECK(\"alighting_stop_sequence\" >= 0 AND (TYPEOF(\"alighting_stop_sequence\") = 'integer' OR \"alighting_stop_sequence\" IS NULL)) , \"service_date\" date , \"boarding_time\" time COLLATE BINARY, \"boarding_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"boarding_time\" IS NULL OR \"boarding_time\" = '' THEN NULL ELSE CAST( substr(\"boarding_time\", 1, instr(\"boarding_time\", ':') - 1) * 3600 + substr(\"boarding_time\", instr(\"boarding_time\", ':') + 1, 2) * 60 + substr(\"boarding_time\", -2) AS INTEGER ) END ) STORED, \"alighting_time\" time COLLATE BINARY, \"alighting_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"alighting_time\" IS NULL OR \"alighting_time\" = '' THEN NULL ELSE CAST( substr(\"alighting_time\", 1, instr(\"alighting_time\", ':') - 1) * 3600 + substr(\"alighting_time\", instr(\"alighting_time\", ':') + 1, 2) * 60 + substr(\"alighting_time\", -2) AS INTEGER ) END ) STORED, \"rider_type\" integer CHECK(\"rider_type\" >= 0 AND \"rider_type\" <= 13 AND (TYPEOF(\"rider_type\") = 'integer' OR \"rider_type\" IS NULL)) , \"rider_type_description\" text COLLATE BINARY, \"fare_paid\" real CHECK((TYPEOF(\"fare_paid\") = 'real' OR \"fare_paid\" IS NULL)) , \"transaction_type\" integer CHECK(\"transaction_type\" >= 0 AND \"transaction_type\" <= 8 AND (TYPEOF(\"transaction_type\") = 'integer' OR \"transaction_type\" IS NULL)) , \"fare_media\" integer CHECK(\"fare_media\" >= 0 AND \"fare_media\" <= 9 AND (TYPEOF(\"fare_media\") = 'integer' OR \"fare_media\" IS NULL)) , \"accompanying_device\" integer CHECK(\"accompanying_device\" >= 0 AND \"accompanying_device\" <= 6 AND (TYPEOF(\"accompanying_device\") = 'integer' OR \"accompanying_device\" IS NULL)) , \"transfer_status\" integer CHECK(\"transfer_status\" >= 0 AND \"transfer_status\" <= 1 AND (TYPEOF(\"transfer_status\") = 'integer' OR \"transfer_status\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"rider_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_ridership_agency_id",
+      "tableName": "ridership",
+      "sql": "CREATE INDEX \"idx_ridership_agency_id\" ON \"ridership\" (\"agency_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_ridership_direction_id",
+      "tableName": "ridership",
+      "sql": "CREATE INDEX \"idx_ridership_direction_id\" ON \"ridership\" (\"direction_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_ridership_ridership_end_date",
+      "tableName": "ridership",
+      "sql": "CREATE INDEX \"idx_ridership_ridership_end_date\" ON \"ridership\" (\"ridership_end_date\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_ridership_ridership_start_date",
+      "tableName": "ridership",
+      "sql": "CREATE INDEX \"idx_ridership_ridership_start_date\" ON \"ridership\" (\"ridership_start_date\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_ridership_route_id",
+      "tableName": "ridership",
+      "sql": "CREATE INDEX \"idx_ridership_route_id\" ON \"ridership\" (\"route_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_ridership_service_id",
+      "tableName": "ridership",
+      "sql": "CREATE INDEX \"idx_ridership_service_id\" ON \"ridership\" (\"service_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_ridership_source_id",
+      "tableName": "ridership",
+      "sql": "CREATE INDEX \"idx_ridership_source_id\" ON \"ridership\" (\"source_id\")"
+    },
+    {
+      "type": "table",
+      "name": "ridership",
+      "tableName": "ridership",
+      "sql": "CREATE TABLE \"ridership\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"total_boardings\" integer CHECK(\"total_boardings\" >= 0 AND (TYPEOF(\"total_boardings\") = 'integer' OR \"total_boardings\" IS NULL)) NOT NULL , \"total_alightings\" integer CHECK(\"total_alightings\" >= 0 AND (TYPEOF(\"total_alightings\") = 'integer' OR \"total_alightings\" IS NULL)) NOT NULL , \"ridership_start_date\" date , \"ridership_end_date\" date , \"ridership_start_time\" time COLLATE BINARY, \"ridership_start_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"ridership_start_time\" IS NULL OR \"ridership_start_time\" = '' THEN NULL ELSE CAST( substr(\"ridership_start_time\", 1, instr(\"ridership_start_time\", ':') - 1) * 3600 + substr(\"ridership_start_time\", instr(\"ridership_start_time\", ':') + 1, 2) * 60 + substr(\"ridership_start_time\", -2) AS INTEGER ) END ) STORED, \"ridership_end_time\" time COLLATE BINARY, \"ridership_end_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"ridership_end_time\" IS NULL OR \"ridership_end_time\" = '' THEN NULL ELSE CAST( substr(\"ridership_end_time\", 1, instr(\"ridership_end_time\", ':') - 1) * 3600 + substr(\"ridership_end_time\", instr(\"ridership_end_time\", ':') + 1, 2) * 60 + substr(\"ridership_end_time\", -2) AS INTEGER ) END ) STORED, \"service_id\" text COLLATE BINARY, \"monday\" integer CHECK(\"monday\" >= 0 AND \"monday\" <= 1 AND (TYPEOF(\"monday\") = 'integer' OR \"monday\" IS NULL)) , \"tuesday\" integer CHECK(\"tuesday\" >= 0 AND \"tuesday\" <= 1 AND (TYPEOF(\"tuesday\") = 'integer' OR \"tuesday\" IS NULL)) , \"wednesday\" integer CHECK(\"wednesday\" >= 0 AND \"wednesday\" <= 1 AND (TYPEOF(\"wednesday\") = 'integer' OR \"wednesday\" IS NULL)) , \"thursday\" integer CHECK(\"thursday\" >= 0 AND \"thursday\" <= 1 AND (TYPEOF(\"thursday\") = 'integer' OR \"thursday\" IS NULL)) , \"friday\" integer CHECK(\"friday\" >= 0 AND \"friday\" <= 1 AND (TYPEOF(\"friday\") = 'integer' OR \"friday\" IS NULL)) , \"saturday\" integer CHECK(\"saturday\" >= 0 AND \"saturday\" <= 1 AND (TYPEOF(\"saturday\") = 'integer' OR \"saturday\" IS NULL)) , \"sunday\" integer CHECK(\"sunday\" >= 0 AND \"sunday\" <= 1 AND (TYPEOF(\"sunday\") = 'integer' OR \"sunday\" IS NULL)) , \"agency_id\" text COLLATE BINARY, \"route_id\" text COLLATE BINARY, \"direction_id\" integer CHECK(\"direction_id\" >= 0 AND \"direction_id\" <= 1 AND (TYPEOF(\"direction_id\") = 'integer' OR \"direction_id\" IS NULL)) , \"trip_id\" text COLLATE BINARY, \"stop_id\" text COLLATE BINARY, \"_unknown_fields\" JSON)"
+    },
+    {
+      "type": "table",
+      "name": "route_attributes",
+      "tableName": "route_attributes",
+      "sql": "CREATE TABLE \"route_attributes\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"route_id\" text NOT NULL COLLATE BINARY, \"category\" integer CHECK(\"category\" >= 0 AND (TYPEOF(\"category\") = 'integer' OR \"category\" IS NULL)) NOT NULL , \"subcategory\" integer CHECK(\"subcategory\" >= 101 AND (TYPEOF(\"subcategory\") = 'integer' OR \"subcategory\" IS NULL)) NOT NULL , \"running_way\" integer CHECK(\"running_way\" >= 1 AND (TYPEOF(\"running_way\") = 'integer' OR \"running_way\" IS NULL)) NOT NULL , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"route_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_route_networks_network_id",
+      "tableName": "route_networks",
+      "sql": "CREATE INDEX \"idx_route_networks_network_id\" ON \"route_networks\" (\"network_id\")"
+    },
+    {
+      "type": "table",
+      "name": "route_networks",
+      "tableName": "route_networks",
+      "sql": "CREATE TABLE \"route_networks\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"network_id\" text NOT NULL COLLATE BINARY, \"route_id\" text NOT NULL COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"route_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_routes_agency_id",
+      "tableName": "routes",
+      "sql": "CREATE INDEX \"idx_routes_agency_id\" ON \"routes\" (\"agency_id\")"
+    },
+    {
+      "type": "table",
+      "name": "routes",
+      "tableName": "routes",
+      "sql": "CREATE TABLE \"routes\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"route_id\" text NOT NULL COLLATE BINARY, \"agency_id\" text COLLATE BINARY, \"route_short_name\" text COLLATE BINARY, \"_node_gtfs_casefold_route_short_name\" TEXT COLLATE BINARY, \"route_long_name\" text COLLATE BINARY, \"_node_gtfs_casefold_route_long_name\" TEXT COLLATE BINARY, \"route_desc\" text COLLATE BINARY, \"_node_gtfs_casefold_route_desc\" TEXT COLLATE BINARY, \"route_type\" integer CHECK(\"route_type\" >= 0 AND (TYPEOF(\"route_type\") = 'integer' OR \"route_type\" IS NULL)) NOT NULL , \"route_url\" text COLLATE BINARY, \"route_color\" text COLLATE BINARY, \"_node_gtfs_casefold_route_color\" TEXT COLLATE BINARY, \"route_text_color\" text COLLATE BINARY, \"_node_gtfs_casefold_route_text_color\" TEXT COLLATE BINARY, \"route_sort_order\" integer CHECK(\"route_sort_order\" >= 0 AND (TYPEOF(\"route_sort_order\") = 'integer' OR \"route_sort_order\" IS NULL)) , \"continuous_pickup\" integer CHECK(\"continuous_pickup\" >= 0 AND \"continuous_pickup\" <= 3 AND (TYPEOF(\"continuous_pickup\") = 'integer' OR \"continuous_pickup\" IS NULL)) , \"continuous_drop_off\" integer CHECK(\"continuous_drop_off\" >= 0 AND \"continuous_drop_off\" <= 3 AND (TYPEOF(\"continuous_drop_off\") = 'integer' OR \"continuous_drop_off\" IS NULL)) , \"network_id\" text COLLATE BINARY, \"cemv_support\" integer CHECK(\"cemv_support\" >= 0 AND \"cemv_support\" <= 2 AND (TYPEOF(\"cemv_support\") = 'integer' OR \"cemv_support\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"route_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "routes_supplement",
+      "tableName": "routes_supplement",
+      "sql": "CREATE TABLE \"routes_supplement\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"route_id\" text NOT NULL COLLATE BINARY, \"agency_id\" text COLLATE BINARY, \"route_short_name\" text COLLATE BINARY, \"_node_gtfs_casefold_route_short_name\" TEXT COLLATE BINARY, \"route_long_name\" text COLLATE BINARY, \"_node_gtfs_casefold_route_long_name\" TEXT COLLATE BINARY, \"route_desc\" text COLLATE BINARY, \"_node_gtfs_casefold_route_desc\" TEXT COLLATE BINARY, \"route_type\" integer CHECK(\"route_type\" >= 0 AND (TYPEOF(\"route_type\") = 'integer' OR \"route_type\" IS NULL)) , \"route_url\" text COLLATE BINARY, \"route_color\" text COLLATE BINARY, \"_node_gtfs_casefold_route_color\" TEXT COLLATE BINARY, \"route_text_color\" text COLLATE BINARY, \"_node_gtfs_casefold_route_text_color\" TEXT COLLATE BINARY, \"route_sort_order\" integer CHECK(\"route_sort_order\" >= 0 AND (TYPEOF(\"route_sort_order\") = 'integer' OR \"route_sort_order\" IS NULL)) , \"continuous_pickup\" integer CHECK(\"continuous_pickup\" >= 0 AND \"continuous_pickup\" <= 3 AND (TYPEOF(\"continuous_pickup\") = 'integer' OR \"continuous_pickup\" IS NULL)) , \"continuous_drop_off\" integer CHECK(\"continuous_drop_off\" >= 0 AND \"continuous_drop_off\" <= 3 AND (TYPEOF(\"continuous_drop_off\") = 'integer' OR \"continuous_drop_off\" IS NULL)) , \"network_id\" text COLLATE BINARY, \"cemv_support\" integer CHECK(\"cemv_support\" >= 0 AND \"cemv_support\" <= 2 AND (TYPEOF(\"cemv_support\") = 'integer' OR \"cemv_support\" IS NULL)) , \"TODS_delete\" integer CHECK(\"TODS_delete\" IN (1) AND (TYPEOF(\"TODS_delete\") = 'integer' OR \"TODS_delete\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"route_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_run_events_block_id",
+      "tableName": "run_events",
+      "sql": "CREATE INDEX \"idx_run_events_block_id\" ON \"run_events\" (\"block_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_run_events_trip_id",
+      "tableName": "run_events",
+      "sql": "CREATE INDEX \"idx_run_events_trip_id\" ON \"run_events\" (\"trip_id\")"
+    },
+    {
+      "type": "table",
+      "name": "run_events",
+      "tableName": "run_events",
+      "sql": "CREATE TABLE \"run_events\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"service_id\" text NOT NULL COLLATE BINARY, \"run_id\" text NOT NULL COLLATE BINARY, \"event_sequence\" integer CHECK(\"event_sequence\" >= 0 AND (TYPEOF(\"event_sequence\") = 'integer' OR \"event_sequence\" IS NULL)) NOT NULL , \"piece_id\" text COLLATE BINARY, \"block_id\" text COLLATE BINARY, \"job_type\" text COLLATE BINARY, \"event_type\" text NOT NULL COLLATE BINARY, \"trip_id\" text COLLATE BINARY, \"start_location\" text NOT NULL COLLATE BINARY, \"start_time\" time NOT NULL COLLATE BINARY, \"start_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"start_time\" IS NULL OR \"start_time\" = '' THEN NULL ELSE CAST( substr(\"start_time\", 1, instr(\"start_time\", ':') - 1) * 3600 + substr(\"start_time\", instr(\"start_time\", ':') + 1, 2) * 60 + substr(\"start_time\", -2) AS INTEGER ) END ) STORED, \"start_mid_trip\" integer CHECK(\"start_mid_trip\" IN (0, 1, 2) AND (TYPEOF(\"start_mid_trip\") = 'integer' OR \"start_mid_trip\" IS NULL)) , \"end_location\" text NOT NULL COLLATE BINARY, \"end_time\" time NOT NULL COLLATE BINARY, \"end_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"end_time\" IS NULL OR \"end_time\" = '' THEN NULL ELSE CAST( substr(\"end_time\", 1, instr(\"end_time\", ':') - 1) * 3600 + substr(\"end_time\", instr(\"end_time\", ':') + 1, 2) * 60 + substr(\"end_time\", -2) AS INTEGER ) END ) STORED, \"end_mid_trip\" integer CHECK(\"end_mid_trip\" IN (0, 1, 2) AND (TYPEOF(\"end_mid_trip\") = 'integer' OR \"end_mid_trip\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"service_id\", \"run_id\", \"event_sequence\"))"
+    },
+    {
+      "type": "table",
+      "name": "shapes",
+      "tableName": "shapes",
+      "sql": "CREATE TABLE \"shapes\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"shape_id\" text NOT NULL COLLATE BINARY, \"shape_pt_lat\" real CHECK(\"shape_pt_lat\" >= -90 AND \"shape_pt_lat\" <= 90 AND (TYPEOF(\"shape_pt_lat\") = 'real' OR \"shape_pt_lat\" IS NULL)) NOT NULL , \"shape_pt_lon\" real CHECK(\"shape_pt_lon\" >= -180 AND \"shape_pt_lon\" <= 180 AND (TYPEOF(\"shape_pt_lon\") = 'real' OR \"shape_pt_lon\" IS NULL)) NOT NULL , \"shape_pt_sequence\" integer CHECK(\"shape_pt_sequence\" >= 0 AND (TYPEOF(\"shape_pt_sequence\") = 'integer' OR \"shape_pt_sequence\" IS NULL)) NOT NULL , \"shape_dist_traveled\" real CHECK(\"shape_dist_traveled\" >= 0 AND (TYPEOF(\"shape_dist_traveled\") = 'real' OR \"shape_dist_traveled\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"shape_id\", \"shape_pt_sequence\"))"
+    },
+    {
+      "type": "table",
+      "name": "station_activities",
+      "tableName": "station_activities",
+      "sql": "CREATE TABLE \"station_activities\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"service_date\" date NOT NULL , \"stop_id\" text NOT NULL COLLATE BINARY, \"time_period_start\" text NOT NULL COLLATE BINARY, \"time_period_end\" text NOT NULL COLLATE BINARY, \"time_period_category\" text COLLATE BINARY, \"total_entries\" integer CHECK(\"total_entries\" >= 0 AND (TYPEOF(\"total_entries\") = 'integer' OR \"total_entries\" IS NULL)) , \"total_exits\" integer CHECK(\"total_exits\" >= 0 AND (TYPEOF(\"total_exits\") = 'integer' OR \"total_exits\" IS NULL)) , \"number_of_transactions\" integer CHECK(\"number_of_transactions\" >= 0 AND (TYPEOF(\"number_of_transactions\") = 'integer' OR \"number_of_transactions\" IS NULL)) , \"bike_entries\" integer CHECK(\"bike_entries\" >= 0 AND (TYPEOF(\"bike_entries\") = 'integer' OR \"bike_entries\" IS NULL)) , \"bike_exits\" integer CHECK(\"bike_exits\" >= 0 AND (TYPEOF(\"bike_exits\") = 'integer' OR \"bike_exits\" IS NULL)) , \"ramp_entries\" integer CHECK(\"ramp_entries\" >= 0 AND (TYPEOF(\"ramp_entries\") = 'integer' OR \"ramp_entries\" IS NULL)) , \"ramp_exits\" integer CHECK(\"ramp_exits\" >= 0 AND (TYPEOF(\"ramp_exits\") = 'integer' OR \"ramp_exits\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"service_date\", \"stop_id\", \"time_period_start\", \"time_period_end\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_stop_areas_stop_id",
+      "tableName": "stop_areas",
+      "sql": "CREATE INDEX \"idx_stop_areas_stop_id\" ON \"stop_areas\" (\"stop_id\")"
+    },
+    {
+      "type": "table",
+      "name": "stop_areas",
+      "tableName": "stop_areas",
+      "sql": "CREATE TABLE \"stop_areas\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"area_id\" text NOT NULL COLLATE BINARY, \"stop_id\" text NOT NULL COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"area_id\", \"stop_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "stop_attributes",
+      "tableName": "stop_attributes",
+      "sql": "CREATE TABLE \"stop_attributes\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"stop_id\" text NOT NULL COLLATE BINARY, \"accessibility_id\" integer CHECK(\"accessibility_id\" >= 0 AND (TYPEOF(\"accessibility_id\") = 'integer' OR \"accessibility_id\" IS NULL)) , \"cardinal_direction\" text COLLATE BINARY, \"relative_position\" text COLLATE BINARY, \"stop_city\" text COLLATE BINARY, \"_node_gtfs_casefold_stop_city\" TEXT COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"stop_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_stop_times_drop_off_booking_rule_id",
+      "tableName": "stop_times",
+      "sql": "CREATE INDEX \"idx_stop_times_drop_off_booking_rule_id\" ON \"stop_times\" (\"drop_off_booking_rule_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_stop_times_location_group_id",
+      "tableName": "stop_times",
+      "sql": "CREATE INDEX \"idx_stop_times_location_group_id\" ON \"stop_times\" (\"location_group_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_stop_times_location_id",
+      "tableName": "stop_times",
+      "sql": "CREATE INDEX \"idx_stop_times_location_id\" ON \"stop_times\" (\"location_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_stop_times_pickup_booking_rule_id",
+      "tableName": "stop_times",
+      "sql": "CREATE INDEX \"idx_stop_times_pickup_booking_rule_id\" ON \"stop_times\" (\"pickup_booking_rule_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_stop_times_stop_id_arrival_service_day_seconds",
+      "tableName": "stop_times",
+      "sql": "CREATE INDEX \"idx_stop_times_stop_id_arrival_service_day_seconds\" ON \"stop_times\" (\"stop_id\", \"arrival_service_day_seconds\")"
+    },
+    {
+      "type": "table",
+      "name": "stop_times",
+      "tableName": "stop_times",
+      "sql": "CREATE TABLE \"stop_times\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"trip_id\" text NOT NULL COLLATE BINARY, \"arrival_time\" time COLLATE BINARY, \"arrival_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"arrival_time\" IS NULL OR \"arrival_time\" = '' THEN NULL ELSE CAST( substr(\"arrival_time\", 1, instr(\"arrival_time\", ':') - 1) * 3600 + substr(\"arrival_time\", instr(\"arrival_time\", ':') + 1, 2) * 60 + substr(\"arrival_time\", -2) AS INTEGER ) END ) STORED, \"departure_time\" time COLLATE BINARY, \"departure_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"departure_time\" IS NULL OR \"departure_time\" = '' THEN NULL ELSE CAST( substr(\"departure_time\", 1, instr(\"departure_time\", ':') - 1) * 3600 + substr(\"departure_time\", instr(\"departure_time\", ':') + 1, 2) * 60 + substr(\"departure_time\", -2) AS INTEGER ) END ) STORED, \"location_group_id\" text COLLATE BINARY, \"location_id\" text COLLATE BINARY, \"stop_id\" text COLLATE BINARY, \"stop_sequence\" integer CHECK(\"stop_sequence\" >= 0 AND (TYPEOF(\"stop_sequence\") = 'integer' OR \"stop_sequence\" IS NULL)) NOT NULL , \"stop_headsign\" text COLLATE BINARY, \"_node_gtfs_casefold_stop_headsign\" TEXT COLLATE BINARY, \"start_pickup_drop_off_window\" time COLLATE BINARY, \"start_pickup_drop_off_window_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"start_pickup_drop_off_window\" IS NULL OR \"start_pickup_drop_off_window\" = '' THEN NULL ELSE CAST( substr(\"start_pickup_drop_off_window\", 1, instr(\"start_pickup_drop_off_window\", ':') - 1) * 3600 + substr(\"start_pickup_drop_off_window\", instr(\"start_pickup_drop_off_window\", ':') + 1, 2) * 60 + substr(\"start_pickup_drop_off_window\", -2) AS INTEGER ) END ) STORED, \"end_pickup_drop_off_window\" time COLLATE BINARY, \"end_pickup_drop_off_window_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"end_pickup_drop_off_window\" IS NULL OR \"end_pickup_drop_off_window\" = '' THEN NULL ELSE CAST( substr(\"end_pickup_drop_off_window\", 1, instr(\"end_pickup_drop_off_window\", ':') - 1) * 3600 + substr(\"end_pickup_drop_off_window\", instr(\"end_pickup_drop_off_window\", ':') + 1, 2) * 60 + substr(\"end_pickup_drop_off_window\", -2) AS INTEGER ) END ) STORED, \"pickup_type\" integer CHECK(\"pickup_type\" >= 0 AND \"pickup_type\" <= 3 AND (TYPEOF(\"pickup_type\") = 'integer' OR \"pickup_type\" IS NULL)) , \"drop_off_type\" integer CHECK(\"drop_off_type\" >= 0 AND \"drop_off_type\" <= 3 AND (TYPEOF(\"drop_off_type\") = 'integer' OR \"drop_off_type\" IS NULL)) , \"continuous_pickup\" integer CHECK(\"continuous_pickup\" >= 0 AND \"continuous_pickup\" <= 3 AND (TYPEOF(\"continuous_pickup\") = 'integer' OR \"continuous_pickup\" IS NULL)) , \"continuous_drop_off\" integer CHECK(\"continuous_drop_off\" >= 0 AND \"continuous_drop_off\" <= 3 AND (TYPEOF(\"continuous_drop_off\") = 'integer' OR \"continuous_drop_off\" IS NULL)) , \"shape_dist_traveled\" real CHECK(\"shape_dist_traveled\" >= 0 AND (TYPEOF(\"shape_dist_traveled\") = 'real' OR \"shape_dist_traveled\" IS NULL)) , \"timepoint\" integer CHECK(\"timepoint\" >= 0 AND \"timepoint\" <= 1 AND (TYPEOF(\"timepoint\") = 'integer' OR \"timepoint\" IS NULL)) , \"pickup_booking_rule_id\" text COLLATE BINARY, \"drop_off_booking_rule_id\" text COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"trip_id\", \"stop_sequence\"))"
+    },
+    {
+      "type": "table",
+      "name": "stop_times_supplement",
+      "tableName": "stop_times_supplement",
+      "sql": "CREATE TABLE \"stop_times_supplement\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"trip_id\" text NOT NULL COLLATE BINARY, \"arrival_time\" time COLLATE BINARY, \"arrival_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"arrival_time\" IS NULL OR \"arrival_time\" = '' THEN NULL ELSE CAST( substr(\"arrival_time\", 1, instr(\"arrival_time\", ':') - 1) * 3600 + substr(\"arrival_time\", instr(\"arrival_time\", ':') + 1, 2) * 60 + substr(\"arrival_time\", -2) AS INTEGER ) END ) STORED, \"departure_time\" time COLLATE BINARY, \"departure_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"departure_time\" IS NULL OR \"departure_time\" = '' THEN NULL ELSE CAST( substr(\"departure_time\", 1, instr(\"departure_time\", ':') - 1) * 3600 + substr(\"departure_time\", instr(\"departure_time\", ':') + 1, 2) * 60 + substr(\"departure_time\", -2) AS INTEGER ) END ) STORED, \"location_group_id\" text COLLATE BINARY, \"location_id\" text COLLATE BINARY, \"stop_id\" text COLLATE BINARY, \"stop_sequence\" integer CHECK(\"stop_sequence\" >= 0 AND (TYPEOF(\"stop_sequence\") = 'integer' OR \"stop_sequence\" IS NULL)) NOT NULL , \"stop_headsign\" text COLLATE BINARY, \"_node_gtfs_casefold_stop_headsign\" TEXT COLLATE BINARY, \"start_pickup_drop_off_window\" time COLLATE BINARY, \"start_pickup_drop_off_window_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"start_pickup_drop_off_window\" IS NULL OR \"start_pickup_drop_off_window\" = '' THEN NULL ELSE CAST( substr(\"start_pickup_drop_off_window\", 1, instr(\"start_pickup_drop_off_window\", ':') - 1) * 3600 + substr(\"start_pickup_drop_off_window\", instr(\"start_pickup_drop_off_window\", ':') + 1, 2) * 60 + substr(\"start_pickup_drop_off_window\", -2) AS INTEGER ) END ) STORED, \"end_pickup_drop_off_window\" time COLLATE BINARY, \"end_pickup_drop_off_window_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"end_pickup_drop_off_window\" IS NULL OR \"end_pickup_drop_off_window\" = '' THEN NULL ELSE CAST( substr(\"end_pickup_drop_off_window\", 1, instr(\"end_pickup_drop_off_window\", ':') - 1) * 3600 + substr(\"end_pickup_drop_off_window\", instr(\"end_pickup_drop_off_window\", ':') + 1, 2) * 60 + substr(\"end_pickup_drop_off_window\", -2) AS INTEGER ) END ) STORED, \"pickup_type\" integer CHECK(\"pickup_type\" >= 0 AND \"pickup_type\" <= 3 AND (TYPEOF(\"pickup_type\") = 'integer' OR \"pickup_type\" IS NULL)) , \"drop_off_type\" integer CHECK(\"drop_off_type\" >= 0 AND \"drop_off_type\" <= 3 AND (TYPEOF(\"drop_off_type\") = 'integer' OR \"drop_off_type\" IS NULL)) , \"continuous_pickup\" integer CHECK(\"continuous_pickup\" >= 0 AND \"continuous_pickup\" <= 3 AND (TYPEOF(\"continuous_pickup\") = 'integer' OR \"continuous_pickup\" IS NULL)) , \"continuous_drop_off\" integer CHECK(\"continuous_drop_off\" >= 0 AND \"continuous_drop_off\" <= 3 AND (TYPEOF(\"continuous_drop_off\") = 'integer' OR \"continuous_drop_off\" IS NULL)) , \"shape_dist_traveled\" real CHECK(\"shape_dist_traveled\" >= 0 AND (TYPEOF(\"shape_dist_traveled\") = 'real' OR \"shape_dist_traveled\" IS NULL)) , \"timepoint\" integer CHECK(\"timepoint\" >= 0 AND \"timepoint\" <= 1 AND (TYPEOF(\"timepoint\") = 'integer' OR \"timepoint\" IS NULL)) , \"pickup_booking_rule_id\" text COLLATE BINARY, \"drop_off_booking_rule_id\" text COLLATE BINARY, \"TODS_delete\" integer CHECK(\"TODS_delete\" IN (1) AND (TYPEOF(\"TODS_delete\") = 'integer' OR \"TODS_delete\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"trip_id\", \"stop_sequence\"))"
+    },
+    {
+      "type": "table",
+      "name": "stop_visits",
+      "tableName": "stop_visits",
+      "sql": "CREATE TABLE \"stop_visits\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"service_date\" date NOT NULL , \"trip_id_performed\" text NOT NULL COLLATE BINARY, \"trip_stop_sequence\" integer CHECK(\"trip_stop_sequence\" >= 1 AND (TYPEOF(\"trip_stop_sequence\") = 'integer' OR \"trip_stop_sequence\" IS NULL)) NOT NULL , \"scheduled_stop_sequence\" integer CHECK(\"scheduled_stop_sequence\" >= 0 AND (TYPEOF(\"scheduled_stop_sequence\") = 'integer' OR \"scheduled_stop_sequence\" IS NULL)) , \"pattern_id\" text COLLATE BINARY, \"vehicle_id\" text COLLATE BINARY, \"dwell\" integer CHECK(\"dwell\" >= 0 AND (TYPEOF(\"dwell\") = 'integer' OR \"dwell\" IS NULL)) , \"stop_id\" text COLLATE BINARY, \"timepoint\" text COLLATE BINARY, \"schedule_arrival_time\" text COLLATE BINARY, \"schedule_departure_time\" text COLLATE BINARY, \"actual_arrival_time\" text COLLATE BINARY, \"actual_departure_time\" text COLLATE BINARY, \"distance\" integer CHECK(\"distance\" >= 0 AND (TYPEOF(\"distance\") = 'integer' OR \"distance\" IS NULL)) , \"boarding_1\" integer CHECK(\"boarding_1\" >= 0 AND (TYPEOF(\"boarding_1\") = 'integer' OR \"boarding_1\" IS NULL)) , \"alighting_1\" integer CHECK(\"alighting_1\" >= 0 AND (TYPEOF(\"alighting_1\") = 'integer' OR \"alighting_1\" IS NULL)) , \"boarding_2\" integer CHECK(\"boarding_2\" >= 0 AND (TYPEOF(\"boarding_2\") = 'integer' OR \"boarding_2\" IS NULL)) , \"alighting_2\" integer CHECK(\"alighting_2\" >= 0 AND (TYPEOF(\"alighting_2\") = 'integer' OR \"alighting_2\" IS NULL)) , \"departure_load\" integer CHECK(\"departure_load\" >= 0 AND (TYPEOF(\"departure_load\") = 'integer' OR \"departure_load\" IS NULL)) , \"door_open\" text COLLATE BINARY, \"door_close\" text COLLATE BINARY, \"door_status\" text COLLATE BINARY, \"ramp_deployed_time\" real CHECK(\"ramp_deployed_time\" >= 0 AND (TYPEOF(\"ramp_deployed_time\") = 'real' OR \"ramp_deployed_time\" IS NULL)) , \"ramp_failure\" text COLLATE BINARY, \"kneel_deployed_time\" real CHECK(\"kneel_deployed_time\" >= 0 AND (TYPEOF(\"kneel_deployed_time\") = 'real' OR \"kneel_deployed_time\" IS NULL)) , \"lift_deployed_time\" real CHECK(\"lift_deployed_time\" >= 0 AND (TYPEOF(\"lift_deployed_time\") = 'real' OR \"lift_deployed_time\" IS NULL)) , \"bike_rack_deployed\" text COLLATE BINARY, \"bike_load\" integer CHECK(\"bike_load\" >= 0 AND (TYPEOF(\"bike_load\") = 'integer' OR \"bike_load\" IS NULL)) , \"revenue\" real CHECK((TYPEOF(\"revenue\") = 'real' OR \"revenue\" IS NULL)) , \"number_of_transactions\" integer CHECK(\"number_of_transactions\" >= 0 AND (TYPEOF(\"number_of_transactions\") = 'integer' OR \"number_of_transactions\" IS NULL)) , \"schedule_relationship\" text COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"service_date\", \"trip_id_performed\", \"trip_stop_sequence\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_stops_level_id",
+      "tableName": "stops",
+      "sql": "CREATE INDEX \"idx_stops_level_id\" ON \"stops\" (\"level_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_stops_parent_station",
+      "tableName": "stops",
+      "sql": "CREATE INDEX \"idx_stops_parent_station\" ON \"stops\" (\"parent_station\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_stops_source_id_stop_lat_stop_lon",
+      "tableName": "stops",
+      "sql": "CREATE INDEX \"idx_stops_source_id_stop_lat_stop_lon\" ON \"stops\" (\"source_id\", \"stop_lat\", \"stop_lon\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_stops_stop_code",
+      "tableName": "stops",
+      "sql": "CREATE INDEX \"idx_stops_stop_code\" ON \"stops\" (\"stop_code\")"
+    },
+    {
+      "type": "table",
+      "name": "stops",
+      "tableName": "stops",
+      "sql": "CREATE TABLE \"stops\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"stop_id\" text NOT NULL COLLATE BINARY, \"stop_code\" text COLLATE BINARY, \"stop_name\" text COLLATE BINARY, \"_node_gtfs_casefold_stop_name\" TEXT COLLATE BINARY, \"tts_stop_name\" text COLLATE BINARY, \"_node_gtfs_casefold_tts_stop_name\" TEXT COLLATE BINARY, \"stop_desc\" text COLLATE BINARY, \"_node_gtfs_casefold_stop_desc\" TEXT COLLATE BINARY, \"stop_lat\" real CHECK(\"stop_lat\" >= -90 AND \"stop_lat\" <= 90 AND (TYPEOF(\"stop_lat\") = 'real' OR \"stop_lat\" IS NULL)) , \"stop_lon\" real CHECK(\"stop_lon\" >= -180 AND \"stop_lon\" <= 180 AND (TYPEOF(\"stop_lon\") = 'real' OR \"stop_lon\" IS NULL)) , \"zone_id\" text COLLATE BINARY, \"stop_url\" text COLLATE BINARY, \"location_type\" integer CHECK(\"location_type\" >= 0 AND \"location_type\" <= 4 AND (TYPEOF(\"location_type\") = 'integer' OR \"location_type\" IS NULL)) , \"parent_station\" text COLLATE BINARY, \"stop_timezone\" text COLLATE BINARY, \"wheelchair_boarding\" integer CHECK(\"wheelchair_boarding\" >= 0 AND \"wheelchair_boarding\" <= 2 AND (TYPEOF(\"wheelchair_boarding\") = 'integer' OR \"wheelchair_boarding\" IS NULL)) , \"level_id\" text COLLATE BINARY, \"platform_code\" text COLLATE BINARY, \"stop_access\" integer CHECK(\"stop_access\" >= 0 AND \"stop_access\" <= 1 AND (TYPEOF(\"stop_access\") = 'integer' OR \"stop_access\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"stop_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "stops_supplement",
+      "tableName": "stops_supplement",
+      "sql": "CREATE TABLE \"stops_supplement\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"stop_id\" text NOT NULL COLLATE BINARY, \"stop_code\" text COLLATE BINARY, \"stop_name\" text COLLATE BINARY, \"_node_gtfs_casefold_stop_name\" TEXT COLLATE BINARY, \"tts_stop_name\" text COLLATE BINARY, \"_node_gtfs_casefold_tts_stop_name\" TEXT COLLATE BINARY, \"stop_desc\" text COLLATE BINARY, \"_node_gtfs_casefold_stop_desc\" TEXT COLLATE BINARY, \"stop_lat\" real CHECK(\"stop_lat\" >= -90 AND \"stop_lat\" <= 90 AND (TYPEOF(\"stop_lat\") = 'real' OR \"stop_lat\" IS NULL)) , \"stop_lon\" real CHECK(\"stop_lon\" >= -180 AND \"stop_lon\" <= 180 AND (TYPEOF(\"stop_lon\") = 'real' OR \"stop_lon\" IS NULL)) , \"zone_id\" text COLLATE BINARY, \"stop_url\" text COLLATE BINARY, \"location_type\" integer CHECK(\"location_type\" >= 0 AND \"location_type\" <= 4 AND (TYPEOF(\"location_type\") = 'integer' OR \"location_type\" IS NULL)) , \"parent_station\" text COLLATE BINARY, \"stop_timezone\" text COLLATE BINARY, \"wheelchair_boarding\" integer CHECK(\"wheelchair_boarding\" >= 0 AND \"wheelchair_boarding\" <= 2 AND (TYPEOF(\"wheelchair_boarding\") = 'integer' OR \"wheelchair_boarding\" IS NULL)) , \"level_id\" text COLLATE BINARY, \"platform_code\" text COLLATE BINARY, \"stop_access\" integer CHECK(\"stop_access\" >= 0 AND \"stop_access\" <= 1 AND (TYPEOF(\"stop_access\") = 'integer' OR \"stop_access\" IS NULL)) , \"TODS_delete\" integer CHECK(\"TODS_delete\" IN (1) AND (TYPEOF(\"TODS_delete\") = 'integer' OR \"TODS_delete\" IS NULL)) , \"TODS_location_type\" text COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"stop_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_timeframes_service_id",
+      "tableName": "timeframes",
+      "sql": "CREATE INDEX \"idx_timeframes_service_id\" ON \"timeframes\" (\"service_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_timeframes_source_id",
+      "tableName": "timeframes",
+      "sql": "CREATE INDEX \"idx_timeframes_source_id\" ON \"timeframes\" (\"source_id\")"
+    },
+    {
+      "type": "table",
+      "name": "timeframes",
+      "tableName": "timeframes",
+      "sql": "CREATE TABLE \"timeframes\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"timeframe_group_id\" text NOT NULL COLLATE BINARY, \"start_time\" time COLLATE BINARY, \"start_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"start_time\" IS NULL OR \"start_time\" = '' THEN NULL ELSE CAST( substr(\"start_time\", 1, instr(\"start_time\", ':') - 1) * 3600 + substr(\"start_time\", instr(\"start_time\", ':') + 1, 2) * 60 + substr(\"start_time\", -2) AS INTEGER ) END ) STORED, \"end_time\" time COLLATE BINARY, \"end_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"end_time\" IS NULL OR \"end_time\" = '' THEN NULL ELSE CAST( substr(\"end_time\", 1, instr(\"end_time\", ':') - 1) * 3600 + substr(\"end_time\", instr(\"end_time\", ':') + 1, 2) * 60 + substr(\"end_time\", -2) AS INTEGER ) END ) STORED, \"service_id\" text NOT NULL COLLATE BINARY, \"_unknown_fields\" JSON, \"_node_gtfs_key\" TEXT NOT NULL CHECK(length(\"_node_gtfs_key\") = 64), UNIQUE (\"_node_gtfs_key\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_timetable_notes_source_id",
+      "tableName": "timetable_notes",
+      "sql": "CREATE INDEX \"idx_timetable_notes_source_id\" ON \"timetable_notes\" (\"source_id\")"
+    },
+    {
+      "type": "table",
+      "name": "timetable_notes",
+      "tableName": "timetable_notes",
+      "sql": "CREATE TABLE \"timetable_notes\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"note_id\" text NOT NULL COLLATE BINARY, \"symbol\" text COLLATE BINARY, \"note\" text COLLATE BINARY, \"_node_gtfs_casefold_note\" TEXT COLLATE BINARY, \"scope\" text COLLATE BINARY, \"timetable_id\" text COLLATE BINARY, \"route_id\" text COLLATE BINARY, \"trip_id\" text COLLATE BINARY, \"stop_id\" text COLLATE BINARY, \"stop_sequence\" integer CHECK(\"stop_sequence\" >= 0 AND (TYPEOF(\"stop_sequence\") = 'integer' OR \"stop_sequence\" IS NULL)) , \"_unknown_fields\" JSON, \"_node_gtfs_key\" TEXT NOT NULL CHECK(length(\"_node_gtfs_key\") = 64), UNIQUE (\"_node_gtfs_key\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_timetable_notes_references_source_id",
+      "tableName": "timetable_notes_references",
+      "sql": "CREATE INDEX \"idx_timetable_notes_references_source_id\" ON \"timetable_notes_references\" (\"source_id\")"
+    },
+    {
+      "type": "table",
+      "name": "timetable_notes_references",
+      "tableName": "timetable_notes_references",
+      "sql": "CREATE TABLE \"timetable_notes_references\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"note_id\" text NOT NULL COLLATE BINARY, \"timetable_id\" text COLLATE BINARY, \"route_id\" text COLLATE BINARY, \"trip_id\" text COLLATE BINARY, \"stop_id\" text COLLATE BINARY, \"stop_sequence\" integer CHECK(\"stop_sequence\" >= 0 AND (TYPEOF(\"stop_sequence\") = 'integer' OR \"stop_sequence\" IS NULL)) , \"show_on_stoptime\" integer CHECK(\"show_on_stoptime\" >= 0 AND \"show_on_stoptime\" <= 1 AND (TYPEOF(\"show_on_stoptime\") = 'integer' OR \"show_on_stoptime\" IS NULL)) , \"_unknown_fields\" JSON, \"_node_gtfs_key\" TEXT NOT NULL CHECK(length(\"_node_gtfs_key\") = 64), UNIQUE (\"_node_gtfs_key\"))"
+    },
+    {
+      "type": "table",
+      "name": "timetable_pages",
+      "tableName": "timetable_pages",
+      "sql": "CREATE TABLE \"timetable_pages\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"timetable_page_id\" text NOT NULL COLLATE BINARY, \"timetable_page_label\" text COLLATE BINARY, \"_node_gtfs_casefold_timetable_page_label\" TEXT COLLATE BINARY, \"filename\" text COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"timetable_page_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_timetable_stop_order_stop_sequence",
+      "tableName": "timetable_stop_order",
+      "sql": "CREATE INDEX \"idx_timetable_stop_order_stop_sequence\" ON \"timetable_stop_order\" (\"stop_sequence\")"
+    },
+    {
+      "type": "table",
+      "name": "timetable_stop_order",
+      "tableName": "timetable_stop_order",
+      "sql": "CREATE TABLE \"timetable_stop_order\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"timetable_id\" text NOT NULL COLLATE BINARY, \"stop_id\" text NOT NULL COLLATE BINARY, \"stop_sequence\" integer CHECK(\"stop_sequence\" >= 0 AND (TYPEOF(\"stop_sequence\") = 'integer' OR \"stop_sequence\" IS NULL)) NOT NULL , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"timetable_id\", \"stop_id\", \"stop_sequence\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_timetables_timetable_sequence",
+      "tableName": "timetables",
+      "sql": "CREATE INDEX \"idx_timetables_timetable_sequence\" ON \"timetables\" (\"timetable_sequence\")"
+    },
+    {
+      "type": "table",
+      "name": "timetables",
+      "tableName": "timetables",
+      "sql": "CREATE TABLE \"timetables\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"timetable_id\" text NOT NULL COLLATE BINARY, \"route_id\" text NOT NULL COLLATE BINARY, \"direction_id\" integer CHECK(\"direction_id\" >= 0 AND \"direction_id\" <= 1 AND (TYPEOF(\"direction_id\") = 'integer' OR \"direction_id\" IS NULL)) , \"start_date\" date , \"end_date\" date , \"monday\" integer CHECK(\"monday\" >= 0 AND \"monday\" <= 1 AND (TYPEOF(\"monday\") = 'integer' OR \"monday\" IS NULL)) NOT NULL , \"tuesday\" integer CHECK(\"tuesday\" >= 0 AND \"tuesday\" <= 1 AND (TYPEOF(\"tuesday\") = 'integer' OR \"tuesday\" IS NULL)) NOT NULL , \"wednesday\" integer CHECK(\"wednesday\" >= 0 AND \"wednesday\" <= 1 AND (TYPEOF(\"wednesday\") = 'integer' OR \"wednesday\" IS NULL)) NOT NULL , \"thursday\" integer CHECK(\"thursday\" >= 0 AND \"thursday\" <= 1 AND (TYPEOF(\"thursday\") = 'integer' OR \"thursday\" IS NULL)) NOT NULL , \"friday\" integer CHECK(\"friday\" >= 0 AND \"friday\" <= 1 AND (TYPEOF(\"friday\") = 'integer' OR \"friday\" IS NULL)) NOT NULL , \"saturday\" integer CHECK(\"saturday\" >= 0 AND \"saturday\" <= 1 AND (TYPEOF(\"saturday\") = 'integer' OR \"saturday\" IS NULL)) NOT NULL , \"sunday\" integer CHECK(\"sunday\" >= 0 AND \"sunday\" <= 1 AND (TYPEOF(\"sunday\") = 'integer' OR \"sunday\" IS NULL)) NOT NULL , \"start_time\" time COLLATE BINARY, \"start_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"start_time\" IS NULL OR \"start_time\" = '' THEN NULL ELSE CAST( substr(\"start_time\", 1, instr(\"start_time\", ':') - 1) * 3600 + substr(\"start_time\", instr(\"start_time\", ':') + 1, 2) * 60 + substr(\"start_time\", -2) AS INTEGER ) END ) STORED, \"end_time\" time COLLATE BINARY, \"end_service_day_seconds\" INTEGER GENERATED ALWAYS AS ( CASE WHEN \"end_time\" IS NULL OR \"end_time\" = '' THEN NULL ELSE CAST( substr(\"end_time\", 1, instr(\"end_time\", ':') - 1) * 3600 + substr(\"end_time\", instr(\"end_time\", ':') + 1, 2) * 60 + substr(\"end_time\", -2) AS INTEGER ) END ) STORED, \"timetable_label\" text COLLATE BINARY, \"_node_gtfs_casefold_timetable_label\" TEXT COLLATE BINARY, \"service_notes\" text COLLATE BINARY, \"_node_gtfs_casefold_service_notes\" TEXT COLLATE BINARY, \"orientation\" text COLLATE BINARY, \"timetable_page_id\" text COLLATE BINARY, \"timetable_sequence\" integer CHECK(\"timetable_sequence\" >= 0 AND (TYPEOF(\"timetable_sequence\") = 'integer' OR \"timetable_sequence\" IS NULL)) , \"direction_name\" text COLLATE BINARY, \"include_exceptions\" integer CHECK(\"include_exceptions\" >= 0 AND \"include_exceptions\" <= 1 AND (TYPEOF(\"include_exceptions\") = 'integer' OR \"include_exceptions\" IS NULL)) , \"show_trip_continuation\" integer CHECK(\"show_trip_continuation\" >= 0 AND \"show_trip_continuation\" <= 1 AND (TYPEOF(\"show_trip_continuation\") = 'integer' OR \"show_trip_continuation\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"timetable_id\", \"route_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "tods_vehicles",
+      "tableName": "tods_vehicles",
+      "sql": "CREATE TABLE \"tods_vehicles\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"vehicle_id\" text NOT NULL COLLATE BINARY, \"vehicle_label\" text COLLATE BINARY, \"license_plate\" text COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"vehicle_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "train_cars",
+      "tableName": "train_cars",
+      "sql": "CREATE TABLE \"train_cars\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"train_car_id\" text NOT NULL COLLATE BINARY, \"model_name\" text COLLATE BINARY, \"facility_name\" text COLLATE BINARY, \"capacity_seated\" integer CHECK(\"capacity_seated\" >= 0 AND (TYPEOF(\"capacity_seated\") = 'integer' OR \"capacity_seated\" IS NULL)) , \"capacity_wheelchair\" integer CHECK(\"capacity_wheelchair\" >= 0 AND (TYPEOF(\"capacity_wheelchair\") = 'integer' OR \"capacity_wheelchair\" IS NULL)) , \"capacity_bike\" integer CHECK(\"capacity_bike\" >= 0 AND (TYPEOF(\"capacity_bike\") = 'integer' OR \"capacity_bike\" IS NULL)) , \"bike_rack\" text COLLATE BINARY, \"capacity_standing\" integer CHECK(\"capacity_standing\" >= 0 AND (TYPEOF(\"capacity_standing\") = 'integer' OR \"capacity_standing\" IS NULL)) , \"train_car_type\" text COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"train_car_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_transfers_source_id",
+      "tableName": "transfers",
+      "sql": "CREATE INDEX \"idx_transfers_source_id\" ON \"transfers\" (\"source_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_transfers_to_stop_id",
+      "tableName": "transfers",
+      "sql": "CREATE INDEX \"idx_transfers_to_stop_id\" ON \"transfers\" (\"to_stop_id\")"
+    },
+    {
+      "type": "table",
+      "name": "transfers",
+      "tableName": "transfers",
+      "sql": "CREATE TABLE \"transfers\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"from_stop_id\" text COLLATE BINARY, \"to_stop_id\" text COLLATE BINARY, \"from_route_id\" text COLLATE BINARY, \"to_route_id\" text COLLATE BINARY, \"from_trip_id\" text COLLATE BINARY, \"to_trip_id\" text COLLATE BINARY, \"transfer_type\" integer CHECK(\"transfer_type\" >= 0 AND \"transfer_type\" <= 5 AND (TYPEOF(\"transfer_type\") = 'integer' OR \"transfer_type\" IS NULL)) DEFAULT 0 , \"min_transfer_time\" integer CHECK(\"min_transfer_time\" >= 0 AND (TYPEOF(\"min_transfer_time\") = 'integer' OR \"min_transfer_time\" IS NULL)) , \"_unknown_fields\" JSON, \"_node_gtfs_key\" TEXT NOT NULL CHECK(length(\"_node_gtfs_key\") = 64), UNIQUE (\"_node_gtfs_key\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_translations_source_id",
+      "tableName": "translations",
+      "sql": "CREATE INDEX \"idx_translations_source_id\" ON \"translations\" (\"source_id\")"
+    },
+    {
+      "type": "table",
+      "name": "translations",
+      "tableName": "translations",
+      "sql": "CREATE TABLE \"translations\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"table_name\" text NOT NULL COLLATE BINARY, \"field_name\" text NOT NULL COLLATE BINARY, \"language\" text NOT NULL COLLATE BINARY, \"translation\" text NOT NULL COLLATE BINARY, \"record_id\" text COLLATE BINARY, \"record_sub_id\" text COLLATE BINARY, \"field_value\" text COLLATE BINARY, \"_unknown_fields\" JSON, \"_node_gtfs_key\" TEXT NOT NULL CHECK(length(\"_node_gtfs_key\") = 64), UNIQUE (\"_node_gtfs_key\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_trip_capacity_agency_id",
+      "tableName": "trip_capacity",
+      "sql": "CREATE INDEX \"idx_trip_capacity_agency_id\" ON \"trip_capacity\" (\"agency_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_trip_capacity_service_date",
+      "tableName": "trip_capacity",
+      "sql": "CREATE INDEX \"idx_trip_capacity_service_date\" ON \"trip_capacity\" (\"service_date\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_trip_capacity_source_id",
+      "tableName": "trip_capacity",
+      "sql": "CREATE INDEX \"idx_trip_capacity_source_id\" ON \"trip_capacity\" (\"source_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_trip_capacity_trip_id",
+      "tableName": "trip_capacity",
+      "sql": "CREATE INDEX \"idx_trip_capacity_trip_id\" ON \"trip_capacity\" (\"trip_id\")"
+    },
+    {
+      "type": "table",
+      "name": "trip_capacity",
+      "tableName": "trip_capacity",
+      "sql": "CREATE TABLE \"trip_capacity\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"agency_id\" text COLLATE BINARY, \"trip_id\" text COLLATE BINARY, \"service_date\" date , \"vehicle_description\" text COLLATE BINARY, \"seated_capacity\" integer CHECK(\"seated_capacity\" >= 0 AND (TYPEOF(\"seated_capacity\") = 'integer' OR \"seated_capacity\" IS NULL)) , \"standing_capacity\" integer CHECK(\"standing_capacity\" >= 0 AND (TYPEOF(\"standing_capacity\") = 'integer' OR \"standing_capacity\" IS NULL)) , \"wheelchair_capacity\" integer CHECK(\"wheelchair_capacity\" >= 0 AND (TYPEOF(\"wheelchair_capacity\") = 'integer' OR \"wheelchair_capacity\" IS NULL)) , \"bike_capacity\" integer CHECK(\"bike_capacity\" >= 0 AND (TYPEOF(\"bike_capacity\") = 'integer' OR \"bike_capacity\" IS NULL)) , \"_unknown_fields\" JSON)"
+    },
+    {
+      "type": "index",
+      "name": "idx_trip_modifications_source_id_expires_at_unix_seconds",
+      "tableName": "trip_modifications",
+      "sql": "CREATE INDEX \"idx_trip_modifications_source_id_expires_at_unix_seconds\" ON \"trip_modifications\" (\"source_id\", \"expires_at_unix_seconds\")"
+    },
+    {
+      "type": "table",
+      "name": "trip_modifications",
+      "tableName": "trip_modifications",
+      "sql": "CREATE TABLE \"trip_modifications\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"realtime_feed_id\" text NOT NULL COLLATE BINARY, \"entity_id\" text NOT NULL COLLATE BINARY, \"selected_trips\" json COLLATE BINARY, \"start_times\" json COLLATE BINARY, \"service_dates\" json COLLATE BINARY, \"modifications\" json COLLATE BINARY, \"created_at_unix_seconds\" integer CHECK(\"created_at_unix_seconds\" >= 0 AND (TYPEOF(\"created_at_unix_seconds\") = 'integer' OR \"created_at_unix_seconds\" IS NULL)) NOT NULL , \"expires_at_unix_seconds\" integer CHECK(\"expires_at_unix_seconds\" >= 0 AND (TYPEOF(\"expires_at_unix_seconds\") = 'integer' OR \"expires_at_unix_seconds\" IS NULL)) NOT NULL , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"realtime_feed_id\", \"entity_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_trip_update_stop_time_updates_source_id_expires_at_unix_seconds",
+      "tableName": "trip_update_stop_time_updates",
+      "sql": "CREATE INDEX \"idx_trip_update_stop_time_updates_source_id_expires_at_unix_seconds\" ON \"trip_update_stop_time_updates\" (\"source_id\", \"expires_at_unix_seconds\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_trip_update_stop_time_updates_source_id_route_id",
+      "tableName": "trip_update_stop_time_updates",
+      "sql": "CREATE INDEX \"idx_trip_update_stop_time_updates_source_id_route_id\" ON \"trip_update_stop_time_updates\" (\"source_id\", \"route_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_trip_update_stop_time_updates_source_id_stop_id",
+      "tableName": "trip_update_stop_time_updates",
+      "sql": "CREATE INDEX \"idx_trip_update_stop_time_updates_source_id_stop_id\" ON \"trip_update_stop_time_updates\" (\"source_id\", \"stop_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_trip_update_stop_time_updates_source_id_trip_id",
+      "tableName": "trip_update_stop_time_updates",
+      "sql": "CREATE INDEX \"idx_trip_update_stop_time_updates_source_id_trip_id\" ON \"trip_update_stop_time_updates\" (\"source_id\", \"trip_id\")"
+    },
+    {
+      "type": "table",
+      "name": "trip_update_stop_time_updates",
+      "tableName": "trip_update_stop_time_updates",
+      "sql": "CREATE TABLE \"trip_update_stop_time_updates\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"realtime_feed_id\" text NOT NULL COLLATE BINARY, \"trip_update_id\" text NOT NULL COLLATE BINARY, \"stop_time_update_ordinal\" integer CHECK(\"stop_time_update_ordinal\" >= 0 AND (TYPEOF(\"stop_time_update_ordinal\") = 'integer' OR \"stop_time_update_ordinal\" IS NULL)) NOT NULL , \"trip_id\" text COLLATE BINARY, \"trip_start_time\" text COLLATE BINARY, \"trip_start_date\" text COLLATE BINARY, \"direction_id\" integer CHECK(\"direction_id\" >= 0 AND \"direction_id\" <= 1 AND (TYPEOF(\"direction_id\") = 'integer' OR \"direction_id\" IS NULL)) , \"route_id\" text COLLATE BINARY, \"trip_schedule_relationship\" text COLLATE BINARY, \"stop_id\" text COLLATE BINARY, \"stop_sequence\" integer CHECK(\"stop_sequence\" >= 0 AND (TYPEOF(\"stop_sequence\") = 'integer' OR \"stop_sequence\" IS NULL)) , \"arrival_delay\" integer CHECK((TYPEOF(\"arrival_delay\") = 'integer' OR \"arrival_delay\" IS NULL)) , \"arrival_unix_seconds\" integer CHECK((TYPEOF(\"arrival_unix_seconds\") = 'integer' OR \"arrival_unix_seconds\" IS NULL)) , \"arrival_uncertainty\" integer CHECK(\"arrival_uncertainty\" >= 0 AND (TYPEOF(\"arrival_uncertainty\") = 'integer' OR \"arrival_uncertainty\" IS NULL)) , \"arrival_scheduled_unix_seconds\" integer CHECK((TYPEOF(\"arrival_scheduled_unix_seconds\") = 'integer' OR \"arrival_scheduled_unix_seconds\" IS NULL)) , \"departure_delay\" integer CHECK((TYPEOF(\"departure_delay\") = 'integer' OR \"departure_delay\" IS NULL)) , \"departure_unix_seconds\" integer CHECK((TYPEOF(\"departure_unix_seconds\") = 'integer' OR \"departure_unix_seconds\" IS NULL)) , \"departure_uncertainty\" integer CHECK(\"departure_uncertainty\" >= 0 AND (TYPEOF(\"departure_uncertainty\") = 'integer' OR \"departure_uncertainty\" IS NULL)) , \"departure_scheduled_unix_seconds\" integer CHECK((TYPEOF(\"departure_scheduled_unix_seconds\") = 'integer' OR \"departure_scheduled_unix_seconds\" IS NULL)) , \"departure_occupancy_status\" text COLLATE BINARY, \"schedule_relationship\" text COLLATE BINARY, \"assigned_stop_id\" text COLLATE BINARY, \"stop_headsign\" text COLLATE BINARY, \"pickup_type\" text COLLATE BINARY, \"drop_off_type\" text COLLATE BINARY, \"created_at_unix_seconds\" integer CHECK(\"created_at_unix_seconds\" >= 0 AND (TYPEOF(\"created_at_unix_seconds\") = 'integer' OR \"created_at_unix_seconds\" IS NULL)) NOT NULL , \"expires_at_unix_seconds\" integer CHECK(\"expires_at_unix_seconds\" >= 0 AND (TYPEOF(\"expires_at_unix_seconds\") = 'integer' OR \"expires_at_unix_seconds\" IS NULL)) NOT NULL , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"realtime_feed_id\", \"trip_update_id\", \"stop_time_update_ordinal\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_trip_updates_source_id_expires_at_unix_seconds",
+      "tableName": "trip_updates",
+      "sql": "CREATE INDEX \"idx_trip_updates_source_id_expires_at_unix_seconds\" ON \"trip_updates\" (\"source_id\", \"expires_at_unix_seconds\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_trip_updates_source_id_route_id",
+      "tableName": "trip_updates",
+      "sql": "CREATE INDEX \"idx_trip_updates_source_id_route_id\" ON \"trip_updates\" (\"source_id\", \"route_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_trip_updates_source_id_trip_id",
+      "tableName": "trip_updates",
+      "sql": "CREATE INDEX \"idx_trip_updates_source_id_trip_id\" ON \"trip_updates\" (\"source_id\", \"trip_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_trip_updates_source_id_vehicle_id",
+      "tableName": "trip_updates",
+      "sql": "CREATE INDEX \"idx_trip_updates_source_id_vehicle_id\" ON \"trip_updates\" (\"source_id\", \"vehicle_id\")"
+    },
+    {
+      "type": "table",
+      "name": "trip_updates",
+      "tableName": "trip_updates",
+      "sql": "CREATE TABLE \"trip_updates\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"realtime_feed_id\" text NOT NULL COLLATE BINARY, \"entity_id\" text NOT NULL COLLATE BINARY, \"vehicle_id\" text COLLATE BINARY, \"vehicle_label\" text COLLATE BINARY, \"vehicle_license_plate\" text COLLATE BINARY, \"vehicle_wheelchair_accessible\" text COLLATE BINARY, \"trip_id\" text COLLATE BINARY, \"trip_start_time\" text COLLATE BINARY, \"direction_id\" integer CHECK(\"direction_id\" >= 0 AND \"direction_id\" <= 1 AND (TYPEOF(\"direction_id\") = 'integer' OR \"direction_id\" IS NULL)) , \"route_id\" text COLLATE BINARY, \"trip_start_date\" text COLLATE BINARY, \"timestamp\" integer CHECK(\"timestamp\" >= 0 AND (TYPEOF(\"timestamp\") = 'integer' OR \"timestamp\" IS NULL)) , \"schedule_relationship\" text COLLATE BINARY, \"modified_trip_modifications_id\" text COLLATE BINARY, \"modified_trip_affected_trip_id\" text COLLATE BINARY, \"modified_trip_start_time\" text COLLATE BINARY, \"modified_trip_start_date\" text COLLATE BINARY, \"delay\" integer CHECK((TYPEOF(\"delay\") = 'integer' OR \"delay\" IS NULL)) , \"trip_properties_trip_id\" text COLLATE BINARY, \"trip_properties_start_date\" text COLLATE BINARY, \"trip_properties_start_time\" text COLLATE BINARY, \"trip_properties_shape_id\" text COLLATE BINARY, \"trip_properties_trip_headsign\" text COLLATE BINARY, \"trip_properties_trip_short_name\" text COLLATE BINARY, \"created_at_unix_seconds\" integer CHECK(\"created_at_unix_seconds\" >= 0 AND (TYPEOF(\"created_at_unix_seconds\") = 'integer' OR \"created_at_unix_seconds\" IS NULL)) NOT NULL , \"expires_at_unix_seconds\" integer CHECK(\"expires_at_unix_seconds\" >= 0 AND (TYPEOF(\"expires_at_unix_seconds\") = 'integer' OR \"expires_at_unix_seconds\" IS NULL)) NOT NULL , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"realtime_feed_id\", \"entity_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_trips_block_id",
+      "tableName": "trips",
+      "sql": "CREATE INDEX \"idx_trips_block_id\" ON \"trips\" (\"block_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_trips_route_id_service_id_trip_id",
+      "tableName": "trips",
+      "sql": "CREATE INDEX \"idx_trips_route_id_service_id_trip_id\" ON \"trips\" (\"route_id\", \"service_id\", \"trip_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_trips_service_id",
+      "tableName": "trips",
+      "sql": "CREATE INDEX \"idx_trips_service_id\" ON \"trips\" (\"service_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_trips_shape_id",
+      "tableName": "trips",
+      "sql": "CREATE INDEX \"idx_trips_shape_id\" ON \"trips\" (\"shape_id\")"
+    },
+    {
+      "type": "table",
+      "name": "trips",
+      "tableName": "trips",
+      "sql": "CREATE TABLE \"trips\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"route_id\" text NOT NULL COLLATE BINARY, \"service_id\" text NOT NULL COLLATE BINARY, \"trip_id\" text NOT NULL COLLATE BINARY, \"trip_headsign\" text COLLATE BINARY, \"_node_gtfs_casefold_trip_headsign\" TEXT COLLATE BINARY, \"trip_short_name\" text COLLATE BINARY, \"_node_gtfs_casefold_trip_short_name\" TEXT COLLATE BINARY, \"direction_id\" integer CHECK(\"direction_id\" >= 0 AND \"direction_id\" <= 1 AND (TYPEOF(\"direction_id\") = 'integer' OR \"direction_id\" IS NULL)) , \"block_id\" text COLLATE BINARY, \"shape_id\" text COLLATE BINARY, \"wheelchair_accessible\" integer CHECK(\"wheelchair_accessible\" >= 0 AND \"wheelchair_accessible\" <= 2 AND (TYPEOF(\"wheelchair_accessible\") = 'integer' OR \"wheelchair_accessible\" IS NULL)) , \"bikes_allowed\" integer CHECK(\"bikes_allowed\" >= 0 AND \"bikes_allowed\" <= 2 AND (TYPEOF(\"bikes_allowed\") = 'integer' OR \"bikes_allowed\" IS NULL)) , \"cars_allowed\" integer CHECK(\"cars_allowed\" >= 0 AND \"cars_allowed\" <= 2 AND (TYPEOF(\"cars_allowed\") = 'integer' OR \"cars_allowed\" IS NULL)) , \"safe_duration_factor\" real CHECK((TYPEOF(\"safe_duration_factor\") = 'real' OR \"safe_duration_factor\" IS NULL)) , \"safe_duration_offset\" real CHECK((TYPEOF(\"safe_duration_offset\") = 'real' OR \"safe_duration_offset\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"trip_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "trips_performed",
+      "tableName": "trips_performed",
+      "sql": "CREATE TABLE \"trips_performed\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"service_date\" date NOT NULL , \"trip_id_performed\" text NOT NULL COLLATE BINARY, \"vehicle_id\" text NOT NULL COLLATE BINARY, \"trip_id_scheduled\" text COLLATE BINARY, \"route_id\" text COLLATE BINARY, \"route_type\" text COLLATE BINARY, \"ntd_mode\" text COLLATE BINARY, \"route_type_agency\" text COLLATE BINARY, \"shape_id\" text COLLATE BINARY, \"pattern_id\" text COLLATE BINARY, \"direction_id\" integer CHECK(\"direction_id\" >= 0 AND \"direction_id\" <= 1 AND (TYPEOF(\"direction_id\") = 'integer' OR \"direction_id\" IS NULL)) , \"operator_id\" text COLLATE BINARY, \"block_id\" text COLLATE BINARY, \"trip_start_stop_id\" text COLLATE BINARY, \"trip_end_stop_id\" text COLLATE BINARY, \"schedule_trip_start\" text COLLATE BINARY, \"schedule_trip_end\" text COLLATE BINARY, \"actual_trip_start\" text COLLATE BINARY, \"actual_trip_end\" text COLLATE BINARY, \"trip_type\" text COLLATE BINARY, \"schedule_relationship\" text COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"service_date\", \"trip_id_performed\"))"
+    },
+    {
+      "type": "table",
+      "name": "trips_supplement",
+      "tableName": "trips_supplement",
+      "sql": "CREATE TABLE \"trips_supplement\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"route_id\" text COLLATE BINARY, \"service_id\" text COLLATE BINARY, \"trip_id\" text NOT NULL COLLATE BINARY, \"trip_headsign\" text COLLATE BINARY, \"_node_gtfs_casefold_trip_headsign\" TEXT COLLATE BINARY, \"trip_short_name\" text COLLATE BINARY, \"_node_gtfs_casefold_trip_short_name\" TEXT COLLATE BINARY, \"direction_id\" integer CHECK(\"direction_id\" >= 0 AND \"direction_id\" <= 1 AND (TYPEOF(\"direction_id\") = 'integer' OR \"direction_id\" IS NULL)) , \"block_id\" text COLLATE BINARY, \"shape_id\" text COLLATE BINARY, \"wheelchair_accessible\" integer CHECK(\"wheelchair_accessible\" >= 0 AND \"wheelchair_accessible\" <= 2 AND (TYPEOF(\"wheelchair_accessible\") = 'integer' OR \"wheelchair_accessible\" IS NULL)) , \"bikes_allowed\" integer CHECK(\"bikes_allowed\" >= 0 AND \"bikes_allowed\" <= 2 AND (TYPEOF(\"bikes_allowed\") = 'integer' OR \"bikes_allowed\" IS NULL)) , \"cars_allowed\" integer CHECK(\"cars_allowed\" >= 0 AND \"cars_allowed\" <= 2 AND (TYPEOF(\"cars_allowed\") = 'integer' OR \"cars_allowed\" IS NULL)) , \"safe_duration_factor\" real CHECK((TYPEOF(\"safe_duration_factor\") = 'real' OR \"safe_duration_factor\" IS NULL)) , \"safe_duration_offset\" real CHECK((TYPEOF(\"safe_duration_offset\") = 'real' OR \"safe_duration_offset\" IS NULL)) , \"TODS_delete\" integer CHECK(\"TODS_delete\" IN (1) AND (TYPEOF(\"TODS_delete\") = 'integer' OR \"TODS_delete\" IS NULL)) , \"TODS_trip_type\" text COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"trip_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_vehicle_assignments_source_id",
+      "tableName": "vehicle_assignments",
+      "sql": "CREATE INDEX \"idx_vehicle_assignments_source_id\" ON \"vehicle_assignments\" (\"source_id\")"
+    },
+    {
+      "type": "table",
+      "name": "vehicle_assignments",
+      "tableName": "vehicle_assignments",
+      "sql": "CREATE TABLE \"vehicle_assignments\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"date\" date NOT NULL , \"service_id\" text COLLATE BINARY, \"block_id\" text NOT NULL COLLATE BINARY, \"vehicle_id\" text NOT NULL COLLATE BINARY, \"_unknown_fields\" JSON, \"_node_gtfs_key\" TEXT NOT NULL CHECK(length(\"_node_gtfs_key\") = 64), UNIQUE (\"_node_gtfs_key\"))"
+    },
+    {
+      "type": "table",
+      "name": "vehicle_locations",
+      "tableName": "vehicle_locations",
+      "sql": "CREATE TABLE \"vehicle_locations\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"location_ping_id\" text NOT NULL COLLATE BINARY, \"service_date\" date , \"event_timestamp\" text NOT NULL COLLATE BINARY, \"trip_id_performed\" text COLLATE BINARY, \"trip_id_scheduled\" text COLLATE BINARY, \"trip_stop_sequence\" integer CHECK(\"trip_stop_sequence\" >= 1 AND (TYPEOF(\"trip_stop_sequence\") = 'integer' OR \"trip_stop_sequence\" IS NULL)) , \"scheduled_stop_sequence\" integer CHECK(\"scheduled_stop_sequence\" >= 0 AND (TYPEOF(\"scheduled_stop_sequence\") = 'integer' OR \"scheduled_stop_sequence\" IS NULL)) , \"vehicle_id\" text NOT NULL COLLATE BINARY, \"device_id\" text COLLATE BINARY, \"pattern_id\" text COLLATE BINARY, \"stop_id\" text COLLATE BINARY, \"current_status\" text COLLATE BINARY, \"latitude\" real CHECK(\"latitude\" >= -90 AND \"latitude\" <= 90 AND (TYPEOF(\"latitude\") = 'real' OR \"latitude\" IS NULL)) , \"longitude\" real CHECK(\"longitude\" >= -180 AND \"longitude\" <= 180 AND (TYPEOF(\"longitude\") = 'real' OR \"longitude\" IS NULL)) , \"gps_quality\" text COLLATE BINARY, \"heading\" real CHECK(\"heading\" >= 0 AND \"heading\" <= 360 AND (TYPEOF(\"heading\") = 'real' OR \"heading\" IS NULL)) , \"speed\" real CHECK(\"speed\" >= 0 AND (TYPEOF(\"speed\") = 'real' OR \"speed\" IS NULL)) , \"odometer\" real CHECK(\"odometer\" >= 0 AND (TYPEOF(\"odometer\") = 'real' OR \"odometer\" IS NULL)) , \"schedule_deviation\" integer CHECK((TYPEOF(\"schedule_deviation\") = 'integer' OR \"schedule_deviation\" IS NULL)) , \"headway_deviation\" integer CHECK((TYPEOF(\"headway_deviation\") = 'integer' OR \"headway_deviation\" IS NULL)) , \"trip_type\" text COLLATE BINARY, \"schedule_relationship\" text COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"location_ping_id\"))"
+    },
+    {
+      "type": "index",
+      "name": "idx_vehicle_positions_source_id_expires_at_unix_seconds",
+      "tableName": "vehicle_positions",
+      "sql": "CREATE INDEX \"idx_vehicle_positions_source_id_expires_at_unix_seconds\" ON \"vehicle_positions\" (\"source_id\", \"expires_at_unix_seconds\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_vehicle_positions_source_id_route_id",
+      "tableName": "vehicle_positions",
+      "sql": "CREATE INDEX \"idx_vehicle_positions_source_id_route_id\" ON \"vehicle_positions\" (\"source_id\", \"route_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_vehicle_positions_source_id_stop_id",
+      "tableName": "vehicle_positions",
+      "sql": "CREATE INDEX \"idx_vehicle_positions_source_id_stop_id\" ON \"vehicle_positions\" (\"source_id\", \"stop_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_vehicle_positions_source_id_trip_id",
+      "tableName": "vehicle_positions",
+      "sql": "CREATE INDEX \"idx_vehicle_positions_source_id_trip_id\" ON \"vehicle_positions\" (\"source_id\", \"trip_id\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_vehicle_positions_source_id_trip_start_date_trip_start_time",
+      "tableName": "vehicle_positions",
+      "sql": "CREATE INDEX \"idx_vehicle_positions_source_id_trip_start_date_trip_start_time\" ON \"vehicle_positions\" (\"source_id\", \"trip_start_date\", \"trip_start_time\")"
+    },
+    {
+      "type": "index",
+      "name": "idx_vehicle_positions_source_id_vehicle_id",
+      "tableName": "vehicle_positions",
+      "sql": "CREATE INDEX \"idx_vehicle_positions_source_id_vehicle_id\" ON \"vehicle_positions\" (\"source_id\", \"vehicle_id\")"
+    },
+    {
+      "type": "table",
+      "name": "vehicle_positions",
+      "tableName": "vehicle_positions",
+      "sql": "CREATE TABLE \"vehicle_positions\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"realtime_feed_id\" text NOT NULL COLLATE BINARY, \"entity_id\" text NOT NULL COLLATE BINARY, \"trip_id\" text COLLATE BINARY, \"route_id\" text COLLATE BINARY, \"direction_id\" integer CHECK(\"direction_id\" >= 0 AND \"direction_id\" <= 1 AND (TYPEOF(\"direction_id\") = 'integer' OR \"direction_id\" IS NULL)) , \"trip_start_time\" text COLLATE BINARY, \"trip_start_date\" text COLLATE BINARY, \"schedule_relationship\" text COLLATE BINARY, \"modified_trip_modifications_id\" text COLLATE BINARY, \"modified_trip_affected_trip_id\" text COLLATE BINARY, \"modified_trip_start_time\" text COLLATE BINARY, \"modified_trip_start_date\" text COLLATE BINARY, \"vehicle_id\" text COLLATE BINARY, \"vehicle_label\" text COLLATE BINARY, \"vehicle_license_plate\" text COLLATE BINARY, \"vehicle_wheelchair_accessible\" text COLLATE BINARY, \"bearing\" real CHECK(\"bearing\" >= 0 AND (TYPEOF(\"bearing\") = 'real' OR \"bearing\" IS NULL)) , \"latitude\" real CHECK(\"latitude\" >= -90 AND \"latitude\" <= 90 AND (TYPEOF(\"latitude\") = 'real' OR \"latitude\" IS NULL)) , \"longitude\" real CHECK(\"longitude\" >= -180 AND \"longitude\" <= 180 AND (TYPEOF(\"longitude\") = 'real' OR \"longitude\" IS NULL)) , \"speed\" real CHECK(\"speed\" >= 0 AND (TYPEOF(\"speed\") = 'real' OR \"speed\" IS NULL)) , \"odometer\" real CHECK(\"odometer\" >= 0 AND (TYPEOF(\"odometer\") = 'real' OR \"odometer\" IS NULL)) , \"current_stop_sequence\" integer CHECK(\"current_stop_sequence\" >= 0 AND (TYPEOF(\"current_stop_sequence\") = 'integer' OR \"current_stop_sequence\" IS NULL)) , \"stop_id\" text COLLATE BINARY, \"current_status\" text COLLATE BINARY, \"congestion_level\" text COLLATE BINARY, \"occupancy_status\" text COLLATE BINARY, \"occupancy_percentage\" integer CHECK(\"occupancy_percentage\" >= 0 AND (TYPEOF(\"occupancy_percentage\") = 'integer' OR \"occupancy_percentage\" IS NULL)) , \"multi_carriage_details\" json COLLATE BINARY, \"timestamp\" integer CHECK(\"timestamp\" >= 0 AND (TYPEOF(\"timestamp\") = 'integer' OR \"timestamp\" IS NULL)) , \"created_at_unix_seconds\" integer CHECK(\"created_at_unix_seconds\" >= 0 AND (TYPEOF(\"created_at_unix_seconds\") = 'integer' OR \"created_at_unix_seconds\" IS NULL)) NOT NULL , \"expires_at_unix_seconds\" integer CHECK(\"expires_at_unix_seconds\" >= 0 AND (TYPEOF(\"expires_at_unix_seconds\") = 'integer' OR \"expires_at_unix_seconds\" IS NULL)) NOT NULL , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"realtime_feed_id\", \"entity_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "vehicle_train_cars",
+      "tableName": "vehicle_train_cars",
+      "sql": "CREATE TABLE \"vehicle_train_cars\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"vehicle_id\" text NOT NULL COLLATE BINARY, \"train_car_id\" text NOT NULL COLLATE BINARY, \"train_car_order\" integer CHECK(\"train_car_order\" >= 0 AND (TYPEOF(\"train_car_order\") = 'integer' OR \"train_car_order\" IS NULL)) , \"operator_id\" text COLLATE BINARY, \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"vehicle_id\", \"train_car_id\"))"
+    },
+    {
+      "type": "table",
+      "name": "vehicles",
+      "tableName": "vehicles",
+      "sql": "CREATE TABLE \"vehicles\" (\"source_id\" TEXT NOT NULL COLLATE BINARY, \"vehicle_id\" text NOT NULL COLLATE BINARY, \"vehicle_start\" text COLLATE BINARY, \"vehicle_end\" text COLLATE BINARY, \"model_name\" text COLLATE BINARY, \"facility_name\" text COLLATE BINARY, \"capacity_seated\" integer CHECK(\"capacity_seated\" >= 0 AND (TYPEOF(\"capacity_seated\") = 'integer' OR \"capacity_seated\" IS NULL)) , \"capacity_wheelchair\" integer CHECK(\"capacity_wheelchair\" >= 0 AND (TYPEOF(\"capacity_wheelchair\") = 'integer' OR \"capacity_wheelchair\" IS NULL)) , \"capacity_bike\" integer CHECK(\"capacity_bike\" >= 0 AND (TYPEOF(\"capacity_bike\") = 'integer' OR \"capacity_bike\" IS NULL)) , \"bike_rack\" text COLLATE BINARY, \"capacity_standing\" integer CHECK(\"capacity_standing\" >= 0 AND (TYPEOF(\"capacity_standing\") = 'integer' OR \"capacity_standing\" IS NULL)) , \"_unknown_fields\" JSON, PRIMARY KEY (\"source_id\", \"vehicle_id\"))"
+    }
+  ]
+}

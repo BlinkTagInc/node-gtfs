@@ -1,7 +1,8 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const ridership = defineGtfsTable({
-  file: 'ridership.txt',
+export const ridership = defineGtfsDomainTable({
+  filename: 'ridership.txt',
+  tableName: 'ridership',
   presence: 'optional',
   fields: {
     total_boardings: { kind: 'integer', presence: 'required', minimum: 0 },
@@ -10,7 +11,7 @@ export const ridership = defineGtfsTable({
     ridership_end_date: { kind: 'date' },
     ridership_start_time: { kind: 'time' },
     ridership_end_time: { kind: 'time' },
-    service_id: { kind: 'id', applyFeedPrefix: true },
+    service_id: { kind: 'id' },
     monday: { kind: 'integer', minimum: 0, maximum: 1 },
     tuesday: { kind: 'integer', minimum: 0, maximum: 1 },
     wednesday: { kind: 'integer', minimum: 0, maximum: 1 },
@@ -18,21 +19,11 @@ export const ridership = defineGtfsTable({
     friday: { kind: 'integer', minimum: 0, maximum: 1 },
     saturday: { kind: 'integer', minimum: 0, maximum: 1 },
     sunday: { kind: 'integer', minimum: 0, maximum: 1 },
-    agency_id: { kind: 'id', applyFeedPrefix: true },
-    route_id: { kind: 'id', applyFeedPrefix: true },
+    agency_id: { kind: 'id' },
+    route_id: { kind: 'id' },
     direction_id: { kind: 'integer', minimum: 0, maximum: 1 },
-    trip_id: { kind: 'id', applyFeedPrefix: true },
-    stop_id: { kind: 'id', applyFeedPrefix: true },
+    trip_id: { kind: 'id' },
+    stop_id: { kind: 'id' },
   },
-  storage: {
-    indexes: [
-      'ridership_start_date',
-      'ridership_end_date',
-      'service_id',
-      'agency_id',
-      'route_id',
-      'direction_id',
-    ],
-  },
-  namespace: 'gtfs-ride',
+  specification: 'gtfs-ride',
 });

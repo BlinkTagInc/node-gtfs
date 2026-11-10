@@ -1,28 +1,32 @@
-import { defineGtfsTable } from '../../define-table.ts';
+import { defineGtfsDomainTable } from '../../domain-table.ts';
 
-export const vehicleTrainCars = defineGtfsTable({
-  file: 'vehicle_train_cars.csv',
+export const vehicleTrainCars = defineGtfsDomainTable({
+  filename: 'vehicle_train_cars.csv',
+  tableName: 'vehicle_train_cars',
   presence: 'optional',
   primaryKey: ['vehicle_id', 'train_car_id'],
   fields: {
     vehicle_id: {
       kind: 'id',
       presence: 'required',
-      references: [{ file: 'vehicles.csv', field: 'vehicle_id' }],
-      applyFeedPrefix: true,
+      references: [
+        { targetFilename: 'vehicles.csv', targetField: 'vehicle_id' },
+      ],
     },
     train_car_id: {
       kind: 'id',
       presence: 'required',
-      references: [{ file: 'train_cars.csv', field: 'train_car_id' }],
-      applyFeedPrefix: true,
+      references: [
+        { targetFilename: 'train_cars.csv', targetField: 'train_car_id' },
+      ],
     },
     train_car_order: { kind: 'integer', minimum: 0 },
     operator_id: {
       kind: 'id',
-      references: [{ file: 'operators.csv', field: 'operator_id' }],
-      applyFeedPrefix: true,
+      references: [
+        { targetFilename: 'operators.csv', targetField: 'operator_id' },
+      ],
     },
   },
-  namespace: 'tides',
+  specification: 'tides',
 });

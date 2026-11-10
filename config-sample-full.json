@@ -1,48 +1,108 @@
 {
-  "agencies": [
+  "database": {
+    "path": "./gtfs.sqlite",
+    "durability": "safe"
+  },
+  "reporting": {
+    "level": "info"
+  },
+  "extensions": ["gtfs-realtime"],
+  "sources": [
     {
-      "url": "https://example.com/remote-feed/gtfs.zip",
-      "headers": {
-        "Authorization": "Bearer replace-with-your-token"
-      },
-      "prefix": "remote",
-      "exclude": ["shapes"],
-      "fillEmptyAgencyId": true,
-      "agencyId": "remote-transit",
-      "realtimeAlerts": {
-        "url": "https://example.com/remote-feed/alerts.pb",
-        "headers": {
+      "sourceId": "remote-transit",
+      "schedule": {
+        "url": "https://example.com/remote-feed/gtfs.zip",
+        "requestHeaders": {
           "Authorization": "Bearer replace-with-your-token"
+        },
+        "timeoutMs": 60000,
+        "excludeFiles": ["shapes.txt"],
+        "defaultAgencyId": "remote-transit",
+        "import": {
+          "archive": {
+            "maxCompressedBytes": 1073741824,
+            "maxEntries": 1000,
+            "maxExtractedFileBytes": 4294967296,
+            "maxExtractedTotalBytes": 8589934592
+          },
+          "csv": {
+            "delimiter": ",",
+            "encoding": "utf8",
+            "escape": "\"",
+            "quote": "\"",
+            "relaxQuotes": true,
+            "skipEmptyLines": true,
+            "trim": true
+          },
+          "onExistingData": "replace-source",
+          "onSourceError": "abort",
+          "validation": {
+            "mode": "off",
+            "onDuplicateKey": "reject",
+            "onUnknownField": "preserve"
+          }
         }
       },
-      "realtimeTripUpdates": {
-        "url": "https://example.com/remote-feed/trip-updates.pb",
-        "headers": {
-          "Authorization": "Bearer replace-with-your-token"
-        }
-      },
-      "realtimeVehiclePositions": {
-        "url": "https://example.com/remote-feed/vehicle-positions.pb",
-        "headers": {
-          "Authorization": "Bearer replace-with-your-token"
-        }
+      "realtime": {
+        "feeds": [
+          {
+            "feedId": "bus-alerts",
+            "type": "alerts",
+            "url": "https://example.com/realtime/bus-alerts",
+            "requestHeaders": {
+              "Authorization": "Bearer replace-with-your-token"
+            },
+            "timeoutMs": 30000,
+            "maxDownloadBytes": 67108864
+          },
+          {
+            "feedId": "rail-alerts",
+            "type": "alerts",
+            "url": "https://example.com/realtime/rail-alerts",
+            "requestHeaders": {
+              "Authorization": "Bearer replace-with-your-token"
+            },
+            "timeoutMs": 30000,
+            "maxDownloadBytes": 67108864
+          },
+          {
+            "type": "tripUpdates",
+            "url": "https://example.com/realtime/trip-updates",
+            "requestHeaders": {
+              "Authorization": "Bearer replace-with-your-token"
+            },
+            "timeoutMs": 30000,
+            "maxDownloadBytes": 67108864
+          },
+          {
+            "type": "vehiclePositions",
+            "url": "https://example.com/realtime/vehicle-positions",
+            "requestHeaders": {
+              "Authorization": "Bearer replace-with-your-token"
+            },
+            "timeoutMs": 30000,
+            "maxDownloadBytes": 67108864
+          }
+        ]
       }
     },
     {
-      "path": "./data/local-gtfs.zip",
-      "prefix": "local"
+      "sourceId": "local-transit",
+      "schedule": {
+        "path": "./data/local-gtfs.zip"
+      }
     }
   ],
-  "csvOptions": {
-    "bom": true,
-    "skip_empty_lines": true
+  "realtime": {
+    "retention": {
+      "currentEntitiesSeconds": 30,
+      "snapshotsSeconds": 86400
+    }
   },
-  "downloadTimeout": 60000,
-  "exportPath": "./gtfs-export",
-  "gtfsRealtimeExpirationSeconds": 3600,
-  "ignoreDuplicates": false,
-  "ignoreErrors": false,
-  "includeImportReport": false,
-  "logLevel": "info",
-  "sqlitePath": "./gtfs.sqlite"
+  "export": {
+    "batchSize": 1000,
+    "outputDirectory": "./gtfs-export",
+    "overwrite": false,
+    "sourceId": "remote-transit"
+  }
 }

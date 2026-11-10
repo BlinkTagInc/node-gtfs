@@ -1,420 +1,168 @@
-<p align="center">
-  <img src="docs/images/node-gtfs-logo.svg" alt="node-GTFS" width="500">
-</p>
+# node-GTFS
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/gtfs"><img src="https://img.shields.io/npm/v/gtfs.svg?style=flat" alt="npm version"></a>
-  <a href="https://www.npmjs.com/package/gtfs"><img src="https://img.shields.io/npm/dm/gtfs.svg?style=flat" alt="monthly npm downloads"></a>
-  <a href="https://github.com/BlinkTagInc/node-gtfs/actions?query=workflow%3A%22Node+CI%22"><img src="https://img.shields.io/github/actions/workflow/status/BlinkTagInc/node-gtfs/nodejs.yml?branch=master" alt="build status"></a>
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT license">
+  <img src="docs/images/node-gtfs-logo.svg" alt="node-GTFS logo" width="140">
 </p>
 
-Import [GTFS](https://gtfs.org/schedule/) transit data into SQLite, PostgreSQL,
-or MySQL. Query, update with GTFS-Realtime, and export SQLite data from Node.js
-or the command line.
+[![npm version](https://img.shields.io/npm/v/gtfs.svg)](https://www.npmjs.com/package/gtfs)
+[![Monthly npm downloads](https://img.shields.io/npm/dm/gtfs.svg)](https://www.npmjs.com/package/gtfs)
+[![Node.js 22.18+ (22.x), 24, or 26+](https://img.shields.io/badge/node-22.18%2B%20%7C%2024%20%7C%2026%2B-339933?logo=node.js&logoColor=white)](package.json)
+[![Build status](https://img.shields.io/github/actions/workflow/status/BlinkTagInc/node-gtfs/nodejs.yml)](https://github.com/BlinkTagInc/node-gtfs/actions/workflows/nodejs.yml)
+[![MIT license](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
 
-## Choose what you want to do
+Turn a transit agency’s GTFS data into something you can explore and use.
 
-- **Import and explore a feed locally:** follow the [SQLite quick start](#quick-start).
-- **Use node-GTFS in an application:** see [Using JavaScript](#using-javascript).
-- **Load an existing PostgreSQL or MySQL database:** see [PostgreSQL and MySQL](#postgresql-and-mysql).
-- **Refresh GTFS-Realtime data:** see [GTFS-Realtime](#gtfs-realtime).
-- **Export a database back to GTFS files:** see [Export GTFS](#export-gtfs).
+**node-GTFS imports transit schedules into a database**, then helps you find
+routes, stops, trips, and arrival times. You can use it to prepare data for a
+map, analyze service, build a transit application, or export GTFS files.
+It also stores GTFS-Realtime updates, including service alerts and vehicle
+positions.
 
-## Database support
+GTFS is the format transit agencies use to share their service information.
+A static GTFS feed is usually a ZIP containing files such as `routes.txt` and
+`stops.txt`. node-GTFS reads those files and makes their contents searchable.
 
-| Feature                        | SQLite |     PostgreSQL      |        MySQL        |
-| ------------------------------ | :----: | :-----------------: | :-----------------: |
-| Import static GTFS             |  Yes   | Yes, through Kysely | Yes, through Kysely |
-| Synchronous query helpers      |  Yes   |         No          |         No          |
-| Import GTFS-Realtime           |  Yes   |         No          |         No          |
-| Export GTFS files              |  Yes   |         No          |         No          |
-| Manage GTFS tables and indexes |  Yes   |      Optional       |      Optional       |
+![Agency data becomes a searchable database, which can supply maps, service analysis, applications, and exported GTFS files.](docs/images/data-flow.svg)
 
-PostgreSQL and MySQL imports use a caller-owned Kysely connection. See
-[Database portability](docs/database-portability.md) for storage details.
+## What would you like to do?
 
-> **Note:** PostgreSQL and MySQL support is new. The interface, configuration
-> options, and functions related to it may change in a future release.
+| I want to…                               | Start here                                     |
+| ---------------------------------------- | ---------------------------------------------- |
+| Load an agency’s GTFS for the first time | [Getting started](docs/getting-started.md)     |
+| Run imports and exports from a terminal  | [Command line](docs/cli.md)                    |
+| Upgrade an application from v4           | [Migration guide](docs/migrating-to-v5.md)     |
+| Use PostgreSQL or MySQL                  | [Database setup](docs/databases.md)            |
+| Find routes, stops, trips, or arrivals   | [Query data](docs/queries.md)                  |
+| Count trips or summarize service         | [Summaries and aggregates](docs/aggregates.md) |
+| Put stops and routes on a map            | [GeoJSON](docs/geojson.md)                     |
+| Store live alerts or vehicle updates     | [GTFS-Realtime](docs/realtime.md)              |
+| Import updated schedules automatically   | [Import data](docs/import.md)                  |
+| Get GTFS files back out of a database    | [Export data](docs/export.md)                  |
 
-## Requirements
+**[Browse all documentation](docs/README.md)** for configuration, validation,
+advanced queries, field references, and troubleshooting.
 
-- [Node.js](https://nodejs.org/) 22 or newer
+## Why node-GTFS?
 
-## Quick start
+- Read GTFS Schedule and GTFS-Realtime, with optional extensions like TIDES and TODS.
+- Start with a local SQLite file, or use PostgreSQL or MySQL.
+- Keep several static GTFS feeds together without changing their GTFS identifiers.
+- Optionally validate static GTFS feeds during import and get messages that identify data problems.
+- Query GTFS and GTFS-Realtime from JavaScript or TypeScript.
+- Create GeoJSON and export schedule data from any supported database.
+- Use terminal commands for import/export, or the JavaScript API in an application.
 
-This example downloads BART's public GTFS feed and saves it as a persistent
-SQLite database.
+## Is this the right tool?
 
-### 1. Create a project
+Use node-GTFS when you have GTFS data and want to query, transform, or serve it
+from your own workflow. The command line is useful even if you do not write
+JavaScript; custom analysis and applications need some programming or SQL.
 
-```bash
-mkdir gtfs-demo
-cd gtfs-demo
-npm init -y
-npm install gtfs
+It is not a point-and-click timetable editor, a hosted transit-data service,
+or a journey-planning engine (although you could build these things with node-GTFS). It does not display a map on its own or calculate
+the best journey between two places. Static GTFS feed validation helps with imports; it
+is not a certification that a static GTFS feed meets every rule in its specification.
+
+## Get started
+
+Node-GTFS supports Node.js 22.18+ (22.x), 24, or 26+.
+Install [Node.js](https://nodejs.org/), then try importing
+[Caltrain’s public static GTFS feed](https://www.caltrain.com/developer-resources) - no
+account or API key is needed. In your terminal, run:
+
+```sh
+npm install --global gtfs
+gtfs import \
+  --url https://data.trilliumtransit.com/gtfs/caltrain-ca-us/caltrain-ca-us.zip \
+  --source-id caltrain \
+  --database ./caltrain.sqlite
 ```
 
-### 2. Import GTFS
+This downloads Caltrain’s schedules and creates `caltrain.sqlite` in your current
+folder. You do not need to install a database server. Run the import again to
+replace Caltrain’s stored Schedule data with the latest static GTFS feed.
 
-```bash
-npx gtfs-import \
-  --gtfsUrl https://www.bart.gov/dev/schedules/google_transit.zip \
-  --sqlitePath ./gtfs.sqlite
+Static GTFS feed validation is off by default; see [how to enable it](docs/validation.md).
+This static GTFS feed also includes optional extensions, so you may see notices about
+files that were not imported. Once the import completes, its Schedule data
+is ready to query.
+
+Already have a GTFS ZIP? Import it into a separate database instead:
+
+```sh
+gtfs import --input ./feed.zip --database ./transit.sqlite
 ```
 
-The import creates `gtfs.sqlite` in the current directory. If you don't
-specify a SQLite path when using the command line, it will default to an
-in-memory database which will be discarded when the command exits.
-
-> **Warning:** A static import drops and recreates the GTFS tables in its
-> destination database. Use a new database or back up data you need to keep.
-
-You can import your own ZIP file or directory instead:
-
-```bash
-npx gtfs-import --gtfsPath ./data/gtfs.zip --sqlitePath ./gtfs.sqlite
-```
-
-### 3. Query the database
-
-Create a file named `query.mjs`:
+To explore the Caltrain database from JavaScript, run `npm install gtfs` in your
+project folder and save this as `routes.mjs` beside `caltrain.sqlite`:
 
 ```js
-import { closeDb, getAgencies, getRoutes, openDb } from 'gtfs';
+import { Gtfs } from 'gtfs';
 
-const db = openDb({ sqlitePath: './gtfs.sqlite' });
+const gtfs = new Gtfs({
+  database: { path: './caltrain.sqlite' },
+});
 
 try {
-  const agencies = getAgencies({}, ['agency_id', 'agency_name']);
-  const routes = getRoutes(
-    {},
-    ['route_id', 'route_short_name', 'route_long_name'],
-    [['route_short_name', 'ASC']],
-  );
+  const routes = await gtfs.schedule.routes
+    .select('route_id', 'route_short_name', 'route_long_name')
+    .orderBy([{ field: 'route_id', direction: 'asc' }])
+    .all();
 
-  console.table(agencies);
   console.table(routes);
 } finally {
-  closeDb(db);
+  await gtfs.close();
 }
 ```
 
-Run it:
-
-```bash
-node query.mjs
-```
-
-The `.mjs` extension lets Node.js run the example as an ES module without any
-additional project configuration.
-
-## Using JavaScript
-
-Install node-GTFS in your application:
-
-```bash
-npm install gtfs
-```
-
-Import a feed and query it in the same process using an in-memory database:
-
-```js
-import { closeDb, getStops, importGtfs, openDb } from 'gtfs';
-
-const config = {
-  agencies: [{ path: './data/gtfs.zip' }],
-};
-
-await importGtfs(config);
-const db = openDb(config);
-
-try {
-  const stops = getStops(
-    { stop_id: ['123', '234', '345'] },
-    ['stop_id', 'stop_name'],
-    [['stop_name', 'ASC']],
-  );
-  console.table(stops);
-} finally {
-  closeDb(db);
-}
-```
-
-Methods that read SQLite data are synchronous. Import, export, and
-GTFS-Realtime updates are asynchronous.
-
-## Common tasks
-
-### Use a configuration file
-
-A configuration file is useful for multiple feeds, custom HTTP headers,
-GTFS-Realtime endpoints, and other import options. Create `config.json` in the
-directory where you run the command:
-
-```json
-{
-  "agencies": [
-    {
-      "url": "https://www.bart.gov/dev/schedules/google_transit.zip"
-    }
-  ],
-  "sqlitePath": "./gtfs.sqlite"
-}
-```
-
-Then run:
-
-```bash
-npx gtfs-import
-```
-
-Use a configuration file in another location with `--configPath`:
-
-```bash
-npx gtfs-import --configPath ./config/production.json
-```
-
-See the [configuration reference](docs/configuration.md) for every option and
-examples for multiple feeds, prefixes, exclusions, and custom logging. A
-[comprehensive sample](config-sample-full.json) is also available.
-
-### Command-line tools
-
-Installing `gtfs` provides three commands:
-
-| Command               | Purpose                                 |
-| --------------------- | --------------------------------------- |
-| `gtfs-import`         | Import static GTFS into SQLite          |
-| `gtfsrealtime-update` | Refresh GTFS-Realtime data in SQLite    |
-| `gtfs-export`         | Export an SQLite database to GTFS files |
-
-Run any command with `--help` to see its options:
-
-```bash
-npx gtfs-import --help
-npx gtfsrealtime-update --help
-npx gtfs-export --help
-```
-
-You can install the commands globally with `npm install --global gtfs`, but a
-local installation with `npx` makes it easier to keep each project on a known
-version.
-
-### Query GTFS
-
-Most getters have the same four optional arguments:
-
-```js
-getRoutes(query, fields, orderBy, options);
-```
-
-- `query` filters rows by field. An array means SQL `IN`; an empty array
-  returns no rows.
-- `fields` selects returned columns. An empty array returns every column.
-- `orderBy` contains `[field, 'ASC' | 'DESC']` pairs.
-- `options` can contain an explicit SQLite `db` connection.
-
-For example, find trips for a route on a service date:
-
-```js
-import { getTrips } from 'gtfs';
-
-const trips = getTrips(
-  { route_id: '12', date: 20260817 },
-  ['trip_id', 'trip_headsign'],
-  [['trip_headsign', 'ASC']],
-  { db },
-);
-```
-
-Specialized helpers support route, trip, service, time, geographic, and
-GeoJSON queries. See the [query API guide](docs/query-api.md).
-
-### Case-insensitive comparisons
-
-Fields marked `caseInsensitiveComparison` in the schema use SQLite's
-`COLLATE NOCASE`. Equality, `IN`, and default ordering ignore ASCII letter
-case for those fields:
-
-```js
-const agencies = getAgencies({ agency_name: 'metro transit' });
-```
-
-GTFS identifiers remain case-sensitive. SQLite `NOCASE` is not Unicode-aware.
-PostgreSQL and MySQL use the collation configured for their database or column.
-
-### GTFS-Realtime
-
-Add one or more realtime endpoints to a feed in `config.json`:
-
-```json
-{
-  "agencies": [
-    {
-      "realtimeAlerts": {
-        "url": "https://example.com/alerts.pb"
-      },
-      "realtimeTripUpdates": {
-        "url": "https://example.com/trip-updates.pb"
-      },
-      "realtimeVehiclePositions": {
-        "url": "https://example.com/vehicle-positions.pb"
-      }
-    }
-  ],
-  "sqlitePath": "./gtfs.sqlite"
-}
-```
-
-Refresh the realtime tables:
-
-```bash
-npx gtfsrealtime-update
-```
-
-The command performs one update and exits. Use your operating system's task
-scheduler or a process manager to run it repeatedly. See the
-[GTFS-Realtime guide](docs/realtime.md) for headers, retention, and JavaScript
-usage.
-
-### Export GTFS
-
-Export an existing SQLite database:
-
-```bash
-npx gtfs-export --sqlitePath ./gtfs.sqlite
-```
-
-Or use JavaScript:
-
-```js
-import { exportGtfs } from 'gtfs';
-
-await exportGtfs({
-  sqlitePath: './gtfs.sqlite',
-  exportPath: './gtfs-export',
-});
-```
-
-The export directory is replaced when an export runs. Make sure it does not
-contain files you need to keep.
-
-### PostgreSQL and MySQL
-
-`importGtfsToKysely()` imports static GTFS using a caller-owned Kysely
-connection. Install the driver for your database in addition to `gtfs`.
-
-> **Note:** PostgreSQL and MySQL support is new. The interface, configuration
-> options, and functions related to it may change in a future release.
-
-PostgreSQL example:
-
-```bash
-npm install pg
-```
-
-```js
-import { importGtfsToKysely } from 'gtfs';
-import { Kysely, PostgresDialect } from 'kysely';
-import { Pool } from 'pg';
-
-const db = new Kysely({
-  dialect: new PostgresDialect({
-    pool: new Pool({ connectionString: process.env.DATABASE_URL }),
-  }),
-});
-
-try {
-  await importGtfsToKysely(
-    { agencies: [{ path: './data/gtfs.zip' }] },
-    { db, dialect: 'postgres' },
-  );
-} finally {
-  await db.destroy();
-}
-```
-
-> **Warning:** `manageSchema` defaults to `true`. The importer drops and
-> recreates the GTFS tables it manages. Set `manageSchema: false` when your
-> application owns the schema.
-
-Use Kysely's `MysqlDialect` with `mysql2` and `dialect: 'mysql'` for MySQL.
-Static Kysely imports do not store configured GTFS-Realtime feeds. See
-[Database portability](docs/database-portability.md) for schema requirements
-and generated columns.
-
-## TypeScript
-
-TypeScript declarations are included. Configuration types include:
-
-- `GtfsSqliteImportConfig` for `importGtfs()`
-- `GtfsImportConfig` for `importGtfsToKysely()`
-- `GtfsExportConfig` for `exportGtfs()`
-- `GtfsRealtimeConfig` for `updateGtfsRealtime()`
-
-Getter query fields, selected fields, and return values are inferred from the
-table schemas. Schema declarations and the `GtfsDatabase` Kysely type are
-exported from both `gtfs` and `gtfs/schema`. See the
-[schema manifest](docs/schema-manifest.md).
-
-## Supported data
-
-In addition to GTFS Schedule and GTFS-Realtime, node-GTFS includes schema and
-import support for:
-
-- [GTFS-Plus](https://github.com/osplanning-data-standards/GTFS-PLUS)
-- [GTFS-Ride](https://gtfsride.org/)
-- [GTFS-to-HTML timetable files](https://gtfstohtml.com/)
-- [Transit Operational Data Standard (TODS)](https://tods-transit.org/)
-- TIDES
-- NOPTIS
-
-The [query API guide](docs/query-api.md) lists the public getters. Other
-imported tables can be read with SQL through the SQLite connection.
-
-## Troubleshooting
-
-Start with the [troubleshooting guide](docs/troubleshooting.md) if a command is
-not found, the database is empty, the configuration cannot be parsed, or a
-native dependency does not install. Include the node-GTFS version, Node.js
-version, command, and complete error when opening an
-[issue](https://github.com/BlinkTagInc/node-gtfs/issues).
-
-## Example applications
-
-- [GTFS-to-HTML](https://gtfstohtml.com/) generates transit timetables.
-- [GTFS-to-GeoJSON](https://github.com/BlinkTagInc/gtfs-to-geojson) creates
-  GeoJSON for transit routes.
-- [GTFS-to-Chart](https://github.com/BlinkTagInc/gtfs-to-chart) generates
-  stringline charts.
-- [GTFS Accessibility Validator](https://github.com/BlinkTagInc/gtfs-accessibility-validator)
-  checks accessibility-related GTFS fields.
-- [GTFS Text-to-Speech](https://github.com/BlinkTagInc/gtfs-tts) tests stop
-  name pronunciation.
-- [Transit Departures Widget](https://github.com/BlinkTagInc/transit-departures-widget)
-  displays realtime departures.
-- [GTFS-to-Blocks](https://github.com/BlinkTagInc/gtfs-to-blocks) exports trip
-  segments grouped by block.
-
-## Documentation
-
-- [Configuration reference](docs/configuration.md)
-- [Query API guide](docs/query-api.md)
-- [GTFS-Realtime guide](docs/realtime.md)
-- [Troubleshooting](docs/troubleshooting.md)
-- [Database portability](docs/database-portability.md)
-- [Schema manifest](docs/schema-manifest.md)
-
-## Contributing
-
-Pull requests are welcome. Run the checks before submitting a change:
-
-```bash
-pnpm test
-pnpm typecheck
-pnpm lint
-pnpm docs:check
-```
-
-node-GTFS is available under the [MIT license](LICENSE.md).
+Run `node routes.mjs` to see the route names. To query your own static GTFS feed instead,
+change the database path to `./transit.sqlite`.
+
+## Next steps
+
+- [Follow the step-by-step guide](docs/getting-started.md) with your own static GTFS feed.
+- [Choose a sample configuration](docs/configuration.md#sample-configuration-files)
+  to save settings for Schedule, GTFS-Realtime, or multiple static GTFS feeds.
+- [Find trips and arrivals](docs/queries.md#query-service-routes-and-stops).
+- [Enable static GTFS feed validation](docs/validation.md) and [interpret warnings](docs/reporting.md).
+- [Browse every guide and field reference](docs/README.md).
+
+## Built with node-GTFS
+
+Explore these projects for ready-to-use transit tools and ideas for your own
+applications. Project names link to their source code and setup instructions.
+
+| Project                                                                                     | What you can do with it                                                                   | Maintained? |
+| ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------- |
+| [GTFS-to-HTML](https://github.com/BlinkTagInc/gtfs-to-html)                                 | Turn GTFS into accessible HTML timetables, printable PDFs, CSV schedules, and route maps. | Yes         |
+| [GTFS-to-GeoJSON](https://github.com/BlinkTagInc/gtfs-to-geojson)                           | Export stops and route shapes as GeoJSON for transit maps.                                | Yes         |
+| [GTFS-to-Chart](https://github.com/BlinkTagInc/gtfs-to-chart)                               | Visualize scheduled vehicle movements through the day with stringline charts.             | Yes         |
+| [GTFS Accessibility Validator](https://github.com/BlinkTagInc/gtfs-accessibility-validator) | Check accessibility fields, station pathways and levels, and route-color contrast.        | Yes         |
+| [GTFS Text-to-Speech](https://github.com/BlinkTagInc/gtfs-tts)                              | Listen to stop names and identify pronunciations that need a `tts_stop_name` value.       | Yes         |
+| [Transit Departures Widget](https://github.com/BlinkTagInc/transit-departures-widget)       | Add a stop-by-stop departure lookup to a website using Schedule and GTFS-Realtime data.   | Yes         |
+| [GTFS-to-Blocks](https://github.com/BlinkTagInc/gtfs-to-blocks)                             | Export trips grouped by vehicle block to review overlaps and gaps in the schedule.        | Yes         |
+
+Built something with node-GTFS? Open a pull request to add your project with
+a source link, a short description, and its maintenance status. An
+[issue](https://github.com/BlinkTagInc/node-gtfs/issues) introducing your project
+is welcome too.
+
+## Help and contributions
+
+Start with [troubleshooting](docs/troubleshooting.md) for common problems and
+the [changelog](CHANGELOG.md) for release notes and breaking changes.
+
+Questions and problem reports are welcome in
+[GitHub issues](https://github.com/BlinkTagInc/node-gtfs/issues) - you do not need
+to submit code. When possible, include a link to the specific GTFS
+and the error you encountered.
+
+Pull requests are welcome too - see the
+[contribution guide](https://github.com/BlinkTagInc/node-gtfs/blob/main/CONTRIBUTING.md).
+Thank you to everyone who has contributed fixes, ideas, and static GTFS feed examples:
+[see the contributors](https://github.com/BlinkTagInc/node-gtfs/graphs/contributors).
+
+Maintained by [BlinkTag Inc.](https://blinktag.com/). Released under the
+[MIT license](LICENSE.md). See the
+[security policy](https://github.com/BlinkTagInc/node-gtfs/blob/main/SECURITY.md) to report a
+security concern and [CITATION.cff](CITATION.cff) for citation information if you use node-gtfs in research.

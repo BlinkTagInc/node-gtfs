@@ -1,3 +1,6 @@
 allowBuilds:
   better-sqlite3: true
   protobufjs: true
+
+overrides:
+  'jsdoc>markdown-it': '15.0.3'

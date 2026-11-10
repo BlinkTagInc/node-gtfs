@@ -1,0 +1,26 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "zone-東京",
+      "properties": {
+        "stop_name": "Zone, \"Central\"",
+        "stop_desc": "Line one\nLine two",
+        "custom_location": "café 🚋",
+        "empty_property": ""
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-122.43, 37.76],
+            [-122.41, 37.76],
+            [-122.41, 37.78],
+            [-122.43, 37.76]
+          ]
+        ]
+      }
+    }
+  ]
+}

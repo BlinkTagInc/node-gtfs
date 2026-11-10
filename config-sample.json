@@ -1,8 +1,29 @@
 {
-  "agencies": [
+  "database": {
+    "path": "./gtfs.sqlite"
+  },
+  "extensions": ["gtfs-realtime"],
+  "sources": [
     {
-      "path": "./gtfs.zip"
+      "schedule": {
+        "path": "./gtfs.zip"
+      },
+      "realtime": {
+        "feeds": [
+          {
+            "type": "alerts",
+            "url": "https://example.com/realtime/alerts"
+          },
+          {
+            "type": "tripUpdates",
+            "url": "https://example.com/realtime/trip-updates"
+          },
+          {
+            "type": "vehiclePositions",
+            "url": "https://example.com/realtime/vehicle-positions"
+          }
+        ]
+      }
     }
-  ],
-  "sqlitePath": "./gtfs.sqlite"
+  ]
 }

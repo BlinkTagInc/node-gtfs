@@ -1,1 +1,1 @@
-npx lint-staged && npm test
+pnpm exec lint-staged
