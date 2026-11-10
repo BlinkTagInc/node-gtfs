@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0-beta.0] - 2026-11-10
+
 > [!WARNING]
 > **V5 is a complete rewrite with extensive breaking changes. It is not a drop-in upgrade from v4.**
 >
@@ -1405,3 +1407,6 @@ Or, you use async/await:
         // handle errors here
       }
     }
+
+[Unreleased]: https://github.com/BlinkTagInc/node-gtfs/compare/5.0.0-beta.0...main
+[5.0.0-beta.0]: https://github.com/BlinkTagInc/node-gtfs/compare/4.21.0...5.0.0-beta.0
