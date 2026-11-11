@@ -8,6 +8,8 @@ static GTFS feeds.** Changing the package version against your v4 database is no
 procedure. This guide assumes an existing v4 SQLite database and compares the
 released 4.21.0 API with v5.
 
+To migrate with a coding assistant, use the [application migration prompt](v4-to-v5-migration-prompt.md).
+
 ## Prepare and switch over
 
 1. Use Node.js 22.18+ (22.x), 24, or 26+.
