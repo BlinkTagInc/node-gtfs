@@ -177,7 +177,7 @@ await writeFile('./route.geojson', JSON.stringify(collection));
 - Coordinates use `[longitude, latitude]` order.
 - Stop properties include GTFS stop fields and a `routes` array; coordinates
   are in the geometry, not repeated as `stop_lat`/`stop_lon` properties.
-- Shape properties include `source_id`, `shape_id`, and a `routes` array.
+- Shape properties include `shape_id` and a `routes` array.
 - Route features include route properties. Colors include a leading `#`.
 - Missing optional properties are omitted rather than set to `null`.
 - `agency_name` is included where an agency can be identified unambiguously.
@@ -189,8 +189,9 @@ trip shapes and removes repeated segments, including reverse duplicates,
 without connecting unrelated line sections. A route without usable shapes
 has no route feature.
 
-Records with identical IDs in different sources remain distinct. Use
-`source_id` together with the GTFS ID in your map application.
+Source IDs are omitted from all feature properties and nested routes. Records
+with identical IDs in different sources remain separate features. Use
+`where: { source_id: 'metro' }` to request features from a single source.
 
 All collections are built in memory. Filter large static GTFS feeds to the area or routes
 you need. The methods do not accept pagination or field-selection options.
@@ -206,14 +207,13 @@ through `gtfs.schedule.locations`:
 
 ```js
 const locations = await gtfs.schedule.locations
-  .select('source_id', 'id', 'stop_name', 'geometry')
+  .select('id', 'stop_name', 'geometry')
   .all();
 
 const features = locations.map((location) => ({
   type: 'Feature',
   id: location.id,
   properties: {
-    source_id: location.source_id,
     stop_name: location.stop_name,
   },
   geometry: JSON.parse(location.geometry),

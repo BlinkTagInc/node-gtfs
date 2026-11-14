@@ -49,3 +49,17 @@ void gtfs.geojson.stops({
 void gtfs.geojson.stops({ sqlWhere: async (eb) => eb('stop_id', '=', 'a') });
 // @ts-expect-error service dates are numbers
 void gtfs.geojson.routes({ serviceDate: '20260922' });
+
+for (const method of ['stops', 'shapes', 'routes'] as const) {
+  const collection = await gtfs.geojson[method]();
+  for (const feature of collection.features) {
+    // @ts-expect-error source identity is not a GeoJSON property
+    void feature.properties.source_id;
+    if ('routes' in feature.properties) {
+      for (const route of feature.properties.routes) {
+        // @ts-expect-error nested routes omit source identity too
+        void route.source_id;
+      }
+    }
+  }
+}

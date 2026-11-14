@@ -134,12 +134,14 @@ function buildUniqueLineStrings(
   return lineStrings;
 }
 
-export function omitNullGeoJSONProperties<Row extends object>(
+export function prepareGeoJSONProperties<Row extends object>(
   properties: Row,
-): GeoJSONRowProperties<Row> {
+): GeoJSONRowProperties<Omit<Row, 'source_id'>> {
   return Object.fromEntries(
-    Object.entries(properties).filter(([, value]) => value != null),
-  ) as GeoJSONRowProperties<Row>;
+    Object.entries(properties).filter(
+      ([key, value]) => key !== 'source_id' && value != null,
+    ),
+  ) as GeoJSONRowProperties<Omit<Row, 'source_id'>>;
 }
 
 export function createRouteGeoJSONFeature<Properties extends object>(
@@ -186,7 +188,7 @@ export function createStopsGeoJSONFeatureCollection<Row extends Stops>(
   stops: readonly Row[],
 ): FeatureCollection<
   Point,
-  GeoJSONRowProperties<Omit<Row, 'stop_lat' | 'stop_lon'>>
+  GeoJSONRowProperties<Omit<Omit<Row, 'stop_lat' | 'stop_lon'>, 'source_id'>>
 > {
   const features = compact(
     stops.map((stop) => {
@@ -201,7 +203,7 @@ export function createStopsGeoJSONFeatureCollection<Row extends Stops>(
           type: 'Point',
           coordinates,
         },
-        omitNullGeoJSONProperties(properties),
+        prepareGeoJSONProperties(properties),
       );
     }),
   );

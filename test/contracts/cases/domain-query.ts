@@ -315,14 +315,14 @@ export async function verifyDomainQueries(
       const features = await gtfs.geojson.stops({ useParentStation });
       const ids = rows
         .filter((row) => row.stop_lat !== null && row.stop_lon !== null)
-        .map((row) => `${row.source_id}/${row.stop_id}`)
+        .map((row) => `${row.stop_lon},${row.stop_lat}/${row.stop_id}`)
         .sort();
       assert.deepEqual(
         ids,
         features.features
           .map(
             (feature) =>
-              `${feature.properties.source_id}/${feature.properties.stop_id}`,
+              `${feature.geometry.coordinates.join(',')}/${feature.properties.stop_id}`,
           )
           .sort(),
       );

@@ -71,6 +71,7 @@ export async function verifyGeoJSONIntegration(
     assert.equal(routes.features.length, 4);
     for (const collection of [stops, shapes, routes]) {
       assert.equal(collection.type, 'FeatureCollection');
+      assert.doesNotMatch(JSON.stringify(collection), /"source_id"|"sourceId"/);
       for (const feature of collection.features) {
         assert.equal('_unknown_fields' in feature.properties, false);
         assert.equal('_node_gtfs_storage_key' in feature.properties, false);
@@ -78,7 +79,7 @@ export async function verifyGeoJSONIntegration(
     }
     for (const [index, sourceId] of ['alpha', 'beta'].entries()) {
       const sourceStops = stops.features.filter(
-        (feature) => feature.properties.source_id === sourceId,
+        (feature) => feature.geometry.coordinates[0] === index * 10,
       );
       assert.deepEqual(
         sourceStops.map((feature) => feature.properties.stop_id),
@@ -92,14 +93,10 @@ export async function verifyGeoJSONIntegration(
       assert.equal(served.properties.stop_city, 'City');
       assert.equal('agency_name' in served.properties, false);
       assert.deepEqual(
-        served.properties.routes.map((row) => [
-          row.source_id,
-          row.route_id,
-          row.route_color,
-        ]),
+        served.properties.routes.map((row) => [row.route_id, row.route_color]),
         [
-          [sourceId, 'blue', '#0000FF'],
-          [sourceId, 'red', '#FF0000'],
+          ['blue', '#0000FF'],
+          ['red', '#FF0000'],
         ],
       );
       assert.equal(
@@ -108,7 +105,7 @@ export async function verifyGeoJSONIntegration(
       );
       const shared = shapes.features.find(
         (feature) =>
-          feature.properties.source_id === sourceId &&
+          feature.geometry.coordinates[0]?.[0] === index * 10 &&
           feature.properties.shape_id === 'shared',
       );
       assert.ok(shared);
@@ -126,7 +123,7 @@ export async function verifyGeoJSONIntegration(
       assert.equal('route_id' in shared.properties, false);
       const red = routes.features.find(
         (feature) =>
-          feature.properties.source_id === sourceId &&
+          feature.geometry.coordinates[0]?.[0]?.[0] === index * 10 + 1 &&
           feature.properties.route_id === 'red',
       );
       assert.ok(red);
@@ -158,7 +155,8 @@ export async function verifyGeoJSONIntegration(
       assert.deepEqual(
         filteredRoutes.features,
         routes.features.filter(
-          (feature) => feature.properties.source_id === sourceId,
+          (feature) =>
+            Math.floor(feature.geometry.coordinates[0]![0]![0]! / 10) === index,
         ),
       );
       const filteredShapes = await gtfs.geojson.shapes({
@@ -230,7 +228,14 @@ export async function verifyGeoJSONIntegration(
         serviceDate: 20260910,
       });
       assert.equal(active.features.length, 1);
-      assert.equal(active.features[0]!.properties.source_id, 'alpha');
+      assert.deepEqual(
+        active,
+        await gtfs.geojson[method]({
+          where: { source_id: 'alpha' },
+          routeId: 'red',
+          serviceDate: 20260910,
+        }),
+      );
     }
 
     const scoped = new Gtfs({
@@ -263,8 +268,10 @@ export async function verifyGeoJSONIntegration(
         );
 
         assert.ok(features.length > 0);
-        assert.ok(
-          features.every((feature) => feature.properties.source_id === 'alpha'),
+        assert.deepEqual(
+          features,
+          (await gtfs.geojson[method]({ where: { source_id: 'alpha' } }))
+            .features,
         );
         assert.deepEqual(
           (await scoped.geojson[method]({ where: { source_id: 'beta' } }))

@@ -507,10 +507,8 @@ describe('GeoJSON feature properties and grouping', () => {
     const shapes = createShapeFeatureCollection(shapeRows);
     const routes = routeCollection(shapeRows);
     for (const collection of [stops, shapes, routes]) {
-      assert.deepEqual(
-        collection.features.map((item) => item.properties.source_id),
-        sources,
-      );
+      assert.equal(collection.features.length, sources.length);
+      assert.doesNotMatch(JSON.stringify(collection), /"source_id"|"sourceId"/);
       assert.deepEqual(
         collection.features.map((item) => item.properties.agency_name),
         sources,
@@ -547,7 +545,7 @@ describe('GeoJSON feature properties and grouping', () => {
       ],
     );
     assert.deepEqual(
-      stops.features.map((item) => item.properties.routes[0]?.source_id),
+      stops.features.map((item) => item.properties.routes[0]?.agency_name),
       sources,
     );
   });

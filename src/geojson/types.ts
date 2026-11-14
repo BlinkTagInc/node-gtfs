@@ -45,7 +45,7 @@ export type GtfsGeoJSONShapesOptions = GtfsGeoJSONFilters<'shapes'>;
 export type GtfsGeoJSONRoutesOptions = GtfsGeoJSONFilters<'routes'>;
 
 export type GtfsRouteGeoJSONProperties = GeoJSONRowProperties<
-  Omit<Routes, 'route_color' | 'route_text_color'>
+  Omit<Routes, 'source_id' | 'route_color' | 'route_text_color'>
 > &
   Partial<
     GeoJSONRowProperties<Omit<RouteAttributes, 'source_id' | 'route_id'>>
@@ -56,7 +56,7 @@ export type GtfsRouteGeoJSONProperties = GeoJSONRowProperties<
   };
 
 export type GtfsStopGeoJSONProperties = GeoJSONRowProperties<
-  Omit<Stops, 'stop_lat' | 'stop_lon'>
+  Omit<Stops, 'source_id' | 'stop_lat' | 'stop_lon'>
 > &
   Partial<
     GeoJSONRowProperties<Omit<StopAttributes, 'source_id' | 'stop_id'>>
@@ -66,7 +66,6 @@ export type GtfsStopGeoJSONProperties = GeoJSONRowProperties<
   };
 
 export interface GtfsShapeGeoJSONProperties {
-  readonly source_id: string;
   readonly shape_id: string;
   readonly routes: readonly GtfsRouteGeoJSONProperties[];
   readonly agency_name?: string;

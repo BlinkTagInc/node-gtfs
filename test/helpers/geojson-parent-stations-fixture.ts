@@ -92,7 +92,10 @@ export async function verifyGeoJSONParentStations(
         assert.ok(
           ungrouped.features.some(
             (feature) =>
-              feature.properties.source_id === sourceId &&
+              feature.geometry.coordinates[0]! >=
+                (sourceId === 'alpha' ? 0 : 20) &&
+              feature.geometry.coordinates[0]! <
+                (sourceId === 'alpha' ? 20 : 40) &&
               feature.properties.stop_id === stopId,
           ),
         );
@@ -123,7 +126,8 @@ export async function verifyGeoJSONParentStations(
       const expectedRoutes = ['red', index === 0 ? 'blue' : 'green'].sort();
       const parent = grouped.features.find(
         (feature) =>
-          feature.properties.source_id === sourceId &&
+          feature.geometry.coordinates[0]! >= (sourceId === 'alpha' ? 0 : 20) &&
+          feature.geometry.coordinates[0]! < (sourceId === 'alpha' ? 20 : 40) &&
           feature.properties.stop_id === 'station',
       );
       assert.ok(parent);
@@ -139,7 +143,7 @@ export async function verifyGeoJSONParentStations(
         expectedRoutes,
       );
       for (const route of parent.properties.routes) {
-        assert.equal(route.source_id, sourceId);
+        assert.equal('source_id' in route, false);
         assert.equal(route.agency_name, `${sourceId} Transit`);
         if (route.route_id === 'red') {
           assert.equal(route.route_color, '#FF0000');

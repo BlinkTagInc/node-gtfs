@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Remove source_id from geojson
+
 ## [5.0.0-beta.0] - 2026-11-10
 
 > [!WARNING]

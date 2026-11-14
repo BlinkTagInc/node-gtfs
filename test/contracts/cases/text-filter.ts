@@ -229,13 +229,12 @@ export async function verifyTextFilterIntegration(
     });
     assert.deepEqual(
       stops.features.map(({ properties }) => [
-        properties.source_id,
         properties.stop_id,
         properties.stop_name,
       ]),
       [
-        ['north', 'c', 'Straße'],
-        ['north', 'd', 'STRASSE'],
+        ['c', 'Straße'],
+        ['d', 'STRASSE'],
       ],
     );
     const routes = await gtfs.geojson.routes({
@@ -243,11 +242,8 @@ export async function verifyTextFilterIntegration(
         sql<boolean>`${sql.ref('routes._node_gtfs_casefold_route_short_name')} like ${'%' + foldGtfsText('RÉD') + '%'} escape '!'`,
     });
     assert.deepEqual(
-      routes.features.map(({ properties }) => [
-        properties.source_id,
-        properties.route_id,
-      ]),
-      [['north', 'red']],
+      routes.features.map(({ properties }) => [properties.route_id]),
+      [['red']],
     );
     const shapes = await gtfs.geojson.shapes({
       sqlWhere: (eb) =>
@@ -276,11 +272,8 @@ export async function verifyTextFilterIntegration(
         ),
     });
     assert.deepEqual(
-      shapes.features.map(({ properties }) => [
-        properties.source_id,
-        properties.shape_id,
-      ]),
-      [['north', 'shape']],
+      shapes.features.map(({ properties }) => [properties.shape_id]),
+      [['shape']],
     );
     for (const where of [
       { stop_id: { contains: 'a', mode: 'insensitive' } },

@@ -61,7 +61,7 @@ describe('Gtfs GeoJSON projections', () => {
     });
     assert.equal(stops.features.length, 1);
     assert.equal(stops.features[0]!.properties.stop_city, 'Test City');
-    assert.equal(stops.features[0]!.properties.source_id, 'caltrain');
+    assert.equal('source_id' in stops.features[0]!.properties, false);
     assert.ok(stops.features[0]!.properties.routes.length > 0);
   });
   test('filters stop points within coordinate bounds', async () => {

@@ -15,7 +15,7 @@ import {
   createRouteGeoJSONFeature,
   createShapeGeoJSONFeature,
   createStopsGeoJSONFeatureCollection,
-  omitNullGeoJSONProperties,
+  prepareGeoJSONProperties,
 } from './features.ts';
 import {
   loadRoutesGeoJSONData,
@@ -176,7 +176,7 @@ function createRoutePropertiesIndex(
       ...attributesByRoute.get(key)?.[0],
     };
     propertiesByRoute.set(key, {
-      ...omitNullGeoJSONProperties(row),
+      ...prepareGeoJSONProperties(row),
       ...(agency === undefined ? {} : { agency_name: agency.agency_name }),
       ...(route_color ? { route_color: `#${route_color}` as const } : {}),
       ...(route_text_color
@@ -216,7 +216,6 @@ function sharedAgencyProperties(
     first?.agency_name === undefined ||
     routes.some(
       (route) =>
-        route.source_id !== first.source_id ||
         route.agency_id !== first.agency_id ||
         route.agency_name !== first.agency_name,
     )
@@ -274,7 +273,6 @@ export function createShapeFeatureCollection(
       propertiesByRoute,
     );
     const shape = createShapeGeoJSONFeature(points, {
-      source_id: first.source_id,
       shape_id: first.shape_id,
       routes,
       ...sharedAgencyProperties(routes),

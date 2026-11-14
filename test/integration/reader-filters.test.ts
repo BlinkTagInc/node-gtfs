@@ -112,7 +112,10 @@ test('GeoJSON shares comparisons, boolean groups and nested time filters', async
       ]),
   });
   assert.equal(stops.features.length, 1);
-  assert.equal(stops.features[0]?.properties.source_id, 'north');
+  assert.deepEqual(
+    stops,
+    await gtfs.geojson.stops({ where: { source_id: 'north' } }),
+  );
 });
 test('unsupported equality-object shapes reject before SQL', () => {
   for (const where of [

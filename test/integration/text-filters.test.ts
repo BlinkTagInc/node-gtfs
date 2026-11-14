@@ -109,25 +109,16 @@ test('GeoJSON SQL predicates preserve folded text and source-aware joins', async
       sql<boolean>`${sql.ref('stops._node_gtfs_casefold_stop_name')} like ${'%' + foldGtfsText('STREET') + '%'} escape '!'`,
   });
   assert.deepEqual(
-    stops.features.map(({ properties }) => [
-      properties.source_id,
-      properties.stop_id,
-    ]),
-    [
-      ['north', 'a'],
-      ['north', 'b'],
-    ],
+    stops.features.map(({ properties }) => [properties.stop_id]),
+    [['a'], ['b']],
   );
   const routes = await gtfs.geojson.routes({
     sqlWhere: () =>
       sql<boolean>`${sql.ref('routes._node_gtfs_casefold_route_short_name')} = ${foldGtfsText('RÉD')}`,
   });
   assert.deepEqual(
-    routes.features.map(({ properties }) => [
-      properties.source_id,
-      properties.route_id,
-    ]),
-    [['north', 'red']],
+    routes.features.map(({ properties }) => [properties.route_id]),
+    [['red']],
   );
   const shapes = await gtfs.geojson.shapes({
     sqlWhere: (eb) =>
@@ -148,11 +139,8 @@ test('GeoJSON SQL predicates preserve folded text and source-aware joins', async
       ),
   });
   assert.deepEqual(
-    shapes.features.map(({ properties }) => [
-      properties.source_id,
-      properties.shape_id,
-    ]),
-    [['north', 'shape']],
+    shapes.features.map(({ properties }) => [properties.shape_id]),
+    [['shape']],
   );
 });
 test('SQL folded searches report missing companion columns without permanent caching', async () => {

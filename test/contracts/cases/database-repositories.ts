@@ -212,11 +212,8 @@ export async function verifyRepositoryFilterIntegration(
         ]),
     });
     assert.deepEqual(
-      geojson.features.map(({ properties }) => [
-        properties.source_id,
-        properties.stop_id,
-      ]),
-      [['north', 'red-stop']],
+      geojson.features.map(({ properties }) => [properties.stop_id]),
+      [['red-stop']],
     );
     await assert.rejects(
       async () => gtfs.schedule.calendarDates.where({ date: 20260229 }).count(),

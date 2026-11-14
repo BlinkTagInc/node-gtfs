@@ -83,28 +83,32 @@ export async function verifyGeoJSONBatchIntegration(
     });
     const routes = await gtfs.geojson.routes();
     const expectedKeys = sources.flatMap(({ sourceId }) =>
-      ids.map((id) => [sourceId, id]),
+      ids.map((id) => [`${sourceId} Transit`, id]),
     );
     assert.deepEqual(
-      stops.features.map(({ properties: row }) => [row.source_id, row.stop_id]),
+      stops.features.map(({ properties: row }) => [
+        row.agency_name,
+        row.stop_id,
+      ]),
       expectedKeys,
     );
     assert.deepEqual(
       shapes.features.map(({ properties: row }) => [
-        row.source_id,
+        row.agency_name,
         row.shape_id,
       ]),
       expectedKeys,
     );
     assert.deepEqual(
       routes.features.map(({ properties: row }) => [
-        row.source_id,
+        row.agency_name,
         row.route_id,
       ]),
       expectedKeys,
     );
     for (const feature of stops.features) {
-      const { source_id: sourceId, stop_id: id } = feature.properties;
+      const sourceId = feature.properties.agency_name!.split(' ')[0];
+      const { stop_id: id } = feature.properties;
       assert.equal(feature.properties.stop_city, `${sourceId} City`);
       assert.deepEqual(feature.geometry.coordinates, [
         sourceId === 'alpha' ? 0 : 10,
@@ -120,7 +124,8 @@ export async function verifyGeoJSONBatchIntegration(
       );
     }
     for (const feature of shapes.features) {
-      const { source_id: sourceId, shape_id: id } = feature.properties;
+      const sourceId = feature.properties.agency_name!.split(' ')[0];
+      const { shape_id: id } = feature.properties;
       const x = sourceId === 'alpha' ? 0 : 10;
       assert.deepEqual(feature.geometry.coordinates, [
         [x, Number(id) / 100],
@@ -134,18 +139,19 @@ export async function verifyGeoJSONBatchIntegration(
     for (const collection of [stops, shapes]) {
       for (const feature of collection.features) {
         for (const route of feature.properties.routes) {
-          assert.equal(route.source_id, feature.properties.source_id);
-          assert.equal(route.agency_name, `${route.source_id} Transit`);
+          assert.equal('source_id' in route, false);
+          assert.equal(route.agency_name, feature.properties.agency_name);
           assert.equal(
             route.subcategory,
-            route.source_id === 'alpha' ? 101 : 102,
+            route.agency_name === 'alpha Transit' ? 101 : 102,
           );
           assert.equal(route.route_color, '#FF0000');
         }
       }
     }
     for (const feature of routes.features) {
-      const { source_id: sourceId, route_id: id } = feature.properties;
+      const sourceId = feature.properties.agency_name!.split(' ')[0];
+      const { route_id: id } = feature.properties;
       const x = sourceId === 'alpha' ? 0 : 10;
       const ownShape = [
         [x, Number(id) / 100],
