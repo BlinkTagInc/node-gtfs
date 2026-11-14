@@ -111,8 +111,8 @@ alone excludes standalone bus stops. A station-only request requires
 
 ## Advanced SQL filters
 
-Replace `where: (fields) => ...` callbacks with the selectors above or a Kysely
-`sqlWhere` callback. The callback receives an expression builder for the root
+For custom SQL conditions, use a Kysely `sqlWhere` callback.
+The callback receives an expression builder for the root
 table and must return a synchronous boolean SQL expression:
 
 ```js

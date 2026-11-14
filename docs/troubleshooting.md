@@ -8,7 +8,7 @@ message alone.
 
 ## I cannot run the command or example
 
-- Check `node --version`: Node.js 22.18+ (22.x), 24, or 26+ is required.
+- Check `node --version`: Node.js 22.18+ (22.x) or 24+ is required.
 - For the CLI, install `gtfs` globally or use `npx gtfs` from a project where
   it is installed. Run `gtfs --help` to see available commands.
 - Save JavaScript examples as `.mjs`, or configure your project for ES modules.
@@ -214,4 +214,4 @@ real static GTFS feed is welcome even if you do not know how to fix it.
 - [Capture progress and structured errors](reporting.md).
 - [Check configuration names, values, and defaults](reference/configuration.md).
 - [Review database setup and connection lifetime](databases.md).
-- [Update a v4 application](migrating-to-v5.md).
+- [Upgrade an existing application](migrating-to-v5.md).

@@ -14,7 +14,7 @@ and the files for one extension.
 The tests compare explicit expected values with public repositories after
 import and reimport, and inspect exported filenames and CSV values directly.
 They exercise explicit selection, individual automatic detection, and the
-automatic union across six sources. Validation uses the default strict mode.
+automatic union across six sources. Validation uses the default `off` mode.
 
 When adding a field or file to a supported extension, add a non-empty value
 here; the coverage assertion fails until the fixture matches the manifest.

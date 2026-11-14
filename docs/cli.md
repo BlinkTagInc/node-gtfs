@@ -39,8 +39,10 @@ but all imported data is discarded when the command finishes.
 
 ## Export Schedule data
 
-**The output directory is cleared before export.** Use a dedicated destination,
-not your original static GTFS feed folder. See [export safety](export.md#choose-a-safe-output-directory).
+Export refuses an existing destination unless `export.overwrite` is `true`
+in your config file. Replacement happens after the new files are generated
+and removes the entire old destination. Use a dedicated folder. See
+[export safety](export.md#choose-a-safe-output-directory).
 
 ```sh
 gtfs export --database ./transit.sqlite --output ./exported-feed

@@ -84,7 +84,7 @@ It includes every getter, lifecycle/utility replacement, and row-type rename.
 
 Before, in v4:
 
-```json
+```json legacy
 {
   "sqlitePath": "./transit-v4.sqlite",
   "agencies": [{ "path": "./feed.zip", "prefix": "metro-" }],
@@ -254,6 +254,30 @@ when adding a filter or changing selection/order.
 stream expecting an array. Close an unfinished iterator with `return()`; breaking
 a `for await` loop does this automatically. Earlier v5 drafts' dual result objects,
 callback filters, aggregate methods, and callback ordering are not the final API.
+
+For callers migrating from the combined result API:
+
+| Previous call                          | Current call                              |
+| -------------------------------------- | ----------------------------------------- |
+| `await query.all()`                    | `await query.all()`                       |
+| `query.all().toArray()`                | `query.all()`                             |
+| `for await (const row of query.all())` | `for await (const row of query.stream())` |
+| `query.limit(1).all().firstOrThrow()`  | `query.firstOrThrow()`                    |
+
+Use `Promise<Row[]>` for arrays and `AsyncIterableIterator<Row>` for streams.
+The combined `AsyncIterableResult` type is no longer exported.
+
+Replace callback ordering such as `orderBy(row => row.trip_id.asc())` with
+`orderBy([{ field: 'trip_id' }])`. Reader `aggregate()` and `groupBy()`
+are replaced by [SQL summaries](aggregates.md). To preserve
+`limit(...).aggregate(...)` behavior, paginate the input subquery before
+aggregating, not the aggregate result.
+
+Reader `distinct()` and `distinctOn()` selected representative rows by named
+keys. Use the [window-function recipe](sql-queries.md#distinct-records) to
+preserve that behavior; SQL `DISTINCT` over additional output fields can return
+more than one row per key. Replace GeoJSON `where: (fields) => ...` callbacks
+with selectors or a Kysely [`sqlWhere` callback](geojson.md#advanced-sql-filters).
 
 | V4 query feature                                    | V5 replacement                                                                                                                                            |
 | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |

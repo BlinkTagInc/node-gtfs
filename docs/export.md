@@ -49,7 +49,7 @@ const result = await gtfs.export({ outputDirectory: './exported-feed' });
 ```
 
 Instance overrides accept `batchSize`, `outputDirectory`, `overwrite`, `sourceId`,
-and `reporting`. Per-call export fields override the corresponding instance
+`reporting`, and a cancellation `signal`. Per-call export fields override the corresponding instance
 `export` settings. Reporting replaces the complete reporting configuration.
 
 Choose a source with `gtfs.export({ sourceId: 'metro', ... })`, set an instance
@@ -131,8 +131,9 @@ are not added as GTFS columns. Monetary amounts are written as decimal values.
 
 ## Large exports
 
-`export.batchSize` is the positive number of rows read per batch (default
-`1000`). It does not split files. PostgreSQL needs the
+`export.batchSize` sets the positive number of rows requested per PostgreSQL
+read batch (default `1000`). SQLite and MySQL stream rows without using this
+setting. It does not split files. PostgreSQL needs the
 [cursor-enabled connection](databases.md#postgresql) used for streaming.
 
 To produce other formats, query the records you need and write them with your

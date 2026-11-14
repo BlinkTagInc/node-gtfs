@@ -461,10 +461,9 @@ rows. Use enough window-order fields to break ties. The window order chooses
 the representative; the outer order controls the returned rows. Filter the
 input before ranking when the representative must satisfy those conditions.
 
-Reader `distinct()` and `distinctOn()` are no longer supported. Their former
-behavior selected representative rows by named keys. Replacing them with SQL
-`DISTINCT` over additional output fields would change their meaning. Use the window recipe for that migration;
-PostgreSQL's `DISTINCT ON` is not portable to SQLite and MySQL.
+Use a window function to choose one representative row per key. SQL `DISTINCT`
+compares all selected fields; PostgreSQL's `DISTINCT ON` is not portable to
+SQLite and MySQL.
 For time keys, partition and sort by the numeric service-day-seconds column.
 Include `source_id` in keys when equal IDs from different sources are separate.
 Custom SQL returns stored values; apply any needed public-value conversions.

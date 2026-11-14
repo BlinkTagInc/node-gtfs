@@ -1,6 +1,6 @@
 # Contributing to node-GTFS
 
-This guide covers development of node-GTFS v5. Bug reports and pull requests are
+This guide covers development of node-GTFS. Bug reports and pull requests are
 welcome. For a bug report, include the version, expected and actual behavior, and
 a small reproducible example.
 
@@ -110,7 +110,9 @@ snapshots with the source changes. Do not edit generated files by hand.
 
 Use `js` or `ts` fences for documentation examples. `pnpm test:release` checks
 them against the packed declarations. Use `js setup` for shared setup within a
-document and `js legacy` or `ts legacy` only for historical examples.
+document and `js legacy`, `ts legacy`, or `json legacy` only for historical examples
+in the migration documentation. Configuration reference paths are checked against
+the public types, and current JSON examples are validated by the config resolver.
 
 ## Pull requests
 

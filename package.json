@@ -109,7 +109,7 @@
     "typecheck": "pnpm run build && tsc --noEmit",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "docs:check": "node scripts/check-docs.mjs && node --disable-warning=ExperimentalWarning scripts/check-migration.mjs",
+    "docs:check": "node scripts/check-docs.mjs && node --disable-warning=ExperimentalWarning scripts/check-config-docs.mjs && node --disable-warning=ExperimentalWarning scripts/check-migration.mjs",
     "repositories:generate": "node --disable-warning=ExperimentalWarning scripts/generate-repositories.mjs",
     "repositories:check": "node --disable-warning=ExperimentalWarning scripts/generate-repositories.mjs --check",
     "row-types:generate": "node --disable-warning=ExperimentalWarning scripts/generate-row-types.mjs",

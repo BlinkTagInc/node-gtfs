@@ -15,7 +15,7 @@ importing your static GTFS feed.
 
 - [Getting started](getting-started.md): install node-GTFS, import a ZIP, and run your first query.
 - [Command line](cli.md): import, export, and refresh GTFS-Realtime without writing a program.
-- [Migrate from v4](migrating-to-v5.md): create a fresh database and update configuration and application calls.
+- [Migration guide](migrating-to-v5.md): create a fresh database and update configuration and application calls.
 
 ## Import and manage static GTFS feeds
 
@@ -50,7 +50,6 @@ importing your static GTFS feed.
 - [GTFS-to-HTML fields](reference/gtfs-to-html.md): timetable presentation settings and notes.
 - [TODS fields](reference/tods.md): operations and Schedule supplements.
 - [TIDES fields](reference/tides.md): vehicles and passenger, fare, and operational events.
-- [V4 API replacements](reference/v4-api.md): replacements for getters, methods, row types, and error codes.
 
 ## Help and diagnostics
 

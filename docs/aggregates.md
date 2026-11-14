@@ -119,9 +119,8 @@ const summary = await gtfs.database.withKysely({
 
 For group pagination, apply `orderBy`, `offset`, and `limit` to the outer
 grouped query instead. Filtering, choosing representative rows, paging input,
-and paging groups are separate operations. Migrating a reader's
-`limit(...).aggregate(...)` to SQL with `LIMIT` on the aggregate itself
-would change the result.
+and paging groups are separate operations. Apply pagination to the input
+subquery when the summary should describe only that page.
 
 ## Summarize GTFS times
 

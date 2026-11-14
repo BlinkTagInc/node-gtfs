@@ -6,6 +6,7 @@ import {
   readFile,
   readdir,
   rm,
+  symlink,
   writeFile,
 } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -182,4 +183,66 @@ test('published examples retain shared setup, preserve source locations, and exp
   ]);
   assert.equal(invalid.status, 1);
   assert.match(invalid.stderr, /README\.md:1: unknown example option/);
+});
+
+test('configuration documentation checks reject misspelled, missing, and invalid options', async (t) => {
+  const directory = await fixture(t);
+  await mkdir(path.join(directory, 'docs/reference'));
+  await symlink(path.join(root, 'src'), path.join(directory, 'src'), 'dir');
+  await symlink(
+    path.join(root, 'node_modules'),
+    path.join(directory, 'node_modules'),
+    'dir',
+  );
+  const referencePath = path.join(directory, 'docs/reference/configuration.md');
+  const reference = await readFile(
+    path.join(root, 'docs/reference/configuration.md'),
+    'utf8',
+  );
+  await writeFile(referencePath, reference);
+  await writeFile(path.join(directory, 'README.md'), '# Examples\n');
+  const valid = check('check-config-docs.mjs', directory);
+  assert.equal(valid.status, 0, valid.stdout + valid.stderr);
+
+  await writeFile(
+    referencePath,
+    reference.replace('`database.path`', '`database.sqlitePath`'),
+  );
+  const renamed = check('check-config-docs.mjs', directory);
+  assert.equal(renamed.status, 1);
+  assert.match(
+    renamed.stderr,
+    /Configuration reference differs from public types/,
+  );
+
+  await writeFile(
+    referencePath,
+    reference
+      .split('\n')
+      .filter((line) => !line.startsWith('| `database.path`'))
+      .join('\n'),
+  );
+  const missing = check('check-config-docs.mjs', directory);
+  assert.equal(missing.status, 1);
+  assert.match(
+    missing.stderr,
+    /Configuration reference differs from public types/,
+  );
+
+  await writeFile(referencePath, reference);
+  for (const config of [
+    { database: { sqlitePath: './feed.sqlite' } },
+    { database: { path: './feed.sqlite' }, export: { batchSize: 0 } },
+  ]) {
+    await writeFile(
+      path.join(directory, 'README.md'),
+      '```json\n' + JSON.stringify(config) + '\n```\n',
+    );
+    const invalid = check('check-config-docs.mjs', directory);
+    assert.equal(invalid.status, 1);
+    assert.match(
+      invalid.stderr,
+      /README.md:1: invalid documented configuration/,
+    );
+  }
 });

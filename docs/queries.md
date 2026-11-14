@@ -169,8 +169,7 @@ const trips = await gtfs.schedule.trips
 Use enough sort fields to break ties for predictable pages. If multiple
 sources are in scope, include `source_id` where necessary. Nullable fields
 follow the database’s default null ordering. `direction` accepts `asc` (the
-default) or `desc`. `orderBy([])` clears row ordering. Replace old sorting callbacks such
-as `orderBy(row => row.trip_id.asc())` with `orderBy([{ field: 'trip_id' }])`.
+default) or `desc`. `orderBy([])` clears row ordering.
 
 ## Count matching rows
 
@@ -191,8 +190,7 @@ Each call executes against the current database and instance source scope.
 For a total across all pages, call `count()` on the query before adding paging.
 
 For field counts, grouped summaries, totals, and extrema, use
-[typed SQL summaries](aggregates.md). Reader `aggregate()` and `groupBy()`
-are no longer supported.
+[typed SQL summaries](aggregates.md).
 
 ## Distinct records
 
@@ -228,17 +226,7 @@ Awaiting the same array Promise again returns its original result; calling
 `all()` again reads current data. Calling `stream()` alone does not reserve a
 connection or execute SQL.
 
-For callers migrating from the combined result API:
-
-| Previous call                          | Current call                              |
-| -------------------------------------- | ----------------------------------------- |
-| `await query.all()`                    | `await query.all()`                       |
-| `query.all().toArray()`                | `query.all()`                             |
-| `for await (const row of query.all())` | `for await (const row of query.stream())` |
-| `query.limit(1).all().firstOrThrow()`  | `query.firstOrThrow()`                    |
-
 Use `Promise<Row[]>` for arrays and `AsyncIterableIterator<Row>` for streams.
-The combined `AsyncIterableResult` type is no longer exported.
 
 For SQLite or a borrowed transaction, finish the stream before starting another
 operation on the same instance. PostgreSQL/MySQL pools can support other reads
