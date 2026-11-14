@@ -136,7 +136,7 @@ export async function verifyGeoJSONParentStations(
       assert.equal(parent.properties.stop_code, 'STATION');
       assert.equal(parent.properties.wheelchair_boarding, 1);
       assert.equal('platform_code' in parent.properties, false);
-      assert.equal(parent.properties.stop_city, `${sourceId} Parent City`);
+      assert.equal('stop_city' in parent.properties, false);
       assert.equal(parent.properties.agency_name, `${sourceId} Transit`);
       assert.deepEqual(
         parent.properties.routes.map((route) => route.route_id),
@@ -147,7 +147,7 @@ export async function verifyGeoJSONParentStations(
         assert.equal(route.agency_name, `${sourceId} Transit`);
         if (route.route_id === 'red') {
           assert.equal(route.route_color, '#FF0000');
-          assert.equal(route.category, 1);
+          assert.equal('category' in route, false);
         }
       }
       for (const stopId of [

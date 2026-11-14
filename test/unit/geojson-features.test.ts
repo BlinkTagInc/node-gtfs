@@ -121,7 +121,6 @@ function shapeData(): ShapesGeoJSONData {
   return {
     agencyRows: [agency()],
     routes: [route()],
-    routeAttributes: [],
     shapeRoutes: [
       { source_id: 'source', shape_id: 'shape', route_id: 'route' },
     ],
@@ -136,8 +135,6 @@ function stopData(): StopsGeoJSONData {
   return {
     agencyRows: [agency()],
     routes: [route()],
-    routeAttributes: [],
-    stopAttributes: [],
     stops: [stop('source', 0, 0)],
     stopRoutes: [{ source_id: 'source', stop_id: 'stop', route_id: 'route' }],
   };
@@ -371,38 +368,10 @@ describe('GeoJSON feature properties and grouping', () => {
     assert.equal(routeCollection(shared).features.length, 2);
   });
 
-  test('formats route colors, omits nulls, and includes typed extension properties at every level', () => {
-    const attributes = [
-      {
-        source_id: 'source',
-        route_id: 'route',
-        category: 1,
-        subcategory: 101,
-        running_way: 1,
-      },
-    ];
-    const routes = routeCollection({
-      ...shapeData(),
-      routeAttributes: attributes,
-    });
-    const shapes = createShapeFeatureCollection({
-      ...shapeData(),
-      routeAttributes: attributes,
-    });
-    const stops = createStopFeatureCollection({
-      ...stopData(),
-      routeAttributes: attributes,
-      stopAttributes: [
-        {
-          source_id: 'source',
-          stop_id: 'stop',
-          accessibility_id: null,
-          cardinal_direction: null,
-          relative_position: null,
-          stop_city: 'City',
-        },
-      ],
-    });
+  test('formats route colors and omits null properties at every level', () => {
+    const routes = routeCollection(shapeData());
+    const shapes = createShapeFeatureCollection(shapeData());
+    const stops = createStopFeatureCollection(stopData());
     for (const properties of [
       routes.features[0]!.properties,
       shapes.features[0]!.properties.routes[0]!,
@@ -410,11 +379,9 @@ describe('GeoJSON feature properties and grouping', () => {
     ]) {
       assert.equal(properties.route_color, '#FF0000');
       assert.equal(properties.route_text_color, '#FFFFFF');
-      assert.equal(properties.category, 1);
       assert.equal(properties.agency_name, 'Transit');
       assert.equal('route_desc' in properties, false);
     }
-    assert.equal(stops.features[0]?.properties.stop_city, 'City');
     assert.equal('accessibility_id' in stops.features[0]!.properties, false);
   });
 
@@ -474,7 +441,6 @@ describe('GeoJSON feature properties and grouping', () => {
     const shared = {
       agencyRows: sources.map((id) => agency(id, 'agency', id)),
       routes: sources.map((id) => route(id)),
-      routeAttributes: [],
     };
     const shapeRows = {
       ...shared,
@@ -496,7 +462,6 @@ describe('GeoJSON feature properties and grouping', () => {
     };
     const stops = createStopFeatureCollection({
       ...shared,
-      stopAttributes: [],
       stops: sources.map((id, i) => stop(id, i * 10, 0)),
       stopRoutes: sources.map((id) => ({
         source_id: id,

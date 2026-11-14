@@ -109,7 +109,7 @@ export async function verifyGeoJSONBatchIntegration(
     for (const feature of stops.features) {
       const sourceId = feature.properties.agency_name!.split(' ')[0];
       const { stop_id: id } = feature.properties;
-      assert.equal(feature.properties.stop_city, `${sourceId} City`);
+      assert.equal('stop_city' in feature.properties, false);
       assert.deepEqual(feature.geometry.coordinates, [
         sourceId === 'alpha' ? 0 : 10,
         0,
@@ -141,10 +141,7 @@ export async function verifyGeoJSONBatchIntegration(
         for (const route of feature.properties.routes) {
           assert.equal('source_id' in route, false);
           assert.equal(route.agency_name, feature.properties.agency_name);
-          assert.equal(
-            route.subcategory,
-            route.agency_name === 'alpha Transit' ? 101 : 102,
-          );
+          assert.equal('subcategory' in route, false);
           assert.equal(route.route_color, '#FF0000');
         }
       }
@@ -170,10 +167,7 @@ export async function verifyGeoJSONBatchIntegration(
           : [ownShape],
       );
       assert.equal(feature.properties.agency_name, `${sourceId} Transit`);
-      assert.equal(
-        feature.properties.subcategory,
-        sourceId === 'alpha' ? 101 : 102,
-      );
+      assert.equal('subcategory' in feature.properties, false);
     }
   } finally {
     await gtfs.close();

@@ -63,3 +63,15 @@ for (const method of ['stops', 'shapes', 'routes'] as const) {
     }
   }
 }
+
+const stopProperties = (await gtfs.geojson.stops()).features[0]!.properties;
+// @ts-expect-error GTFS+ stop attributes are not GeoJSON properties
+void stopProperties.stop_city;
+const routeProperties = (await gtfs.geojson.routes()).features[0]!.properties;
+// @ts-expect-error GTFS+ route attributes are not GeoJSON properties
+void routeProperties.category;
+// @ts-expect-error nested routes omit GTFS+ attributes too
+void stopProperties.routes[0]!.category;
+const shapeProperties = (await gtfs.geojson.shapes()).features[0]!.properties;
+// @ts-expect-error shape routes omit GTFS+ attributes too
+void shapeProperties.routes[0]!.category;

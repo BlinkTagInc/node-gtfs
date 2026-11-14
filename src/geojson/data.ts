@@ -7,14 +7,7 @@ import {
   compileGeoJSONSelectors,
   compileGeoJSONSqlWhere,
 } from './query-filters.ts';
-import type {
-  Agency,
-  RouteAttributes,
-  Routes,
-  Shapes,
-  StopAttributes,
-  Stops,
-} from '../schema/row-types.ts';
+import type { Agency, Routes, Shapes, Stops } from '../schema/row-types.ts';
 import { asDynamicKysely } from '../database/clients.ts';
 import type { GtfsDatabaseDialect } from '../database/dialects.ts';
 import { compilePortableQueryPlan } from '../database/kysely/query/plan.ts';
@@ -49,7 +42,6 @@ interface LoadGtfsGeoJSONDataOptions<
 interface RouteGeoJSONData {
   readonly agencyRows: readonly Agency[];
   readonly routes: readonly Routes[];
-  readonly routeAttributes: readonly RouteAttributes[];
 }
 
 interface StopRouteAssociation {
@@ -65,7 +57,6 @@ interface ShapeRouteAssociation {
 }
 
 export interface StopsGeoJSONData extends RouteGeoJSONData {
-  readonly stopAttributes: readonly StopAttributes[];
   readonly stops: readonly Stops[];
   readonly stopRoutes: readonly StopRouteAssociation[];
 }
@@ -82,10 +73,8 @@ export interface RoutesGeoJSONData extends RouteGeoJSONData {
 
 interface GeoJSONRows {
   agency: Agency;
-  routeAttributes: RouteAttributes;
   routes: Routes;
   shapes: Shapes;
-  stopAttributes: StopAttributes;
   stops: Stops;
 }
 
@@ -149,7 +138,6 @@ async function createGeoJSONReader<
     context: { ...context, table, additionalWhere },
     where: undefined,
   });
-  const includeAttributes = context.enabledExtensions.includes('gtfs-plus');
   const tables = [
     table,
     compiledTableRegistry.agency,
@@ -162,12 +150,6 @@ async function createGeoJSONReader<
     ...(root === 'stops'
       ? [compiledTableRegistry.stopTimes]
       : [compiledTableRegistry.shapes]),
-    ...(includeAttributes
-      ? [
-          compiledTableRegistry.routeAttributes,
-          ...(root === 'stops' ? [compiledTableRegistry.stopAttributes] : []),
-        ]
-      : []),
   ];
   for (const requiredTable of tables) {
     assertGtfsExtensionEnabled(
@@ -218,24 +200,12 @@ async function createGeoJSONReader<
         agencyRows.push(agency);
       }
     }
-    const routeAttributes = includeAttributes
-      ? await readSourceScopedBatches(
-          routes,
-          (route) => route.route_id,
-          (sourceId, ids) =>
-            select('routeAttributes')
-              .where('source_id', '=', sourceId)
-              .where('route_id', 'in', ids)
-              .execute(),
-        )
-      : [];
-    return { agencyRows, routeAttributes };
+    return { agencyRows };
   };
   return {
     database,
     predicates,
     hasRootFilter: additionalWhere.length > 0,
-    includeAttributes,
     select,
     loadRouteDetails,
   };
@@ -435,19 +405,8 @@ export async function loadStopsGeoJSONData<DB>(
         .where('route_id', 'in', ids)
         .execute(),
   );
-  const stopAttributes = reader.includeAttributes
-    ? await readSourceScopedBatches(
-        stops,
-        (stop) => stop.stop_id,
-        (sourceId, ids) =>
-          select('stopAttributes')
-            .where('source_id', '=', sourceId)
-            .where('stop_id', 'in', ids)
-            .execute(),
-      )
-    : [];
   const details = await reader.loadRouteDetails(routes);
-  return { stops, stopRoutes, routes, stopAttributes, ...details };
+  return { stops, stopRoutes, routes, ...details };
 }
 
 export async function loadShapesGeoJSONData<DB>(

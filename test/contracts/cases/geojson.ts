@@ -71,7 +71,10 @@ export async function verifyGeoJSONIntegration(
     assert.equal(routes.features.length, 4);
     for (const collection of [stops, shapes, routes]) {
       assert.equal(collection.type, 'FeatureCollection');
-      assert.doesNotMatch(JSON.stringify(collection), /"source_id"|"sourceId"/);
+      assert.doesNotMatch(
+        JSON.stringify(collection),
+        /"source_id"|"sourceId"|"stop_city"|"category"|"subcategory"|"running_way"/,
+      );
       for (const feature of collection.features) {
         assert.equal('_unknown_fields' in feature.properties, false);
         assert.equal('_node_gtfs_storage_key' in feature.properties, false);
@@ -90,7 +93,7 @@ export async function verifyGeoJSONIntegration(
       );
       assert.ok(served);
       assert.deepEqual(served.geometry.coordinates, [index * 10, 0]);
-      assert.equal(served.properties.stop_city, 'City');
+      assert.equal('stop_city' in served.properties, false);
       assert.equal('agency_name' in served.properties, false);
       assert.deepEqual(
         served.properties.routes.map((row) => [row.route_id, row.route_color]),
@@ -128,7 +131,7 @@ export async function verifyGeoJSONIntegration(
       );
       assert.ok(red);
       assert.equal(red.geometry.type, 'MultiLineString');
-      assert.equal(red.properties.category, 1);
+      assert.equal('category' in red.properties, false);
       assert.equal(red.properties.agency_name, 'Transit');
       assert.deepEqual(red.geometry.coordinates, [
         [
@@ -315,9 +318,7 @@ export async function verifyGeoJSONIntegration(
     try {
       for (const method of ['stops', 'shapes', 'routes'] as const) {
         assert.deepEqual((await core.geojson[method]()).features, []);
-        await assert.rejects(gtfs.geojson[method](), {
-          code: 'GTFS_SCHEMA_INVALID',
-        });
+        assert.deepEqual((await gtfs.geojson[method]()).features, []);
       }
     } finally {
       await core.close();

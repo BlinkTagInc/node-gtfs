@@ -602,8 +602,8 @@ type _StopGeoJSONIdIsRequired = Assert<
 type _StopGeoJSONNameIsOptional = Assert<
   Equal<GtfsStopGeoJSONProperties['stop_name'], string | undefined>
 >;
-type _StopGeoJSONAttributeIsOptional = Assert<
-  Equal<GtfsStopGeoJSONProperties['stop_city'], string | undefined>
+type _StopGeoJSONOmitsAttributes = Assert<
+  Equal<Extract<'stop_city', keyof GtfsStopGeoJSONProperties>, never>
 >;
 type _ShapeGeoJSONIdIsRequired = Assert<
   Equal<GtfsShapeGeoJSONProperties['shape_id'], string>
@@ -614,10 +614,10 @@ type _NestedGeoJSONRouteType = Assert<
     Routes['route_type']
   >
 >;
-type _NestedGeoJSONRouteAttribute = Assert<
+type _NestedGeoJSONRouteOmitsAttributes = Assert<
   Equal<
-    GtfsShapeGeoJSONProperties['routes'][number]['category'],
-    number | undefined
+    Extract<'category', keyof GtfsShapeGeoJSONProperties['routes'][number]>,
+    never
   >
 >;
 type _RouteGeoJSONColor = Assert<

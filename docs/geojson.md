@@ -69,7 +69,7 @@ const stops = await gtfs.geojson.stops({
 ```
 
 - Selected child locations use their parent station's `stop_id`, name,
-  coordinates, and other stop properties, including available GTFS+ attributes.
+  coordinates, and other standard GTFS stop properties.
 - Each station appears once within its source. Standalone stops remain.
 - A station's `routes` includes all routes serving its platforms, even if
   the filter matched only one platform or route.
@@ -181,7 +181,7 @@ await writeFile('./route.geojson', JSON.stringify(collection));
 - Route features include route properties. Colors include a leading `#`.
 - Missing optional properties are omitted rather than set to `null`.
 - `agency_name` is included where an agency can be identified unambiguously.
-- When GTFS+ is enabled, available stop/route attributes are included.
+- GTFS+ stop and route attributes are omitted, even when GTFS+ is enabled.
 
 Shape points are ordered by `shape_pt_sequence`. Stops without coordinates
 and shapes without a usable line are omitted. Route geometry combines its

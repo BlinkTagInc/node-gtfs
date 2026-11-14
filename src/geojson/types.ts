@@ -8,12 +8,7 @@ import type {
 import type { Expression, ExpressionBuilder, SqlBool } from 'kysely';
 import type { GtfsDatabase } from '../schema/database.ts';
 import type { GtfsEqualityFilter } from '../types/repository.ts';
-import type {
-  RouteAttributes,
-  Routes,
-  StopAttributes,
-  Stops,
-} from '../schema/row-types.ts';
+import type { Routes, Stops } from '../schema/row-types.ts';
 
 export type GeoJSONRowProperties<Row> = {
   readonly [
@@ -46,24 +41,18 @@ export type GtfsGeoJSONRoutesOptions = GtfsGeoJSONFilters<'routes'>;
 
 export type GtfsRouteGeoJSONProperties = GeoJSONRowProperties<
   Omit<Routes, 'source_id' | 'route_color' | 'route_text_color'>
-> &
-  Partial<
-    GeoJSONRowProperties<Omit<RouteAttributes, 'source_id' | 'route_id'>>
-  > & {
-    readonly agency_name?: string;
-    readonly route_color?: `#${string}`;
-    readonly route_text_color?: `#${string}`;
-  };
+> & {
+  readonly agency_name?: string;
+  readonly route_color?: `#${string}`;
+  readonly route_text_color?: `#${string}`;
+};
 
 export type GtfsStopGeoJSONProperties = GeoJSONRowProperties<
   Omit<Stops, 'source_id' | 'stop_lat' | 'stop_lon'>
-> &
-  Partial<
-    GeoJSONRowProperties<Omit<StopAttributes, 'source_id' | 'stop_id'>>
-  > & {
-    readonly routes: readonly GtfsRouteGeoJSONProperties[];
-    readonly agency_name?: string;
-  };
+> & {
+  readonly routes: readonly GtfsRouteGeoJSONProperties[];
+  readonly agency_name?: string;
+};
 
 export interface GtfsShapeGeoJSONProperties {
   readonly shape_id: string;

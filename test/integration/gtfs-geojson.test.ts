@@ -55,12 +55,12 @@ describe('Gtfs GeoJSON projections', () => {
       ),
     );
   });
-  test('retains stop attributes and source-scoped route metadata', async () => {
+  test('omits GTFS+ attributes and retains source-scoped route metadata', async () => {
     const stops = await gtfs.geojson.stops({
       where: { stop_id: '70031' },
     });
     assert.equal(stops.features.length, 1);
-    assert.equal(stops.features[0]!.properties.stop_city, 'Test City');
+    assert.equal('stop_city' in stops.features[0]!.properties, false);
     assert.equal('source_id' in stops.features[0]!.properties, false);
     assert.ok(stops.features[0]!.properties.routes.length > 0);
   });

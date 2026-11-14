@@ -153,12 +153,8 @@ function indexCompositeRows<Row extends { source_id: string }>(
 }
 
 function createRoutePropertiesIndex(
-  data: Pick<ShapesGeoJSONData, 'routes' | 'routeAttributes' | 'agencyRows'>,
+  data: Pick<ShapesGeoJSONData, 'routes' | 'agencyRows'>,
 ) {
-  const attributesByRoute = indexCompositeRows(
-    data.routeAttributes,
-    (row) => row.route_id,
-  );
   const agencyBySource = indexCompositeRows(data.agencyRows, () => '');
   const propertiesByRoute = new Map<string, GtfsRouteGeoJSONProperties>();
   for (const route of data.routes) {
@@ -171,10 +167,7 @@ function createRoutePropertiesIndex(
           ? agencies[0]
           : undefined
         : agencies.find((candidate) => candidate.agency_id === route.agency_id);
-    const { route_color, route_text_color, ...row } = {
-      ...route,
-      ...attributesByRoute.get(key)?.[0],
-    };
+    const { route_color, route_text_color, ...row } = route;
     propertiesByRoute.set(key, {
       ...prepareGeoJSONProperties(row),
       ...(agency === undefined ? {} : { agency_name: agency.agency_name }),
@@ -232,10 +225,6 @@ export function createStopFeatureCollection(
     data.stopRoutes,
     (row) => row.stop_id,
   );
-  const attributesByStop = indexCompositeRows(
-    data.stopAttributes,
-    (row) => row.stop_id,
-  );
   const propertiesByRoute = createRoutePropertiesIndex(data);
   const preparedStops = data.stops.map((stop) => {
     const key = compositeKey(stop.source_id, stop.stop_id);
@@ -245,7 +234,6 @@ export function createStopFeatureCollection(
     );
     return {
       ...stop,
-      ...attributesByStop.get(key)?.[0],
       routes,
       ...sharedAgencyProperties(routes),
     };
