@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0-beta.1] - 2026-11-16
+
 ### Changed
 
 - Remove source_id from geojson
@@ -1417,5 +1419,6 @@ Or, you use async/await:
       }
     }
 
-[Unreleased]: https://github.com/BlinkTagInc/node-gtfs/compare/5.0.0-beta.0...main
+[Unreleased]: https://github.com/BlinkTagInc/node-gtfs/compare/5.0.0-beta.1...main
+[5.0.0-beta.1]: https://github.com/BlinkTagInc/node-gtfs/compare/5.0.0-beta.0...5.0.0-beta.1
 [5.0.0-beta.0]: https://github.com/BlinkTagInc/node-gtfs/compare/4.21.0...5.0.0-beta.0
