@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Require Node.js 24.22.3 or above
+
 ## [5.0.0-beta.1] - 2026-11-16
 
 ### Changed

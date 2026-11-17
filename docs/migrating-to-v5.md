@@ -12,7 +12,7 @@ To migrate with a coding assistant, use the [application migration prompt](v4-to
 
 ## Prepare and switch over
 
-1. Use Node.js 22.18+ (22.x), 24, or 26+.
+1. Use Node.js 24.22.3 or above.
    Update your application lockfile and test the application with the selected runtime.
 2. Preserve the v4 application, lockfile, configuration, original static GTFS feed archives,
    and a consistent SQLite backup. Stop writes before copying SQLite files;

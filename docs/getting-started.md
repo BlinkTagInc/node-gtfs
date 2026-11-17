@@ -3,7 +3,7 @@
 [All guides](README.md)
 
 This guide loads one static GTFS feed into a local database. You need a GTFS ZIP
-from a transit agency and Node.js 22.18+ (22.x), 24, or 26+. A **terminal** is the application
+from a transit agency and Node.js 24.22.3 or above. A **terminal** is the application
 where you enter commands; on macOS it is called Terminal.
 
 Already using PostgreSQL or MySQL? Follow the [database setup examples](databases.md)

@@ -11,7 +11,7 @@ export default defineConfig({
   outDir: 'dist',
   clean: true,
   platform: 'node',
-  target: 'node22.18',
+  target: 'node24.22.3',
   format: 'esm',
   fixedExtension: false,
   dts: true,

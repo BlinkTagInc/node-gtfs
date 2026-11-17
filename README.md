@@ -6,7 +6,7 @@
 
 [![npm version](https://img.shields.io/npm/v/gtfs.svg)](https://www.npmjs.com/package/gtfs)
 [![Monthly npm downloads](https://img.shields.io/npm/dm/gtfs.svg)](https://www.npmjs.com/package/gtfs)
-[![Node.js 22.18+ (22.x), 24, or 26+](https://img.shields.io/badge/node-22.18%2B%20%7C%2024%20%7C%2026%2B-339933?logo=node.js&logoColor=white)](package.json)
+[![Node.js 24.22.3 or above](https://img.shields.io/badge/node-24.22.3%2B-339933?logo=node.js&logoColor=white)](package.json)
 [![Build status](https://img.shields.io/github/actions/workflow/status/BlinkTagInc/node-gtfs/nodejs.yml)](https://github.com/BlinkTagInc/node-gtfs/actions/workflows/nodejs.yml)
 [![MIT license](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
 
@@ -65,7 +65,7 @@ is not a certification that a static GTFS feed meets every rule in its specifica
 
 ## Get started
 
-Node-GTFS supports Node.js 22.18+ (22.x), 24, or 26+.
+Node-GTFS supports Node.js 24.22.3 or above.
 Install [Node.js](https://nodejs.org/), then try importing
 [Caltrain’s public static GTFS feed](https://www.caltrain.com/developer-resources) - no
 account or API key is needed. In your terminal, run:

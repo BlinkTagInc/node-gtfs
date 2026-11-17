@@ -8,7 +8,7 @@ message alone.
 
 ## I cannot run the command or example
 
-- Check `node --version`: Node.js 22.18+ (22.x) or 24+ is required.
+- Check `node --version`: Node.js 24.22.3 or above is required.
 - For the CLI, install `gtfs` globally or use `npx gtfs` from a project where
   it is installed. Run `gtfs --help` to see available commands.
 - Save JavaScript examples as `.mjs`, or configure your project for ES modules.

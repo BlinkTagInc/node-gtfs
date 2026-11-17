@@ -11,7 +11,7 @@ credentials and private feed data out of issues. Report security concerns throug
 
 ## Getting set up
 
-Use the latest patch release of Node.js 22, 24, or 26 and the pnpm version pinned
+Use the latest patch release of Node.js 24 (24.22.3 or above) or 26 and the pnpm version pinned
 in `package.json`.
 
 After cloning your fork:
@@ -120,6 +120,6 @@ Explain the problem, what changed, and how you tested it. Note checks you could
 not run. Keep unrelated formatting and dependency updates out of the diff.
 Short, descriptive commit messages are sufficient; no special format is required.
 
-Before merging, check the full CI results, including Node.js 22/24/26, both
+Before merging, check the full CI results, including Node.js 24/26, both
 server databases, and packed-package compatibility. Version bumps, tags, and
 publishing are handled separately from ordinary contributions.

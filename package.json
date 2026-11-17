@@ -189,7 +189,7 @@
     "typescript": "7.1.0-beta"
   },
   "engines": {
-    "node": "^22.18.0 || >=24.0.0"
+    "node": ">=24.22.3"
   },
   "release-it": {
     "git": {
