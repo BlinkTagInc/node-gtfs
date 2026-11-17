@@ -1,6 +1,6 @@
 {
   "name": "gtfs",
-  "version": "4.21.0",
+  "version": "4.21.1",
   "description": "Import GTFS transit data into SQLite, PostgreSQL, or MySQL and query routes, stops, times and fares",
   "keywords": [
     "gtfs",
