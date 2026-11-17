@@ -14,3 +14,7 @@ config*.json
 
 # build files
 /dist
+
+# Local development artifacts shared across branches
+/internal/
+/scripts/benchmark/baseline/package-lock.json
