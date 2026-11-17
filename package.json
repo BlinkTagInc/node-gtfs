@@ -153,11 +153,11 @@
   },
   "dependencies": {
     "@turf/helpers": "7.4.0",
-    "better-sqlite3": "13.0.3",
+    "better-sqlite3": "13.2.0",
     "csv-parse": "7.0.3",
     "csv-stringify": "6.9.0",
-    "gtfs-realtime-bindings": "2.2.0",
-    "kysely": "0.29.8",
+    "gtfs-realtime-bindings": "3.0.0",
+    "kysely": "0.29.9",
     "lodash-es": "4.18.1",
     "sanitize-filename": "1.6.5",
     "yauzl": "3.4.0",
@@ -176,13 +176,13 @@
     "fast-check": "4.10.2",
     "github-slugger": "2.0.0",
     "husky": "9.1.7",
-    "lint-staged": "17.6.0",
+    "lint-staged": "17.6.1",
     "markdown-it": "15.0.3",
     "mysql2": "3.24.6",
-    "oxlint": "1.93.0",
+    "oxlint": "1.94.0",
     "pg": "8.23.1",
     "pg-cursor": "2.22.1",
-    "prettier": "3.9.10",
+    "prettier": "3.10.1",
     "publint": "^0.3.25",
     "release-it": "^21.1.2",
     "tsdown": "0.23.7",
@@ -240,5 +240,5 @@
     ],
     "*.{json,jsonc,md,yml,yaml}": "prettier --write"
   },
-  "packageManager": "pnpm@12.18.0"
+  "packageManager": "pnpm@12.21.0"
 }

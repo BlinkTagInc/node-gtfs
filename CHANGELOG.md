@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove source_id from geojson
 - Remove GTFS+ properties from geojson
 
+### Updated
+
+- Dependency updates
+
 ## [5.0.0-beta.0] - 2026-11-10
 
 > [!WARNING]
