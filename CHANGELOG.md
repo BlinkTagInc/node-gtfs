@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Require Node.js 24.22.3 or above
 
+### Updated
+
+- Dependency updates
+
 ## [5.0.0-beta.1] - 2026-11-16
 
 ### Changed
