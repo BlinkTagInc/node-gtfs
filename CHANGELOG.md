@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0-beta.2] - 2026-11-22
+
 ### Changed
 
 - Require Node.js 24.22.3 or above
@@ -1427,6 +1429,7 @@ Or, you use async/await:
       }
     }
 
-[Unreleased]: https://github.com/BlinkTagInc/node-gtfs/compare/5.0.0-beta.1...main
+[Unreleased]: https://github.com/BlinkTagInc/node-gtfs/compare/5.0.0-beta.2...main
+[5.0.0-beta.2]: https://github.com/BlinkTagInc/node-gtfs/compare/5.0.0-beta.1...5.0.0-beta.2
 [5.0.0-beta.1]: https://github.com/BlinkTagInc/node-gtfs/compare/5.0.0-beta.0...5.0.0-beta.1
 [5.0.0-beta.0]: https://github.com/BlinkTagInc/node-gtfs/compare/4.21.0...5.0.0-beta.0

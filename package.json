@@ -1,6 +1,6 @@
 {
   "name": "gtfs",
-  "version": "5.0.0-beta.1",
+  "version": "5.0.0-beta.2",
   "description": "Import, validate, query, and export GTFS Schedule and Realtime data with SQLite, PostgreSQL, and MySQL.",
   "keywords": [
     "gtfs",
